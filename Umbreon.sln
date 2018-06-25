@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbreon", "Umbreon\Umbreon.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Addons.Interactive", "..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj", "{B8751A76-82E8-4033-AC13-2FEDF2CF9236}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Helpers", "..\Discord.Net.Helpers\Discord.Net.Helpers\Discord.Net.Helpers.csproj", "{5FFEDB34-1378-460A-A6E5-C9B53018D592}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B8751A76-82E8-4033-AC13-2FEDF2CF9236}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8751A76-82E8-4033-AC13-2FEDF2CF9236}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8751A76-82E8-4033-AC13-2FEDF2CF9236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FFEDB34-1378-460A-A6E5-C9B53018D592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FFEDB34-1378-460A-A6E5-C9B53018D592}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FFEDB34-1378-460A-A6E5-C9B53018D592}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FFEDB34-1378-460A-A6E5-C9B53018D592}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

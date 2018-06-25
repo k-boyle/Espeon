@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj" />
+    <ProjectReference Include="..\..\Discord.Net.Helpers\Discord.Net.Helpers\Discord.Net.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

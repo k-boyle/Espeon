@@ -15,6 +15,13 @@ namespace Umbreon.Services
             _database = database;
         }
 
+        public void UseTag(ICommandContext context, string tagName)
+        {
+            var guild = _database.GetGuild(context);
+            guild.Tags.Find(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)).Uses++;
+            _database.UpdateGuild(guild);
+        }
+
         public void CreateTag(ICommandContext context, string tagName, string tagValue)
         {
             var newTag = new Tag
@@ -32,10 +39,17 @@ namespace Umbreon.Services
 
         public void UpdateTag(ICommandContext context, string tagName, string tagValue)
         {
+            var guild = _database.GetGuild(context);
+            guild.Tags.Find(x => x.TagName == tagName).TagValue = tagValue;
+            _database.UpdateGuild(guild);
+        }
+
+        public void DeleteTag(ICommandContext context, string tagName)
+        {
             var targetTag = GetTags(context).FirstOrDefault(x =>
                 string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
             var guild = _database.GetGuild(context);
-            guild.Tags.Find(x => x.TagName == targetTag.TagName).TagValue = tagValue;
+            guild.Tags.Remove(targetTag);
             _database.UpdateGuild(guild);
         }
 

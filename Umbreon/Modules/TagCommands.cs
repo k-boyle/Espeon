@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -31,6 +32,20 @@ namespace Umbreon.Modules
             var totalTags = levenTags.Concat(containsTags);
             await Message.SendMessageAsync(Context, "Tag not found did you mean?\n" +
                                                      $"{string.Join("\n", totalTags.Select(x => x.TagName))}");
+        }
+
+        [Command("List"), Priority(1)]
+        public async Task ListTags()
+        {
+            var assortedTags = new List<string>();
+            var iterations = CurrentTags.Count();
+            var count = 0;
+            while (iterations > 0)
+            {
+                assortedTags.Add(string.Join("\n", CurrentTags.Select(x => $"{x.TagName}"), count, count + 10));
+                iterations -= 10;
+                count += 10;
+            }
         }
 
         [Group("Create")]
@@ -125,6 +140,41 @@ namespace Umbreon.Modules
                 }
 
                 await Message.SendMessageAsync(Context, "Tag not found");
+            }
+        }
+
+        [Group("Delete")]
+        public class DeleteTag : TagCommands
+        {
+            [Command, Priority(1)]
+            public async Task Delete()
+            {
+                await Message.SendMessageAsync(Context, "Which tag do you want to delete? [reply with `cancel` to cancel modification]");
+                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+                var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, reply.Content, StringComparison.CurrentCultureIgnoreCase));
+                if (targetTag != null)
+                {
+                    Tags.DeleteTag(Context, reply.Content);
+                    await Message.SendMessageAsync(Context, "Tag has been deleted");
+                    return;
+                }
+
+                await Message.SendMessageAsync(Context, "Tag was not found");
+            }
+
+            [Command, Priority(1)]
+            public async Task Delete([Remainder] string tagName)
+            {
+                var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
+                if (targetTag != null)
+                {
+                    Tags.DeleteTag(Context, targetTag.TagName);
+                    await Message.SendMessageAsync(Context, "Tag has been deleted");
+                    return;
+                }
+
+                await Message.SendMessageAsync(Context, "Tag was not found");
             }
         }
     }
