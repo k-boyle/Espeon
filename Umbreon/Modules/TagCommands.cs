@@ -37,15 +37,8 @@ namespace Umbreon.Modules
         [Command("List"), Priority(1)]
         public async Task ListTags()
         {
-            var assortedTags = new List<string>();
-            var iterations = CurrentTags.Count();
-            var count = 0;
-            while (iterations > 0)
-            {
-                assortedTags.Add(string.Join("\n", CurrentTags.Select(x => $"{x.TagName}"), count, count + 10));
-                iterations -= 10;
-                count += 10;
-            }
+            var chunks = CurrentTags.Chunk(10);
+
         }
 
         [Group("Create")]
@@ -96,6 +89,11 @@ namespace Umbreon.Modules
                 var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, reply.Content, StringComparison.CurrentCultureIgnoreCase));
                 if (targetTag != null)
                 {
+                    if(targetTag.TagOwner != Context.User.Id)
+                    {
+                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        return;
+                    }
                     await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
                     reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                     if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
@@ -115,6 +113,11 @@ namespace Umbreon.Modules
                     string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
                 if (targetTag != null)
                 {
+                    if (targetTag.TagOwner != Context.User.Id)
+                    {
+                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        return;
+                    }
                     await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
                     var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                     if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
@@ -134,6 +137,11 @@ namespace Umbreon.Modules
                     string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
                 if (targetTag != null)
                 {
+                    if (targetTag.TagOwner != Context.User.Id)
+                    {
+                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        return;
+                    }
                     Tags.UpdateTag(Context, targetTag.TagName, tagValue);
                     await Message.SendMessageAsync(Context, "Tag has been modified");
                     return;
@@ -155,6 +163,11 @@ namespace Umbreon.Modules
                 var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, reply.Content, StringComparison.CurrentCultureIgnoreCase));
                 if (targetTag != null)
                 {
+                    if (targetTag.TagOwner != Context.User.Id)
+                    {
+                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        return;
+                    }
                     Tags.DeleteTag(Context, reply.Content);
                     await Message.SendMessageAsync(Context, "Tag has been deleted");
                     return;
@@ -169,6 +182,11 @@ namespace Umbreon.Modules
                 var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
                 if (targetTag != null)
                 {
+                    if (targetTag.TagOwner != Context.User.Id)
+                    {
+                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        return;
+                    }
                     Tags.DeleteTag(Context, targetTag.TagName);
                     await Message.SendMessageAsync(Context, "Tag has been deleted");
                     return;
