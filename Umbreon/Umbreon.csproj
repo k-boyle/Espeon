@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net.Commands" Version="2.0.0-beta2-00969" />
+    <PackageReference Include="Discord.Net.Core" Version="2.0.0-beta2-00969" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.0.0-beta2-00969" />
+    <PackageReference Include="LiteDB" Version="4.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj" />
+  </ItemGroup>
+
+</Project>

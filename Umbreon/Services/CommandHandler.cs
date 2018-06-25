@@ -1,0 +1,45 @@
+﻿using Discord.Commands;
+using Discord.WebSocket;
+using System;
+using System.Threading.Tasks;
+using Umbreon.Core.Extensions;
+using Discord;
+
+namespace Umbreon.Services
+{
+    public class CommandHandler
+    {
+        private readonly DiscordSocketClient _client;
+        private readonly CommandService _commands;
+        private readonly DatabaseService _database;
+        private readonly MessageService _message;
+        private readonly IServiceProvider _services;
+
+        public CommandHandler(DiscordSocketClient client, CommandService commands, DatabaseService database, MessageService message, IServiceProvider services)
+        {
+            _client = client;
+            _commands = commands;
+            _database = database;
+            _message = message;
+            _services = services;
+        }
+
+        public async Task HandleMessageAsync(SocketMessage msg)
+        {
+            if (msg is SocketUserMessage message)
+            {
+                if (message.Channel is IDMChannel || message.Author.IsBot || message.Author.IsWebhook) return;
+                {
+                    var context = new GuildCommandContext(_client, message);
+                    _message.SetCurrentMessage(message.Id);
+                    var guild = _database.GetGuild(context);
+                    var argPos = 0;
+                    if (message.HasStringPrefix(guild.Prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                    {
+                        var result = await _commands.ExecuteAsync(context, argPos, _services);
+                    }
+                }
+            }
+        }
+    }
+}
