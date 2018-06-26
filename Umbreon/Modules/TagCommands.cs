@@ -1,8 +1,11 @@
 ﻿using Discord.Commands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Addons.Interactive;
+using Discord.Net.Helpers;
+using MoreLinq;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Extensions;
@@ -37,8 +40,20 @@ namespace Umbreon.Modules
         [Command("List"), Priority(1)]
         public async Task ListTags()
         {
-            var chunks = CurrentTags.Chunk(10);
-
+            var pages = CurrentTags.Select(x => x.TagName).Batch(10).Select(y => string.Join("\n", y));
+            var paginator = new PaginatedMessage
+            {
+                Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = Context.User.GetAvatarOrDefaultUrl(),
+                    Name = Context.User.GetDisplayName()
+                },
+                Color = Color.DarkPurple,
+                Title = "Available tags for this server",
+                Options = PaginatedAppearanceOptions.Default,
+                Pages = pages
+            };
+            await Message.SendMessageAsync(Context, null, paginator: paginator);
         }
 
         [Group("Create")]

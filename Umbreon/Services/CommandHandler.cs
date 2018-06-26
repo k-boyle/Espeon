@@ -31,6 +31,7 @@ namespace Umbreon.Services
                 if (message.Channel is IDMChannel || message.Author.IsBot || message.Author.IsWebhook) return;
                 {
                     var context = new GuildCommandContext(_client, message);
+                    if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
                     _message.SetCurrentMessage(message.Id);
                     var guild = _database.GetGuild(context);
                     var argPos = 0;

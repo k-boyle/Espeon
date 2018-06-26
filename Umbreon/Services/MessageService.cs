@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
 using Umbreon.Core.Extensions;
 using Discord.WebSocket;
 
@@ -11,10 +12,16 @@ namespace Umbreon.Services
 {
     public class MessageService
     {
+        private readonly InteractiveService _interactive;
         private readonly List<MessageModel> _messages = new List<MessageModel>();
         private ulong _currentMessage;
 
-        public async Task<IMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null)
+        public MessageService(InteractiveService interactive)
+        {
+            _interactive = interactive;
+        }
+
+        public async Task<IMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, PaginatedMessage paginator = null)
         {
             CleanseOldMessages();
             if (_messages.Any(x => x.ExecutingMessageId == _currentMessage))
@@ -31,7 +38,7 @@ namespace Umbreon.Services
                 return retrievedMessage;
             }
 
-            var sentMessage = await context.Channel.SendMessageAsync(message, embed: embed);
+            var sentMessage = paginator is null ? await context.Channel.SendMessageAsync(message, embed: embed) : await _interactive.SendPaginatedMessageAsync(context, paginator);
             var newMessage = new MessageModel(_currentMessage, context.User.Id, context.Channel.Id, sentMessage.Id, sentMessage.CreatedAt);
             _messages.Add(newMessage);
             return sentMessage;
