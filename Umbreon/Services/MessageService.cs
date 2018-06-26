@@ -30,11 +30,23 @@ namespace Umbreon.Services
                 var retrievedMessage = (context.Channel as SocketTextChannel).GetCachedMessage(targetMessage.MessageId) ??
                                        await context.Channel.GetMessageAsync(targetMessage.MessageId);
                 if (retrievedMessage is null) return null;
-                await (retrievedMessage as IUserMessage).ModifyAsync(x =>
+                if (paginator is null)
                 {
-                    x.Content = message;
-                    x.Embed = embed;
-                });
+                    if ((await context.Guild.GetCurrentUserAsync()).GetPermissions(context.Channel as SocketGuildChannel)
+                        .ManageMessages)
+                        await (retrievedMessage as SocketUserMessage).RemoveAllReactionsAsync();
+                    await (retrievedMessage as IUserMessage).ModifyAsync(x =>
+                    {
+                        x.Content = message;
+                        x.Embed = embed;
+                    });
+                }
+                else
+                {
+                    await retrievedMessage.DeleteAsync();
+                    return await _interactive.SendPaginatedMessageAsync(context, paginator);
+                }
+
                 return retrievedMessage;
             }
 
