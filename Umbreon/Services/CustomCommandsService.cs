@@ -43,7 +43,7 @@ namespace Umbreon.Services
             {
                 module.WithName("Custom Commands");
                 module.AddAliases("");
-                module.AddAttributes(new RequireGuild(guildId));
+                module.AddPrecondition(new RequireGuild(guildId));
 
                 foreach (var cmd in cmds)
                 {
@@ -78,6 +78,15 @@ namespace Umbreon.Services
             guild.CustomCommands.Add(newCmd);
             _database.UpdateGuild(guild);
             await CreateNewCmd(context.Guild.Id);
+        }
+
+        public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
+        {
+            var guild = _database.GetGuild(context);
+            guild.CustomCommands
+                .Find(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase))
+                .CommandValue = newValue;
+            _database.UpdateGuild(guild);
         }
 
         public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)

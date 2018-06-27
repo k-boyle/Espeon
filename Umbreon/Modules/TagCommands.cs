@@ -56,6 +56,11 @@ namespace Umbreon.Modules
         [Usage("tag list")]
         public async Task ListTags()
         {
+            if (!CurrentTags.Any())
+            {
+                await Message.SendMessageAsync(Context, "There are no tags for this server currently");
+                return;
+            }
             var pages = CurrentTags.Select(x => x.TagName).Batch(10).Select(y => string.Join("\n", y));
             var paginator = new PaginatedMessage
             {
@@ -155,8 +160,7 @@ namespace Umbreon.Modules
             [Usage("tag create ServerInfo")]
             public async Task Create(
                 [Name("Tag Name")]
-                [Summary("The name of the tag that you want to create")]
-                [Remainder]string tagName)
+                [Summary("The name of the tag that you want to create")]string tagName)
             {
                 if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
                 {
