@@ -2,11 +2,13 @@
 {
     public enum Module
     {
-        Tags
+        Tags,
+        Commands
     }
 
     public enum LogSource
     {
-        Database
+        Database,
+        CustomCmds
     }
 }

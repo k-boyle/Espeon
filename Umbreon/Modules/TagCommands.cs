@@ -1,11 +1,12 @@
-﻿using Discord.Commands;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Addons.Interactive;
+using Discord.Commands;
 using Discord.Net.Helpers;
 using MoreLinq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Extensions;
@@ -33,8 +34,7 @@ namespace Umbreon.Modules
             [Summary("The name of the tag you want to fetch")]
             [Remainder] string tagName)
         {
-            var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
-            if (targetTag != null)
+            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
             {
                 Tags.UseTag(Context, targetTag.TagName);
                 await Message.SendMessageAsync(Context, targetTag.TagValue);
@@ -70,6 +70,46 @@ namespace Umbreon.Modules
                 Pages = pages
             };
             await Message.SendMessageAsync(Context, null, paginator: paginator);
+        }
+
+        [Command("Info")]
+        [Name("Tag Info")]
+        [Priority(1)]
+        [Summary("Get info on the specified tag")]
+        [Usage("tag info ServerInfo")]
+        public async Task GetInfo(
+            [Name("Tag Name")]
+            [Summary("The tag you want to get info on")]
+            [Remainder]string tagName)
+        {
+            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            {
+                var user = Context.Guild.GetUser(targetTag.TagOwner);
+                await Message.SendMessageAsync(Context, string.Empty, new EmbedBuilder
+                {
+                    Title = $"{targetTag.TagName} info",
+                    Author = new EmbedAuthorBuilder
+                    {
+                        IconUrl = user.GetDefaultAvatarUrl(),
+                        Name = user.GetDisplayName()
+                    },
+                    Color = Color.Blue,
+                    Fields = new List<EmbedFieldBuilder>
+                    {
+                        new EmbedFieldBuilder
+                        {
+                            Name = targetTag.TagName,
+                            Value = $"**Tag Uses**: {targetTag.Uses}\n" +
+                                    $"**Created At**: {targetTag.CreatedAt}\n" +
+                                    $"**Created By**: {user.GetDisplayName()}\n" +
+                                    $"**Is Claimable**? {user is null}"
+                        }
+                    }
+                }.Build());
+                return;
+            }
+
+            await Message.SendMessageAsync(Context, "Tag not found");
         }
 
         [Group("Create")]
@@ -112,7 +152,7 @@ namespace Umbreon.Modules
             [Name("Create Tag")]
             [Priority(1)]
             [Summary("Creates a tag with the specified name")]
-            [Usage("tag create")]
+            [Usage("tag create ServerInfo")]
             public async Task Create(
                 [Name("Tag Name")]
                 [Summary("The name of the tag that you want to create")]
@@ -142,7 +182,7 @@ namespace Umbreon.Modules
             [Name("Create Tag")]
             [Priority(1)]
             [Summary("Creates a tag with the pass parameters")]
-            [Usage("tag create")]
+            [Usage("tag create ServerInfo This is my server it is for Umbreon")]
             public async Task Create(
                 [Name("Tag Name")]
                 [Summary("The name of the tag you want to create")]
@@ -183,10 +223,10 @@ namespace Umbreon.Modules
                 await Message.SendMessageAsync(Context, "Which tag do you want to edit? [reply with `cancel` to cancel modification]");
                 var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, reply.Content, StringComparison.CurrentCultureIgnoreCase));
-                if (targetTag != null)
+
+                if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
                 {
-                    if(targetTag.TagOwner != Context.User.Id)
+                    if (targetTag.TagOwner != Context.User.Id)
                     {
                         await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
                         return;
@@ -207,15 +247,13 @@ namespace Umbreon.Modules
             [Name("Modify Tag")]
             [Priority(1)]
             [Summary("Modify the specified tag name")]
-            [Usage("tag modify")]
+            [Usage("tag modify ServerInfo")]
             public async Task Modify(
                 [Name("Tag Name")]
                 [Summary("The tag you wanna modify")]
                 [Remainder]string tagName)
             {
-                var targetTag = CurrentTags.FirstOrDefault(x =>
-                    string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
-                if (targetTag != null)
+                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
                 {
                     if (targetTag.TagOwner != Context.User.Id)
                     {
@@ -238,7 +276,7 @@ namespace Umbreon.Modules
             [Name("Modify Tag")]
             [Priority(1)]
             [Summary("Modify the specified tag with the given value")]
-            [Usage("tag modify")]
+            [Usage("tag modify ServerInfo Umbreon is the greatest bot")]
             public async Task Modify(
                 [Name("Tag Name")]
                 [Summary("The name of the tag you want to modify")]
@@ -247,9 +285,7 @@ namespace Umbreon.Modules
                 [Summary("The new value that you want the tag to have")]
                 [Remainder] string tagValue)
             {
-                var targetTag = CurrentTags.FirstOrDefault(x =>
-                    string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
-                if (targetTag != null)
+                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
                 {
                     if (targetTag.TagOwner != Context.User.Id)
                     {
@@ -280,12 +316,12 @@ namespace Umbreon.Modules
                 await Message.SendMessageAsync(Context, "Which tag do you want to delete? [reply with `cancel` to cancel modification]");
                 var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, reply.Content, StringComparison.CurrentCultureIgnoreCase));
-                if (targetTag != null)
+
+                if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
                 {
                     if (targetTag.TagOwner != Context.User.Id)
                     {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
                         return;
                     }
                     Tags.DeleteTag(Context, reply.Content);
@@ -300,18 +336,17 @@ namespace Umbreon.Modules
             [Priority(1)]
             [Name("Delete Tag")]
             [Summary("Delete the specified tag")]
-            [Usage("tag delete")]
+            [Usage("tag delete ServerInfo")]
             public async Task Delete(
                 [Name("Tag Name")]
                 [Summary("The name of the tag you want to delete")]
                 [Remainder] string tagName)
             {
-                var targetTag = CurrentTags.FirstOrDefault(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
-                if (targetTag != null)
+                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
                 {
                     if (targetTag.TagOwner != Context.User.Id)
                     {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                        await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
                         return;
                     }
                     Tags.DeleteTag(Context, targetTag.TagName);

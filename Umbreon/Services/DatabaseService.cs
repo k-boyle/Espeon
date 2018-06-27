@@ -79,8 +79,11 @@ namespace Umbreon.Services
         }
 
         public GuildObject GetGuild(ICommandContext context)
+            => GetGuild(context.Guild.Id);
+
+        public GuildObject GetGuild(ulong guildId)
         {
-            return _guilds[context.Guild.Id];
+            return _guilds[guildId];
         }
 
         public void UpdateGuild(GuildObject guild)

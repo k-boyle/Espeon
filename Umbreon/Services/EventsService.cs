@@ -1,7 +1,7 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Umbreon.Services
 {
@@ -12,14 +12,16 @@ namespace Umbreon.Services
         private readonly DatabaseService _database;
         private readonly LogService _logs;
         private readonly CommandHandler _handler;
+        private readonly CustomCommandsService _customCommands;
 
-        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, CommandHandler handler)
+        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, CommandHandler handler, CustomCommandsService customCommands)
         {
             _client = client;
             _commands = commands;
             _database = database;
             _logs = logs;
             _handler = handler;
+            _customCommands = customCommands;
         }
 
         public void HookEvents()
@@ -36,10 +38,10 @@ namespace Umbreon.Services
             await _handler.HandleMessageAsync(arg2);
         }
 
-        private Task ClientReady()
+        private async Task ClientReady()
         {
             _database.LoadGuilds();
-            return Task.CompletedTask;
+            await _customCommands.LoadCmds(_client);
         }
     }
 }

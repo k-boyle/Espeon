@@ -32,6 +32,7 @@ namespace Umbreon.Core
                 .AddSingleton<MessageService>()
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<TagService>()
+                .AddSingleton<CustomCommandsService>()
                 .BuildServiceProvider();
 
             await services.GetService<StartupService>().InitialiseAsync();

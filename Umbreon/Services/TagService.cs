@@ -57,5 +57,12 @@ namespace Umbreon.Services
         {
             return _database.GetGuild(context).Tags;
         }
+
+        public bool TryParse(IEnumerable<Tag> tags, string tagName, out Tag tag)
+        {
+            tag = tags.FirstOrDefault(x =>
+                string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
+            return !(tag is null);
+        }
     }
 }
