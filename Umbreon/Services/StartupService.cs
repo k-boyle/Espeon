@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Helpers;
 using Discord;
+using Umbreon.TypeReaders;
 
 namespace Umbreon.Services
 {
@@ -42,6 +43,8 @@ namespace Umbreon.Services
 
         private async Task LoadCommands()
         {
+            _commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
+            _commands.AddTypeReader(typeof(CommandInfo), new CommandInfoTypeReader());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }

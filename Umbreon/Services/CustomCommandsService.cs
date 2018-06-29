@@ -41,9 +41,10 @@ namespace Umbreon.Services
             var cmds = GetCmds(guildId);
             await _commandService.CreateModuleAsync(guildId.ToString(), module =>
             {
-                module.WithName("Custom Commands");
+                module.WithName(guildId.ToString());
                 module.AddAliases("");
                 module.AddPrecondition(new RequireGuild(guildId));
+                module.WithSummary("The custom commands for this server");
 
                 foreach (var cmd in cmds)
                 {
@@ -87,6 +88,14 @@ namespace Umbreon.Services
                 .Find(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase))
                 .CommandValue = newValue;
             _database.UpdateGuild(guild);
+        }
+
+
+        // TODO
+        public async Task RemoveCmd(ICommandContext context, string cmdName)
+        {
+            var guild = _database.GetGuild(context);
+
         }
 
         public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)

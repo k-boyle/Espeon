@@ -2,13 +2,14 @@
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Umbreon.Core.Extensions
+namespace Umbreon.Modules.Contexts
 {
     public class GuildCommandContext : ICommandContext
     {
         public DiscordSocketClient Client { get; }
         public SocketGuild Guild { get; }
         public SocketGuildChannel Channel { get; }
+        public SocketTextChannel Textchannel { get; }
         public SocketGuildUser User { get; }
         public SocketUserMessage Message { get; }
 
@@ -17,6 +18,7 @@ namespace Umbreon.Core.Extensions
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
             Channel = msg.Channel as SocketGuildChannel;
+            Textchannel = Channel as SocketTextChannel;
             User = msg.Author as SocketGuildUser;
             Message = msg;
         }

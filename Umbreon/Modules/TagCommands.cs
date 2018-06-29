@@ -9,10 +9,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
-using Umbreon.Core.Extensions;
 using Umbreon.Helpers;
+using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+
+// TODO tag claiming, searching and mod stuff
 
 namespace Umbreon.Modules
 {
@@ -20,8 +22,8 @@ namespace Umbreon.Modules
     [Name("Tag Commands")]
     [RequireEnabled]
     [ModuleType(Module.Tags)]
-    [Summary("Allows all users to create tags for the server. Unlike custom commands these have to be prefix'd with tag")]
-    [@Remarks("This module can be disabled", "Module Code: Tags")]
+    [Summary("Allows all users to create tags for the server")]
+    [@Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
     public class TagCommands : TagBase<GuildCommandContext>
     {
         [Command]
@@ -116,250 +118,232 @@ namespace Umbreon.Modules
 
             await Message.SendMessageAsync(Context, "Tag not found");
         }
-
-        [Group("Create")]
-        [Name("Create Tags")]
-        [Summary("Create a custom tag for the server")]
-        public class CreateTag : TagCommands
+        [Command("Create", RunMode = RunMode.Async)]
+        [Name("Create Tag")]
+        [Priority(1)]
+        [Summary("Starts the create tag process")]
+        [Usage("tag create")]
+        public async Task Create()
         {
-            [Command(RunMode = RunMode.Async)]
-            [Name("Create Tag")]
-            [Priority(1)]
-            [Summary("Starts the create tag process")]
-            [Usage("tag create")]
-            public async Task Create()
+            await Message.SendMessageAsync(Context, "What do you want the tag to be called? [reply with `cancel` to cancel creation]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            var tagName = reply.Content;
+            if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "What do you want the tag to be called? [reply with `cancel` to cancel creation]");
-                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var tagName = reply.Content;
-                if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This tag already exists");
-                    return;
-                }
-
-                if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
-                    return;
-                }
-
-                await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
-                reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var tagValue = reply.Content;
-                Tags.CreateTag(Context, tagName, tagValue);
-                await Message.SendMessageAsync(Context, "Tag has been created");
+                await Message.SendMessageAsync(Context, "This tag already exists");
+                return;
             }
 
-            [Command(RunMode = RunMode.Async)]
-            [Name("Create Tag")]
-            [Priority(1)]
-            [Summary("Creates a tag with the specified name")]
-            [Usage("tag create ServerInfo")]
-            public async Task Create(
-                [Name("Tag Name")]
+            if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                return;
+            }
+
+            await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
+            reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            var tagValue = reply.Content;
+            Tags.CreateTag(Context, tagName, tagValue);
+            await Message.SendMessageAsync(Context, "Tag has been created");
+        }
+
+        [Command("Create", RunMode = RunMode.Async)]
+        [Name("Create Tag")]
+        [Priority(1)]
+        [Summary("Creates a tag with the specified name")]
+        [Usage("tag create ServerInfo")]
+        public async Task Create(
+            [Name("Tag Name")]
                 [Summary("The name of the tag that you want to create")]string tagName)
+        {
+            if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This tag already exists");
-                    return;
-                }
-
-                if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
-                    return;
-                }
-
-                await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
-                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var tagValue = reply.Content;
-                Tags.CreateTag(Context, tagName, tagValue);
-                await Message.SendMessageAsync(Context, "Tag has been created");
+                await Message.SendMessageAsync(Context, "This tag already exists");
+                return;
             }
 
-            [Command]
-            [Name("Create Tag")]
-            [Priority(1)]
-            [Summary("Creates a tag with the pass parameters")]
-            [Usage("tag create ServerInfo This is my server it is for Umbreon")]
-            public async Task Create(
-                [Name("Tag Name")]
+            if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                return;
+            }
+
+            await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            var tagValue = reply.Content;
+            Tags.CreateTag(Context, tagName, tagValue);
+            await Message.SendMessageAsync(Context, "Tag has been created");
+        }
+
+        [Command("Create")]
+        [Name("Create Tag")]
+        [Priority(1)]
+        [Summary("Creates a tag with the pass parameters")]
+        [Usage("tag create ServerInfo This is my server it is for Umbreon")]
+        public async Task Create(
+            [Name("Tag Name")]
                 [Summary("The name of the tag you want to create")]
-                string tagName, 
-                [Name("Tag Value")]
+                string tagName,
+            [Name("Tag Value")]
                 [Summary("The response you want from the tag")]
                 [Remainder] string tagValue)
+        {
+            if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This tag already exists");
-                    return;
-                }
-
-                if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
-                    return;
-                }
-
-                Tags.CreateTag(Context, tagName, tagValue);
-                await Message.SendMessageAsync(Context, "Tag has been created");
+                await Message.SendMessageAsync(Context, "This tag already exists");
+                return;
             }
+
+            if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                return;
+            }
+
+            Tags.CreateTag(Context, tagName, tagValue);
+            await Message.SendMessageAsync(Context, "Tag has been created");
         }
 
-        [Group("Modify")]
-        [Name("Modify Tags")]
-        [Summary("Modify one of your tags")]
-        public class ModifyTag : TagCommands
+        [Command("Modify", RunMode = RunMode.Async)]
+        [Name("Modify Tag")]
+        [Priority(1)]
+        [Summary("Starts the tag modification process")]
+        [Usage("tag modify")]
+        public async Task Modify()
         {
-            [Command(RunMode = RunMode.Async)]
-            [Name("Modify Tag")]
-            [Priority(1)]
-            [Summary("Starts the tag modification process")]
-            [Usage("tag modify")]
-            public async Task Modify()
-            {
-                await Message.SendMessageAsync(Context, "Which tag do you want to edit? [reply with `cancel` to cancel modification]");
-                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            await Message.SendMessageAsync(Context, "Which tag do you want to edit? [reply with `cancel` to cancel modification]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-                if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
+            if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
+            {
+                if (targetTag.TagOwner != Context.User.Id)
                 {
-                    if (targetTag.TagOwner != Context.User.Id)
-                    {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
-                        return;
-                    }
-                    await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
-                    reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                    if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                    var newValue = reply.Content;
-                    Tags.UpdateTag(Context, targetTag.TagName, newValue);
-                    await Message.SendMessageAsync(Context, "Tag has been modified");
+                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
                     return;
                 }
-
-                await Message.SendMessageAsync(Context, "Tag was not found");
+                await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
+                reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+                var newValue = reply.Content;
+                Tags.UpdateTag(Context, targetTag.TagName, newValue);
+                await Message.SendMessageAsync(Context, "Tag has been modified");
+                return;
             }
 
-            [Command(RunMode = RunMode.Async)]
-            [Name("Modify Tag")]
-            [Priority(1)]
-            [Summary("Modify the specified tag name")]
-            [Usage("tag modify ServerInfo")]
-            public async Task Modify(
-                [Name("Tag Name")]
+            await Message.SendMessageAsync(Context, "Tag was not found");
+        }
+
+        [Command("Modify", RunMode = RunMode.Async)]
+        [Name("Modify Tag")]
+        [Priority(1)]
+        [Summary("Modify the specified tag name")]
+        [Usage("tag modify ServerInfo")]
+        public async Task Modify(
+            [Name("Tag Name")]
                 [Summary("The tag you wanna modify")]
                 [Remainder]string tagName)
-            {
-                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
-                {
-                    if (targetTag.TagOwner != Context.User.Id)
-                    {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
-                        return;
-                    }
-                    await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
-                    var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                    if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                    var newValue = reply.Content;
-                    Tags.UpdateTag(Context, targetTag.TagName, newValue);
-                    await Message.SendMessageAsync(Context, "Tag has been modified");
-                    return;
-                }
-
-                await Message.SendMessageAsync(Context, "Tag not found");
-            }
-
-            [Command]
-            [Name("Modify Tag")]
-            [Priority(1)]
-            [Summary("Modify the specified tag with the given value")]
-            [Usage("tag modify ServerInfo Umbreon is the greatest bot")]
-            public async Task Modify(
-                [Name("Tag Name")]
-                [Summary("The name of the tag you want to modify")]
-                string tagName, 
-                [Name("Tag Value")]
-                [Summary("The new value that you want the tag to have")]
-                [Remainder] string tagValue)
-            {
-                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
-                {
-                    if (targetTag.TagOwner != Context.User.Id)
-                    {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
-                        return;
-                    }
-                    Tags.UpdateTag(Context, targetTag.TagName, tagValue);
-                    await Message.SendMessageAsync(Context, "Tag has been modified");
-                    return;
-                }
-
-                await Message.SendMessageAsync(Context, "Tag not found");
-            }
-        }
-
-        [Group("Delete")]
-        [Name("Delete Tag")]
-        [Summary("Delete one of your tags")]
-        public class DeleteTag : TagCommands
         {
-            [Command(RunMode = RunMode.Async)]
-            [Priority(1)]
-            [Name("Delete Tag")]
-            [Summary("Start the tag deleted process")]
-            [Usage("tag delete")]
-            public async Task Delete()
+            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
             {
-                await Message.SendMessageAsync(Context, "Which tag do you want to delete? [reply with `cancel` to cancel modification]");
+                if (targetTag.TagOwner != Context.User.Id)
+                {
+                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                    return;
+                }
+                await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-
-                if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
-                {
-                    if (targetTag.TagOwner != Context.User.Id)
-                    {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
-                        return;
-                    }
-                    Tags.DeleteTag(Context, reply.Content);
-                    await Message.SendMessageAsync(Context, "Tag has been deleted");
-                    return;
-                }
-
-                await Message.SendMessageAsync(Context, "Tag was not found");
+                var newValue = reply.Content;
+                Tags.UpdateTag(Context, targetTag.TagName, newValue);
+                await Message.SendMessageAsync(Context, "Tag has been modified");
+                return;
             }
 
-            [Command]
-            [Priority(1)]
-            [Name("Delete Tag")]
-            [Summary("Delete the specified tag")]
-            [Usage("tag delete ServerInfo")]
-            public async Task Delete(
-                [Name("Tag Name")]
+            await Message.SendMessageAsync(Context, "Tag not found");
+        }
+
+        [Command("Modify")]
+        [Name("Modify Tag")]
+        [Priority(1)]
+        [Summary("Modify the specified tag with the given value")]
+        [Usage("tag modify ServerInfo Umbreon is the greatest bot")]
+        public async Task Modify(
+            [Name("Tag Name")]
+                [Summary("The name of the tag you want to modify")]
+                string tagName,
+            [Name("Tag Value")]
+                [Summary("The new value that you want the tag to have")]
+                [Remainder] string tagValue)
+        {
+            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            {
+                if (targetTag.TagOwner != Context.User.Id)
+                {
+                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                    return;
+                }
+                Tags.UpdateTag(Context, targetTag.TagName, tagValue);
+                await Message.SendMessageAsync(Context, "Tag has been modified");
+                return;
+            }
+
+            await Message.SendMessageAsync(Context, "Tag not found");
+        }
+
+        [Command("Delete", RunMode = RunMode.Async)]
+        [Priority(1)]
+        [Name("Delete Tag")]
+        [Summary("Start the tag deleted process")]
+        [Usage("tag delete")]
+        public async Task Delete()
+        {
+            await Message.SendMessageAsync(Context, "Which tag do you want to delete? [reply with `cancel` to cancel modification]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+
+            if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
+            {
+                if (targetTag.TagOwner != Context.User.Id)
+                {
+                    await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
+                    return;
+                }
+                Tags.DeleteTag(Context, reply.Content);
+                await Message.SendMessageAsync(Context, "Tag has been deleted");
+                return;
+            }
+
+            await Message.SendMessageAsync(Context, "Tag was not found");
+        }
+
+        [Command("Delete")]
+        [Priority(1)]
+        [Name("Delete Tag")]
+        [Summary("Delete the specified tag")]
+        [Usage("tag delete ServerInfo")]
+        public async Task Delete(
+            [Name("Tag Name")]
                 [Summary("The name of the tag you want to delete")]
                 [Remainder] string tagName)
+        {
+            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
             {
-                if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+                if (targetTag.TagOwner != Context.User.Id)
                 {
-                    if (targetTag.TagOwner != Context.User.Id)
-                    {
-                        await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
-                        return;
-                    }
-                    Tags.DeleteTag(Context, targetTag.TagName);
-                    await Message.SendMessageAsync(Context, "Tag has been deleted");
+                    await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
                     return;
                 }
-
-                await Message.SendMessageAsync(Context, "Tag was not found");
+                Tags.DeleteTag(Context, targetTag.TagName);
+                await Message.SendMessageAsync(Context, "Tag has been deleted");
+                return;
             }
+
+            await Message.SendMessageAsync(Context, "Tag was not found");
         }
+
     }
 }

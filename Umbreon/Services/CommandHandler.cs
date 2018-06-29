@@ -2,8 +2,8 @@
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
-using Umbreon.Core.Extensions;
 using Discord;
+using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services
 {
@@ -38,6 +38,8 @@ namespace Umbreon.Services
                     if (message.HasStringPrefix(guild.Prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                     {
                         var result = await _commands.ExecuteAsync(context, argPos, _services);
+                        if (!result.IsSuccess)
+                            await context.Textchannel.SendMessageAsync(result.ErrorReason);
                     }
                 }
             }

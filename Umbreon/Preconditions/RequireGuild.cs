@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
+using Umbreon.Results;
 
 namespace Umbreon.Preconditions
 {
@@ -15,7 +16,7 @@ namespace Umbreon.Preconditions
         {
             return context.Guild.Id == _guildId
                 ? Task.FromResult(PreconditionResult.FromSuccess())
-                : Task.FromResult(PreconditionResult.FromError(PreconditionResult.FromError("Command not found")));
+                : Task.FromResult(PreconditionResult.FromError(PreconditionResult.FromError(new WrongGuildResult("Unknown Command", false, CommandError.UnknownCommand))));
         }
     }
 }

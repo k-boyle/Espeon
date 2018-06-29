@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbreon.Core.Extensions
+namespace Umbreon.Core.Models
 {
     public class MessageModel
     {

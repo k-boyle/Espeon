@@ -1,12 +1,13 @@
 ﻿using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive;
-using Umbreon.Core.Extensions;
-using Discord.WebSocket;
+using Discord.Addons.Interactive.Interfaces;
+using Umbreon.Core.Models;
 
 namespace Umbreon.Services
 {
@@ -21,7 +22,7 @@ namespace Umbreon.Services
             _interactive = interactive;
         }
 
-        public async Task<IMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, PaginatedMessage paginator = null)
+        public async Task<IMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, IPaginatedMessage paginator = null)
         {
             CleanseOldMessages();
             if (_messages.Any(x => x.ExecutingMessageId == _currentMessage))
