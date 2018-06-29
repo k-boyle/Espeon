@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-using Discord.Addons.Interactive;
-using Discord.Commands;
+﻿using Discord.Commands;
+using System.Collections.Generic;
 using Umbreon.Core.Models.Database;
 using Umbreon.Services;
 
 namespace Umbreon.Modules.ModuleBases
 {
-    public class CustomCommandsBase<T> : InteractiveBase<T> where T : class, ICommandContext
+    public class CustomCommandsBase<T> : UmbreonBase<T> where T : class, ICommandContext
     {
-        public MessageService Message { get; set; }
         public CustomCommandsService Commands { get; set; }
         public IEnumerable<CustomCommand> CurrentCmds;
         public string[] ReservedWords = { "Create", "Modify", "Delete", "Cancel", "List"};

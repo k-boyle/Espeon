@@ -22,7 +22,7 @@ namespace Umbreon.Modules
     [Name("Tag Commands")]
     [RequireEnabled]
     [ModuleType(Module.Tags)]
-    [Summary("Allows all users to create tags for the server")]
+    [Summary("Create tags for your server")]
     [@Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
     public class TagCommands : TagBase<GuildCommandContext>
     {
@@ -39,14 +39,14 @@ namespace Umbreon.Modules
             if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
             {
                 Tags.UseTag(Context, targetTag.TagName);
-                await Message.SendMessageAsync(Context, targetTag.TagValue);
+                await SendMessageAsync(targetTag.TagValue);
                 return;
             }
 
             var levenTags = CurrentTags.Where(x => StringHelper.CalcLevenshteinDistance(x.TagName, tagName) < 5);
             var containsTags = CurrentTags.Where(x => x.TagName.Contains(tagName));
             var totalTags = levenTags.Concat(containsTags);
-            await Message.SendMessageAsync(Context, "Tag not found did you mean?\n" +
+            await SendMessageAsync("Tag not found did you mean?\n" +
                                                      $"{string.Join("\n", totalTags.Select(x => x.TagName))}");
         }
 
@@ -60,7 +60,7 @@ namespace Umbreon.Modules
         {
             if (!CurrentTags.Any())
             {
-                await Message.SendMessageAsync(Context, "There are no tags for this server currently");
+                await SendMessageAsync("There are no tags for this server currently");
                 return;
             }
             var pages = CurrentTags.Select(x => x.TagName).Batch(10).Select(y => string.Join("\n", y));
@@ -76,7 +76,7 @@ namespace Umbreon.Modules
                 Options = new PaginatedAppearanceOptions(),
                 Pages = pages
             };
-            await Message.SendMessageAsync(Context, null, paginator: paginator);
+            await SendMessageAsync(null, paginator: paginator);
         }
 
         [Command("Info")]
@@ -92,7 +92,7 @@ namespace Umbreon.Modules
             if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
             {
                 var user = Context.Guild.GetUser(targetTag.TagOwner);
-                await Message.SendMessageAsync(Context, string.Empty, new EmbedBuilder
+                await SendMessageAsync(string.Empty, new EmbedBuilder
                 {
                     Title = $"{targetTag.TagName} info",
                     Author = new EmbedAuthorBuilder
@@ -116,8 +116,9 @@ namespace Umbreon.Modules
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag not found");
+            await SendMessageAsync("Tag not found");
         }
+
         [Command("Create", RunMode = RunMode.Async)]
         [Name("Create Tag")]
         [Priority(1)]
@@ -125,28 +126,28 @@ namespace Umbreon.Modules
         [Usage("tag create")]
         public async Task Create()
         {
-            await Message.SendMessageAsync(Context, "What do you want the tag to be called? [reply with `cancel` to cancel creation]");
+            await SendMessageAsync("What do you want the tag to be called? [reply with `cancel` to cancel creation]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var tagName = reply.Content;
             if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This tag already exists");
+                await SendMessageAsync("This tag already exists");
                 return;
             }
 
             if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                await SendMessageAsync("This is a reserved word, tag cannot be created");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
+            await SendMessageAsync("What do you want the tag response to be? [reply with `cancel` to cancel creation]");
             reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var tagValue = reply.Content;
             Tags.CreateTag(Context, tagName, tagValue);
-            await Message.SendMessageAsync(Context, "Tag has been created");
+            await SendMessageAsync("Tag has been created");
         }
 
         [Command("Create", RunMode = RunMode.Async)]
@@ -160,22 +161,22 @@ namespace Umbreon.Modules
         {
             if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This tag already exists");
+                await SendMessageAsync("This tag already exists");
                 return;
             }
 
             if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                await SendMessageAsync("This is a reserved word, tag cannot be created");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "What do you want the tag response to be? [reply with `cancel` to cancel creation]");
+            await SendMessageAsync("What do you want the tag response to be? [reply with `cancel` to cancel creation]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var tagValue = reply.Content;
             Tags.CreateTag(Context, tagName, tagValue);
-            await Message.SendMessageAsync(Context, "Tag has been created");
+            await SendMessageAsync("Tag has been created");
         }
 
         [Command("Create")]
@@ -193,18 +194,18 @@ namespace Umbreon.Modules
         {
             if (CurrentTags.Any(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This tag already exists");
+                await SendMessageAsync("This tag already exists");
                 return;
             }
 
             if (ReservedWords.Any(x => string.Equals(x, tagName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await Message.SendMessageAsync(Context, "This is a reserved word, tag cannot be created");
+                await SendMessageAsync("This is a reserved word, tag cannot be created");
                 return;
             }
 
             Tags.CreateTag(Context, tagName, tagValue);
-            await Message.SendMessageAsync(Context, "Tag has been created");
+            await SendMessageAsync("Tag has been created");
         }
 
         [Command("Modify", RunMode = RunMode.Async)]
@@ -214,7 +215,7 @@ namespace Umbreon.Modules
         [Usage("tag modify")]
         public async Task Modify()
         {
-            await Message.SendMessageAsync(Context, "Which tag do you want to edit? [reply with `cancel` to cancel modification]");
+            await SendMessageAsync("Which tag do you want to edit? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
@@ -222,19 +223,19 @@ namespace Umbreon.Modules
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
-                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                    await SendMessageAsync("Only the tag owner can modify this tag");
                     return;
                 }
-                await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
+                await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
                 var newValue = reply.Content;
                 Tags.UpdateTag(Context, targetTag.TagName, newValue);
-                await Message.SendMessageAsync(Context, "Tag has been modified");
+                await SendMessageAsync("Tag has been modified");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag was not found");
+            await SendMessageAsync("Tag was not found");
         }
 
         [Command("Modify", RunMode = RunMode.Async)]
@@ -251,19 +252,19 @@ namespace Umbreon.Modules
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
-                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                    await SendMessageAsync("Only the tag owner can modify this tag");
                     return;
                 }
-                await Message.SendMessageAsync(Context, "What do you want the new response to be? [reply with `cancel` to cancel modification]");
+                await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
                 var newValue = reply.Content;
                 Tags.UpdateTag(Context, targetTag.TagName, newValue);
-                await Message.SendMessageAsync(Context, "Tag has been modified");
+                await SendMessageAsync("Tag has been modified");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag not found");
+            await SendMessageAsync("Tag not found");
         }
 
         [Command("Modify")]
@@ -283,15 +284,15 @@ namespace Umbreon.Modules
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
-                    await Message.SendMessageAsync(Context, "Only the tag owner can modify this tag");
+                    await SendMessageAsync("Only the tag owner can modify this tag");
                     return;
                 }
                 Tags.UpdateTag(Context, targetTag.TagName, tagValue);
-                await Message.SendMessageAsync(Context, "Tag has been modified");
+                await SendMessageAsync("Tag has been modified");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag not found");
+            await SendMessageAsync("Tag not found");
         }
 
         [Command("Delete", RunMode = RunMode.Async)]
@@ -301,7 +302,7 @@ namespace Umbreon.Modules
         [Usage("tag delete")]
         public async Task Delete()
         {
-            await Message.SendMessageAsync(Context, "Which tag do you want to delete? [reply with `cancel` to cancel modification]");
+            await SendMessageAsync("Which tag do you want to delete? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
@@ -309,15 +310,15 @@ namespace Umbreon.Modules
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
-                    await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
+                    await SendMessageAsync("Only the tag owner can delete this tag");
                     return;
                 }
                 Tags.DeleteTag(Context, reply.Content);
-                await Message.SendMessageAsync(Context, "Tag has been deleted");
+                await SendMessageAsync("Tag has been deleted");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag was not found");
+            await SendMessageAsync("Tag was not found");
         }
 
         [Command("Delete")]
@@ -334,15 +335,15 @@ namespace Umbreon.Modules
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
-                    await Message.SendMessageAsync(Context, "Only the tag owner can delete this tag");
+                    await SendMessageAsync("Only the tag owner can delete this tag");
                     return;
                 }
                 Tags.DeleteTag(Context, targetTag.TagName);
-                await Message.SendMessageAsync(Context, "Tag has been deleted");
+                await SendMessageAsync("Tag has been deleted");
                 return;
             }
 
-            await Message.SendMessageAsync(Context, "Tag was not found");
+            await SendMessageAsync("Tag was not found");
         }
 
     }

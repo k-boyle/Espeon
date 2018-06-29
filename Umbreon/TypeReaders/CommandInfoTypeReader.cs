@@ -13,14 +13,9 @@ namespace Umbreon.TypeReaders
         {
             var commands = services.GetService<CommandService>();
             var cmds = commands.Commands;
-            var targetCmd = cmds.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
-            targetCmd = targetCmd ?? cmds.FirstOrDefault(x => x.Name.Contains(input));
-            return targetCmd is null
-                ? TypeReaderResult.FromError(new NotFoundResult("Command not found", false,
-                    CommandError.ObjectNotFound))
-                : (await targetCmd.CheckPreconditionsAsync(context, services)).IsSuccess
-                    ? TypeReaderResult.FromSuccess(targetCmd)
-                    : TypeReaderResult.FromError(new FailedPreconditionResult("You do not have permission to view this command", false, CommandError.UnmetPrecondition));
+            var targetCmds = cmds.Where(x => string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
+            targetCmds = targetCmds.Any() ? targetCmds : cmds.Where(x => x.Name.Contains(input));
+            return !targetCmds.Any() ? TypeReaderResult.FromError(new NotFoundResult("No commands found", false, CommandError.UnknownCommand)) : TypeReaderResult.FromSuccess(targetCmds.Where(x => x.CheckPreconditionsAsync(context, services).Result.IsSuccess));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Helpers;
@@ -44,7 +45,7 @@ namespace Umbreon.Services
         private async Task LoadCommands()
         {
             _commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
-            _commands.AddTypeReader(typeof(CommandInfo), new CommandInfoTypeReader());
+            _commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }

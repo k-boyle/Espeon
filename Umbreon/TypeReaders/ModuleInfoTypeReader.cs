@@ -15,7 +15,6 @@ namespace Umbreon.TypeReaders
             var commands = services.GetService<CommandService>();
             var modules = commands.Modules;
             var targetModule = modules.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
-            targetModule = targetModule ?? modules.FirstOrDefault(x => x.Name.Contains(input));
             return targetModule is null
                 ? TypeReaderResult.FromError(new NotFoundResult("Module not found", false,
                     CommandError.ObjectNotFound))
