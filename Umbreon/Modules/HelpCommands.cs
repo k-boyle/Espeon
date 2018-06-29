@@ -55,6 +55,8 @@ namespace Umbreon.Modules
 
             foreach (var mod in modules)
             {
+                if(!(await mod.CheckPermissionsAsync(Context)).IsSuccess) continue;
+
                 if (ulong.TryParse(mod.Name, out var id))
                     if (id != Context.Guild.Id)
                         continue;
@@ -100,7 +102,7 @@ namespace Umbreon.Modules
                 Options = PaginatedAppearanceOptions.Default,
                 Pages = pages,
                 Prefix = _database.GetGuild(Context).Prefix,
-                Remarks = (module.Attributes.FirstOrDefault(x => x is @Remarks) as @Remarks).RemarkStrings
+                Remarks = (module.Attributes.FirstOrDefault(x => x is @Remarks) as @Remarks)?.RemarkStrings
             });
         }
 

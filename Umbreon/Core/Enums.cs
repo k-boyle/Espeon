@@ -11,4 +11,10 @@
         Database,
         CustomCmds
     }
+
+    public enum SpecialRole
+    {
+        Admin,
+        Mod
+    }
 }
