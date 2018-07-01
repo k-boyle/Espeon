@@ -1,10 +1,10 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
 using Umbreon.Preconditions;
@@ -90,12 +90,23 @@ namespace Umbreon.Services
             _database.UpdateGuild(guild);
         }
 
-
-        // TODO
+        private async Task RemoveCmd(ulong guildId)
+        {
+            await _commandService.RemoveModuleAsync(
+                _commandService.Modules.FirstOrDefault(x =>
+                    string.Equals(x.Name, guildId.ToString(), StringComparison.CurrentCultureIgnoreCase)));
+            await NewCmds(guildId);
+            _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"Command has been removed in {guildId}");
+        }
+        
         public async Task RemoveCmd(ICommandContext context, string cmdName)
         {
             var guild = _database.GetGuild(context);
-
+            var targetCmd = guild.CustomCommands.Find(x =>
+                string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
+            guild.CustomCommands.Remove(targetCmd);
+            _database.UpdateGuild(guild);
+            await RemoveCmd(context.Guild.Id);
         }
 
         public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)

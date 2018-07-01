@@ -1,18 +1,16 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Addons.Interactive;
+using Discord.Commands;
+using Discord.Net.Helpers;
+using MoreLinq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Addons.Interactive;
-using Discord.Net.Helpers;
-using MoreLinq;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
-
-// TODO add require role and finish it all lmao
 
 namespace Umbreon.Modules
 {
@@ -28,6 +26,7 @@ namespace Umbreon.Modules
         [Alias("")]
         [Name("List Commands")]
         [Summary("List all the available custom commands for this server")]
+        [Priority(0)]
         [Usage("cmd list")]
         public async Task ListCmds()
         {
@@ -57,6 +56,8 @@ namespace Umbreon.Modules
         [Name("Create Command")]
         [Summary("Start the custom command creation process")]
         [Usage("cmd create")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Create()
         {
             await SendMessageAsync("What do you want the command to be called? [reply with `cancel` to cancel creation]");
@@ -88,6 +89,8 @@ namespace Umbreon.Modules
         [Name("Create Command")]
         [Summary("Creates a command with the specified name")]
         [Usage("cmd create YoutubeUrl")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Create(
             [Name("Command Name")]
                 [Summary("The name of the command that you want to create")]string cmdName)
@@ -117,6 +120,8 @@ namespace Umbreon.Modules
         [Name("Create Command")]
         [Summary("Creates a command with the pass parameters")]
         [Usage("cmd create YoutubeUrl https://www.youtube.com/")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Create(
             [Name("Command Name")]
                 [Summary("The name of the command you want to create")]
@@ -147,6 +152,8 @@ namespace Umbreon.Modules
         [Name("Modify Command")]
         [Summary("Starts the Command modification process")]
         [Usage("cmd modify")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Modify()
         {
             await SendMessageAsync("Which Command do you want to edit? [reply with `cancel` to cancel modification]");
@@ -169,9 +176,10 @@ namespace Umbreon.Modules
 
         [Command("Modify", RunMode = RunMode.Async)]
         [Name("Modify Command")]
-        [Priority(1)]
         [Summary("Modify the specified Command name")]
         [Usage("cmd modify YoutubeUrl")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Modify(
             [Name("Command Name")]
                 [Summary("The Command you wanna modify")]
@@ -195,6 +203,8 @@ namespace Umbreon.Modules
         [Name("Modify Command")]
         [Summary("Modify the specified Command with the given value")]
         [Usage("cmd modify YoutubeUrl Totally a Url")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
         public async Task Modify(
             [Name("Command Name")]
                 [Summary("The name of the Command you want to modify")]
@@ -211,6 +221,50 @@ namespace Umbreon.Modules
             }
 
             await SendMessageAsync("Command not found");
+        }
+
+        [Command("Remove", RunMode = RunMode.Async)]
+        [Name("Remove Command")]
+        [Summary("Remove a custom command from the server")]
+        [Usage("cmd remove")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
+        public async Task Remove()
+        {
+            await SendMessageAsync("Which Command do you want to remove? [reply with `cancel` to cancel modification]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+
+            if (Commands.TryParse(CurrentCmds, reply.Content, out var targetCommand))
+            {
+                await Commands.RemoveCmd(Context, targetCommand.CommandName);
+                await SendMessageAsync("Command has been removed");
+                return;
+            }
+
+            await SendMessageAsync("Command was not found");
+        }
+
+        [Command("Remove")]
+        [Name("Remove Command")]
+        [Summary("Remove the passed custom command from the server")]
+        [Usage("cmd remove YoutubeUrl")]
+        [Priority(1)]
+        [RequireRole(SpecialRole.Admin)]
+        public async Task Remove(
+            [Name("Command Name")]
+            [Summary("The name of the command that you want to remove")]
+            [Remainder] string cmdName
+            )
+        {
+            if (Commands.TryParse(CurrentCmds, cmdName, out var targetCmd))
+            {
+                await Commands.RemoveCmd(Context, targetCmd.CommandName);
+                await SendMessageAsync("Command has been removed");
+                return;
+            }
+
+            await SendMessageAsync("Command was not found");
         }
     }
 }

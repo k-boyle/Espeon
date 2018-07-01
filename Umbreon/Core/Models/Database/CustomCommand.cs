@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Umbreon.Core.Models.Database
+﻿namespace Umbreon.Core.Models.Database
 {
     public class CustomCommand
     {

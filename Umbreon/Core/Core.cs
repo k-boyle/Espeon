@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using Umbreon.Services;
-using Discord;
+﻿using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
+using Umbreon.Services;
 
 namespace Umbreon.Core
 {
@@ -33,8 +33,9 @@ namespace Umbreon.Core
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<TagService>()
                 .AddSingleton<CustomCommandsService>()
+                .AddSingleton<StarboardService>()
                 .BuildServiceProvider();
-
+            
             await services.GetService<StartupService>().InitialiseAsync();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Addons.Interactive;
+using Discord.Addons.Interactive.HelpPaginator;
 using Discord.Commands;
 using Discord.Net.Helpers;
 using MoreLinq;
@@ -7,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.HelpPaginator;
 using Umbreon.Attributes;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
@@ -20,6 +20,7 @@ namespace Umbreon.Modules
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
+        private CommandInfo cmd;
         private const int BatchSize = 7;
 
         public HelpCommands(CommandService commands, DatabaseService database)
@@ -44,7 +45,7 @@ namespace Umbreon.Modules
                 Description = "All the available modules for Umbreon",
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Type {_database.GetGuild(Context).Prefix}help Module-Name to view help for that module"
+                    Text = $"Type {_database.GetGuild(Context).Prefixes.First()}help Module-Name to view help for that module"
                 },
                 ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
                 Timestamp = DateTimeOffset.UtcNow,
@@ -55,7 +56,7 @@ namespace Umbreon.Modules
 
             foreach (var mod in modules)
             {
-                if(!(await mod.CheckPermissionsAsync(Context)).IsSuccess) continue;
+                if(!(await mod.CheckPermissionsAsync(Context, mod.Commands.FirstOrDefault(), Services)).IsSuccess) continue;
 
                 if (ulong.TryParse(mod.Name, out var id))
                     if (id != Context.Guild.Id)
@@ -101,7 +102,7 @@ namespace Umbreon.Modules
                 Content = string.Empty,
                 Options = PaginatedAppearanceOptions.Default,
                 Pages = pages,
-                Prefix = _database.GetGuild(Context).Prefix,
+                Prefix = _database.GetGuild(Context).Prefixes.First(),
                 Remarks = (module.Attributes.FirstOrDefault(x => x is @Remarks) as @Remarks)?.RemarkStrings
             });
         }
@@ -119,7 +120,7 @@ namespace Umbreon.Modules
                 },
                 Color = Color.LightOrange,
                 Description = $"All commands found with the name '{cmds.FirstOrDefault().Name}'\n" +
-                              $"Type {_database.GetGuild(Context).Prefix}help ... wait no you can't do deeper than this",
+                              $"Type {_database.GetGuild(Context).Prefixes.First()}help ... wait no you can't do deeper than this",
                 Timestamp = DateTimeOffset.Now, 
                 ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
                 Title = "Umbreon's Help"
@@ -149,6 +150,11 @@ namespace Umbreon.Modules
             }
 
             await SendMessageAsync(string.Empty, builder.Build());
+        }
+
+        protected override void BeforeExecute(CommandInfo command)
+        {
+            cmd = command;
         }
     }
 }

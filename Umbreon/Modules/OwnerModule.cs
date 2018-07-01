@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using System.Threading.Tasks;
 using Umbreon.Activities;
 using Umbreon.Modules.Contexts;
@@ -38,6 +39,19 @@ namespace Umbreon.Modules
         {
             await Context.Client.CurrentUser.ModifyAsync(x => x.Username = userName);
             await SendMessageAsync("Username has been changed");
+        }
+
+        [Command("Message")]
+        [Name("Message Guild")]
+        [Summary("Send a message to the passed channel in a different guild")]
+        public async Task SendMessage(
+            [Name("Channel Id")]
+            [Summary("Id of the channel you want to send the message to")] ulong channelId,
+            [Name("Message")] [Summary("The message you want to send")]
+            [Remainder] string message)
+        {
+            var channel = Context.Client.GetChannel(channelId) as SocketTextChannel;
+            await channel.SendMessageAsync(message);
         }
     }
 }

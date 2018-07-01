@@ -1,8 +1,8 @@
 ﻿using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Results;
 
 namespace Umbreon.TypeReaders

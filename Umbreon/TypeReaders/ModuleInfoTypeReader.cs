@@ -1,9 +1,9 @@
 ﻿using Discord.Commands;
+using Discord.Net.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Net.Helpers;
 using Umbreon.Results;
 
 namespace Umbreon.TypeReaders
@@ -18,7 +18,7 @@ namespace Umbreon.TypeReaders
             return targetModule is null
                 ? TypeReaderResult.FromError(new NotFoundResult("Module not found", false,
                     CommandError.ObjectNotFound))
-                : (await targetModule.CheckPermissionsAsync(context)).IsSuccess
+                : (await targetModule.CheckPermissionsAsync(context, null, services)).IsSuccess
                     ? TypeReaderResult.FromSuccess(targetModule) 
                     : TypeReaderResult.FromError(new FailedPreconditionResult("You do not have permission to use this module", false, CommandError.UnmetPrecondition));
         }

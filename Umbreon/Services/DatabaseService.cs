@@ -1,15 +1,14 @@
-﻿using Umbreon.Core;
-using Umbreon.Core.Models.Database;
-using Umbreon.Helpers;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Discord.Commands;
+using Umbreon.Core;
+using Umbreon.Core.Models.Database;
+using Umbreon.Helpers;
 
 namespace Umbreon.Services
 {

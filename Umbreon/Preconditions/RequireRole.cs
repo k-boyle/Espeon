@@ -33,6 +33,9 @@ namespace Umbreon.Preconditions
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            if (roleId == 0 || !context.Guild.Roles.Select(x => x.Id).Contains(roleId))
+                return Task.FromResult(PreconditionResult.FromError($"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role"));
             var user = context.User as SocketGuildUser;
             var roles = user.Roles.Select(x => x.Id);
             return roles.Contains(roleId)

@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Addons.Interactive;
+using Discord.Addons.Interactive.Interfaces;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.Interfaces;
 using Umbreon.Core.Models;
 
 namespace Umbreon.Services

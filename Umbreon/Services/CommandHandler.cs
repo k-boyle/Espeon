@@ -1,8 +1,9 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Discord;
 using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services
@@ -35,7 +36,7 @@ namespace Umbreon.Services
                     _message.SetCurrentMessage(message.Id);
                     var guild = _database.GetGuild(context);
                     var argPos = 0;
-                    if (message.HasStringPrefix(guild.Prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                    if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                     {
                         var result = await _commands.ExecuteAsync(context, argPos, _services);
                         if (!result.IsSuccess)

@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace Umbreon.Helpers
+﻿namespace Umbreon.Helpers
 {
     public static class ConstantsHelper
     {
