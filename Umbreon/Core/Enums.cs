@@ -3,7 +3,8 @@
     public enum Module
     {
         Tags,
-        Commands
+        Commands,
+        Roles
     }
 
     public enum LogSource

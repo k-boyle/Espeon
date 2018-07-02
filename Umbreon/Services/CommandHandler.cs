@@ -36,7 +36,7 @@ namespace Umbreon.Services
                     _message.SetCurrentMessage(message.Id);
                     var guild = _database.GetGuild(context);
                     var argPos = 0;
-                    if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                    if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) // TODO Command searching and close matching
                     {
                         var result = await _commands.ExecuteAsync(context, argPos, _services);
                         if (!result.IsSuccess)

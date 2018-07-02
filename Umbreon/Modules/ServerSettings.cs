@@ -40,7 +40,8 @@ namespace Umbreon.Modules
         {
             if (CurrentGuild.Prefixes.Count == 1)
             {
-                await SendMessageAsync("There is the last prefix for the server you cannot remove it");
+                await SendMessageAsync("This is the last prefix for the server you cannot remove it");
+                return;
             }
             CurrentGuild.Prefixes.Remove(newPrefix);
             await SendMessageAsync("Prefix has been removed");
@@ -110,9 +111,10 @@ namespace Umbreon.Modules
             if (starChannel is null)
             {
                 CurrentGuild.Starboard.Enabled = false;
+                await SendMessageAsync("Starboard has been disabled");
                 return;
             }
-
+            
             CurrentGuild.Starboard.Enabled = true;
             CurrentGuild.Starboard.ChannelId = starChannel.Id;
             await SendMessageAsync("Starboard has been enabled");

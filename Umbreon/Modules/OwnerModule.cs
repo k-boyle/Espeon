@@ -8,6 +8,8 @@ using Umbreon.Modules.ModuleBases;
 
 namespace Umbreon.Modules
 {
+    // TODO eval
+
     [Group("cas")]
     [Name("Owner Commands")]
     [Summary("Super duper secret commands")]
@@ -47,7 +49,8 @@ namespace Umbreon.Modules
         public async Task SendMessage(
             [Name("Channel Id")]
             [Summary("Id of the channel you want to send the message to")] ulong channelId,
-            [Name("Message")] [Summary("The message you want to send")]
+            [Name("Message")]
+            [Summary("The message you want to send")]
             [Remainder] string message)
         {
             var channel = Context.Client.GetChannel(channelId) as SocketTextChannel;

@@ -34,6 +34,7 @@ namespace Umbreon.Core
                 .AddSingleton<TagService>()
                 .AddSingleton<CustomCommandsService>()
                 .AddSingleton<StarboardService>()
+                .AddSingleton<SelfAssigningRolesService>()
                 .BuildServiceProvider();
             
             await services.GetService<StartupService>().InitialiseAsync();
