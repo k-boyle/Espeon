@@ -22,6 +22,8 @@ namespace Umbreon.Modules
     [RequireEnabled]
     public class SelfAssigningRoles : SelfAssigningRolesBase<GuildCommandContext>
     {
+        // TODO finish this
+
         [Command("List", RunMode = RunMode.Async)]
         [Alias("")]
         [Name("List Roles")]

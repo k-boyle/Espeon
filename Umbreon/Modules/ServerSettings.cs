@@ -16,6 +16,8 @@ namespace Umbreon.Modules
     [RequireOwner(Group = "RequireAdmin")]
     public class ServerSettings : ServerSettingsBase<GuildCommandContext>
     {
+        // TODO Welcome channel, welcome message, MOTDChannel, MOTDMessage
+
         [Command("AddPrefix")]
         [Name("Add Prefix")]
         [Summary("Add a command prefix for the server")]

@@ -19,7 +19,7 @@ namespace Umbreon.Core
                     LogLevel = LogSeverity.Verbose,
                     MessageCacheSize = 20
                 }))
-                .AddSingleton(new CommandService(new CommandServiceConfig()
+                .AddSingleton(new CommandService(new CommandServiceConfig
                 {
                     LogLevel = LogSeverity.Verbose,
                     CaseSensitiveCommands = false

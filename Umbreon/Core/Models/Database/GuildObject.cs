@@ -10,6 +10,10 @@ namespace Umbreon.Core.Models.Database
         
         public ulong AdminRole { get; set; }
         public ulong ModRole { get; set; }
+        public ulong WelcomeChannel { get; set; } = 0;
+        public string WelcomeMessage { get; set; }
+        public ulong MOTDChannel { get; set; } = 0;
+        public string MOTDMessage { get; set; }
         public Starboard Starboard { get; set; } = new Starboard();
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
         public List<Module> DisabledModules { get; set; } = new List<Module>();
@@ -20,5 +24,6 @@ namespace Umbreon.Core.Models.Database
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
         public List<CustomFunction> CustomFunctions { get; set; } = new List<CustomFunction>();
+        public List<Warning> Warnings { get; set; } = new List<Warning>();
     }
 }

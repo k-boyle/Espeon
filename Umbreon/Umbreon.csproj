@@ -9,8 +9,12 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+    <FileAlignment>1024</FileAlignment>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Commands" Version="2.0.0-beta2-00970" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="MoreLinq.Portable" Version="2.0.0-beta04" />
@@ -18,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj" />
+    <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
     <ProjectReference Include="..\..\Discord.Net.Helpers\Discord.Net.Helpers\Discord.Net.Helpers.csproj" />

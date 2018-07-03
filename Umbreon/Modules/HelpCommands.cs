@@ -29,7 +29,7 @@ namespace Umbreon.Modules
             _database = database;
         }
 
-        [Command("help")]
+        [Command("Help")]
         [Priority(0)]
         public async Task HelpCmd()
         {
@@ -81,7 +81,7 @@ namespace Umbreon.Modules
             await SendMessageAsync(string.Empty, builder.Build());
         }
 
-        [Command("help")]
+        [Command("Help")]
         [Priority(1)]
         public async Task HelpCmd([Remainder] ModuleInfo module)
         {
@@ -107,7 +107,7 @@ namespace Umbreon.Modules
             });
         }
 
-        [Command("help")]
+        [Command("Help")]
         [Priority(2)]
         public async Task HelpCmd([Remainder] IEnumerable<CommandInfo> cmds)
         {

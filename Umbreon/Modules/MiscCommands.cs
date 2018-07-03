@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
-using Umbreon.Services;
 
 namespace Umbreon.Modules
 {
@@ -13,12 +12,7 @@ namespace Umbreon.Modules
     [Summary("Commands that don't fit into a category")]
     public class MiscCommands : UmbreonBase<GuildCommandContext>
     {
-        private readonly MessageService _message;
-
-        public MiscCommands(MessageService message)
-        {
-            _message = message;
-        }
+        // TODO reminders, admin/mod list
 
         [Command("ping")]
         [Name("Ping")]

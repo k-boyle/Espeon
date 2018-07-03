@@ -18,7 +18,9 @@ namespace Umbreon.Modules
     [RequireGuildOwner(Group = "RequireRole")]
     public class Moderation : UmbreonBase<GuildCommandContext>
     {
-        // TODO mute 
+        // TODO mute, warnings
+        // TODO promo users, demote users, annoucement
+        // TODO nickname
 
         [Command("kick")]
         [Name("Kick User")]

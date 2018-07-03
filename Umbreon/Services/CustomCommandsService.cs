@@ -26,6 +26,20 @@ namespace Umbreon.Services
             _logs = logs;
         }
 
+        private string RemoveGroupName(string inStr)
+        {
+            var groups = _commandService.Modules.Where(x => !(x.Group is null)).Select(y => y.Group);
+            var outStr = inStr;
+            foreach (var group in groups)
+            {
+                if (inStr.Contains(group))
+                {
+                    outStr = inStr.Replace($"{group} ", "");
+                }
+            }
+            return outStr;
+        }
+
         public async Task LoadCmds(DiscordSocketClient client)
         {
             foreach (var guild in client.Guilds)
@@ -109,6 +123,18 @@ namespace Umbreon.Services
             await RemoveCmd(context.Guild.Id);
         }
 
+        public bool IsReserved(string toCheck)
+        {
+            var cmds = _commandService.Commands.SelectMany(x => x.Aliases).ToList();
+            var reserved = new List<string>();
+            foreach (var cmd in cmds)
+            {
+                reserved.Add(RemoveGroupName(cmd));
+            }
+
+            return reserved.Contains(toCheck, StringComparer.CurrentCultureIgnoreCase);
+        }
+
         public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)
         {
             cmd = cmds.FirstOrDefault(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
@@ -119,8 +145,6 @@ namespace Umbreon.Services
             => GetCmds(context.Guild.Id);
 
         private IEnumerable<CustomCommand> GetCmds(ulong guildId)
-        {
-            return _database.GetGuild(guildId).CustomCommands;
-        }
+            => _database.GetGuild(guildId).CustomCommands;
     }
 }

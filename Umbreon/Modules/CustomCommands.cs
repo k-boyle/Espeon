@@ -71,7 +71,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)))
+            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)) || Commands.IsReserved(cmdName))
             {
                 await SendMessageAsync("This is a reserved word, command cannot be created");
                 return;
@@ -102,7 +102,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)))
+            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)) || Commands.IsReserved(cmdName))
             {
                 await SendMessageAsync("This is a reserved word, command cannot be created");
                 return;
@@ -138,7 +138,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)))
+            if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)) || Commands.IsReserved(cmdName))
             {
                 await SendMessageAsync("This is a reserved word, command cannot be created");
                 return;

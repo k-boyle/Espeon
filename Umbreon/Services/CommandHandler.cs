@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
+using Umbreon.Helpers;
 using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services
@@ -36,11 +38,32 @@ namespace Umbreon.Services
                     _message.SetCurrentMessage(message.Id);
                     var guild = _database.GetGuild(context);
                     var argPos = 0;
-                    if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) // TODO Command searching and close matching
+                    if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                     {
                         var result = await _commands.ExecuteAsync(context, argPos, _services);
                         if (!result.IsSuccess)
-                            await context.Textchannel.SendMessageAsync(result.ErrorReason);
+                        {
+                            switch (result.Error)
+                            {
+                                case CommandError.UnknownCommand: // TODO make better
+                                    var commands = _commands.Commands.Where(x => StringHelper.CalcLevenshteinDistance(x.Aliases.FirstOrDefault(), message.Content) < 5).Select(x => x.Aliases.FirstOrDefault()).Distinct();
+                                    await _message.SendMessageAsync(context, $"{(commands.Any() ? "Command not found. Did you mean one of these?\n" + $"{string.Join("\n", commands)}" : "No commands found")}");
+                                    break;
+                                case CommandError.BadArgCount:
+                                    var foundCommand = _commands.Search(context, argPos).Commands.FirstOrDefault().Command;
+                                    await _message.SendMessageAsync(context, "Wrong command usage, have an example:\n" +
+                                                                             $"{guild.Prefixes.First()}{(foundCommand.Attributes.FirstOrDefault(x => x is Usage) as Usage).Example}\n" +
+                                                                             $"If you need more help with the command, simply type {guild.Prefixes.First()}help {foundCommand.Name}");
+                                    break;
+                                case CommandError.UnmetPrecondition:
+                                    await _message.SendMessageAsync(context, $"There was an unmet precondition: {result.ErrorReason}");
+                                    break;
+                                case CommandError.Exception:
+                                    await (_client.GetChannel(463299724326469634) as SocketTextChannel)
+                                        .SendMessageAsync($"{message} : {result.ErrorReason}");
+                                    break;
+                            }
+                        }
                     }
                 }
             }
