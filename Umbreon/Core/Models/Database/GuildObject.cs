@@ -14,6 +14,7 @@ namespace Umbreon.Core.Models.Database
         public string WelcomeMessage { get; set; }
         public ulong MOTDChannel { get; set; } = 0;
         public string MOTDMessage { get; set; }
+        public bool CloseCommandMatching { get; set; } = false;
         public Starboard Starboard { get; set; } = new Starboard();
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
         public List<Module> DisabledModules { get; set; } = new List<Module>();

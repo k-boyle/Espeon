@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using System;
+using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -6,6 +7,7 @@ using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using Umbreon.TypeReaders;
 
 namespace Umbreon.Modules
 {
@@ -108,7 +110,10 @@ namespace Umbreon.Modules
         [Summary("Set the starboard channel for this guild")]
         [@Remarks("Leave blank to disable starboard")]
         [Usage("set starboard #starboard")]
-        public async Task Starboard(SocketTextChannel starChannel = null)
+        public async Task Starboard(
+            [Name("Star Channel")]
+            [Summary("The channel you want starboard to be, leave blank to disable starboard")]
+            [Remainder] SocketTextChannel starChannel = null)
         {
             if (starChannel is null)
             {
@@ -120,6 +125,33 @@ namespace Umbreon.Modules
             CurrentGuild.Starboard.Enabled = true;
             CurrentGuild.Starboard.ChannelId = starChannel.Id;
             await SendMessageAsync("Starboard has been enabled");
+        }
+
+        [Command("Starlimit")]
+        [Name("Star Limit")]
+        [Summary("Set the star limit for starboard")]
+        [Usage("set starlimit 3")]
+        [RequireStarboard]
+        public async Task StarLimit(
+            [Name("Star Limit")]
+            [Summary("How many stars are required")]
+            [OverrideTypeReader(typeof(StarLimitTypeReader))] int starLimit)
+        {
+            CurrentGuild.Starboard.StarLimit = starLimit;
+            await SendMessageAsync("Star limit has been updated");
+        }
+
+        [Command("CommandMatching")]
+        [Name("Close Command Matching")]
+        [Summary("Choose whether the bot will try match failed commands to the best match")]
+        [@Remarks("This can lead to unexpected results")]
+        [Usage("set commandmatching false")]
+        public async Task SetMatching(
+            [Name("Enabled")]
+            [Summary("true of false")] bool enabled)
+        {
+            CurrentGuild.CloseCommandMatching = enabled;
+            await SendMessageAsync("Close command matching has been changed");
         }
     }
 }

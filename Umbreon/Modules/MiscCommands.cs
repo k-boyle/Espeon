@@ -27,12 +27,14 @@ namespace Umbreon.Modules
             await (msg as IUserMessage).ModifyAsync(x => x.Content = $"Ping: {sw.ElapsedMilliseconds}ms\nLatency: {Context.Client.Latency}ms");
         }
 
-        [Command("c")]
+        [Command("c", RunMode = RunMode.Async)]
         [Name("Clear Responses")]
         [Usage("c")]
         [Summary("Will clear all responses from the bot to you in the last 5 minutes")]
         public async Task Clear()
         {
+            await SendMessageAsync("Clearing messages");
+            await Task.Delay(1000);
             await Message.ClearMessages(Context);
         }
 

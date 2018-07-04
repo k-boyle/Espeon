@@ -59,8 +59,7 @@ namespace Umbreon.Modules
                 if(!(await mod.CheckPermissionsAsync(Context, mod.Commands.FirstOrDefault(), Services)).IsSuccess) continue;
 
                 if (ulong.TryParse(mod.Name, out var id))
-                    if (id != Context.Guild.Id)
-                        continue;
+                    if (id != Context.Guild.Id) continue;
                     else
                     {
                         builder.AddField(f =>

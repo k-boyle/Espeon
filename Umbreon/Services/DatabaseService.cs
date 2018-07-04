@@ -16,7 +16,7 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _logs;
-        private readonly Dictionary<ulong, GuildObject> _guilds = new Dictionary<ulong, GuildObject>();
+        private readonly Dictionary<ulong, GuildObject> _guilds = new Dictionary<ulong, GuildObject>(); // TODO change to ConcurrentDictionary
 
         public DatabaseService(DiscordSocketClient client, LogService logs )
         {

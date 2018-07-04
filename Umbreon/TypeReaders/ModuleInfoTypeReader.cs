@@ -16,11 +16,11 @@ namespace Umbreon.TypeReaders
             var modules = commands.Modules;
             var targetModule = modules.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
             return targetModule is null
-                ? TypeReaderResult.FromError(new NotFoundResult("Module not found", false,
+                ? TypeReaderResult.FromError(new FailedResult("Module not found", false,
                     CommandError.ObjectNotFound))
                 : (await targetModule.CheckPermissionsAsync(context, null, services)).IsSuccess
                     ? TypeReaderResult.FromSuccess(targetModule) 
-                    : TypeReaderResult.FromError(new FailedPreconditionResult("You do not have permission to use this module", false, CommandError.UnmetPrecondition));
+                    : TypeReaderResult.FromError(new FailedResult("You do not have permission to use this module", false, CommandError.UnmetPrecondition));
         }
     }
 }
