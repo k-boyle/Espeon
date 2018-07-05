@@ -2,13 +2,13 @@
 
 namespace Umbreon.Results
 {
-    public class NotFoundResult : IResult
+    public class FailedResult : IResult
     {
         public CommandError? Error { get; }
         public string ErrorReason { get; }
         public bool IsSuccess { get; }
 
-        public NotFoundResult(string errorReason, bool isSuccess, CommandError? error)
+        public FailedResult(string errorReason, bool isSuccess, CommandError? error)
         {
             Error = error;
             ErrorReason = errorReason;

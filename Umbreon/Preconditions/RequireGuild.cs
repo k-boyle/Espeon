@@ -16,7 +16,7 @@ namespace Umbreon.Preconditions
         {
             return context.Guild.Id == _guildId
                 ? Task.FromResult(PreconditionResult.FromSuccess())
-                : Task.FromResult(PreconditionResult.FromError(PreconditionResult.FromError(new WrongGuildResult("Unknown Command", false, CommandError.UnknownCommand))));
+                : Task.FromResult(PreconditionResult.FromError(PreconditionResult.FromError(new FailedResult("Unknown Command", false, CommandError.UnknownCommand))));
         }
     }
 }

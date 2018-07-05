@@ -22,8 +22,6 @@ namespace Umbreon.Modules
     [RequireEnabled]
     public class SelfAssigningRoles : SelfAssigningRolesBase<GuildCommandContext>
     {
-        // TODO finish this
-
         [Command("List", RunMode = RunMode.Async)]
         [Alias("")]
         [Name("List Roles")]
@@ -92,6 +90,46 @@ namespace Umbreon.Modules
             }
 
             await SendMessageAsync("Role was not found in the available self assigning roles");
+        }
+
+        [Command("AddSelf")]
+        [Name("Add New Role")]
+        [Summary("Add a new self assigning role to the server")]
+        [Usage("roles addself Umbreon")]
+        [RequireRole(SpecialRole.Mod, Group = "SpecialRole")]
+        [RequireRole(SpecialRole.Admin, Group = "SpecialRole")]
+        [Priority(1)]
+        public async Task AddNewRole(
+            [Name("Role To Add")]
+            [Summary("The new role want that you want to add to the self assigning roles")]
+            [Remainder] SocketRole roleToAdd)
+        {
+            if (!SelfRoles.HasRole(CurrentRoles, roleToAdd.Id))
+            {
+                SelfRoles.AddNewSelfRole(Context, roleToAdd.Id);
+            }
+
+            await SendMessageAsync("New self role has been added");
+        }
+
+        [Command("RemoveSelf")]
+        [Name("Remove Old Role")]
+        [Summary("Add a new self assigning role to the server")]
+        [Usage("roles removeself Umbreon")]
+        [RequireRole(SpecialRole.Mod, Group = "SpecialRole")]
+        [RequireRole(SpecialRole.Admin, Group = "SpecialRole")]
+        [Priority(1)]
+        public async Task RemoveOldRole(
+            [Name("Role To Remove")]
+            [Summary("The old role want that you want to remove from the self assigning roles")]
+            [Remainder] SocketRole roleToRemove)
+        {
+            if (SelfRoles.HasRole(CurrentRoles, roleToRemove.Id))
+            {
+                SelfRoles.RemoveSelfRole(Context, roleToRemove.Id);
+            }
+
+            await SendMessageAsync("Old self role has been removed");
         }
     }
 }

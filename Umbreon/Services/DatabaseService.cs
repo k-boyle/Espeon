@@ -16,7 +16,7 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _logs;
-        private readonly Dictionary<ulong, GuildObject> _guilds = new Dictionary<ulong, GuildObject>();
+        private readonly Dictionary<ulong, GuildObject> _guilds = new Dictionary<ulong, GuildObject>(); // TODO change to ConcurrentDictionary
 
         public DatabaseService(DiscordSocketClient client, LogService logs )
         {
@@ -61,12 +61,7 @@ namespace Umbreon.Services
                     var g = guilds.FindOne(x => x.GuildId == guild.Id);
                     if (g is null)
                     {
-                        g = new GuildObject
-                        {
-                            GuildId = guild.Id
-                        };
-                        guilds.Insert(g);
-                        _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been added to the database");
+                        NewGuild(guilds, guild);
                     }
                     else
                     {
@@ -75,6 +70,26 @@ namespace Umbreon.Services
                     }
                 }
             }
+        }
+
+        public void NewGuild(SocketGuild guild)
+        {
+            using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
+            {
+                var guilds = db.GetCollection<GuildObject>("guilds");
+                NewGuild(guilds, guild);
+            }
+        }
+
+        public void NewGuild(LiteCollection<GuildObject> guilds, SocketGuild guild)
+        {
+            var newGuild = new GuildObject
+            {
+                GuildId = guild.Id
+            };
+            guilds.Insert(newGuild);
+            _guilds.Add(guild.Id, newGuild);
+            _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been added to the database");
         }
 
         public GuildObject GetGuild(ICommandContext context)

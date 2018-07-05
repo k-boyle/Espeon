@@ -25,7 +25,7 @@ namespace Umbreon.Modules
         [Command("kick")]
         [Name("Kick User")]
         [Summary("Kick a user from the server")]
-        [Usage("mod kick Umbreon")]
+        [Usage("mod kick Umbreon being too cwl 8)")]
         [RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickUser(
             [Name("User To Kick")]
@@ -42,7 +42,7 @@ namespace Umbreon.Modules
         [Command("ban")]
         [Name("Ban User")]
         [Summary("Ban a user from the server")]
-        [Usage("mod ban Umbreon")]
+        [Usage("mod ban Umbreon too cwl 4 scwl 8)")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanUser(
             [Name("User To Ban")]
