@@ -27,7 +27,7 @@ namespace Umbreon.Services
             _services = services;
         }
 
-        public async Task HandleMessageAsync(SocketMessage msg) // TODO custom command alias'
+        public async Task HandleMessageAsync(SocketMessage msg)
         {
             if (msg is SocketUserMessage message)
             {
@@ -37,6 +37,9 @@ namespace Umbreon.Services
                     if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
                     _message.SetCurrentMessage(message.Id);
                     var guild = _database.GetGuild(context);
+                    if (guild.BlacklistedUsers.Contains(context.User.Id)) return;
+                    if (guild.RestrictedChannels.Contains(context.Channel.Id)) return;
+                    if (guild.UseWhiteList && !guild.WhiteListedUsers.Contains(context.User.Id)) return;
                     var argPos = 0;
                     if (guild.Prefixes.Any(x => message.HasStringPrefix(x, ref argPos)) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                     {
