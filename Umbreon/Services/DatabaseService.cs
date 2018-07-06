@@ -3,7 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using LiteDB;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Core;
@@ -16,7 +16,7 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _logs;
-        private readonly Dictionary<ulong, GuildObject> _guilds = new Dictionary<ulong, GuildObject>(); // TODO change to ConcurrentDictionary
+        private readonly ConcurrentDictionary<ulong, GuildObject> _guilds = new ConcurrentDictionary<ulong, GuildObject>();
 
         public DatabaseService(DiscordSocketClient client, LogService logs )
         {
@@ -65,7 +65,7 @@ namespace Umbreon.Services
                     }
                     else
                     {
-                        _guilds.Add(g.GuildId, g);
+                        _guilds.TryAdd(g.GuildId, g);
                         _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been loaded");
                     }
                 }
@@ -89,7 +89,7 @@ namespace Umbreon.Services
                 GuildId = guild.Id
             };
             guilds.Insert(newGuild);
-            _guilds.Add(guild.Id, newGuild);
+            _guilds.TryAdd(guild.Id, newGuild);
             _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been added to the database");
         }
 
