@@ -2,7 +2,7 @@
 using Discord.Commands;
 using Discord.Net.Helpers;
 using Discord.WebSocket;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace Umbreon.Services
 {
@@ -27,34 +27,35 @@ namespace Umbreon.Services
 
         public void HookEvents()
         {
-            _client.Ready += ClientReady;
             _client.Log += _logs.LogEvent;
+            _client.Ready += async () =>
+            {
+                _database.LoadGuilds();
+                await _customCommands.LoadCmds(_client);
+            };
             _client.MessageReceived += _handler.HandleMessageAsync;
-            _client.MessageUpdated += MessageUpdated;
+            _client.MessageUpdated += async (_, message, __) => { await _handler.HandleMessageAsync(message); };
             _client.JoinedGuild += async guild =>
             {
                 _database.NewGuild(guild);
-                var channel = guild.GetDefaultChannel(guild.CurrentUser);
+                var channel = guild.GetDefaultChannel();
                 if (!(channel is null))
                 {
                     await channel.SendMessageAsync(string.Empty, embed: new EmbedBuilder
                     {
-                        // TODO THIS
+                        Author = new EmbedAuthorBuilder
+                        {
+                            IconUrl = _client.CurrentUser.GetAvatarOrDefaultUrl(),
+                            Name = guild.CurrentUser.GetDisplayName()
+                        },
+                        Color = new Color(0, 0, 0),
+                        ThumbnailUrl = _client.CurrentUser.GetDefaultAvatarUrl(),
+                        Description = $"Hello! I am {guild.CurrentUser.GetDisplayName()} and I have just been added to your guild!\n" +
+                                      $"Type {_database.GetGuild(guild.Id).Prefixes.First()}help to see all my available commands!"
                     }.Build());
                 }
             };
             _commands.Log += _logs.LogEvent;
-        }
-
-        private async Task MessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3)
-        {
-            await _handler.HandleMessageAsync(arg2);
-        }
-
-        private async Task ClientReady()
-        {
-            _database.LoadGuilds();
-            await _customCommands.LoadCmds(_client);
         }
     }
 }

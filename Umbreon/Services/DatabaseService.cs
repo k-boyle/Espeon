@@ -81,8 +81,9 @@ namespace Umbreon.Services
             }
         }
 
-        public void NewGuild(LiteCollection<GuildObject> guilds, SocketGuild guild)
+        private void NewGuild(LiteCollection<GuildObject> guilds, IGuild guild)
         {
+            if (!(guilds.FindOne(x => x.GuildId == guild.Id) is null)) return;
             var newGuild = new GuildObject
             {
                 GuildId = guild.Id
