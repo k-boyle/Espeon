@@ -2,11 +2,13 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Discord.Net.Helpers;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using Umbreon.TypeReaders;
 
 namespace Umbreon.Modules
 {
@@ -21,6 +23,7 @@ namespace Umbreon.Modules
         // TODO mute, warnings
         // TODO promo users, demote users, annoucement
         // TODO nickname
+        // TODO add dm messages
 
         [Command("kick")]
         [Name("Kick User")]
@@ -35,6 +38,7 @@ namespace Umbreon.Modules
             [Summary("The reason for kicking them")]
             [Remainder] string reason = null)
         {
+            await userToKick.TrySendDMAsync($"You have been kicked from {Context.Guild.Name} {(reason is null ? "" : $"for; {reason}")}");
             await userToKick.KickAsync(reason);
             await SendMessageAsync("User has been kicked");
         }
@@ -42,17 +46,20 @@ namespace Umbreon.Modules
         [Command("ban")]
         [Name("Ban User")]
         [Summary("Ban a user from the server")]
-        [Usage("mod ban Umbreon too cwl 4 scwl 8)")]
+        [Usage("mod ban Umbreon 1 too cwl 4 scwl 8)")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanUser(
             [Name("User To Ban")]
-            [Summary("The user you want to ban")]
-            SocketGuildUser userToBan,
+            [Summary("The user you want to ban")] SocketGuildUser userToBan,
+            [Name("Prune Amount")]
+            [Summary("The number of days of messages from the user you want to delete")]
+            [OverrideTypeReader(typeof(BanLimitTypeReader))] int pruneAmount = 0,
             [Name("Reason")]
             [Summary("The reason for banning them")]
             [Remainder] string reason = null)
         {
-            await Context.Guild.AddBanAsync(userToBan, 1, reason);
+            await userToBan.TrySendDMAsync($"You have been banned from {Context.Guild.Name} {(reason is null ? "" : $"for; {reason}")}");
+            await Context.Guild.AddBanAsync(userToBan, pruneAmount, reason);
             await SendMessageAsync("User has been banned");
         }
     }

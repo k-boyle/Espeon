@@ -8,10 +8,7 @@ namespace Umbreon.TypeReaders
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            if (!int.TryParse(input, out var num))
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                    "Integer greater than 0 input required"));
-            return Task.FromResult(num > 0 ? TypeReaderResult.FromSuccess(num) : TypeReaderResult.FromError(CommandError.ParseFailed, "Integer greater than 0 input required"));
+            return Task.FromResult(uint.TryParse(input, out var num) ? TypeReaderResult.FromSuccess((int)num) : TypeReaderResult.FromError(CommandError.ParseFailed, "Requires an integer input > 0"));
         }
     }
 }
