@@ -42,7 +42,8 @@ namespace Umbreon.Modules
                     Name = Context.User.GetDisplayName()
                 },
                 Color = Color.LightOrange,
-                Description = "All the available modules for Umbreon",
+                Description = "All the available modules for Umbreon\n" +
+                              $"Commands: {_commands.Commands.Count()}",
                 Footer = new EmbedFooterBuilder
                 {
                     Text = $"Type {_database.GetGuild(Context).Prefixes.First()}help Module-Name to view help for that module"
