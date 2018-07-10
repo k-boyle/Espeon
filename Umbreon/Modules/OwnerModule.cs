@@ -1,8 +1,16 @@
-﻿using Discord;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Umbreon.Activities;
+using Umbreon.Attributes;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 
@@ -16,9 +24,10 @@ namespace Umbreon.Modules
     [RequireOwner]
     public class OwnerModule : UmbreonBase<GuildCommandContext>
     {
-        [Command("playing")]
-        [Name("Set Playing")]
-        [Summary("Change what the bot is playing")]
+        [Command("activity")]
+        [Name("Set Activity")]
+        [Summary("Change what activity the bot is doing")]
+        [Usage("cas activity watching")]
         public async Task SetPlaying(
             [Name("Activity")]
             [Summary("Listening, Streaming, Playing, Watching")]
@@ -34,6 +43,7 @@ namespace Umbreon.Modules
         [Command("Username")]
         [Name("Set Username")]
         [Summary("Change the bots username")]
+        [Usage("cas username Umbreon")]
         public async Task SetUsername(
             [Name("New Name")]
             [Summary("The new username for the bot")]
@@ -46,6 +56,7 @@ namespace Umbreon.Modules
         [Command("Message")]
         [Name("Message Guild")]
         [Summary("Send a message to the passed channel in a different guild")]
+        [Usage("cas message 123 hi there")]
         public async Task SendMessage(
             [Name("Channel Id")]
             [Summary("Id of the channel you want to send the message to")] ulong channelId,
