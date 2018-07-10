@@ -3,8 +3,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Umbreon.Core.Models.Database;
 using Umbreon.Helpers;
 using Umbreon.TypeReaders;
 
@@ -49,6 +51,8 @@ namespace Umbreon.Services
         {
             _commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
             _commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
+            _commands.AddTypeReader(typeof(Tag), new TagTypeReader());
+            _commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }
