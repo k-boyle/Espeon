@@ -14,7 +14,7 @@ namespace Umbreon.Services
     public class MessageService
     {
         private readonly InteractiveService _interactive;
-        private readonly List<MessageModel> _messages = new List<MessageModel>();
+        private readonly List<MessageModel> _messages = new List<MessageModel>(); // TODO remodel to use ConcurrentDictionary
         private ulong _currentMessage;
 
         public MessageService(InteractiveService interactive)
@@ -22,7 +22,7 @@ namespace Umbreon.Services
             _interactive = interactive;
         }
 
-        public async Task<IMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, IPaginatedMessage paginator = null)
+        public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, IPaginatedMessage paginator = null)
         {
             CleanseOldMessages();
             if (_messages.Any(x => x.ExecutingMessageId == _currentMessage))
@@ -48,7 +48,7 @@ namespace Umbreon.Services
                     return await _interactive.SendPaginatedMessageAsync(context, paginator);
                 }
 
-                return retrievedMessage;
+                return retrievedMessage as IUserMessage;
             }
 
             var sentMessage = paginator is null ? await context.Channel.SendMessageAsync(message, embed: embed) : await _interactive.SendPaginatedMessageAsync(context, paginator);

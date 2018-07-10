@@ -13,7 +13,7 @@ namespace Umbreon.Modules.ModuleBases
         public MessageService Message { get; set; }
         public IServiceProvider Services { get; set; }
 
-        public async Task<IMessage> SendMessageAsync(string content, Embed embed = null, IPaginatedMessage paginator = null)
+        public async Task<IUserMessage> SendMessageAsync(string content, Embed embed = null, IPaginatedMessage paginator = null)
         {
             return await Message.SendMessageAsync(Context, content, embed, paginator);
         }

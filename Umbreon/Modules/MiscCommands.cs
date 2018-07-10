@@ -1,7 +1,10 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using Discord.Commands;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
@@ -20,11 +23,41 @@ namespace Umbreon.Modules
         [Usage("ping")]
         public async Task Ping()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            var msg = await SendMessageAsync("Ping: ");
-            sw.Stop();
-            await (msg as IUserMessage).ModifyAsync(x => x.Content = $"Ping: {sw.ElapsedMilliseconds}ms\nLatency: {Context.Client.Latency}ms");
+            ulong target = 0;
+            CancellationTokenSource cts = new CancellationTokenSource();
+
+            Task WaitTarget(SocketMessage message)
+            {
+                if (message.Id != target) return Task.CompletedTask;
+                cts.Cancel();
+                return Task.CompletedTask;
+            }
+
+            var latency = Context.Client.Latency;
+            var s = Stopwatch.StartNew();
+            var m = await SendMessageAsync($"heartbeat: {latency}ms, init: ---, rtt: ---");
+            var init = s.ElapsedMilliseconds;
+            target = m.Id;
+            s.Restart();
+            Context.Client.MessageReceived += WaitTarget;
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(30), cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                var rtt = s.ElapsedMilliseconds;
+                s.Stop();
+                await m.ModifyAsync(x => x.Content = $"heartbeat: {latency}ms, init: {init}ms, rtt: {rtt}ms");
+                return;
+            }
+            finally
+            {
+                Context.Client.MessageReceived -= WaitTarget;
+            }
+            s.Stop();
+            await m.ModifyAsync(x => x.Content = $"heartbeat: {latency}ms, init: {init}ms, rtt: timeout");
         }
 
         [Command("c", RunMode = RunMode.Async)]
