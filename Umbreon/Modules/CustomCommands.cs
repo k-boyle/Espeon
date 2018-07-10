@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using Umbreon.Core.Models.Database;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
@@ -183,20 +184,14 @@ namespace Umbreon.Modules
         public async Task Modify(
             [Name("Command Name")]
                 [Summary("The Command you wanna modify")]
-                [Remainder]string cmdName)
+                [Remainder]CustomCommand cmd)
         {
-            if (Commands.TryParse(CurrentCmds, cmdName, out var targetCommand))
-            {
-                await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
-                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var newValue = reply.Content;
-                Commands.UpdateCommand(Context, targetCommand.CommandName, newValue);
-                await SendMessageAsync("Command has been modified");
-                return;
-            }
-
-            await SendMessageAsync("Command not found");
+            await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            var newValue = reply.Content;
+            Commands.UpdateCommand(Context, cmd.CommandName, newValue);
+            await SendMessageAsync("Command has been modified");
         }
 
         [Command("Modify")]
@@ -208,19 +203,13 @@ namespace Umbreon.Modules
         public async Task Modify(
             [Name("Command Name")]
                 [Summary("The name of the Command you want to modify")]
-                string cmdName,
+                CustomCommand cmd,
             [Name("Command Value")]
                 [Summary("The new value that you want the Command to have")]
                 [Remainder] string cmdValue)
         {
-            if (Commands.TryParse(CurrentCmds, cmdName, out var targetCommand))
-            {
-                Commands.UpdateCommand(Context, targetCommand.CommandName, cmdValue);
-                await SendMessageAsync("Command has been modified");
-                return;
-            }
-
-            await SendMessageAsync("Command not found");
+            Commands.UpdateCommand(Context, cmd.CommandName, cmdValue);
+            await SendMessageAsync("Command has been modified");
         }
 
         [Command("Remove", RunMode = RunMode.Async)]
@@ -254,17 +243,11 @@ namespace Umbreon.Modules
         public async Task Remove(
             [Name("Command Name")]
             [Summary("The name of the command that you want to remove")]
-            [Remainder] string cmdName
+            [Remainder] CustomCommand cmd
             )
         {
-            if (Commands.TryParse(CurrentCmds, cmdName, out var targetCmd))
-            {
-                await Commands.RemoveCmd(Context, targetCmd.CommandName);
-                await SendMessageAsync("Command has been removed");
-                return;
-            }
-
-            await SendMessageAsync("Command was not found");
+            await Commands.RemoveCmd(Context, cmd.CommandName);
+            await SendMessageAsync("Command has been removed");
         }
     }
 }

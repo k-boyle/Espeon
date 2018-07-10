@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
-using Umbreon.Helpers;
+using Umbreon.Core.Models.Database;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
@@ -34,24 +34,14 @@ namespace Umbreon.Modules
         public async Task GetTag(
             [Name("Tag Name")]
             [Summary("The name of the tag you want to fetch")]
-            [Remainder] string tagName)
+            [Remainder] Tag tag)
         {
-            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
-            {
-                Tags.UseTag(Context, targetTag.TagName);
-                await SendMessageAsync(targetTag.TagValue);
-                return;
-            }
-
-            var levenTags = CurrentTags.Where(x => StringHelper.CalcLevenshteinDistance(x.TagName, tagName) < 5);
-            var containsTags = CurrentTags.Where(x => x.TagName.Contains(tagName));
-            var totalTags = levenTags.Concat(containsTags);
-            await SendMessageAsync("Tag not found did you mean?\n" +
-                                                     $"{string.Join("\n", totalTags.Select(x => x.TagName))}");
+            Tags.UseTag(Context, tag.TagName);
+            await SendMessageAsync(tag.TagValue);
         }
 
         [Command("List", RunMode = RunMode.Async)]
-        [Alias("")]
+        [Alias("Tags")]
         [Name("List Tags")]
         [Priority(1)]
         [Summary("List all the available tags for this server")]
@@ -87,36 +77,30 @@ namespace Umbreon.Modules
         public async Task GetInfo(
             [Name("Tag Name")]
             [Summary("The tag you want to get info on")]
-            [Remainder]string tagName)
+            [Remainder]Tag tag)
         {
-            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            var user = Context.Guild.GetUser(tag.TagOwner);
+            await SendMessageAsync(string.Empty, new EmbedBuilder
             {
-                var user = Context.Guild.GetUser(targetTag.TagOwner);
-                await SendMessageAsync(string.Empty, new EmbedBuilder
+                Title = $"{tag.TagName} info",
+                Author = new EmbedAuthorBuilder
                 {
-                    Title = $"{targetTag.TagName} info",
-                    Author = new EmbedAuthorBuilder
+                    IconUrl = user.GetDefaultAvatarUrl(),
+                    Name = user.GetDisplayName()
+                },
+                Color = Color.Blue,
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
                     {
-                        IconUrl = user.GetDefaultAvatarUrl(),
-                        Name = user.GetDisplayName()
-                    },
-                    Color = Color.Blue,
-                    Fields = new List<EmbedFieldBuilder>
-                    {
-                        new EmbedFieldBuilder
-                        {
-                            Name = targetTag.TagName,
-                            Value = $"**Tag Uses**: {targetTag.Uses}\n" +
-                                    $"**Created At**: {targetTag.CreatedAt}\n" +
-                                    $"**Created By**: {user.GetDisplayName()}\n" +
-                                    $"**Is Claimable**? {user is null}"
-                        }
+                        Name = tag.TagName,
+                        Value = $"**Tag Uses**: {tag.Uses}\n" +
+                                $"**Created At**: {tag.CreatedAt}\n" +
+                                $"**Created By**: {user.GetDisplayName()}\n" +
+                                $"**Is Claimable**? {user is null}"
                     }
-                }.Build());
-                return;
-            }
-
-            await SendMessageAsync("Tag not found");
+                }
+            }.Build());
         }
 
         [Command("Create", RunMode = RunMode.Async)]
@@ -246,25 +230,19 @@ namespace Umbreon.Modules
         public async Task Modify(
             [Name("Tag Name")]
                 [Summary("The tag you wanna modify")]
-                [Remainder]string tagName)
+                [Remainder] Tag tag)
         {
-            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            if (tag.TagOwner != Context.User.Id)
             {
-                if (targetTag.TagOwner != Context.User.Id)
-                {
-                    await SendMessageAsync("Only the tag owner can modify this tag");
-                    return;
-                }
-                await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
-                var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
-                if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
-                var newValue = reply.Content;
-                Tags.UpdateTag(Context, targetTag.TagName, newValue);
-                await SendMessageAsync("Tag has been modified");
+                await SendMessageAsync("Only the tag owner can modify this tag");
                 return;
             }
-
-            await SendMessageAsync("Tag not found");
+            await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
+            var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
+            if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
+            var newValue = reply.Content;
+            Tags.UpdateTag(Context, tag.TagName, newValue);
+            await SendMessageAsync("Tag has been modified");
         }
 
         [Command("Modify")]
@@ -275,24 +253,18 @@ namespace Umbreon.Modules
         public async Task Modify(
             [Name("Tag Name")]
                 [Summary("The name of the tag you want to modify")]
-                string tagName,
+                Tag tag,
             [Name("Tag Value")]
                 [Summary("The new value that you want the tag to have")]
                 [Remainder] string tagValue)
         {
-            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            if (tag.TagOwner != Context.User.Id)
             {
-                if (targetTag.TagOwner != Context.User.Id)
-                {
-                    await SendMessageAsync("Only the tag owner can modify this tag");
-                    return;
-                }
-                Tags.UpdateTag(Context, targetTag.TagName, tagValue);
-                await SendMessageAsync("Tag has been modified");
+                await SendMessageAsync("Only the tag owner can modify this tag");
                 return;
             }
-
-            await SendMessageAsync("Tag not found");
+            Tags.UpdateTag(Context, tag.TagName, tagValue);
+            await SendMessageAsync("Tag has been modified");
         }
 
         [Command("Delete", RunMode = RunMode.Async)]
@@ -329,21 +301,15 @@ namespace Umbreon.Modules
         public async Task Delete(
             [Name("Tag Name")]
                 [Summary("The name of the tag you want to delete")]
-                [Remainder] string tagName)
+                [Remainder] Tag tag)
         {
-            if (Tags.TryParse(CurrentTags, tagName, out var targetTag))
+            if (tag.TagOwner != Context.User.Id)
             {
-                if (targetTag.TagOwner != Context.User.Id)
-                {
-                    await SendMessageAsync("Only the tag owner can delete this tag");
-                    return;
-                }
-                Tags.DeleteTag(Context, targetTag.TagName);
-                await SendMessageAsync("Tag has been deleted");
+                await SendMessageAsync("Only the tag owner can delete this tag");
                 return;
             }
-
-            await SendMessageAsync("Tag was not found");
+            Tags.DeleteTag(Context, tag.TagName);
+            await SendMessageAsync("Tag has been deleted");
         }
 
     }
