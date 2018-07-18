@@ -4,6 +4,6 @@
     {
         public ulong MessageId { get; set; }
         public ulong StarMessageId { get; set; }
-        public int StarCount { get; set; } = 0;
+        public int StarCount { get; set; }
     }
 }

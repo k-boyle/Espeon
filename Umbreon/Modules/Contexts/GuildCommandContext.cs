@@ -8,8 +8,8 @@ namespace Umbreon.Modules.Contexts
     {
         public DiscordSocketClient Client { get; }
         public SocketGuild Guild { get; }
-        public SocketGuildChannel Channel { get; }
-        public SocketTextChannel Textchannel { get; }
+        public SocketGuildChannel GuildChannel { get; }
+        public SocketTextChannel Channel { get; }
         public SocketGuildUser User { get; }
         public SocketUserMessage Message { get; }
 
@@ -17,15 +17,15 @@ namespace Umbreon.Modules.Contexts
         {
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
-            Channel = msg.Channel as SocketGuildChannel;
-            Textchannel = Channel as SocketTextChannel;
+            GuildChannel = msg.Channel as SocketGuildChannel;
+            Channel = msg.Channel as SocketTextChannel;
             User = msg.Author as SocketGuildUser;
             Message = msg;
         }
 
         IDiscordClient ICommandContext.Client => Client;
         IGuild ICommandContext.Guild => Guild;
-        IMessageChannel ICommandContext.Channel => Channel as IMessageChannel;
+        IMessageChannel ICommandContext.Channel => Channel;
         IUser ICommandContext.User => User;
         IUserMessage ICommandContext.Message => Message;
     }

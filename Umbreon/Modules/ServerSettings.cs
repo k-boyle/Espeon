@@ -104,42 +104,6 @@ namespace Umbreon.Modules
             await SendMessageAsync("Module has been enabled");
         }
 
-        [Command("Starboard")]
-        [Name("Setup Starboard")]
-        [Summary("Set the starboard channel for this guild")]
-        [@Remarks("Leave blank to disable starboard")]
-        [Usage("set starboard #starboard")]
-        public async Task Starboard(
-            [Name("Star Channel")]
-            [Summary("The channel you want starboard to be, leave blank to disable starboard")]
-            [Remainder] SocketTextChannel starChannel = null)
-        {
-            if (starChannel is null)
-            {
-                CurrentGuild.Starboard.Enabled = false;
-                await SendMessageAsync("Starboard has been disabled");
-                return;
-            }
-            
-            CurrentGuild.Starboard.Enabled = true;
-            CurrentGuild.Starboard.ChannelId = starChannel.Id;
-            await SendMessageAsync("Starboard has been enabled");
-        }
-
-        [Command("Starlimit")]
-        [Name("Star Limit")]
-        [Summary("Set the star limit for starboard")]
-        [Usage("set starlimit 3")]
-        [RequireStarboard]
-        public async Task StarLimit(
-            [Name("Star Limit")]
-            [Summary("How many stars are required")]
-            [OverrideTypeReader(typeof(StarLimitTypeReader))] int starLimit)
-        {
-            CurrentGuild.Starboard.StarLimit = starLimit;
-            await SendMessageAsync("Star limit has been updated");
-        }
-
         [Command("CommandMatching")]
         [Name("Close Command Matching")]
         [Summary("Choose whether the bot will try match failed commands to the best match")]

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
 using Umbreon.Preconditions;
@@ -62,7 +63,12 @@ namespace Umbreon.Services
 
                 foreach (var cmd in cmds)
                 {
-                    module.AddCommand(cmd.CommandName, CommandCallback, _ => { });
+                    module.AddCommand(cmd.CommandName, CommandCallback, command =>
+                    {
+                        command.AddAttributes(new Usage($"{cmd.CommandName}"));
+                        command.WithSummary("This is a custom command");
+                        command.WithName(cmd.CommandName);
+                    });
                 }
             });
         }
