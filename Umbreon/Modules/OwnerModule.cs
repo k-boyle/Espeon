@@ -1,16 +1,19 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Umbreon.Activities;
 using Umbreon.Attributes;
+using Umbreon.Helpers;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
+using Umbreon.TypeReaders;
+using Activity = Umbreon.Activities.Activity;
 
 namespace Umbreon.Modules
 {
-    // TODO eval
-
     [Group("cas")]
     [Name("Owner Commands")]
     [Summary("Super duper secret commands")]
@@ -59,6 +62,37 @@ namespace Umbreon.Modules
         {
             var channel = Context.Client.GetChannel(channelId) as SocketTextChannel;
             await channel.SendMessageAsync(message);
+        }
+
+        [Command("eval", RunMode = RunMode.Async)]
+        [Name("Eval")]
+        [Summary("Evaluate C# code")]
+        [Usage("cas eval Console.WriteLine(\"Umbreon is the bestest\");")]
+        public async Task Eval(
+            [Name("Code")]
+            [Summary("The code you want to evaluate")]
+            [Remainder]
+            [OverrideTypeReader(typeof(CodeTypeReader))] string code)
+        {
+            var scriptOptions = ScriptOptions.Default.AddEssemblies().AddNamespaces();
+            var sw = new Stopwatch();
+            var message = await SendMessageAsync("Debugging... ");
+            var global = new Globals
+            {
+                Context = Context
+            };
+            sw.Start();
+            try
+            {
+                var eval = await CSharpScript.EvaluateAsync(code, scriptOptions, global, typeof(Globals));
+                sw.Stop();
+                await message.ModifyAsync(x => x.Content = $"Completed! Time taken: {sw.ElapsedMilliseconds}ms\n" +
+                                                           $"Returned Results: {eval ?? "None"}");
+            }
+            catch (CompilationErrorException e)
+            {
+                await message.ModifyAsync(x => x.Content = $"Completed! But there was an error:\n{e.Message}");
+            }
         }
     }
 }
