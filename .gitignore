@@ -261,3 +261,7 @@ __pycache__/
 *.pyc
 *.db
 Umbreon/Properties/PublishProfiles/FolderProfile.pubxml
+
+Umbreon/application\.yml
+
+Umbreon/Lavalink\.jar

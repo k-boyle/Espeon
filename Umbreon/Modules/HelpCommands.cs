@@ -14,7 +14,8 @@ using Umbreon.Services;
 
 namespace Umbreon.Modules
 {
-    [Name("help")]
+    [Name("Help")]
+    [Summary("Help commands")]
     public class HelpCommands : UmbreonBase<GuildCommandContext>
     {
         private readonly CommandService _commands;

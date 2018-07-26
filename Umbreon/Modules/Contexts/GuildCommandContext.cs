@@ -11,9 +11,9 @@ namespace Umbreon.Modules.Contexts
         public SocketGuildChannel GuildChannel { get; }
         public SocketTextChannel Channel { get; }
         public SocketGuildUser User { get; }
-        public SocketUserMessage Message { get; }
+        public IUserMessage Message { get; }
 
-        public GuildCommandContext(DiscordSocketClient client, SocketUserMessage msg)
+        public GuildCommandContext(DiscordSocketClient client, IUserMessage msg)
         {
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
