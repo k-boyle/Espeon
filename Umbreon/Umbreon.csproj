@@ -16,9 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="4.1.4" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="MoreLinq.Portable" Version="2.0.0-beta04" />
+    <PackageReference Include="SharpLink" Version="1.0.0-beta-0004" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,15 @@
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
     <ProjectReference Include="..\..\Discord.Net.Helpers\Discord.Net.Helpers\Discord.Net.Helpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="application.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Lavalink.jar">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

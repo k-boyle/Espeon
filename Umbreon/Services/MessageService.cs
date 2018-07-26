@@ -7,19 +7,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.HelpPaginator;
+using Umbreon.Controllers.CommandMenu;
+using Umbreon.Controllers.Music;
 using Umbreon.Core.Models;
 
 namespace Umbreon.Services
 {
-    public class MessageService
+    public class MessageService : InteractiveService
     {
-        private readonly InteractiveService _interactive;
         private readonly List<MessageModel> _messages = new List<MessageModel>(); // TODO remodel to use ConcurrentDictionary
+        private readonly CommandService _commands;
+        private readonly IServiceProvider _services;
         private ulong _currentMessage;
 
-        public MessageService(InteractiveService interactive)
+        public MessageService(DiscordSocketClient client, CommandService commands, IServiceProvider services) : base(client)
         {
-            _interactive = interactive;
+            _commands = commands;
+            _services = services;
         }
 
         public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, IPaginatedMessage paginator = null)
@@ -45,16 +50,44 @@ namespace Umbreon.Services
                 else
                 {
                     await retrievedMessage.DeleteAsync();
-                    return await _interactive.SendPaginatedMessageAsync(context, paginator);
+                    return await SendPaginatedMessageAsync(context, paginator);
                 }
 
                 return retrievedMessage as IUserMessage;
             }
 
-            var sentMessage = paginator is null ? await context.Channel.SendMessageAsync(message, embed: embed) : await _interactive.SendPaginatedMessageAsync(context, paginator);
+            var sentMessage = paginator is null ? await context.Channel.SendMessageAsync(message, embed: embed) : await SendPaginatedMessageAsync(context, paginator);
             var newMessage = new MessageModel(_currentMessage, context.User.Id, context.Channel.Id, sentMessage.Id, sentMessage.CreatedAt);
             _messages.Add(newMessage);
             return sentMessage;
+        }
+
+        private new async Task<IUserMessage> SendPaginatedMessageAsync(ICommandContext context, IPaginatedMessage pager, ICriterion<SocketReaction> criterion = null)
+        {
+            ICallback callback;
+
+            switch (pager)
+            {
+                case HelpPaginatedMessage helpPaginatedMessage:
+                    callback = new HelpPaginatedCallback(this, context, helpPaginatedMessage);
+                    break;
+                case PaginatedMessage paginatedMessage:
+                    callback = new PaginatedMessageCallback(this, context, paginatedMessage);
+                    break;
+                case MusicPanelProperties musicPanelProperties:
+                    callback = new MusicPanel(this, context, musicPanelProperties);
+                    break;
+                case CommandMenuProperties commandMenuProperties:
+                    callback = new CommandMenu(this, context, commandMenuProperties, _commands, _services, Discord);
+                    break;
+                default:
+                    callback = null;
+                    break;
+            }
+
+            await callback.DisplayAsync().ConfigureAwait(false);
+
+            return callback.Message;
         }
 
         public async Task ClearMessages(ICommandContext context)

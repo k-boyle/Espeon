@@ -27,7 +27,7 @@ namespace Umbreon.Services
             _services = services;
         }
 
-        public async Task HandleMessageAsync(SocketMessage msg)
+        public async Task HandleMessageAsync(SocketMessage msg) // TODO clean up, make external different method and pipe CommandMenu into it
         {
             if (msg is SocketUserMessage message)
             {
