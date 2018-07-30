@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 using System.Collections.Generic;
-using Umbreon.Core.Models.Database;
+using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Services;
 
 namespace Umbreon.Modules.ModuleBases

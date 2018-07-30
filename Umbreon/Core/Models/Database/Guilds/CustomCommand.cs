@@ -1,4 +1,4 @@
-﻿namespace Umbreon.Core.Models.Database
+﻿namespace Umbreon.Core.Models.Database.Guilds
 {
     public class CustomCommand
     {

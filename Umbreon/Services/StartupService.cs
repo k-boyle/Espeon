@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Core.Models.Database;
+using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Helpers;
 using Umbreon.TypeReaders;
 
@@ -17,16 +18,14 @@ namespace Umbreon.Services
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
         private readonly EventsService _events;
-        private readonly StarboardService _starboard;
         private readonly IServiceProvider _services;
 
-        public StartupService(DiscordSocketClient client, CommandService commands, DatabaseService database, EventsService events, StarboardService starboard, IServiceProvider services)
+        public StartupService(DiscordSocketClient client, CommandService commands, DatabaseService database, EventsService events, IServiceProvider services)
         {
             _client = client;
             _commands = commands;
             _database = database;
             _events = events;
-            _starboard = starboard;
             _services = services;
         }
 
@@ -36,7 +35,6 @@ namespace Umbreon.Services
             await StartClient();
             _events.HookEvents();
             await LoadCommands();
-            _starboard.Initialize();
             await Task.Delay(-1);
         }
 

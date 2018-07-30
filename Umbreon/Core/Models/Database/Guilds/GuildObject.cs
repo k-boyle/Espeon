@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using System.Collections.Generic;
+using Umbreon.Core.Models.Database.Guilds;
 
 namespace Umbreon.Core.Models.Database
 {

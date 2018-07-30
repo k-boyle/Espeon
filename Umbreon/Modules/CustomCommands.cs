@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
-using Umbreon.Core.Models.Database;
+using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
