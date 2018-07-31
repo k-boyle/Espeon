@@ -31,5 +31,9 @@ namespace Umbreon.Core.Models.Database
         public List<ulong> BlacklistedUsers { get; set; } = new List<ulong>(); // TODO
         public List<ulong> WhiteListedUsers { get; set; } = new List<ulong>(); // TODO
         public List<ulong> RestrictedChannels { get; set; } = new List<ulong>(); // TODO
+        public List<ulong> MusicUsers { get; set; } = new List<ulong>
+        {
+            84291986575613952
+        };
     }
 }

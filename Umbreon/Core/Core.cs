@@ -33,8 +33,8 @@ namespace Umbreon.Core
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<TagService>()
                 .AddSingleton<CustomCommandsService>()
-                .AddSingleton<StarboardService>()
                 .AddSingleton<SelfAssigningRolesService>()
+                .AddSingleton<MusicService>()
                 .BuildServiceProvider();
             
             await services.GetService<StartupService>().InitialiseAsync();
