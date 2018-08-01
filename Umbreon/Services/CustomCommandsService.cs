@@ -66,7 +66,7 @@ namespace Umbreon.Services
                 {
                     module.AddCommand(cmd.CommandName, CommandCallback, command =>
                     {
-                        command.AddAttributes(new Usage($"{cmd.CommandName}"));
+                        command.AddAttributes(new UsageAttribute($"{cmd.CommandName}"));
                         command.WithSummary("This is a custom command");
                         command.WithName(cmd.CommandName);
                     });

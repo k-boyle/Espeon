@@ -3,11 +3,11 @@
 namespace Umbreon.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Parameter)]
-    public class Remarks : Attribute
+    public class RemarksAttribute : Attribute
     {
         public string[] RemarkStrings { get; }
 
-        public Remarks(params string[] remarks)
+        public RemarksAttribute(params string[] remarks)
         {
             RemarkStrings = remarks;
         }

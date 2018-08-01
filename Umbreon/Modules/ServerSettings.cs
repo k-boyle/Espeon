@@ -6,7 +6,6 @@ using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
-using Umbreon.TypeReaders;
 
 namespace Umbreon.Modules
 {
@@ -107,7 +106,7 @@ namespace Umbreon.Modules
         [Command("CommandMatching")]
         [Name("Close Command Matching")]
         [Summary("Choose whether the bot will try match failed commands to the best match")]
-        [@Remarks("This can lead to unexpected results")]
+        [Attributes.Remarks("This can lead to unexpected results")]
         [Usage("set commandmatching false")]
         public async Task SetMatching(
             [Name("Enabled")]

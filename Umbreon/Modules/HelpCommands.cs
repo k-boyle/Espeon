@@ -36,7 +36,7 @@ namespace Umbreon.Modules
             Page newPage;
             foreach (var module in modules)
             {
-                var remarks = module.Attributes.FirstOrDefault(x => x is Remarks) as Remarks;
+                var remarks = module.Attributes.FirstOrDefault(x => x is Attributes.RemarksAttribute) as Attributes.RemarksAttribute;
                 fields.Clear();
                 newPage = new Page
                 {
@@ -59,7 +59,7 @@ namespace Umbreon.Modules
                     {
                         Name = $"Command: {cmd.Name}",
                         Value = $"**Summary**: {cmd.Summary}\n" +
-                                $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is Usage) as Usage).Example}"
+                                $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute).Example}"
                     });
                 }
 
@@ -112,7 +112,7 @@ namespace Umbreon.Modules
                 {
                     f.Name = cmd.Name;
                     f.Value = $"**Summary**: {cmd.Summary}\n" +
-                              $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is Usage) as Usage).Example}\n" +
+                              $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute).Example}\n" +
                               $"**Parameter**: {string.Join("\n**Parameter**:", cmd.Parameters.Select(x => $"`{x.Name}` > {x.Summary}"))}";
                 });
             }

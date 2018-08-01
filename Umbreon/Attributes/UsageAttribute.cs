@@ -3,11 +3,11 @@
 namespace Umbreon.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class Usage : Attribute
+    public class UsageAttribute : Attribute
     {
         public string Example { get; }
 
-        public Usage(string example)
+        public UsageAttribute(string example)
         {
             Example = example;
         }

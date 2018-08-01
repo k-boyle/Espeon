@@ -23,7 +23,7 @@ namespace Umbreon.Modules
     [RequireEnabled]
     [ModuleType(Module.Tags)]
     [Summary("Create tags for your server")]
-    [@Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
+    [Attributes.Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
     public class TagCommands : TagBase<GuildCommandContext>
     {
         [Command]

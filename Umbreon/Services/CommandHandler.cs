@@ -71,7 +71,7 @@ namespace Umbreon.Services
                                 case CommandError.BadArgCount:
                                     var foundCommand = _commands.Search(context, argPos).Commands.FirstOrDefault().Command;
                                     await _message.SendMessageAsync(context, "Wrong command usage, have an example:\n" +
-                                                                             $"{guild.Prefixes.First()}{(foundCommand.Attributes.FirstOrDefault(x => x is Usage) as Usage).Example}\n\n" +
+                                                                             $"{guild.Prefixes.First()}{(foundCommand.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute).Example}\n\n" +
                                                                              $"If you need more help with the command, simply type {guild.Prefixes.First()}help {foundCommand.Name}");
                                     break;
 

@@ -4,11 +4,11 @@ using Umbreon.Core;
 namespace Umbreon.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ModuleType : Attribute
+    public class ModuleTypeAttribute : Attribute
     {
         public Module Type;
 
-        public ModuleType(Module module)
+        public ModuleTypeAttribute(Module module)
             => Type = module;
     }
 }

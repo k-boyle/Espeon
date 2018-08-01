@@ -20,7 +20,7 @@ namespace Umbreon.Modules
     [Summary("Create custom commands for your server")]
     [RequireEnabled]
     [ModuleType(Module.Commands)]
-    [@Remarks("This module can be disabled", "Module Code: Commands")]
+    [Attributes.Remarks("This module can be disabled", "Module Code: Commands")]
     public class CustomCommands : CustomCommandsBase<GuildCommandContext>
     {
         [Command("List", RunMode = RunMode.Async)]
