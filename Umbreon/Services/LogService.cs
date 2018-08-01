@@ -3,12 +3,13 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.Interfaces;
+using Umbreon.Attributes;
 using Umbreon.Core;
 
 namespace Umbreon.Services
 {
-    public class LogService : IService
+    [Service]
+    public class LogService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;

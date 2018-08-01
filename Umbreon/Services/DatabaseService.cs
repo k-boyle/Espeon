@@ -6,14 +6,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.Interfaces;
+using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
 using Umbreon.Helpers;
 
 namespace Umbreon.Services
 {
-    public class DatabaseService : IService
+    [Service]
+    public class DatabaseService
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _logs;

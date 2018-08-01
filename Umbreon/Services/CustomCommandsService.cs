@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.Interfaces;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database.Guilds;
@@ -13,7 +12,8 @@ using Umbreon.Preconditions;
 
 namespace Umbreon.Services
 {
-    public class CustomCommandsService : IService
+    [Service]
+    public class CustomCommandsService
     {
         private readonly DatabaseService _database;
         private readonly CommandService _commandService;
@@ -80,7 +80,7 @@ namespace Umbreon.Services
                 _commandService.Modules.FirstOrDefault(x =>
                     string.Equals(x.Name, guildId.ToString(), StringComparison.CurrentCultureIgnoreCase)));
             await NewCmds(guildId);
-            _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"New command has been created in {guildId}");
+           _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"New command has been created in {guildId}");
         }
 
         private async Task CommandCallback(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
@@ -119,7 +119,7 @@ namespace Umbreon.Services
             await NewCmds(guildId);
             _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"Command has been removed in {guildId}");
         }
-
+        
         public async Task RemoveCmd(ICommandContext context, string cmdName)
         {
             var guild = _database.GetGuild(context);

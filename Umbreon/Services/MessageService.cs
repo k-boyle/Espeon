@@ -8,15 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive.HelpPaginator;
+using Umbreon.Attributes;
 using Umbreon.Controllers.CommandMenu;
 using Umbreon.Core.Models;
 
 namespace Umbreon.Services
 {
+    [Service]
     public class MessageService : InteractiveService
     {
-        // TODO overhaul this garbage
-        private readonly List<MessageModel> _messages = new List<MessageModel>();
+        private readonly List<MessageModel> _messages = new List<MessageModel>(); // TODO remodel to use ConcurrentDictionary
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         private ulong _currentMessage;

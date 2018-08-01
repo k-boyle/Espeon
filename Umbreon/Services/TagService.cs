@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord.Addons.Interactive.Interfaces;
+using Umbreon.Attributes;
 using Umbreon.Core.Models.Database;
 
 namespace Umbreon.Services
 {
-    public class TagService : IService
+    [Service]
+    public class TagService
     {
         private readonly DatabaseService _database;
 

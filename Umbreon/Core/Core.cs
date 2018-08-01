@@ -1,11 +1,12 @@
-﻿using Discord;
-using Discord.Addons.Interactive.Interfaces;
+﻿using System;
+using System.Linq;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
+using Umbreon.Attributes;
 using Umbreon.Services;
 
 namespace Umbreon.Core
@@ -25,11 +26,12 @@ namespace Umbreon.Core
                 {
                     LogLevel = LogSeverity.Verbose,
                     CaseSensitiveCommands = false
-                }));
+                }))
+                .AddSingleton<InteractiveService>();
 
-            var type = typeof(IService);
+            var attribute = typeof(ServiceAttribute);
             var services = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
-                .Where(y => type.IsAssignableFrom(y) && !y.IsInterface);
+                .Where(y => y.GetCustomAttributes(attribute, true).Length > 0);
             foreach (var service in services)
                 serviceCollection.AddSingleton(service);
 

@@ -5,11 +5,12 @@ using SharpLink;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.Interfaces;
+using Umbreon.Attributes;
 
 namespace Umbreon.Services
 {
-    public class MusicService : IService
+    [Service]
+    public class MusicService
     {
         private readonly DiscordSocketClient _client;
         private LavalinkManager _lavalinkManager;
