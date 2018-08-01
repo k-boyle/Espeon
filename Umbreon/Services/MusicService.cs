@@ -76,8 +76,9 @@ namespace Umbreon.Services
         public Task<LavalinkTrack> GetTrackAsync(string toSearch)
             => _lavalinkManager.GetTrackAsync($"ytsearch:{toSearch}");
 
-        private async Task TrackFinishedAsync(LavalinkPlayer player, LavalinkTrack __, string ___)
+        private async Task TrackFinishedAsync(LavalinkPlayer player, LavalinkTrack __, string reason)
         {
+            if (reason == "REPLACED") return;
             var guildId = player.VoiceChannel.GuildId;
             _lavaCache[guildId].queue.TryDequeue(out _);
             if (_lavaCache[guildId].queue.TryPeek(out var track))
@@ -133,7 +134,23 @@ namespace Umbreon.Services
         public async Task SkipSongAsync(ICommandContext context)
         {
             if (!_lavaCache.TryGetValue(context.Guild.Id, out var currentGuild)) return;
-            await currentGuild.player.SeekAsync(int.MaxValue);
+            currentGuild.queue.TryDequeue(out _);
+            if (currentGuild.queue.TryPeek(out var track))
+            {
+                await currentGuild.player.PlayAsync(track);
+                var channel = _client.GetChannel(currentGuild.channelId) as SocketTextChannel;
+                var embed = new EmbedBuilder
+                {
+                    Title = $"Now playing {track.Title}",
+                    Color = Color.Red
+                };
+                await channel.SendMessageAsync(string.Empty, embed: embed.Build()); // TODO once overhauled fix this
+                _lavaCache[context.Guild.Id] = currentGuild;
+            }
+            else
+            {
+                await currentGuild.player.StopAsync();
+            }
         }
     }
 }
