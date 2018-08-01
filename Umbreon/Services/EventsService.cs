@@ -3,10 +3,11 @@ using Discord.Commands;
 using Discord.Net.Helpers;
 using Discord.WebSocket;
 using System.Linq;
+using Discord.Addons.Interactive.Interfaces;
 
 namespace Umbreon.Services
 {
-    public class EventsService
+    public class EventsService : IService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;

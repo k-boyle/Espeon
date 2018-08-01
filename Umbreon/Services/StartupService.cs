@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.Interfaces;
 using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Helpers;
@@ -12,7 +13,7 @@ using Umbreon.TypeReaders;
 
 namespace Umbreon.Services
 {
-    public class StartupService
+    public class StartupService : IService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;

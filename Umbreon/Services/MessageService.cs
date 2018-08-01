@@ -9,14 +9,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive.HelpPaginator;
 using Umbreon.Controllers.CommandMenu;
-using Umbreon.Controllers.Music;
 using Umbreon.Core.Models;
 
 namespace Umbreon.Services
 {
     public class MessageService : InteractiveService
     {
-        private readonly List<MessageModel> _messages = new List<MessageModel>(); // TODO remodel to use ConcurrentDictionary
+        // TODO overhaul this garbage
+        private readonly List<MessageModel> _messages = new List<MessageModel>();
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         private ulong _currentMessage;
@@ -73,9 +73,6 @@ namespace Umbreon.Services
                     break;
                 case PaginatedMessage paginatedMessage:
                     callback = new PaginatedMessageCallback(this, context, paginatedMessage);
-                    break;
-                case MusicPanelProperties musicPanelProperties:
-                    callback = new MusicPanel(this, context, musicPanelProperties);
                     break;
                 case CommandMenuProperties commandMenuProperties:
                     callback = new CommandMenu(this, context, commandMenuProperties, _commands, _services, Discord);

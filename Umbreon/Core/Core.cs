@@ -1,8 +1,10 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
+using Discord.Addons.Interactive.Interfaces;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Services;
 
@@ -12,7 +14,7 @@ namespace Umbreon.Core
     {
         private static async Task Main()
         {
-            var services = new ServiceCollection()
+            var serviceCollection = new ServiceCollection()
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     AlwaysDownloadUsers = true,
@@ -23,21 +25,17 @@ namespace Umbreon.Core
                 {
                     LogLevel = LogSeverity.Verbose,
                     CaseSensitiveCommands = false
-                }))
-                .AddSingleton<EventsService>()
-                .AddSingleton<LogService>()
-                .AddSingleton<CommandHandler>()
-                .AddSingleton<StartupService>()
-                .AddSingleton<DatabaseService>()
-                .AddSingleton<MessageService>()
-                .AddSingleton<InteractiveService>()
-                .AddSingleton<TagService>()
-                .AddSingleton<CustomCommandsService>()
-                .AddSingleton<SelfAssigningRolesService>()
-                .AddSingleton<MusicService>()
-                .BuildServiceProvider();
-            
-            await services.GetService<StartupService>().InitialiseAsync();
+                }));
+
+            var type = typeof(IService);
+            var services = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                .Where(y => type.IsAssignableFrom(y) && !y.IsInterface);
+            foreach (var service in services)
+                serviceCollection.AddSingleton(service);
+
+            var builtProvider = serviceCollection.BuildServiceProvider();
+
+            await builtProvider.GetService<StartupService>().InitialiseAsync();
         }
     }
 }

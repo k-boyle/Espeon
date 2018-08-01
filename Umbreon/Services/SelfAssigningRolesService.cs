@@ -1,10 +1,11 @@
 ﻿using Discord.Commands;
 using System.Collections.Generic;
 using System.Linq;
+using Discord.Addons.Interactive.Interfaces;
 
 namespace Umbreon.Services
 {
-    public class SelfAssigningRolesService
+    public class SelfAssigningRolesService : IService
     {
         private readonly DatabaseService _database;
 

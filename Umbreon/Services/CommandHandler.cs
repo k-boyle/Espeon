@@ -4,13 +4,14 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.Interfaces;
 using Umbreon.Attributes;
 using Umbreon.Helpers;
 using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services
 {
-    public class CommandHandler
+    public class CommandHandler : IService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
