@@ -10,7 +10,8 @@
     public enum LogSource
     {
         Database,
-        CustomCmds
+        CustomCmds,
+        CustomFuncs
     }
 
     public enum SpecialRole

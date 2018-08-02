@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbreon.Core.Models.Database;
 
 namespace Umbreon.Helpers
 {
@@ -76,6 +77,29 @@ namespace Umbreon.Helpers
             }
 
             return strings;
+        }
+
+        public static CustomFunction GetFunction(this string content)
+        {
+            var lines = content.Split("\n");
+            var function = new CustomFunction {FunctionCallback = string.Join("", content.GetCodes())};
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("name: ", StringComparison.CurrentCultureIgnoreCase))
+                    function.FunctionName = line.Substring(6);
+                else if (line.StartsWith("summary: ", StringComparison.CurrentCultureIgnoreCase))
+                    function.Summary = line.Substring(8);
+                else if (line.StartsWith("private: ", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!bool.TryParse(line.Substring(8), out var res)) return null;
+                    function.IsPrivate = res;
+                }
+                else if (line.StartsWith("guild: ", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    function.GuildId = 1;
+                }
+            }
+            return function;
         }
     }
 }

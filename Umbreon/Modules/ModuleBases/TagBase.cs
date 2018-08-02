@@ -9,7 +9,7 @@ namespace Umbreon.Modules.ModuleBases
     {
         public TagService Tags { get; set; }
         public IEnumerable<Tag> CurrentTags { get; set; }
-        public readonly string[] ReservedWords = { "Create", "Modify", "Delete", "List", "Cancel"};
+        public readonly string[] ReservedWords = { "Create", "Modify", "Delete", "List", "Cancel" };
 
         protected override void BeforeExecute(CommandInfo command)
         {

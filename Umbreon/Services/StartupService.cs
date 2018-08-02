@@ -52,6 +52,7 @@ namespace Umbreon.Services
             _commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
             _commands.AddTypeReader(typeof(Tag), new TagTypeReader());
             _commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
+            _commands.AddTypeReader(typeof(CustomFunction), new CustomFunctionTypeReader());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }

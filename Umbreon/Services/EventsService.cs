@@ -16,9 +16,11 @@ namespace Umbreon.Services
         private readonly LogService _logs;
         private readonly CommandHandler _handler;
         private readonly CustomCommandsService _customCommands;
+        private readonly CustomFunctionService _customFunctions;
         private readonly MusicService _musicService;
 
-        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, CommandHandler handler, CustomCommandsService customCommands, MusicService musicService)
+        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, 
+            CommandHandler handler, CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService)
         {
             _client = client;
             _commands = commands;
@@ -26,6 +28,7 @@ namespace Umbreon.Services
             _logs = logs;
             _handler = handler;
             _customCommands = customCommands;
+            _customFunctions = customFunctions;
             _musicService = musicService;
         }
 
@@ -36,6 +39,7 @@ namespace Umbreon.Services
             {
                 _database.LoadGuilds();
                 await _customCommands.LoadCmds(_client);
+                await _customFunctions.LoadFuncs(_client);
                 await _musicService.Initialise();
             };
             _client.MessageReceived += _handler.HandleMessageAsync;

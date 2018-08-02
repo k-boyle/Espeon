@@ -9,7 +9,7 @@ namespace Umbreon.Modules.ModuleBases
     {
         public CustomCommandsService Commands { get; set; }
         public IEnumerable<CustomCommand> CurrentCmds;
-        public string[] ReservedWords = { "Create", "Modify", "Delete", "Cancel", "List"};
+        public string[] ReservedWords = { "Create", "Modify", "Delete", "Cancel", "List", "c" };
 
         protected override void BeforeExecute(CommandInfo command)
         {
