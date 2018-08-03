@@ -48,6 +48,7 @@ namespace Umbreon.Interactive.Paginator
             // Reactions take a while to add, don't wait for them
             _ = Task.Run(async () =>
             {
+                //BypassBuckets flag is a property that is part of my modified form of the lib
                 await message.AddReactionAsync(Options.First, new RequestOptions
                 {
                     BypassBuckets = true
