@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
 using System.Linq;
 using Umbreon.Attributes;
+using Umbreon.Extensions;
 
 namespace Umbreon.Services
 {

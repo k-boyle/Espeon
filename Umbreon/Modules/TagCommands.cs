@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
+using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;

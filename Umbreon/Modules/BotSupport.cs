@@ -1,9 +1,9 @@
 ﻿using Discord.Commands;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Extensions;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 

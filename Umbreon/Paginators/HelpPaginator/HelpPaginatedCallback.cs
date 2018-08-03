@@ -1,11 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Extensions;
+using Umbreon.Helpers;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;

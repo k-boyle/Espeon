@@ -1,10 +1,10 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
-using System.Threading.Tasks;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
+using System;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Extensions;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
@@ -17,6 +17,8 @@ namespace Umbreon.Modules
     [RequireMusic]
     public class Music : MusicModuleBase<GuildCommandContext>
     {
+        //TODO add show queue
+
         [Command("join")]
         [Summary("Gets the bot to join your voice channel")]
         [Usage("music join")]
@@ -55,7 +57,7 @@ namespace Umbreon.Modules
                 Title = res ? $"{track.Title} added to queue" : $"Now playing {track.Title}",
                 Color = Color.Red
             };
-            await SendMessageAsync(string.Empty, embed.Build());
+            await SendMessageAsync(string.Empty, embed: embed.Build());
         }
 
         [Command("leave")]
@@ -123,11 +125,26 @@ namespace Umbreon.Modules
         [Name("Approve User")]
         [RequireOwner]
         public async Task Approve(
-            [Name("User")] [Summary("The user you want to approve")] [Remainder]
-            SocketGuildUser user)
+            [Name("User")]
+            [Summary("The user you want to approve")]
+            [Remainder] SocketGuildUser user)
         {
             CurrentGuild.MusicUsers.Add(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been approved");
+        }
+
+        [Command("unapprove")]
+        [Summary("Unapprove a user for music commands")]
+        [Usage("music unapprove Umbreon")]
+        [Name("Unapprove User")]
+        [RequireOwner]
+        public async Task Unapprove(
+            [Name("User")]
+            [Summary("The user you want to unapprove")]
+            [Remainder] SocketGuildUser user)
+        {
+            CurrentGuild.MusicUsers.Remove(user.Id);
+            await SendMessageAsync($"{user.GetDisplayName()} has been unapproved");
         }
     }
 }

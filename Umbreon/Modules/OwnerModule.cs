@@ -1,17 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Helpers;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Services;
 using Umbreon.TypeReaders;
-using Activity = Umbreon.Activities.Activity;
+using Activity = Umbreon.Core.Entities.Activity;
 
 namespace Umbreon.Modules
 {

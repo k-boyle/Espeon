@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using Umbreon.Extensions;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;

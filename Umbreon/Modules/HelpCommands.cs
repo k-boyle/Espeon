@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;

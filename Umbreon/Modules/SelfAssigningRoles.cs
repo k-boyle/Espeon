@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Net.Helpers;
 using Discord.WebSocket;
 using MoreLinq;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
