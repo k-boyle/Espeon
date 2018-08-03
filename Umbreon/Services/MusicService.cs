@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using SharpLink;
-using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -13,6 +12,7 @@ namespace Umbreon.Services
     public class MusicService
     {
         private readonly DiscordSocketClient _client;
+        private readonly LogService _log;
         private LavalinkManager _lavalinkManager;
 
         private
@@ -20,9 +20,10 @@ namespace Umbreon.Services
                 ConcurrentQueue<LavalinkTrack> queue)> _lavaCache =
                 new ConcurrentDictionary<ulong, (LavalinkPlayer, bool, ulong, ConcurrentQueue<LavalinkTrack>)>();
 
-        public MusicService(DiscordSocketClient client)
+        public MusicService(DiscordSocketClient client, LogService log)
         {
             _client = client;
+            _log = log;
         }
 
         public async Task Initialise()
@@ -37,11 +38,7 @@ namespace Umbreon.Services
                 TotalShards = 1,
                 LogSeverity = LogSeverity.Verbose
             });
-            _lavalinkManager.Log += message =>
-            {
-                Console.WriteLine(message);
-                return Task.CompletedTask;
-            };
+            _lavalinkManager.Log += _log.LogEvent;
             await _lavalinkManager.StartAsync();
             _lavalinkManager.TrackEnd += TrackFinishedAsync;
         }
