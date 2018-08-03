@@ -11,13 +11,14 @@ using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
 {
     [Group("Roles")]
     [Name("Self Assigning Roles")]
     [Summary("Roles that users can add/remove to/from themselves")]
-    [Attributes.Remarks("This module can be disabled", "Module Code: Roles")]
+    [Remarks("This module can be disabled", "Module Code: Roles")]
     [ModuleType(Module.Roles)]
     [RequireEnabled]
     public class SelfAssigningRoles : SelfAssigningRolesBase<GuildCommandContext>

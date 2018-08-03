@@ -11,6 +11,7 @@ using Umbreon.Attributes;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Services;
+using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
 {
@@ -36,7 +37,7 @@ namespace Umbreon.Modules
             Page newPage;
             foreach (var module in modules)
             {
-                var remarks = module.Attributes.FirstOrDefault(x => x is Attributes.RemarksAttribute) as Attributes.RemarksAttribute;
+                var remarks = module.Attributes.FirstOrDefault(x => x is RemarksAttribute) as RemarksAttribute;
                 fields.Clear();
                 newPage = new Page
                 {

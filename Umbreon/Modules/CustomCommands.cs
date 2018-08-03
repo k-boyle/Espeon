@@ -12,6 +12,7 @@ using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
 {
@@ -20,7 +21,7 @@ namespace Umbreon.Modules
     [Summary("Create custom commands for your server")]
     [RequireEnabled]
     [ModuleType(Module.Commands)]
-    [Attributes.Remarks("This module can be disabled", "Module Code: Commands")]
+    [Remarks("This module can be disabled", "Module Code: Commands")]
     public class CustomCommands : CustomCommandsBase<GuildCommandContext>
     {
         [Command("List", RunMode = RunMode.Async)]

@@ -13,6 +13,7 @@ using Umbreon.Core.Models.Database;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 // TODO tag claiming, searching and mod stuff
 
@@ -23,7 +24,7 @@ namespace Umbreon.Modules
     [RequireEnabled]
     [ModuleType(Module.Tags)]
     [Summary("Create tags for your server")]
-    [Attributes.Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
+    [Remarks("Unlike custom commands anyone can make a tag, and tags must be prefixed with `tag`", "This module can be disabled", "Module Code: Tags")]
     public class TagCommands : TagBase<GuildCommandContext>
     {
         [Command]
