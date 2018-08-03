@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Core.Entities;
 using Umbreon.Core.Models;
 using Umbreon.Modules.Contexts;
 
@@ -34,7 +35,6 @@ namespace Umbreon.Services
         public async Task EvaluateAsync(ICommandContext context, string code, bool isEval, IServiceProvider services)
         {
             var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(GetNamespaces());
-            _message.SetCurrentMessage(context.Message.Id);
             var globals = new Globals
             {
                 Context = context as GuildCommandContext,
@@ -48,7 +48,9 @@ namespace Umbreon.Services
             sw.Start();
             try
             {
-                var eval = await CSharpScript.EvaluateAsync($"{string.Join("", Usings.Select(x => $"using {x};"))} {code}", scriptOptions, globals, typeof(Globals));
+                var eval = await CSharpScript.EvaluateAsync(
+                    $"{string.Join("", Usings.Select(x => $"using {x};"))} {code}", scriptOptions, globals,
+                    typeof(Globals));
                 sw.Stop();
                 if (isEval)
                 {
@@ -65,7 +67,13 @@ namespace Umbreon.Services
                     return;
                 }
 
-                await _message.SendMessageAsync(context, $"There was an error. Please report this!\n```{Format.Sanitize(ex.ToString().Substring(0, 500))}```");
+                await _message.SendMessageAsync(context,
+                    $"There was an error. Please report this!\n```{Format.Sanitize(ex.ToString().Substring(0, 500))}```");
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 

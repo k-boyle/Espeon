@@ -1,119 +1,245 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Addons.Interactive.Interfaces;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive.HelpPaginator;
 using Umbreon.Attributes;
-using Umbreon.Controllers.CommandMenu;
-using Umbreon.Core.Models;
+using Umbreon.Core.Entities;
+using Umbreon.Interactive;
+using Umbreon.Interactive.Interfaces;
+using Umbreon.Interactive.Paginator;
+using Umbreon.Modules.Contexts;
+using Umbreon.Paginators;
+using Umbreon.Paginators.CommandMenu;
+using Umbreon.Paginators.HelpPaginator;
 
 namespace Umbreon.Services
 {
     [Service]
-    public class MessageService : InteractiveService
+    public class MessageService
     {
-        private readonly List<MessageModel> _messages = new List<MessageModel>(); // TODO remodel to use ConcurrentDictionary
+        private readonly DiscordSocketClient _client;
+        private readonly DatabaseService _database;
         private readonly CommandService _commands;
+        private readonly InteractiveService _interactive;
         private readonly IServiceProvider _services;
-        private ulong _currentMessage;
 
-        public MessageService(DiscordSocketClient client, CommandService commands, IServiceProvider services) : base(client)
+        private const int CacheSize = 10;
+
+        private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache = new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
+
+        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, IServiceProvider services)
         {
+            _client = client;
+            _database = database;
             _commands = commands;
+            _interactive = interactive;
             _services = services;
         }
 
-        public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string message, Embed embed = null, IPaginatedMessage paginator = null)
+        public async Task HandleMessageAsync(SocketMessage msg)
         {
-            CleanseOldMessages();
-            if (_messages.Any(x => x.ExecutingMessageId == _currentMessage))
+            if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) || !(msg is SocketUserMessage message)) return;
+
+            var guild = _database.GetGuild(channel.Guild.Id);
+
+            if (guild.BlacklistedUsers.Contains(message.Author.Id) || guild.RestrictedChannels.Contains(channel.Id) || 
+                guild.UseWhiteList && !guild.WhiteListedUsers.Contains(message.Author.Id)) return;
+
+            var prefixes = guild.Prefixes;
+
+            var argPos = 0;
+
+            if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) || prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
-                var targetMessage = _messages.FirstOrDefault(x => x.ExecutingMessageId == _currentMessage);
-                var retrievedMessage = (context.Channel as SocketTextChannel).GetCachedMessage(targetMessage.MessageId) ??
-                                       await context.Channel.GetMessageAsync(targetMessage.MessageId);
-                if (retrievedMessage is null) return null;
-                if (paginator is null)
-                {
-                    if ((await context.Guild.GetCurrentUserAsync()).GetPermissions(context.Channel as SocketGuildChannel)
-                        .ManageMessages)
-                        await (retrievedMessage as SocketUserMessage).RemoveAllReactionsAsync();
-                    await (retrievedMessage as IUserMessage).ModifyAsync(x =>
-                    {
-                        x.Content = message;
-                        x.Embed = embed;
-                    });
-                }
-                else
-                {
-                    await retrievedMessage.DeleteAsync();
-                    return await SendPaginatedMessageAsync(context, paginator);
-                }
-
-                return retrievedMessage as IUserMessage;
+                var context = new GuildCommandContext(_client, message);
+                await HandleCommandAsync(context, argPos);
             }
-
-            var sentMessage = paginator is null ? await context.Channel.SendMessageAsync(message, embed: embed) : await SendPaginatedMessageAsync(context, paginator);
-            var newMessage = new MessageModel(_currentMessage, context.User.Id, context.Channel.Id, sentMessage.Id, sentMessage.CreatedAt);
-            _messages.Add(newMessage);
-            return sentMessage;
         }
 
-        private new async Task<IUserMessage> SendPaginatedMessageAsync(ICommandContext context, IPaginatedMessage pager, ICriterion<SocketReaction> criterion = null)
-        {
-            ICallback callback;
+        public Task HandleMessageUpdateAsync(SocketMessage msg)
+            => HandleMessageAsync(msg);
 
-            switch (pager)
+        public async Task HandleCommandAsync(GuildCommandContext context, int argPos)
+        {
+            if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
+            await _commands.ExecuteAsync(context, argPos, _services);
+        }
+
+        private Task CommandExecuted(CommandInfo command, ICommandContext context, IResult result)
+        {
+            if (!result.IsSuccess)
             {
-                case HelpPaginatedMessage helpPaginatedMessage:
-                    callback = new HelpPaginatedCallback(this, context, helpPaginatedMessage);
+
+            }
+            return Task.CompletedTask;
+        }
+
+        public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false, Embed embed = null)
+        {
+            var message = await GetExistingMessageAsync(context);
+            if (message is null)
+            {
+                return await NewMessageAsync(context, content, isTTS, embed);
+            }
+
+            var currentUser = await context.Guild.GetCurrentUserAsync();
+            var perms = currentUser.GetPermissions(context.Channel as IGuildChannel);
+
+            if(perms.ManageMessages)
+                await message.RemoveAllReactionsAsync();
+
+            await message.ModifyAsync(x =>
+            {
+                x.Content = content;
+                x.Embed = embed;
+            });
+
+            return message;
+        }
+
+        public Task<IUserMessage> NewMessageAsync(ICommandContext context, string content, bool isTTS = false, Embed embed = null)
+            => NewMessageAsync(context.User.Id, context.Message.Id, context.Channel.Id, content, isTTS, embed);
+
+        public async Task<IUserMessage> NewMessageAsync(ulong userId, ulong executingId, ulong channelId, string content, bool isTTS = false, Embed embed = null)
+        {
+            if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
+            var response = await channel.SendMessageAsync(content, isTTS, embed);
+            await NewItem(userId, channelId, response.CreatedAt, executingId, response.Id);
+
+            return response;
+        }
+
+        public async Task<IUserMessage> SendPaginatedMessageAsync(ICommandContext context, BasePaginator paginator)
+        {
+            var message = await GetExistingMessageAsync(context);
+
+            if (!(message is null))
+            {
+                await message.DeleteAsync();
+            }
+
+            ICallback callback = null;
+
+            // TODO clean up all paginators
+            switch (paginator)
+            {
+                case HelpPaginatedMessage help:
+                    callback = new HelpPaginatedCallback(_interactive, context, help);
                     break;
-                case PaginatedMessage paginatedMessage:
-                    callback = new PaginatedMessageCallback(this, context, paginatedMessage);
+
+                case CommandMenuMessage cmd:
+                    callback = new CommandMenuCallback(_interactive, context, cmd, _commands, _services, _client);
                     break;
-                case CommandMenuProperties commandMenuProperties:
-                    callback = new CommandMenu(this, context, commandMenuProperties, _commands, _services, Discord);
-                    break;
-                default:
-                    callback = null;
+
+                case PaginatedMessage pager:
+                    callback = new PaginatedMessageCallback(_interactive, context, pager);
                     break;
             }
 
             await callback.DisplayAsync().ConfigureAwait(false);
 
+            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id, callback.Message.Id);
+
             return callback.Message;
         }
 
-        public async Task ClearMessages(ICommandContext context)
+        public async Task<int> ClearMessages(ICommandContext context, int amount)
         {
-            CleanseOldMessages();
-            var foundMessages = _messages.Where(x => x.UserId == context.User.Id && x.ChannelId == context.Channel.Id).ToList();
-            foreach (var foundMessage in foundMessages)
+            if (!_messageCache.TryGetValue(context.User.Id, out var found)) return 0;
+            amount = amount > found.Count ? found.Count + 1 : amount;
+            var matching = found.Where(x => x.ChannelId == context.Channel.Id).TakeWhile(item => amount-- != 0);
+            var retrieved = new List<IMessage>();
+            foreach(var item in matching)
             {
-                _messages.Remove(foundMessage);
-                var retrievedMessage = (context.Channel as SocketTextChannel).GetCachedMessage(foundMessage.MessageId) ??
-                                       await context.Channel.GetMessageAsync(foundMessage.MessageId);
-                if (retrievedMessage == null) continue;
-                await retrievedMessage.DeleteAsync();
+                var msg = await GetOrDownloadMessageAsync(context, item.ResponseId);
+                if(msg is null) continue;
+                retrieved.Add(msg);
+            }
+
+            var currentUser = await context.Guild.GetCurrentUserAsync();
+            var perms = currentUser.GetPermissions(context.Channel as IGuildChannel);
+
+            if (perms.ManageMessages)
+            {
+                if (context.Channel is ITextChannel channel)
+                {
+                    await channel.DeleteMessagesAsync(retrieved);
+                }
+            }
+            else
+            {
+                foreach (var message in retrieved)
+                    await context.Channel.DeleteMessageAsync(message);
+            }
+
+            var newQueue = new ConcurrentQueue<Message>();
+            var delIds = retrieved.Select(x => x.Id);
+            foreach (var item in found)
+            {
+                if(delIds.Contains(item.ResponseId)) continue;
+                newQueue.Enqueue(item);
+            }
+
+            if (newQueue.IsEmpty)
+                _messageCache.TryRemove(context.User.Id, out _);
+            else
+                _messageCache[context.User.Id] = newQueue;
+
+            return retrieved.Count(x => !(x is null));
+        }
+
+        public async Task DeleteMessageAsync(ICommandContext context, IUserMessage message)
+        {
+            if (_messageCache.TryGetValue(context.User.Id, out var found))
+            {
+                if (found.Any(x => x.ResponseId == message.Id))
+                {
+                    await message.DeleteAsync();
+                    _messageCache[context.User.Id] =
+                        new ConcurrentQueue<Message>(found.Where(x => x.ResponseId != message.Id));
+                    if (_messageCache.TryGetValue(context.User.Id, out var newFound))
+                    {
+                        if (newFound.IsEmpty)
+                            _messageCache.TryRemove(context.User.Id, out _);
+                    }
+                }
             }
         }
 
-        private void CleanseOldMessages()
+        private Task NewItem(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId)
         {
-            var oldMessages = _messages.Where(x => x.CreatedAt.AddMinutes(5) < DateTime.UtcNow).ToList();
-            foreach (var oldMessage in oldMessages)
+            _messageCache.TryAdd(userId, new ConcurrentQueue<Message>());
+            if (!_messageCache.TryGetValue(userId, out var found)) return null;
+            if (found.Count >= CacheSize)
+                found.TryDequeue(out _);
+
+            found.Enqueue(new Message
             {
-                _messages.Remove(oldMessage);
-            }
+                ChannelId = channelId,
+                CreatedAt = createdAt,
+                ExecutingId = executingId,
+                ResponseId = responseId
+            });
+
+            _messageCache[userId] = found;
+            return Task.CompletedTask;
         }
 
-        public void SetCurrentMessage(ulong receivedMessageId)
+        private async Task<IUserMessage> GetExistingMessageAsync(ICommandContext context)
         {
-            _currentMessage = receivedMessageId;
+            if (!_messageCache.TryGetValue(context.User.Id, out var queue)) return null;
+            var found = queue.FirstOrDefault(x => x.ExecutingId == context.Message.Id);
+            if (found is null) return null;
+            var retrievedMessage = await GetOrDownloadMessageAsync(context, found.ResponseId);
+            return retrievedMessage as IUserMessage;
         }
+
+        private Task<IMessage> GetOrDownloadMessageAsync(ICommandContext context, ulong messageId)
+            => context.Channel.GetMessageAsync(messageId, CacheMode.CacheOnly) ??
+               context.Channel.GetMessageAsync(messageId);
     }
 }

@@ -14,22 +14,21 @@ namespace Umbreon.Services
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
         private readonly LogService _logs;
-        private readonly CommandHandler _handler;
         private readonly CustomCommandsService _customCommands;
         private readonly CustomFunctionService _customFunctions;
         private readonly MusicService _musicService;
+        private readonly MessageService _message;
 
-        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, 
-            CommandHandler handler, CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService)
+        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService, MessageService message)
         {
             _client = client;
             _commands = commands;
             _database = database;
             _logs = logs;
-            _handler = handler;
             _customCommands = customCommands;
             _customFunctions = customFunctions;
             _musicService = musicService;
+            _message = message;
         }
 
         public void HookEvents()
@@ -42,8 +41,8 @@ namespace Umbreon.Services
                 await _customFunctions.LoadFuncs(_client);
                 await _musicService.Initialise();
             };
-            _client.MessageReceived += _handler.HandleMessageAsync;
-            _client.MessageUpdated += async (_, message, __) => { await _handler.HandleMessageAsync(message); };
+            _client.MessageReceived += _message.HandleMessageAsync;
+            _client.MessageUpdated += (_, msg, __) => _message.HandleMessageUpdateAsync(msg);
             _client.JoinedGuild += async guild =>
             {
                 _database.NewGuild(guild);
