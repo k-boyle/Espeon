@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace Umbreon.Activities
+namespace Umbreon.Core.Entities
 {
     public class Activity : IActivity
     {

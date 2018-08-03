@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
-using Umbreon.Helpers;
+using Umbreon.Extensions;
 
 namespace Umbreon.TypeReaders
 {
