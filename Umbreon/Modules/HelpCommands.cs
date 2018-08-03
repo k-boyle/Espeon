@@ -21,13 +21,11 @@ namespace Umbreon.Modules
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
-        private readonly MessageService _messageService;
 
-        public HelpCommands(CommandService commands, DatabaseService database, MessageService messageService)
+        public HelpCommands(CommandService commands, DatabaseService database)
         {
             _commands = commands;
             _database = database;
-            _messageService = messageService;
         }
 
         [Command("help")]
@@ -45,7 +43,7 @@ namespace Umbreon.Modules
                 {
                     Fields = new List<EmbedFieldBuilder>()
                 };
-                if(!(await module.CheckPermissionsAsync(Context, module.Commands.FirstOrDefault(), Services)).IsSuccess) continue;
+                if(!(await module.CheckPermissionsAsync(Context, Services)).IsSuccess) continue;
 
                 newPage.Title = new EmbedFieldBuilder
                 {
@@ -81,9 +79,7 @@ namespace Umbreon.Modules
                 Prefix = _database.GetGuild(Context).Prefixes.First(),
             };
 
-            //await SendMessageAsync(string.Empty, paginator: paginatedMessage);
-
-            await _messageService.SendPaginatedMessageAsync(Context, paginatedMessage);
+            await SendPaginatedMessageAsync(paginatedMessage);
         }
 
         [Command("help")]

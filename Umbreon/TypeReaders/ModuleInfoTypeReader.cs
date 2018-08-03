@@ -18,7 +18,7 @@ namespace Umbreon.TypeReaders
             return targetModule is null
                 ? TypeReaderResult.FromError(new FailedResult("Module not found", false,
                     CommandError.ObjectNotFound))
-                : (await targetModule.CheckPermissionsAsync(context, null, services)).IsSuccess
+                : (await targetModule.CheckPermissionsAsync(context, services)).IsSuccess
                     ? TypeReaderResult.FromSuccess(targetModule) 
                     : TypeReaderResult.FromError(new FailedResult("You do not have permission to use this module", false, CommandError.UnmetPrecondition));
         }

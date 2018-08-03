@@ -8,28 +8,37 @@ namespace Umbreon.Extensions
 {
     public static class ModuleInfoExtensions
     {
-        public static async Task<PreconditionResult> CheckPermissionsAsync(this ModuleInfo module, ICommandContext context, CommandInfo command, IServiceProvider services)
+        public static async Task<PreconditionResult> CheckPermissionsAsync(this ModuleInfo module, ICommandContext context, IServiceProvider services)
         {
-            var results = new List<PreconditionResult>();
-            foreach (var precon in module.Preconditions)
+            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
-                if (precon.Group is null)
+                foreach (var preconditionGroup in preconditions.GroupBy(x => x.Group, StringComparer.Ordinal))
                 {
-                    results.Add(await precon.CheckPermissionsAsync(context, command, services));
-                    continue;
-                }
+                    if (preconditionGroup.Key is null)
+                    {
+                        foreach (var precondition in preconditionGroup)
+                        {
+                            var result = await precondition.CheckPermissionsAsync(context, null, services);
+                            if (!result.IsSuccess)
+                                return result;
+                        }
+                    }
+                    else
+                    {
+                        var results = new List<PreconditionResult>();
+                        foreach(var precondition in preconditionGroup)
+                            results.Add(await precondition.CheckPermissionsAsync(context, null, services));
 
-                var grouped = module.Preconditions.Where(x => x.Group == precon.Group);
-                foreach (var pre in grouped)
-                {
-                    var res = await pre.CheckPermissionsAsync(context, null, services);
-                    if (!res.IsSuccess) continue;
-                    results.Add(res);
-                    break;
+                        if (!results.Any(x => x.IsSuccess))
+                            return PreconditionGroupResult.FromError(
+                                $"{type} precondition group {preconditionGroup.Key} failed", results);
+                    }
                 }
+                return PreconditionResult.FromSuccess();
             }
 
-            return results.Any(x => !x.IsSuccess) ? PreconditionResult.FromError("Precondition not met") : PreconditionResult.FromSuccess();
+            var moduleResult = await CheckGroups(module.Preconditions, "Module");
+            return !moduleResult.IsSuccess ? moduleResult : PreconditionResult.FromSuccess();
         }
     }
 }

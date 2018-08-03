@@ -34,7 +34,7 @@ namespace Umbreon.Modules
             sw.Start();
             var reply = await SendMessageAsync($"Latency: {Context.Client.Latency}. Ping: ");
             sw.Stop();
-            await reply.ModifyAsync(x => x.Content = $"Latency: {Context.Client.Latency}. Ping: {sw.ElapsedMilliseconds}ms");
+            await reply.ModifyAsync(x => x.Content = $"Latency: {Context.Client.Latency}ms Ping: {sw.ElapsedMilliseconds}ms");
         }
 
         [Command("c", RunMode = RunMode.Async)]
@@ -58,7 +58,7 @@ namespace Umbreon.Modules
             var dict = new Dictionary<ModuleInfo, IEnumerable<CommandInfo>>();
             foreach (var module in _commands.Modules)
             {
-                if(!(await module.CheckPermissionsAsync(Context, module.Commands.FirstOrDefault(), Services)).IsSuccess) continue; // TODO this doesn't work properly
+                if(!(await module.CheckPermissionsAsync(Context, Services)).IsSuccess) continue;
                 var cmdList = new List<CommandInfo>();
                 foreach (var cmd in module.Commands)
                 {
