@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using Discord;
-using Discord.Addons.Interactive.Interfaces;
+﻿using Discord;
 using Discord.Commands;
+using System.Collections.Generic;
 
-namespace Umbreon.Controllers.CommandMenu
+namespace Umbreon.Paginators.CommandMenu
 {
-    public class CommandMenuProperties : IPaginatedMessage
+    public class CommandMenuMessage : BasePaginator
     {
         public Dictionary<string, Emoji> Emojis = new Dictionary<string, Emoji>();
         public Dictionary<ModuleInfo, IEnumerable<CommandInfo>> CommandsDictionary;
@@ -16,7 +15,7 @@ namespace Umbreon.Controllers.CommandMenu
         public Emoji Back = new Emoji("🔙");
         public Emoji Delete = new Emoji("❌");
 
-        public CommandMenuProperties(Dictionary<ModuleInfo, IEnumerable<CommandInfo>> dict)
+        public CommandMenuMessage(Dictionary<ModuleInfo, IEnumerable<CommandInfo>> dict)
         {
             Emojis.Add("up", MoveUp);
             Emojis.Add("down", MoveDown);

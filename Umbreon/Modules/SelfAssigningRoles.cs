@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.Net.Helpers;
 using Discord.WebSocket;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
@@ -50,7 +50,7 @@ namespace Umbreon.Modules
                 Options = new PaginatedAppearanceOptions(),
                 Pages = pages
             };
-            await SendMessageAsync(string.Empty, paginator: paginator);
+            await SendPaginatedMessageAsync(paginator);
         }
 
         [Command("Add")]

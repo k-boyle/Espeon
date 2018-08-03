@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Addons.Interactive.Interfaces;
 using Discord.Commands;
 using Discord.Net.Helpers;
 using Discord.WebSocket;
@@ -8,20 +6,22 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Umbreon.Modules.Contexts;
-using Umbreon.Services;
+using Umbreon.Interactive;
+using Umbreon.Interactive.Callbacks;
+using Umbreon.Interactive.Criteria;
+using Umbreon.Interactive.Interfaces;
 
-namespace Umbreon.Controllers.CommandMenu
+namespace Umbreon.Paginators.CommandMenu
 {
-    public class CommandMenu : IReactionCallback, ICallback
+    public class CommandMenuCallback : IReactionCallback, ICallback
     {
         public IUserMessage Message { get; private set; }
         public RunMode RunMode => RunMode.Sync;
         public ICriterion<SocketReaction> Criterion => new EmptyCriterion<SocketReaction>();
         public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
         public ICommandContext Context { get; }
-        public MessageService Interactive { get; }
-        public CommandMenuProperties Properties { get; }
+        public InteractiveService Interactive { get; }
+        public CommandMenuMessage Properties { get; }
         public CommandService Commands;
         public IServiceProvider Services;
         public DiscordSocketClient Client;
@@ -31,7 +31,7 @@ namespace Umbreon.Controllers.CommandMenu
         private bool _executing;
         private int _selectedIndex;
 
-        public CommandMenu(MessageService interactive, ICommandContext context, CommandMenuProperties properties, CommandService commands, IServiceProvider services, DiscordSocketClient client)
+        public CommandMenuCallback(InteractiveService interactive, ICommandContext context, CommandMenuMessage properties, CommandService commands, IServiceProvider services, DiscordSocketClient client)
         {
             Context = context;
             Interactive = interactive;
@@ -113,7 +113,7 @@ namespace Umbreon.Controllers.CommandMenu
                         var execute = true;
                         foreach (var param in selectedCommand.Parameters)
                         {
-                            var criteria = new Criteria<SocketMessage>()
+                            var criteria = new Interactive.Criteria.Criteria<SocketMessage>()
                                 .AddCriterion(new EnsureSourceChannelCriterion())
                                 .AddCriterion(new EnsureFromUserCriterion(reaction.UserId));
                             await Context.Channel.SendMessageAsync($"What do you want the {param.Name} to be? Respond with `cancel` to cancel execution");
@@ -129,7 +129,7 @@ namespace Umbreon.Controllers.CommandMenu
                         if (execute)
                         {
                             //var context = new GuildCommandContext(Client, Message);
-                            Interactive.SetCurrentMessage(Message.Id);
+                            //Interactive.SetCurrentMessage(Message.Id);
                             var result = await Commands.ExecuteAsync(Context,
                                 $"{selectedCommand.Aliases.FirstOrDefault()} {paramValues}", Services);
                             if (!result.IsSuccess)

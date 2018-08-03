@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.Net.Helpers;
 using MoreLinq;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
+using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
@@ -67,7 +67,7 @@ namespace Umbreon.Modules
                 Options = new PaginatedAppearanceOptions(),
                 Pages = pages
             };
-            await SendMessageAsync(null, paginator: paginator);
+            await SendPaginatedMessageAsync(paginator);
         }
 
         [Command("Info")]
@@ -81,7 +81,7 @@ namespace Umbreon.Modules
             [Remainder]Tag tag)
         {
             var user = Context.Guild.GetUser(tag.TagOwner);
-            await SendMessageAsync(string.Empty, new EmbedBuilder
+            await SendMessageAsync(string.Empty, embed: new EmbedBuilder
             {
                 Title = $"{tag.TagName} info",
                 Author = new EmbedAuthorBuilder

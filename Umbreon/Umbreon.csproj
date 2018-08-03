@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />

@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.Addons.Interactive;
-using Discord.Addons.Interactive.HelpPaginator;
 using Discord.Commands;
 using Discord.Net.Helpers;
 using System;
@@ -8,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
+using Umbreon.Paginators.HelpPaginator;
 using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
@@ -21,11 +21,13 @@ namespace Umbreon.Modules
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
+        private readonly MessageService _messageService;
 
-        public HelpCommands(CommandService commands, DatabaseService database)
+        public HelpCommands(CommandService commands, DatabaseService database, MessageService messageService)
         {
             _commands = commands;
             _database = database;
+            _messageService = messageService;
         }
 
         [Command("help")]
@@ -76,10 +78,12 @@ namespace Umbreon.Modules
                 },
                 Options = PaginatedAppearanceOptions.Default,
                 Pages = pages,
-                Prefix = _database.GetGuild(Context).Prefixes.First()
+                Prefix = _database.GetGuild(Context).Prefixes.First(),
             };
 
-            await SendMessageAsync(string.Empty, paginator: paginatedMessage);
+            //await SendMessageAsync(string.Empty, paginator: paginatedMessage);
+
+            await _messageService.SendPaginatedMessageAsync(Context, paginatedMessage);
         }
 
         [Command("help")]
@@ -118,7 +122,7 @@ namespace Umbreon.Modules
                 });
             }
 
-            await SendMessageAsync(string.Empty, builder.Build());
+            await SendMessageAsync(string.Empty, embed: builder.Build());
         }
     }
 }

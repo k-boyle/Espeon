@@ -1,16 +1,13 @@
 ﻿using Discord.Commands;
-using Discord.WebSocket;
-using System;
+using Discord.Net.Helpers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Discord.Net.Helpers;
 using Umbreon.Attributes;
-using Umbreon.Controllers.CommandMenu;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
+using Umbreon.Paginators.CommandMenu;
 
 namespace Umbreon.Modules
 {
@@ -44,11 +41,12 @@ namespace Umbreon.Modules
         [Name("Clear Responses")]
         [Usage("c")]
         [Summary("Will clear all responses from the bot to you in the last 5 minutes")]
-        public async Task Clear()
+        public async Task Clear(int amount = 5)
         {
-            await SendMessageAsync("Clearing messages");
+            var m = await SendMessageAsync("Clearing messages");
+            await ClearMessages(amount);
             await Task.Delay(1000);
-            await Message.ClearMessages(Context);
+            await DeleteMessageAsync(m);
         }
 
         [Command("Menu")]
@@ -69,7 +67,8 @@ namespace Umbreon.Modules
                 }
                 dict.Add(module, cmdList);
             }
-            await SendMessageAsync(string.Empty, paginator: new CommandMenuProperties(dict));
+
+            await SendPaginatedMessageAsync(new CommandMenuMessage(dict));
         }
     }
 }
