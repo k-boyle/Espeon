@@ -59,7 +59,7 @@ namespace Umbreon.Services
             {
                 module.WithName(guildId.ToString());
                 module.AddAliases("");
-                module.AddPrecondition(new RequireGuild(guildId));
+                module.AddPrecondition(new RequireGuildAttribute(guildId));
                 module.WithSummary("The custom commands for this server");
 
                 foreach (var cmd in cmds)

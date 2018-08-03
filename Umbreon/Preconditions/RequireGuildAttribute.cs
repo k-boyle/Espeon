@@ -5,11 +5,11 @@ using Umbreon.Results;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireGuild : PreconditionAttribute
+    public class RequireGuildAttribute : PreconditionAttribute
     {
         private readonly ulong _guildId;
 
-        public RequireGuild(ulong guildId)
+        public RequireGuildAttribute(ulong guildId)
             => _guildId = guildId;
 
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)

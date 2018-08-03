@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireGuildOwner : PreconditionAttribute
+    public class RequireGuildOwnerAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {

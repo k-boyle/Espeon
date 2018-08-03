@@ -57,7 +57,7 @@ namespace Umbreon.Services
                             function.AddPrecondition(new RequireOwnerAttribute());
 
                         if (func.GuildId != 0)
-                            function.AddPrecondition(new RequireGuild(func.GuildId));
+                            function.AddPrecondition(new RequireGuildAttribute(func.GuildId));
                     });
                 }
             });

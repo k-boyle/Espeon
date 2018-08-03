@@ -9,11 +9,11 @@ using Umbreon.Services;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireRole : PreconditionAttribute
+    public class RequireRoleAttribute : PreconditionAttribute
     {
         private readonly SpecialRole _role;
 
-        public RequireRole(SpecialRole role)
+        public RequireRoleAttribute(SpecialRole role)
             => _role = role;
 
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)

@@ -9,7 +9,7 @@ using Umbreon.Services;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireEnabled : PreconditionAttribute
+    public class RequireEnabledAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {

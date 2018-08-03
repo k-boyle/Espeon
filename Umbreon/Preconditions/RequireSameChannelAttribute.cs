@@ -5,7 +5,7 @@ using Discord;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireSameChannel : PreconditionAttribute
+    public class RequireSameChannelAttribute : PreconditionAttribute
     {
         public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {

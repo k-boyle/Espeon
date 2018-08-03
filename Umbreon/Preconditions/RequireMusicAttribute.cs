@@ -7,7 +7,7 @@ using Umbreon.Services;
 
 namespace Umbreon.Preconditions
 {
-    public class RequireMusic : PreconditionAttribute
+    public class RequireMusicAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
