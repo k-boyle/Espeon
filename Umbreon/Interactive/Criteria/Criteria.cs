@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Commands;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord.Commands;
 
 namespace Umbreon.Interactive.Criteria
 {

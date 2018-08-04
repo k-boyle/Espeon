@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Threading.Tasks;
-using Discord;
 using Umbreon.Modules.Contexts;
 using Umbreon.Services;
 

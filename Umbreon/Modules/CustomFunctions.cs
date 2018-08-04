@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Core.Models.Database;
 using Umbreon.Modules.Contexts;

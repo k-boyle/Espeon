@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace Umbreon.Interactive.Paginator
 {

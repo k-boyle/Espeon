@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
+using System.Threading.Tasks;
 
 namespace Umbreon.Interactive.Interfaces
 {

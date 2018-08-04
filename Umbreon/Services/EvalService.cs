@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities;
-using Umbreon.Core.Models;
 using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services

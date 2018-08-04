@@ -15,16 +15,16 @@ using Umbreon.Interactive.Results;
 
 namespace Umbreon.Interactive
 {
-    public class InteractiveBase : InteractiveBase<ICommandContext>
+    public abstract class InteractiveBase : InteractiveBase<ICommandContext>
     {
     }
 
-    public class InteractiveBase<T> : ModuleBase<T>
+    public abstract class InteractiveBase<T> : ModuleBase<T>
         where T : class, ICommandContext
     {
         public InteractiveService Interactive { get; set; }
 
-        public Task<SocketMessage> NextMessageAsync(Umbreon.Interactive.Criteria.ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
+        public Task<SocketMessage> NextMessageAsync(Criteria.ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
             => Interactive.NextMessageAsync(Context, criterion, timeout);
         public Task<SocketMessage> NextMessageAsync(bool fromSourceUser = true, bool inSourceChannel = true, TimeSpan? timeout = null) 
             => Interactive.NextMessageAsync(Context, fromSourceUser, inSourceChannel, timeout);
@@ -42,12 +42,12 @@ namespace Umbreon.Interactive
         }
         public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, bool fromSourceUser = true)
         {
-            var criterion = new Umbreon.Interactive.Criteria.Criteria<SocketReaction>();
+            var criterion = new Criteria.Criteria<SocketReaction>();
             if (fromSourceUser)
                 criterion.AddCriterion(new EnsureReactionFromSourceUserCriterion());
             return PagedReplyAsync(pager, criterion);
         }
-        public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, Umbreon.Interactive.Criteria.ICriterion<SocketReaction> criterion)
+        public Task<IUserMessage> PagedReplyAsync(PaginatedMessage pager, Criteria.ICriterion<SocketReaction> criterion)
             => Interactive.SendPaginatedMessageAsync(Context, pager, criterion);
         
         public RuntimeResult Ok(string reason = null) => new OkResult(reason);

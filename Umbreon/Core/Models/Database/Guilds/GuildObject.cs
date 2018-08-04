@@ -25,10 +25,13 @@ namespace Umbreon.Core.Models.Database
         };
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
-        public List<CustomFunction> CustomFunctions { get; set; } = new List<CustomFunction>(); // TODO
+        public List<CustomFunction> CustomFunctions { get; set; } = new List<CustomFunction>();
         public List<Warning> Warnings { get; set; } = new List<Warning>(); // TODO
         public List<ulong> BlacklistedUsers { get; set; } = new List<ulong>(); // TODO
-        public List<ulong> WhiteListedUsers { get; set; } = new List<ulong>(); // TODO
+        public List<ulong> WhiteListedUsers { get; set; } = new List<ulong>
+        {
+            84291986575613952
+        }; // TODO
         public List<ulong> RestrictedChannels { get; set; } = new List<ulong>(); // TODO
         public List<ulong> MusicUsers { get; set; } = new List<ulong>
         {

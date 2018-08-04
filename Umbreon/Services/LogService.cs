@@ -26,7 +26,7 @@ namespace Umbreon.Services
         {
             var source = log.Source;
             var message = log.Message;
-            var exception = log.Exception?.ToString();
+            var exception = log.Exception?.InnerException;
             var severity = log.Severity;
 
             var time = DateTime.UtcNow;
@@ -97,11 +97,13 @@ namespace Umbreon.Services
             Console.ResetColor();
             Console.Write("] ");
 
-            Console.Write(string.Join("", message.Where(x => !char.IsControl(x))));
+            if(!string.IsNullOrEmpty(message))
+                Console.Write(string.Join("", message.Where(x => !char.IsControl(x))));
 
-            if (!string.IsNullOrEmpty(exception))
+            if (!string.IsNullOrEmpty(exception?.ToString()))
             {
-                Console.WriteLine(exception);
+                Console.Write(log.Exception.ToString());
+                Console.Write(exception);
             }
 
             Console.WriteLine();

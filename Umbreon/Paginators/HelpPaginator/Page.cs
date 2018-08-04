@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Discord;
+﻿using Discord;
+using System.Collections.Generic;
 
 namespace Umbreon.Paginators.HelpPaginator
 {

@@ -1,7 +1,7 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using System;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Umbreon.Preconditions
 {
