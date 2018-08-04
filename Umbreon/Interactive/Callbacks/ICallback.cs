@@ -1,7 +1,7 @@
-﻿using Discord;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Discord;
 
-namespace Umbreon.Interactive.Interfaces
+namespace Umbreon.Interactive.Callbacks
 {
     public interface ICallback
     {

@@ -1,40 +1,35 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
-using Umbreon.Interactive.Interfaces;
 
 namespace Umbreon.Interactive.Paginator
 {
     public class PaginatedMessageCallback : IReactionCallback, ICallback
     {
-        public ICommandContext Context { get; }
-        public InteractiveService Interactive { get; private set; }
-        public IUserMessage Message { get; private set; }
-
-        public RunMode RunMode => RunMode.Sync;
-        public ICriterion<SocketReaction> Criterion => _criterion;
-        public TimeSpan? Timeout => Options.Timeout;
-
-        private readonly ICriterion<SocketReaction> _criterion;
         private readonly PaginatedMessage _pager;
-
-        private PaginatedAppearanceOptions Options => _pager.Options;
         private readonly int _pages;
+        private readonly InteractiveService _interactive;
         private int _page = 1;
-        
+        private PaginatedAppearanceOptions Options => _pager.Options;
 
-        public PaginatedMessageCallback(InteractiveService interactive, 
+        public IUserMessage Message { get; private set; }
+        public ICommandContext Context { get; }
+        public RunMode RunMode => RunMode.Sync;
+        public ICriterion<SocketReaction> Criterion { get; }
+        public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
+
+        public PaginatedMessageCallback(InteractiveService interactive,
             ICommandContext sourceContext,
             PaginatedMessage pager, ICriterion<SocketReaction> criterion = null)
         {
-            Interactive = interactive;
+            _interactive = interactive;
             Context = sourceContext;
-            _criterion = criterion ?? new EmptyCriterion<SocketReaction>();
+            Criterion = criterion ?? new EmptyCriterion<SocketReaction>();
             _pager = pager;
             _pages = _pager.Pages.Count();
         }
@@ -44,8 +39,7 @@ namespace Umbreon.Interactive.Paginator
             var embed = BuildEmbed();
             var message = await Context.Channel.SendMessageAsync(_pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
-            Interactive.AddReactionCallback(message, this);
-            // Reactions take a while to add, don't wait for them
+            _interactive.AddReactionCallback(message, this);
             _ = Task.Run(async () =>
             {
                 //BypassBuckets flag is a property that is part of my modified form of the lib
@@ -66,12 +60,12 @@ namespace Umbreon.Interactive.Paginator
                     BypassBuckets = true
                 });
 
-                var manageMessages = (Context.Channel is IGuildChannel guildChannel)
+                var manageMessages = Context.Channel is IGuildChannel guildChannel
                     ? (Context.User as IGuildUser).GetPermissions(guildChannel).ManageMessages
                     : false;
 
                 if (Options.JumpDisplayOptions == JumpDisplayOptions.Always
-                    || (Options.JumpDisplayOptions == JumpDisplayOptions.WithManageMessages && manageMessages))
+                    || Options.JumpDisplayOptions == JumpDisplayOptions.WithManageMessages && manageMessages)
                     await message.AddReactionAsync(Options.Jump, new RequestOptions
                     {
                         BypassBuckets = true
@@ -88,15 +82,12 @@ namespace Umbreon.Interactive.Paginator
                         BypassBuckets = true
                     });
             });
-            // TODO: (Next major version) timeouts need to be handled at the service-level!
             if (Timeout.HasValue && Timeout.Value != null)
-            {
                 _ = Task.Delay(Timeout.Value).ContinueWith(_ =>
                 {
-                    Interactive.RemoveReactionCallback(message);
+                    _interactive.RemoveReactionCallback(message);
                     _ = Message.DeleteAsync();
                 });
-            }
         }
 
         public async Task<bool> HandleCallbackAsync(SocketReaction reaction)
@@ -104,21 +95,31 @@ namespace Umbreon.Interactive.Paginator
             var emote = reaction.Emote;
 
             if (emote.Equals(Options.First))
+            {
                 _page = 1;
+            }
             else if (emote.Equals(Options.Next))
             {
                 if (_page >= _pages)
+                {
+                    _page = 1;
                     return false;
+                }
                 ++_page;
             }
             else if (emote.Equals(Options.Back))
             {
                 if (_page <= 1)
+                {
+                    _page = _pages;
                     return false;
+                }
                 --_page;
             }
             else if (emote.Equals(Options.Last))
+            {
                 _page = _pages;
+            }
             else if (emote.Equals(Options.Stop))
             {
                 await Message.DeleteAsync().ConfigureAwait(false);
@@ -132,14 +133,15 @@ namespace Umbreon.Interactive.Paginator
                         .AddCriterion(new EnsureSourceChannelCriterion())
                         .AddCriterion(new EnsureFromUserCriterion(reaction.UserId))
                         .AddCriterion(new EnsureIsIntegerCriterion());
-                    var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
+                    var response = await _interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
                     var request = int.Parse(response.Content);
                     if (request < 1 || request > _pages)
                     {
                         _ = response.DeleteAsync().ConfigureAwait(false);
-                        await Interactive.ReplyAndDeleteAsync(Context, Options.Stop.Name);
+                        await _interactive.ReplyAndDeleteAsync(Context, Options.Stop.Name);
                         return;
                     }
+
                     _page = request;
                     _ = response.DeleteAsync().ConfigureAwait(false);
                     await RenderAsync().ConfigureAwait(false);
@@ -147,24 +149,26 @@ namespace Umbreon.Interactive.Paginator
             }
             else if (emote.Equals(Options.Info))
             {
-                await Interactive.ReplyAndDeleteAsync(Context, Options.InformationText, timeout: Options.InfoTimeout);
+                await _interactive.ReplyAndDeleteAsync(Context, Options.InformationText, timeout: Options.InfoTimeout);
                 return false;
             }
+
             _ = Message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
             await RenderAsync().ConfigureAwait(false);
             return false;
         }
-        
+
         protected Embed BuildEmbed()
         {
             return new EmbedBuilder()
                 .WithAuthor(_pager.Author)
                 .WithColor(_pager.Color)
-                .WithDescription(_pager.Pages.ElementAt(_page-1).ToString())
+                .WithDescription(_pager.Pages.ElementAt(_page - 1).ToString())
                 .WithFooter(f => f.Text = string.Format(Options.FooterFormat, _page, _pages))
                 .WithTitle(_pager.Title)
                 .Build();
         }
+
         private async Task RenderAsync()
         {
             var embed = BuildEmbed();

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities;
 using Umbreon.Interactive;
-using Umbreon.Interactive.Interfaces;
+using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Paginators;
@@ -132,7 +132,7 @@ namespace Umbreon.Services
                     break;
 
                 case CommandMenuMessage cmd:
-                    callback = new CommandMenuCallback(_interactive, context, cmd, _commands, _services, _client);
+                    callback = new CommandMenuCallback(_interactive, context, cmd, _commands, _services);
                     break;
 
                 case PaginatedMessage pager:

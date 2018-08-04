@@ -1,77 +1,74 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using Umbreon.Extensions;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
-using Umbreon.Interactive.Interfaces;
 
 namespace Umbreon.Paginators.CommandMenu
 {
     public class CommandMenuCallback : IReactionCallback, ICallback
     {
+        private readonly CommandService _commands;
+        private readonly IServiceProvider _services;
+        private readonly InteractiveService _interactive;
+        private readonly CommandMenuMessage _properties;
+
+        private string _currentMenu;
+        private bool _executing;
+        private bool _isMain = true;
+        private int _selectedIndex;
+
         public IUserMessage Message { get; private set; }
         public RunMode RunMode => RunMode.Sync;
         public ICriterion<SocketReaction> Criterion => new EmptyCriterion<SocketReaction>();
         public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
         public ICommandContext Context { get; }
-        public InteractiveService Interactive { get; }
-        public CommandMenuMessage Properties { get; }
-        public CommandService Commands;
-        public IServiceProvider Services;
-        public DiscordSocketClient Client;
 
-        private bool _isMain = true;
-        private string _currentMenu;
-        private bool _executing;
-        private int _selectedIndex;
-
-        public CommandMenuCallback(InteractiveService interactive, ICommandContext context, CommandMenuMessage properties, CommandService commands, IServiceProvider services, DiscordSocketClient client)
+        public CommandMenuCallback(InteractiveService interactive, ICommandContext context,
+            CommandMenuMessage properties, CommandService commands, IServiceProvider services)
         {
             Context = context;
-            Interactive = interactive;
-            Properties = properties;
-            Commands = commands;
-            Services = services;
-            Client = client;
+            _interactive = interactive;
+            _properties = properties;
+            _commands = commands;
+            _services = services;
         }
 
         public async Task DisplayAsync()
         {
             var message = await Context.Channel.SendMessageAsync(string.Empty, embed: BuildEmbed());
             Message = message;
-            Interactive.AddReactionCallback(message, this);
+            _interactive.AddReactionCallback(message, this);
             _ = Task.Run(async () =>
             {
-                foreach (var emoji in Properties.Emojis.Values)
-                {
+                foreach (var emoji in _properties.Emojis.Values)
                     await message.AddReactionAsync(emoji, new RequestOptions
                     {
                         BypassBuckets = true
                     });
-                }
             });
             if (Timeout.HasValue && Timeout.Value != null)
-            {
                 _ = Task.Delay(Timeout.Value).ContinueWith(async _ =>
                 {
-                    Interactive.RemoveReactionCallback(message);
+                    _interactive.RemoveReactionCallback(message);
                     await Message.DeleteAsync();
                 });
-            }
         }
 
         public async Task<bool> HandleCallbackAsync(SocketReaction reaction)
         {
             var emote = reaction.Emote;
-            var emotes = Properties.Emojis;
-            var count = _isMain ? Properties.CommandsDictionary.Keys.Count : Properties.CommandsDictionary.FirstOrDefault(x =>
-                string.Equals(x.Key.Name, _currentMenu, StringComparison.CurrentCultureIgnoreCase)).Value.Count();
+            var emotes = _properties.Emojis;
+            var count = _isMain
+                ? _properties.CommandsDictionary.Keys.Count
+                : _properties.CommandsDictionary.FirstOrDefault(x =>
+                    string.Equals(x.Key.Name, _currentMenu, StringComparison.CurrentCultureIgnoreCase)).Value.Count();
 
             if (_executing) return false;
 
@@ -99,39 +96,42 @@ namespace Umbreon.Paginators.CommandMenu
                 if (_isMain)
                 {
                     _isMain = false;
-                    _currentMenu = Properties.CommandsDictionary.Keys.ElementAt(_selectedIndex).Name;
+                    _currentMenu = _properties.CommandsDictionary.Keys.ElementAt(_selectedIndex).Name;
                     _selectedIndex = 0;
                 }
                 else
                 {
                     _executing = true;
-                    var selectedCommand = Properties.CommandsDictionary.FirstOrDefault(x =>
-                        string.Equals(x.Key.Name, _currentMenu, StringComparison.CurrentCultureIgnoreCase)).Value.ElementAt(_selectedIndex);
+                    var selectedCommand = _properties.CommandsDictionary.FirstOrDefault(x =>
+                            string.Equals(x.Key.Name, _currentMenu, StringComparison.CurrentCultureIgnoreCase)).Value
+                        .ElementAt(_selectedIndex);
                     _ = Task.Run(async () =>
                     {
                         var paramValues = new StringBuilder();
                         var execute = true;
                         foreach (var param in selectedCommand.Parameters)
                         {
-                            var criteria = new Interactive.Criteria.Criteria<SocketMessage>()
+                            var criteria = new Criteria<SocketMessage>()
                                 .AddCriterion(new EnsureSourceChannelCriterion())
                                 .AddCriterion(new EnsureFromUserCriterion(reaction.UserId));
-                            await Context.Channel.SendMessageAsync($"What do you want the {param.Name} to be? Respond with `cancel` to cancel execution");
-                            var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
-                            if (response is null || response.Content.Equals("cancel", StringComparison.CurrentCultureIgnoreCase))
+                            await Context.Channel.SendMessageAsync(
+                                $"What do you want the {param.Name} to be? Respond with `cancel` to cancel execution");
+                            var response =
+                                await _interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
+                            if (response is null ||
+                                response.Content.Equals("cancel", StringComparison.CurrentCultureIgnoreCase))
                             {
                                 execute = false;
                                 break;
                             }
+
                             paramValues.AppendJoin(' ', response.Content);
                         }
 
                         if (execute)
                         {
-                            //var context = new GuildCommandContext(Client, Message);
-                            //Interactive.SetCurrentMessage(Message.Id);
-                            var result = await Commands.ExecuteAsync(Context,
-                                $"{selectedCommand.Aliases.FirstOrDefault()} {paramValues}", Services);
+                            var result = await _commands.ExecuteAsync(Context,
+                                $"{selectedCommand.Aliases.FirstOrDefault()} {paramValues}", _services);
                             if (!result.IsSuccess)
                                 await Context.Channel.SendMessageAsync(result.ErrorReason);
                         }
@@ -172,25 +172,26 @@ namespace Umbreon.Paginators.CommandMenu
             var builder = new StringBuilder();
             if (_isMain)
             {
-                foreach (var module in Properties.CommandsDictionary.Keys)
-                {
-                    builder.AppendLine(i++ == _selectedIndex ? $"**>{(ulong.TryParse(module.Name, out _) ? Context.Guild.Name : module.Name)}**"
-                        : ulong.TryParse(module.Name, out _) ? Context.Guild.Name : module.Name);
-                }
+                foreach (var module in _properties.CommandsDictionary.Keys)
+                    builder.AppendLine(i++ == _selectedIndex
+                        ? $"**>{(ulong.TryParse(module.Name, out _) ? Context.Guild.Name : module.Name)}**"
+                        : ulong.TryParse(module.Name, out _)
+                            ? Context.Guild.Name
+                            : module.Name);
 
                 embed.AddField("Modules", builder.ToString());
             }
             else
             {
-                var commands = Properties.CommandsDictionary.FirstOrDefault(x =>
+                var commands = _properties.CommandsDictionary.FirstOrDefault(x =>
                     string.Equals(x.Key.Name, _currentMenu, StringComparison.CurrentCultureIgnoreCase)).Value;
                 foreach (var command in commands)
-                {
                     builder.AppendLine(i++ == _selectedIndex ? $"**>{command.Name}**" : command.Name);
-                }
 
-                embed.AddField($"{(ulong.TryParse(_currentMenu, out _) ? Context.Guild.Name : _currentMenu)} Commands", builder.ToString());
+                embed.AddField($"{(ulong.TryParse(_currentMenu, out _) ? Context.Guild.Name : _currentMenu)} Commands",
+                    builder.ToString());
             }
+
             return embed.Build();
         }
     }

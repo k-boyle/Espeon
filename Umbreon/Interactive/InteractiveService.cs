@@ -1,10 +1,4 @@
-﻿/*
- * All code under Umbreon.Interactive is using
- * Discord.Addons.Interactive
- * https://github.com/foxbot/Discord.Addons.Interactive
- */
-
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
@@ -13,7 +7,6 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
-using Umbreon.Interactive.Paginator;
 
 namespace Umbreon.Interactive
 {
@@ -43,6 +36,7 @@ namespace Umbreon.Interactive
                 criterion.AddCriterion(new EnsureSourceChannelCriterion());
             return NextMessageAsync(context, criterion, timeout);
         }
+
         public async Task<SocketMessage> NextMessageAsync(ICommandContext context, ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
         {
             timeout = timeout ?? _defaultTimeout;
@@ -56,44 +50,39 @@ namespace Umbreon.Interactive
                     eventTrigger.SetResult(message);
             }
 
-            (context.Client as DiscordSocketClient).MessageReceived += Handler;
-            
+            if (!(context.Client is DiscordSocketClient client)) return null;
+            client.MessageReceived += Handler;
+
             var trigger = eventTrigger.Task;
             var delay = Task.Delay(timeout.Value);
             var task = await Task.WhenAny(trigger, delay).ConfigureAwait(false);
 
-            (context.Client as DiscordSocketClient).MessageReceived -= Handler;
+            client.MessageReceived -= Handler;
 
             if (task == trigger)
                 return await trigger.ConfigureAwait(false);
-            else
-                return null;
+            return null;
         }
 
-        public async Task<IUserMessage> ReplyAndDeleteAsync(ICommandContext context, string content, bool isTts = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
+        public async Task<IUserMessage> ReplyAndDeleteAsync(ICommandContext context, string content, bool isTTS = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
         {
             timeout = timeout ?? _defaultTimeout;
-            var message = await context.Channel.SendMessageAsync(content, isTts, embed, options).ConfigureAwait(false);
+            var message = await context.Channel.SendMessageAsync(content, isTTS, embed, options).ConfigureAwait(false);
             _ = Task.Delay(timeout.Value)
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
                 .ConfigureAwait(false);
             return message;
         }
 
-        public async Task<IUserMessage> SendPaginatedMessageAsync(ICommandContext context, PaginatedMessage pager, ICriterion<SocketReaction> criterion = null)
-        {
-            var callback = new PaginatedMessageCallback(this, context, pager, criterion);
-            await callback.DisplayAsync().ConfigureAwait(false);
-
-            return callback.Message;
-        }
-
         public void AddReactionCallback(IMessage message, IReactionCallback callback)
             => _callbacks[message.Id] = callback;
+
         public void RemoveReactionCallback(IMessage message)
             => RemoveReactionCallback(message.Id);
+
         public void RemoveReactionCallback(ulong id)
             => _callbacks.Remove(id);
+
         public void ClearReactionCallbacks()
             => _callbacks.Clear();
         
