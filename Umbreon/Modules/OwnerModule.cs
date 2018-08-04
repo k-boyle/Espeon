@@ -79,5 +79,26 @@ namespace Umbreon.Modules
             [OverrideTypeReader(typeof(CodeTypeReader))]
             string code)
             => _eval.EvaluateAsync(Context, code, true, Services);
+
+        [Command("flush")]
+        [Name("Flush Reactions")]
+        [Summary("Remove all callbacks from interactive")]
+        [Usage("cas flush")]
+        public Task Flush()
+        {
+            Interactive.ClearReactionCallbacks();
+            return Task.CompletedTask;
+        }
+
+        [Command("gc")]
+        [Name("Garbage Collect")]
+        [Summary("Run garbage collection")]
+        [Usage("cas gc")]
+        public Task GC()
+        {
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers();
+            return Task.CompletedTask;
+        }
     }
 }

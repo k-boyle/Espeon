@@ -5,8 +5,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Core;
 using Umbreon.Core.Entities;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
@@ -25,19 +27,47 @@ namespace Umbreon.Services
         private readonly DatabaseService _database;
         private readonly CommandService _commands;
         private readonly InteractiveService _interactive;
+        private readonly LogService _logs;
         private readonly IServiceProvider _services;
+        private Timer _timer;
 
         private const int CacheSize = 10;
 
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache = new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
 
-        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, IServiceProvider services)
+        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, LogService logs, IServiceProvider services)
         {
             _client = client;
             _database = database;
             _commands = commands;
             _interactive = interactive;
+            _logs = logs;
             _services = services;
+        }
+
+        public void StartCleaner()
+        {
+            _timer = new Timer(__ =>
+            {
+                var cleaned = 0;
+                foreach (var key in _messageCache.Keys)
+                {
+                    if (!_messageCache.TryGetValue(key, out var queue)) continue;
+                    var newQueue = new ConcurrentQueue<Message>();
+                    foreach (var item in queue)
+                    {
+                        if (DateTimeOffset.UtcNow - item.CreatedAt > TimeSpan.FromMinutes(5))
+                        {
+                            cleaned++;
+                            continue;
+                        }
+                        newQueue.Enqueue(item);
+                    }
+
+                    _messageCache[key] = newQueue;
+                }
+                _logs.NewLogEvent(LogSeverity.Info, LogSource.Message, $"Cleaned {cleaned} message(s)");
+            }, null, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5));
         }
 
         public async Task HandleMessageAsync(SocketMessage msg)
@@ -46,7 +76,7 @@ namespace Umbreon.Services
 
             var guild = _database.GetGuild(channel.Guild.Id);
 
-            if (guild.BlacklistedUsers.Contains(message.Author.Id) || guild.RestrictedChannels.Contains(channel.Id) || 
+            if (guild.BlacklistedUsers.Contains(message.Author.Id) || guild.RestrictedChannels.Contains(channel.Id) ||
                 guild.UseWhiteList && !guild.WhiteListedUsers.Contains(message.Author.Id)) return;
 
             var prefixes = guild.Prefixes;
@@ -89,7 +119,7 @@ namespace Umbreon.Services
             var currentUser = await context.Guild.GetCurrentUserAsync();
             var perms = currentUser.GetPermissions(context.Channel as IGuildChannel);
 
-            if(perms.ManageMessages)
+            if (perms.ManageMessages)
                 await message.RemoveAllReactionsAsync();
 
             await message.ModifyAsync(x =>
@@ -153,10 +183,10 @@ namespace Umbreon.Services
             amount = amount > found.Count ? found.Count + 1 : amount;
             var matching = found.Where(x => x.ChannelId == context.Channel.Id).TakeWhile(item => amount-- != 0);
             var retrieved = new List<IMessage>();
-            foreach(var item in matching)
+            foreach (var item in matching)
             {
                 var msg = await GetOrDownloadMessageAsync(context, item.ResponseId);
-                if(msg is null) continue;
+                if (msg is null) continue;
                 retrieved.Add(msg);
             }
 
@@ -180,7 +210,7 @@ namespace Umbreon.Services
             var delIds = retrieved.Select(x => x.Id);
             foreach (var item in found)
             {
-                if(delIds.Contains(item.ResponseId)) continue;
+                if (delIds.Contains(item.ResponseId)) continue;
                 newQueue.Enqueue(item);
             }
 

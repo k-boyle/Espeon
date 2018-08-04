@@ -11,7 +11,8 @@
     {
         Database,
         CustomCmds,
-        CustomFuncs
+        CustomFuncs,
+        Message
     }
 
     public enum SpecialRole

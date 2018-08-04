@@ -20,14 +20,16 @@ namespace Umbreon.Services
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
         private readonly EventsService _events;
+        private readonly MessageService _message;
         private readonly IServiceProvider _services;
 
-        public StartupService(DiscordSocketClient client, CommandService commands, DatabaseService database, EventsService events, IServiceProvider services)
+        public StartupService(DiscordSocketClient client, CommandService commands, DatabaseService database, EventsService events, MessageService message, IServiceProvider services)
         {
             _client = client;
             _commands = commands;
             _database = database;
             _events = events;
+            _message = message;
             _services = services;
         }
 
@@ -36,6 +38,7 @@ namespace Umbreon.Services
             await _database.Initialize();
             await StartClient();
             _events.HookEvents();
+            _message.StartCleaner();
             await LoadCommands();
             await Task.Delay(-1);
         }
