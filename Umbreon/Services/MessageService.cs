@@ -5,14 +5,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core;
 using Umbreon.Core.Entities;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Paginator;
+using Umbreon.Interfaces;
 using Umbreon.Modules.Contexts;
 using Umbreon.Paginators;
 using Umbreon.Paginators.CommandMenu;
@@ -21,58 +20,52 @@ using Umbreon.Paginators.HelpPaginator;
 namespace Umbreon.Services
 {
     [Service]
-    public class MessageService
+    public class MessageService : IRemoveableService
+
     {
         private readonly DiscordSocketClient _client;
         private readonly DatabaseService _database;
         private readonly CommandService _commands;
         private readonly InteractiveService _interactive;
-        private readonly LogService _logs;
+        private readonly TimerService _timer;
         private readonly IServiceProvider _services;
-        private Timer _timer;
 
         private const int CacheSize = 10;
 
-        private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache = new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
+        private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache =
+            new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
 
-        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, LogService logs, IServiceProvider services)
+        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, IServiceProvider services)
         {
             _client = client;
             _database = database;
             _commands = commands;
             _interactive = interactive;
-            _logs = logs;
+            _timer = timer;
             _services = services;
         }
 
-        public void StartCleaner()
+        public void Remove(IRemoveable obj)
         {
-            _timer = new Timer(__ =>
+            if (!(obj is Message message)) return;
+            if (!_messageCache.TryGetValue(message.UserId, out var found)) return;
+            var newQueue = new ConcurrentQueue<Message>();
+            foreach (var item in found)
             {
-                var cleaned = 0;
-                foreach (var key in _messageCache.Keys)
-                {
-                    if (!_messageCache.TryGetValue(key, out var queue)) continue;
-                    var newQueue = new ConcurrentQueue<Message>();
-                    foreach (var item in queue)
-                    {
-                        if (DateTimeOffset.UtcNow - item.CreatedAt > TimeSpan.FromMinutes(5))
-                        {
-                            cleaned++;
-                            continue;
-                        }
-                        newQueue.Enqueue(item);
-                    }
+                if(item.ResponseId == message.ResponseId) continue;
+                newQueue.Enqueue(item);
+            }
 
-                    _messageCache[key] = newQueue;
-                }
-                _logs.NewLogEvent(LogSeverity.Info, LogSource.Message, $"Cleaned {cleaned} message(s)");
-            }, null, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5));
+            if (newQueue.IsEmpty)
+                _messageCache.TryRemove(message.UserId, out _);
+            else
+                _messageCache[message.UserId] = newQueue;
         }
 
         public async Task HandleMessageAsync(SocketMessage msg)
         {
-            if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) || !(msg is SocketUserMessage message)) return;
+            if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
+                !(msg is SocketUserMessage message)) return;
 
             var guild = _database.GetGuild(channel.Guild.Id);
 
@@ -83,7 +76,8 @@ namespace Umbreon.Services
 
             var argPos = 0;
 
-            if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) || prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
+            if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
+                prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
                 var context = new GuildCommandContext(_client, message);
                 await HandleCommandAsync(context, argPos);
@@ -131,10 +125,12 @@ namespace Umbreon.Services
             return message;
         }
 
-        public Task<IUserMessage> NewMessageAsync(ICommandContext context, string content, bool isTTS = false, Embed embed = null)
+        public Task<IUserMessage> NewMessageAsync(ICommandContext context, string content, bool isTTS = false,
+            Embed embed = null)
             => NewMessageAsync(context.User.Id, context.Message.Id, context.Channel.Id, content, isTTS, embed);
 
-        public async Task<IUserMessage> NewMessageAsync(ulong userId, ulong executingId, ulong channelId, string content, bool isTTS = false, Embed embed = null)
+        public async Task<IUserMessage> NewMessageAsync(ulong userId, ulong executingId, ulong channelId, string content,
+            bool isTTS = false, Embed embed = null)
         {
             if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
             var response = await channel.SendMessageAsync(content, isTTS, embed);
@@ -154,7 +150,6 @@ namespace Umbreon.Services
 
             ICallback callback = null;
 
-            // TODO clean up all paginators
             switch (paginator)
             {
                 case HelpPaginatedMessage help:
@@ -162,7 +157,7 @@ namespace Umbreon.Services
                     break;
 
                 case CommandMenuMessage cmd:
-                    callback = new CommandMenuCallback(_interactive, context, cmd, _commands, _services);
+                    callback = new CommandMenuCallback(_commands, _services, _interactive, cmd, this, context);
                     break;
 
                 case PaginatedMessage pager:
@@ -172,7 +167,8 @@ namespace Umbreon.Services
 
             await callback.DisplayAsync().ConfigureAwait(false);
 
-            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id, callback.Message.Id);
+            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
+                callback.Message.Id);
 
             return callback.Message;
         }
@@ -247,14 +243,20 @@ namespace Umbreon.Services
             if (found.Count >= CacheSize)
                 found.TryDequeue(out _);
 
-            found.Enqueue(new Message
+            var newMessage = new Message
             {
+                UserId = userId,
                 ChannelId = channelId,
                 CreatedAt = createdAt,
                 ExecutingId = executingId,
-                ResponseId = responseId
-            });
+                ResponseId = responseId,
 
+                Service = this
+            };
+
+            found.Enqueue(newMessage);
+
+            _timer.Enqueue(newMessage);
             _messageCache[userId] = found;
             return Task.CompletedTask;
         }
