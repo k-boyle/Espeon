@@ -12,7 +12,7 @@
         Database,
         CustomCmds,
         CustomFuncs,
-        Message
+        Timer
     }
 
     public enum SpecialRole
