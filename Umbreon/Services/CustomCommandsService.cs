@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace Umbreon.Services
         private readonly CommandService _commandService;
         private readonly MessageService _message;
         private readonly LogService _logs;
+        private readonly ConcurrentDictionary<ulong, ModuleInfo> _modules = new ConcurrentDictionary<ulong, ModuleInfo>();
 
         public CustomCommandsService(DatabaseService database, CommandService commandsService, MessageService message, LogService logs)
         {
@@ -26,20 +28,6 @@ namespace Umbreon.Services
             _commandService = commandsService;
             _message = message;
             _logs = logs;
-        }
-
-        private string RemoveGroupName(string inStr)
-        {
-            var groups = _commandService.Modules.Where(x => !(x.Group is null)).Select(y => y.Group);
-            var outStr = inStr;
-            foreach (var group in groups)
-            {
-                if (inStr.Contains(group))
-                {
-                    outStr = inStr.Replace($"{group} ", "");
-                }
-            }
-            return outStr;
         }
 
         public async Task LoadCmds(DiscordSocketClient client)
@@ -54,8 +42,11 @@ namespace Umbreon.Services
 
         private async Task NewCmds(ulong guildId)
         {
+            if (_modules.TryGetValue(guildId, out var found))
+                await _commandService.RemoveModuleAsync(found);
+
             var cmds = GetCmds(guildId);
-            await _commandService.CreateModuleAsync(guildId.ToString(), module =>
+            var created = await _commandService.CreateModuleAsync(guildId.ToString(), module =>
             {
                 module.WithName(guildId.ToString());
                 module.AddAliases("");
@@ -72,15 +63,8 @@ namespace Umbreon.Services
                     });
                 }
             });
-        }
 
-        private async Task CreateNewCmd(ulong guildId)
-        {
-            await _commandService.RemoveModuleAsync(
-                _commandService.Modules.FirstOrDefault(x =>
-                    string.Equals(x.Name, guildId.ToString(), StringComparison.CurrentCultureIgnoreCase)));
-            await NewCmds(guildId);
-           _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"New command has been created in {guildId}");
+            _modules.TryAdd(guildId, created);
         }
 
         private async Task CommandCallback(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
@@ -99,7 +83,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomCommands.Add(newCmd);
             _database.UpdateGuild(guild);
-            await CreateNewCmd(context.Guild.Id);
+            await NewCmds(context.Guild.Id);
         }
 
         public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
@@ -111,15 +95,6 @@ namespace Umbreon.Services
             _database.UpdateGuild(guild);
         }
 
-        private async Task RemoveCmd(ulong guildId)
-        {
-            await _commandService.RemoveModuleAsync(
-                _commandService.Modules.FirstOrDefault(x =>
-                    string.Equals(x.Name, guildId.ToString(), StringComparison.CurrentCultureIgnoreCase)));
-            await NewCmds(guildId);
-            _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, $"Command has been removed in {guildId}");
-        }
-        
         public async Task RemoveCmd(ICommandContext context, string cmdName)
         {
             var guild = _database.GetGuild(context);
@@ -127,7 +102,7 @@ namespace Umbreon.Services
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
             _database.UpdateGuild(guild);
-            await RemoveCmd(context.Guild.Id);
+            await NewCmds(context.Guild.Id);
         }
 
         public bool IsReserved(string toCheck)
@@ -140,6 +115,20 @@ namespace Umbreon.Services
             }
 
             return reserved.Contains(toCheck, StringComparer.CurrentCultureIgnoreCase);
+        }
+
+        private string RemoveGroupName(string inStr)
+        {
+            var groups = _commandService.Modules.Where(x => !(x.Group is null)).Select(y => y.Group);
+            var outStr = inStr;
+            foreach (var group in groups)
+            {
+                if (inStr.Contains(group))
+                {
+                    outStr = inStr.Replace($"{group} ", "");
+                }
+            }
+            return outStr;
         }
 
         public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)

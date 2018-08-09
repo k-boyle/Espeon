@@ -20,6 +20,7 @@ namespace Umbreon.Services
         private readonly EvalService _eval;
         private readonly LogService _logs;
         private const string Name = "Created Functions";
+        private ModuleInfo module = null;
 
         public CustomFunctionService(DatabaseService database, CommandService commandService, EvalService eval, LogService logs)
         {
@@ -37,10 +38,13 @@ namespace Umbreon.Services
 
         private async Task AddFuncs(BaseSocketClient client)
         {
+            if (!(module is null))
+                await _commandService.RemoveModuleAsync(module);
+
             var allFunctions = client.Guilds.Select(x => _database.GetGuild(x.Id))
                 .SelectMany(y => y.CustomFunctions);
 
-            await _commandService.CreateModuleAsync(Name, module =>
+            module = await _commandService.CreateModuleAsync(Name, module =>
             {
                 module.WithSummary("Custom functions for the bot");
                 module.AddAliases("");
@@ -77,7 +81,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomFunctions.Add(function);
             _database.UpdateGuild(guild);
-            await UpdateFuncs(context.Client as BaseSocketClient);
+            await LoadFuncs(context.Client as BaseSocketClient);
         }
 
         public async Task RemoveFunc(ICommandContext context, CustomFunction function)
@@ -85,7 +89,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomFunctions.Remove(function);
             _database.UpdateGuild(guild);
-            await UpdateFuncs(context.Client as BaseSocketClient);
+            await LoadFuncs(context.Client as BaseSocketClient);
         }
 
         public async Task UpdateFunction(ICommandContext context, CustomFunction before, CustomFunction after)
@@ -93,15 +97,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomFunctions[guild.CustomFunctions.IndexOf(before)] = after;
             _database.UpdateGuild(guild);
-            await UpdateFuncs(context.Client as BaseSocketClient);
-        }
-
-        private async Task UpdateFuncs(BaseSocketClient client)
-        {
-            await _commandService.RemoveModuleAsync(
-                _commandService.Modules.FirstOrDefault(x => x.Name == Name));
-            await LoadFuncs(client);
-            _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomFuncs, "Custom functions have been updated");
+            await LoadFuncs(context.Client as BaseSocketClient);
         }
 
         public IEnumerable<CustomFunction> GetFuncs(ICommandContext context)

@@ -20,7 +20,7 @@ namespace Umbreon.Services
         private readonly LogService _logs;
         private readonly ConcurrentDictionary<ulong, GuildObject> _guilds = new ConcurrentDictionary<ulong, GuildObject>();
 
-        public DatabaseService(DiscordSocketClient client, LogService logs )
+        public DatabaseService(DiscordSocketClient client, LogService logs)
         {
             _client = client;
             _logs = logs;
@@ -52,7 +52,7 @@ namespace Umbreon.Services
             return Task.CompletedTask;
         }
 
-        public void LoadGuilds()
+        public async Task LoadGuilds()
         {
             _guilds.Clear();
             using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
@@ -60,16 +60,9 @@ namespace Umbreon.Services
                 var guilds = db.GetCollection<GuildObject>("guilds");
                 foreach (var guild in _client.Guilds)
                 {
-                    var g = guilds.FindOne(x => x.GuildId == guild.Id);
-                    if (g is null)
-                    {
-                        NewGuild(guilds, guild);
-                    }
-                    else
-                    {
-                        _guilds.TryAdd(g.GuildId, g);
-                        _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been loaded");
-                    }
+                    var g = guilds.FindOne(x => x.GuildId == guild.Id) ?? await NewGuild(guilds, guild);
+                    _guilds.TryAdd(g.GuildId, g);
+                    _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been loaded");
                 }
             }
         }
@@ -83,9 +76,9 @@ namespace Umbreon.Services
             }
         }
 
-        private void NewGuild(LiteCollection<GuildObject> guilds, IGuild guild)
+        private Task<GuildObject> NewGuild(LiteCollection<GuildObject> guilds, IGuild guild)
         {
-            if (!(guilds.FindOne(x => x.GuildId == guild.Id) is null)) return;
+            if (!(guilds.FindOne(x => x.GuildId == guild.Id) is null)) return null;
             var newGuild = new GuildObject
             {
                 GuildId = guild.Id
@@ -93,6 +86,7 @@ namespace Umbreon.Services
             guilds.Insert(newGuild);
             _guilds.TryAdd(guild.Id, newGuild);
             _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been added to the database");
+            return Task.FromResult(newGuild);
         }
 
         public GuildObject GetGuild(ICommandContext context)

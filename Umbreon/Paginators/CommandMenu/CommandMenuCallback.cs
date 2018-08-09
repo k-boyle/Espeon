@@ -9,6 +9,7 @@ using Umbreon.Extensions;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
+using Umbreon.Services;
 
 namespace Umbreon.Paginators.CommandMenu
 {
@@ -18,6 +19,7 @@ namespace Umbreon.Paginators.CommandMenu
         private readonly IServiceProvider _services;
         private readonly InteractiveService _interactive;
         private readonly CommandMenuMessage _properties;
+        private readonly MessageService _message;
 
         private string _currentMenu;
         private bool _executing;
@@ -29,15 +31,15 @@ namespace Umbreon.Paginators.CommandMenu
         public ICriterion<SocketReaction> Criterion => new EmptyCriterion<SocketReaction>();
         public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
         public ICommandContext Context { get; }
-
-        public CommandMenuCallback(InteractiveService interactive, ICommandContext context,
-            CommandMenuMessage properties, CommandService commands, IServiceProvider services)
+        
+        public CommandMenuCallback(CommandService commands, IServiceProvider services, InteractiveService interactive, CommandMenuMessage properties, MessageService message, ICommandContext context)
         {
-            Context = context;
-            _interactive = interactive;
-            _properties = properties;
             _commands = commands;
             _services = services;
+            _interactive = interactive;
+            _properties = properties;
+            _message = message;
+            Context = context;
         }
 
         public async Task DisplayAsync()
@@ -114,7 +116,7 @@ namespace Umbreon.Paginators.CommandMenu
                             var criteria = new Criteria<SocketMessage>()
                                 .AddCriterion(new EnsureSourceChannelCriterion())
                                 .AddCriterion(new EnsureFromUserCriterion(reaction.UserId));
-                            await Context.Channel.SendMessageAsync(
+                            await _message.SendMessageAsync(Context,
                                 $"What do you want the {param.Name} to be? Respond with `cancel` to cancel execution");
                             var response =
                                 await _interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
