@@ -12,7 +12,6 @@ using Umbreon.TypeReaders;
 
 namespace Umbreon.Modules
 {
-    [Group("Music")]
     [Summary("Music commands")]
     [RequireMusic]
     public class Music : MusicModuleBase<GuildCommandContext>

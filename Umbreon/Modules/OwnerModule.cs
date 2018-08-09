@@ -11,7 +11,6 @@ using Activity = Umbreon.Core.Entities.Activity;
 
 namespace Umbreon.Modules
 {
-    [Group("cas")]
     [Name("Owner Commands")]
     [Summary("Super duper secret commands")]
     [RequireOwner]

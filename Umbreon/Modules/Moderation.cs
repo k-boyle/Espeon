@@ -12,7 +12,6 @@ using Umbreon.TypeReaders;
 
 namespace Umbreon.Modules
 {
-    [Group("mod")]
     [Name("Moderation")]
     [Summary("Moderation commands for the server")]
     [RequireRole(SpecialRole.Mod, Group = "RequireRole")]
