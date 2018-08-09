@@ -45,10 +45,10 @@ namespace Umbreon.Services
             _services = services;
         }
 
-        public void Remove(IRemoveable obj)
+        public Task Remove(IRemoveable obj)
         {
-            if (!(obj is Message message)) return;
-            if (!_messageCache.TryGetValue(message.UserId, out var found)) return;
+            if (!(obj is Message message)) return Task.CompletedTask;
+            if (!_messageCache.TryGetValue(message.UserId, out var found)) return Task.CompletedTask;
             var newQueue = new ConcurrentQueue<Message>();
             foreach (var item in found)
             {
@@ -60,6 +60,7 @@ namespace Umbreon.Services
                 _messageCache.TryRemove(message.UserId, out _);
             else
                 _messageCache[message.UserId] = newQueue;
+            return Task.CompletedTask;
         }
 
         public async Task HandleMessageAsync(SocketMessage msg)

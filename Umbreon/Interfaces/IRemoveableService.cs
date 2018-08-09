@@ -1,7 +1,9 @@
-﻿namespace Umbreon.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace Umbreon.Interfaces
 {
     public interface IRemoveableService
     {
-        void Remove(IRemoveable obj);
+        Task Remove(IRemoveable obj);
     }
 }
