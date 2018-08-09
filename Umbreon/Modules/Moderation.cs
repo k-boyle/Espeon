@@ -32,7 +32,7 @@ namespace Umbreon.Modules
         public async Task KickUser(
             [Name("User To Kick")]
             [Summary("The user you want to kick")]
-            SocketGuildUser userToKick,
+            [RequireHierarchy] SocketGuildUser userToKick,
             [Name("Reason")]
             [Summary("The reason for kicking them")]
             [Remainder] string reason = null)
@@ -49,7 +49,8 @@ namespace Umbreon.Modules
         [RequireBotPermission(GuildPermission.BanMembers)]
         public async Task BanUser(
             [Name("User To Ban")]
-            [Summary("The user you want to ban")] SocketGuildUser userToBan,
+            [Summary("The user you want to ban")]
+            [RequireHierarchy] SocketGuildUser userToBan,
             [Name("Prune Amount")]
             [Summary("The number of days of messages from the user you want to delete")]
             [OverrideTypeReader(typeof(BanLimitTypeReader))] int pruneAmount = 0,
