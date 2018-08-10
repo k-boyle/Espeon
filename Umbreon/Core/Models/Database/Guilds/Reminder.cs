@@ -1,21 +1,21 @@
-﻿using LiteDB;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using LiteDB;
+using Umbreon.Interfaces;
 
-namespace Umbreon.Core.Models.Database
+namespace Umbreon.Core.Models.Database.Guilds
 {
-    public class Reminders
+    public class Reminder : IRemoveable
     {
-        [BsonId]
-        public int Index;
-        public List<Reminder> TheReminders { get; set; } = new List<Reminder>();
-    }
+        [BsonId(true)]
+        public int Id { get; set; }
 
-    public class Reminder
-    {
         public string TheReminder { get; set; }
-        public ulong Channel { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong ChannelId { get; set; }
         public ulong UserId { get; set; }
         public DateTime ToExecute { get; set; }
+
+        public TimeSpan When { get; set; }
+        public IRemoveableService Service { get; set; }
     }
 }

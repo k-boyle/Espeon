@@ -18,8 +18,11 @@ namespace Umbreon.Services
         private readonly CustomFunctionService _customFunctions;
         private readonly MusicService _musicService;
         private readonly MessageService _message;
+        private readonly RemindersService _reminders;
 
-        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService, MessageService message)
+        public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, 
+            CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService, 
+            MessageService message, RemindersService reminders)
         {
             _client = client;
             _commands = commands;
@@ -29,6 +32,7 @@ namespace Umbreon.Services
             _customFunctions = customFunctions;
             _musicService = musicService;
             _message = message;
+            _reminders = reminders;
         }
 
         public void HookEvents()
@@ -36,10 +40,11 @@ namespace Umbreon.Services
             _client.Log += _logs.LogEvent;
             _client.Ready += async () =>
             {
-                _database.LoadGuilds();
+                await _database.LoadGuilds();
                 await _customCommands.LoadCmds(_client);
                 await _customFunctions.LoadFuncs(_client);
                 await _musicService.Initialise();
+                await _reminders.LoadReminders();
             };
             _client.MessageReceived += _message.HandleMessageAsync;
             _client.MessageUpdated += (_, msg, __) => _message.HandleMessageUpdateAsync(msg);
@@ -64,6 +69,7 @@ namespace Umbreon.Services
                 }
             };
             _commands.Log += _logs.LogEvent;
+            _commands.CommandExecuted += _message.CommandExecuted;
         }
     }
 }
