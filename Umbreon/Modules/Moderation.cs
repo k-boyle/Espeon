@@ -17,7 +17,7 @@ namespace Umbreon.Modules
     [RequireRole(SpecialRole.Mod, Group = "RequireRole")]
     [RequireRole(SpecialRole.Admin, Group = "RequireRole")]
     [RequireGuildOwner(Group = "RequireRole")]
-    public class Moderation : UmbreonBase<GuildCommandContext>
+    public class Moderation : UmbreonBase<UmbreonContext>
     {
         // TODO mute, warnings
         // TODO promo users, demote users, annoucement

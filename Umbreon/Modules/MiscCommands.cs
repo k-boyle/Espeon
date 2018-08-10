@@ -12,7 +12,7 @@ namespace Umbreon.Modules
 {
     [Name("Misc Commands")]
     [Summary("Commands that don't fit into a category")]
-    public class MiscCommands : UmbreonBase<GuildCommandContext>
+    public class MiscCommands : UmbreonBase<UmbreonContext>
     {
         // TODO reminders, admin/mod list
 

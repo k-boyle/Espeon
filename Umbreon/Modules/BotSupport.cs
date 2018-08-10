@@ -12,7 +12,7 @@ namespace Umbreon.Modules
     [Group("bot")]
     [Name("Bot Support")]
     [Summary("Commands to give feedback/support for the bot")]
-    public class BotSupport : UmbreonBase<GuildCommandContext>
+    public class BotSupport : UmbreonBase<UmbreonContext>
     {
         [Command("Bug")]
         [Name("Bug Report")]

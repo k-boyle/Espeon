@@ -23,9 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
-    <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.Core\Discord.Net.Core.csproj" />
-    <ProjectReference Include="..\..\Discord.Net-Casino\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
+    <Reference Include="Discord.Net.Commands">
+      <HintPath>Discord.Net.Commands.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Core">
+      <HintPath>Discord.Net.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.WebSocket">
+      <HintPath>Discord.Net.WebSocket.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

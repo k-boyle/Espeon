@@ -13,7 +13,7 @@ namespace Umbreon.Modules
     [Name("Custom Functions")]
     [Summary("Create custom functions for the bot")]
     [RequireOwner]
-    public class CustomFunctions : CustomFunctionsBase<GuildCommandContext>
+    public class CustomFunctions : CustomFunctionsBase<UmbreonContext>
     {
         [Command("create")]
         [Summary("Create a function")]

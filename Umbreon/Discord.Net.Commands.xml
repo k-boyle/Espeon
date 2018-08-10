@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Discord.Net.Commands</name>
+    </assembly>
+    <members>
+        <member name="T:Discord.Commands.AliasAttribute">
+            <summary> Provides aliases for a command. </summary>
+        </member>
+        <member name="P:Discord.Commands.AliasAttribute.Aliases">
+            <summary> The aliases which have been defined for the command. </summary>
+        </member>
+        <member name="M:Discord.Commands.AliasAttribute.#ctor(System.String[])">
+            <summary> Creates a new <see cref="T:Discord.Commands.AliasAttribute"/> with the given aliases. </summary>
+        </member>
+        <member name="P:Discord.Commands.PreconditionAttribute.Group">
+            <summary>
+            Specify a group that this precondition belongs to. Preconditions of the same group require only one
+            of the preconditions to pass in order to be successful (A || B). Specifying <see cref="P:Discord.Commands.PreconditionAttribute.Group"/> = <see langword="null"/>
+            or not at all will require *all* preconditions to pass, just like normal (A &amp;&amp; B).
+            </summary>
+        </member>
+        <member name="T:Discord.Commands.RequireBotPermissionAttribute">
+            <summary>
+            This attribute requires that the bot has a specified permission in the channel a command is invoked in.
+            </summary>
+        </member>
+        <member name="M:Discord.Commands.RequireBotPermissionAttribute.#ctor(Discord.GuildPermission)">
+            <summary>
+            Require that the bot account has a specified GuildPermission
+            </summary>
+            <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
+            <param name="permission">The GuildPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        </member>
+        <member name="M:Discord.Commands.RequireBotPermissionAttribute.#ctor(Discord.ChannelPermission)">
+            <summary>
+            Require that the bot account has a specified ChannelPermission.
+            </summary>
+            <param name="permission">The ChannelPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
+            <example>
+            <code language="c#">
+                [Command("permission")]
+                [RequireBotPermission(ChannelPermission.ManageMessages)]
+                public async Task Purge()
+                {
+                }
+            </code>
+            </example>
+        </member>
+        <member name="T:Discord.Commands.RequireContextAttribute">
+            <summary>
+            Require that the command be invoked in a specified context.
+            </summary>
+        </member>
+        <member name="M:Discord.Commands.RequireContextAttribute.#ctor(Discord.Commands.ContextType)">
+            <summary>
+            Require that the command be invoked in a specified context.
+            </summary>
+            <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
+            <example>
+            <code language="c#">
+                [Command("private_only")]
+                [RequireContext(ContextType.DM | ContextType.Group)]
+                public async Task PrivateOnly()
+                {
+                }
+            </code>
+            </example>
+        </member>
+        <member name="T:Discord.Commands.RequireNsfwAttribute">
+            <summary>
+            Require that the command is invoked in a channel marked NSFW
+            </summary>
+        </member>
+        <member name="T:Discord.Commands.RequireOwnerAttribute">
+            <summary>
+            Require that the command is invoked by the owner of the bot.
+            </summary>
+            <remarks>This precondition will only work if the bot is a bot account.</remarks>
+        </member>
+        <member name="T:Discord.Commands.RequireUserPermissionAttribute">
+            <summary>
+            This attribute requires that the user invoking the command has a specified permission.
+            </summary>
+        </member>
+        <member name="M:Discord.Commands.RequireUserPermissionAttribute.#ctor(Discord.GuildPermission)">
+            <summary>
+            Require that the user invoking the command has a specified GuildPermission
+            </summary>
+            <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
+            <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        </member>
+        <member name="M:Discord.Commands.RequireUserPermissionAttribute.#ctor(Discord.ChannelPermission)">
+            <summary>
+            Require that the user invoking the command has a specified ChannelPermission.
+            </summary>
+            <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
+            <example>
+            <code language="c#">
+                [Command("permission")]
+                [RequireUserPermission(ChannelPermission.ReadMessageHistory | ChannelPermission.ReadMessages)]
+                public async Task HasPermission()
+                {
+                    await ReplyAsync("You can read messages and the message history!");
+                }
+            </code>
+            </example>
+        </member>
+        <member name="T:Discord.Commands.PriorityAttribute">
+            <summary> Sets priority of commands </summary>
+        </member>
+        <member name="P:Discord.Commands.PriorityAttribute.Priority">
+            <summary> The priority which has been set for the command </summary>
+        </member>
+        <member name="M:Discord.Commands.PriorityAttribute.#ctor(System.Int32)">
+            <summary> Creates a new <see cref="T:Discord.Commands.PriorityAttribute"/> with the given priority. </summary>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddModuleAsync``1(System.IServiceProvider)">
+            <summary>
+            Add a command module from a type
+            </summary>
+            <typeparam name="T">The type of module</typeparam>
+            <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+            <returns>A built module</returns>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddModulesAsync(System.Reflection.Assembly,System.IServiceProvider)">
+            <summary>
+            Add command modules from an assembly
+            </summary>
+            <param name="assembly">The assembly containing command modules</param>
+            <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+            <returns>A collection of built modules</returns>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddTypeReader``1(Discord.Commands.TypeReader)">
+            <summary>
+            Adds a custom <see cref="T:Discord.Commands.TypeReader"/> to this <see cref="T:Discord.Commands.CommandService"/> for the supplied object type. 
+            If <typeparamref name="T"/> is a <see cref="T:System.ValueType"/>, a <see cref="T:Discord.Commands.NullableTypeReader`1"/> will also be added.
+            If a default <see cref="T:Discord.Commands.TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="T:Discord.Commands.TypeReader"/> will be replaced. 
+            </summary>
+            <typeparam name="T">The object type to be read by the <see cref="T:Discord.Commands.TypeReader"/>.</typeparam>
+            <param name="reader">An instance of the <see cref="T:Discord.Commands.TypeReader"/> to be added.</param>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddTypeReader(System.Type,Discord.Commands.TypeReader)">
+            <summary>
+            Adds a custom <see cref="T:Discord.Commands.TypeReader"/> to this <see cref="T:Discord.Commands.CommandService"/> for the supplied object type. 
+            If <paramref name="type"/> is a <see cref="T:System.ValueType"/>, a <see cref="T:Discord.Commands.NullableTypeReader`1"/> for the value type will also be added.
+            If a default <see cref="T:Discord.Commands.TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="T:Discord.Commands.TypeReader"/> will be replaced.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> instance for the type to be read.</param>
+            <param name="reader">An instance of the <see cref="T:Discord.Commands.TypeReader"/> to be added.</param>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddTypeReader``1(Discord.Commands.TypeReader,System.Boolean)">
+            <summary>
+            Adds a custom <see cref="T:Discord.Commands.TypeReader"/> to this <see cref="T:Discord.Commands.CommandService"/> for the supplied object type. 
+            If <typeparamref name="T"/> is a <see cref="T:System.ValueType"/>, a <see cref="T:Discord.Commands.NullableTypeReader`1"/> will also be added.
+            </summary>
+            <typeparam name="T">The object type to be read by the <see cref="T:Discord.Commands.TypeReader"/>.</typeparam>
+            <param name="reader">An instance of the <see cref="T:Discord.Commands.TypeReader"/> to be added.</param>
+            <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="T:Discord.Commands.TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        </member>
+        <member name="M:Discord.Commands.CommandService.AddTypeReader(System.Type,Discord.Commands.TypeReader,System.Boolean)">
+            <summary>
+            Adds a custom <see cref="T:Discord.Commands.TypeReader"/> to this <see cref="T:Discord.Commands.CommandService"/> for the supplied object type. 
+            If <paramref name="type"/> is a <see cref="T:System.ValueType"/>, a <see cref="T:Discord.Commands.NullableTypeReader`1"/> for the value type will also be added. 
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> instance for the type to be read.</param>
+            <param name="reader">An instance of the <see cref="T:Discord.Commands.TypeReader"/> to be added.</param>
+            <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="T:Discord.Commands.TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.DefaultRunMode">
+            <summary> Gets or sets the default RunMode commands should have, if one is not specified on the Command attribute or builder. </summary>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.CaseSensitiveCommands">
+            <summary> Determines whether commands should be case-sensitive. </summary>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.LogLevel">
+            <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.ThrowOnError">
+            <summary> Determines whether RunMode.Sync commands should push exceptions up to the caller. </summary>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.QuotationMarkAliasMap">
+            <summary> Collection of aliases that can wrap strings for command parsing. 
+            represents the opening quotation mark and the value is the corresponding closing mark.</summary>
+        </member>
+        <member name="P:Discord.Commands.CommandServiceConfig.IgnoreExtraArgs">
+            <summary> Determines whether extra parameters should be ignored. </summary>
+        </member>
+        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+            <summary>
+            Sends a message to the source channel
+            </summary>
+            <param name="message">Contents of the message; optional only if <paramref name="embed"/> is specified</param>
+            <param name="isTTS">Specifies if Discord should read this message aloud using TTS</param>
+            <param name="embed">An embed to be displayed alongside the message</param>
+        </member>
+        <member name="T:Discord.Commands.QuotationAliasUtils">
+            <summary>
+            Utility methods for generating matching pairs of unicode quotation marks for CommandServiceConfig
+            </summary>
+        </member>
+        <member name="P:Discord.Commands.QuotationAliasUtils.GetDefaultAliasMap">
+            <summary>
+            Generates an IEnumerable of characters representing open-close pairs of
+            quotation punctuation.
+            </summary>
+        </member>
+    </members>
+</doc>

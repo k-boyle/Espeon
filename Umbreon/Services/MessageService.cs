@@ -80,7 +80,7 @@ namespace Umbreon.Services
             if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
-                var context = new GuildCommandContext(_client, message);
+                var context = new UmbreonContext(_client, message);
                 await HandleCommandAsync(context, argPos);
             }
         }
@@ -88,22 +88,42 @@ namespace Umbreon.Services
         public Task HandleMessageUpdateAsync(SocketMessage msg)
             => HandleMessageAsync(msg);
 
-        public async Task HandleCommandAsync(GuildCommandContext context, int argPos)
+        public async Task HandleCommandAsync(UmbreonContext context, int argPos)
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
             await _commands.ExecuteAsync(context, argPos, _services);
         }
 
-        private Task CommandExecuted(CommandInfo command, ICommandContext context, IResult result)
+        public async Task CommandExecuted(CommandInfo command, ICommandContext context, IResult result)
         {
-            if (!result.IsSuccess)
+            if (result.IsSuccess) return;
+            var guild = _database.GetGuild(context);
+            switch (result.Error)
             {
+                case CommandError.UnknownCommand:
 
+                    break;
+                case CommandError.ParseFailed:
+                    break;
+                case CommandError.BadArgCount:
+                    break;
+                case CommandError.ObjectNotFound:
+                    break;
+                case CommandError.MultipleMatches:
+                    break;
+                case CommandError.UnmetPrecondition:
+                    break;
+                case CommandError.Exception:
+                    break;
+                case CommandError.Unsuccessful:
+                    break;
+                default:
+                    break;
             }
-            return Task.CompletedTask;
         }
 
-        public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false, Embed embed = null)
+        public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false,
+            Embed embed = null)
         {
             var message = await GetExistingMessageAsync(context);
             if (message is null)

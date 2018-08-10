@@ -15,7 +15,7 @@ namespace Umbreon.Core.Models.Database
         public string WelcomeMessage { get; set; } // TODO
         public ulong MOTDChannel { get; set; } = 0; // TODO
         public string MOTDMessage { get; set; } // TODO
-        public bool CloseCommandMatching { get; set; } = false;
+        public bool UnkownCommandResult { get; set; } = false;
         public bool UseWhiteList { get; set; } = false; // TODO
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
         public List<Module> DisabledModules { get; set; } = new List<Module>();
@@ -37,5 +37,6 @@ namespace Umbreon.Core.Models.Database
         {
             84291986575613952
         };
+        public List<Reminder> Reminders { get; set; } = new List<Reminder>();
     }
 }

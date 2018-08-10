@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using SharpLink;
@@ -13,17 +14,20 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _log;
+        private readonly MessageService _message;
+
         private LavalinkManager _lavalinkManager;
 
         private
-            ConcurrentDictionary<ulong, (LavalinkPlayer player, bool isPaused, ulong channelId,
+            ConcurrentDictionary<ulong, (LavalinkPlayer player, bool isPaused, ulong channelId, ulong userId,
                 ConcurrentQueue<LavalinkTrack> queue)> _lavaCache =
-                new ConcurrentDictionary<ulong, (LavalinkPlayer, bool, ulong, ConcurrentQueue<LavalinkTrack>)>();
-
-        public MusicService(DiscordSocketClient client, LogService log)
+                new ConcurrentDictionary<ulong, (LavalinkPlayer, bool, ulong, ulong, ConcurrentQueue<LavalinkTrack>)>();
+        
+        public MusicService(DiscordSocketClient client, LogService log, MessageService message)
         {
             _client = client;
             _log = log;
+            _message = message;
         }
 
         public async Task Initialise()
@@ -43,9 +47,9 @@ namespace Umbreon.Services
             _lavalinkManager.TrackEnd += TrackFinishedAsync;
         }
 
-        public (LavalinkPlayer, bool, ulong, ConcurrentQueue<LavalinkTrack>) GetGuild(ICommandContext context)
+        public (LavalinkPlayer, bool, ulong, ulong, ConcurrentQueue<LavalinkTrack>) GetGuild(ICommandContext context)
         {
-            return _lavaCache.TryGetValue(context.Guild.Id, out var found) ? found : (null, false, 0, null);
+            return _lavaCache.TryGetValue(context.Guild.Id, out var found) ? found : (null, false, 0, 0, null);
         }
 
         public async Task JoinAsync(ICommandContext context)
@@ -54,9 +58,9 @@ namespace Umbreon.Services
                 await _lavalinkManager.LeaveAsync(context.Guild.Id);
             var player = await _lavalinkManager.JoinAsync((context.User as IGuildUser).VoiceChannel);
             if (!_lavaCache.TryAdd(context.Guild.Id,
-                (player, false, context.Channel.Id, new ConcurrentQueue<LavalinkTrack>())))
+                (player, false, context.Channel.Id, context.User.Id, new ConcurrentQueue<LavalinkTrack>())))
             {
-                _lavaCache[context.Guild.Id] = (player, false, context.Channel.Id, _lavaCache[context.Guild.Id].queue);
+                _lavaCache[context.Guild.Id] = (player, false, context.Channel.Id, context.User.Id, _lavaCache[context.Guild.Id].queue);
             }
         }
 
@@ -89,7 +93,7 @@ namespace Umbreon.Services
                     Title = $"Now playing {track.Title}",
                     Color = Color.Red
                 };
-                await channel.SendMessageAsync(string.Empty, embed: embed.Build()); // TODO once overhauled fix this
+                await _message.NewMessageAsync(_lavaCache[guildId].userId, 0, channel.Id, string.Empty, embed: embed.Build());
             }
             else
             {
@@ -116,7 +120,7 @@ namespace Umbreon.Services
             if (!currentGuild.isPaused)
             {
                 await currentGuild.player.PauseAsync();
-                _lavaCache[context.Guild.Id] = (currentGuild.player, true, currentGuild.channelId, currentGuild.queue);
+                _lavaCache[context.Guild.Id] = (currentGuild.player, true, currentGuild.channelId, currentGuild.userId, currentGuild.queue);
             }
         }
 
@@ -126,7 +130,7 @@ namespace Umbreon.Services
             if (currentGuild.isPaused)
             {
                 await currentGuild.player.ResumeAsync();
-                _lavaCache[context.Guild.Id] = (currentGuild.player, false, currentGuild.channelId, currentGuild.queue);
+                _lavaCache[context.Guild.Id] = (currentGuild.player, false, currentGuild.channelId, currentGuild.userId, currentGuild.queue);
             }
         }
 
@@ -143,7 +147,8 @@ namespace Umbreon.Services
                     Title = $"Now playing {track.Title}",
                     Color = Color.Red
                 };
-                await channel.SendMessageAsync(string.Empty, embed: embed.Build()); // TODO once overhauled fix this
+                await _message.NewMessageAsync(currentGuild.userId, 0, currentGuild.channelId, string.Empty,
+                    embed: embed.Build()); 
                 _lavaCache[context.Guild.Id] = currentGuild;
             }
             else

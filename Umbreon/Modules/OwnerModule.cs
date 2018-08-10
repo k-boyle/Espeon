@@ -14,7 +14,7 @@ namespace Umbreon.Modules
     [Name("Owner Commands")]
     [Summary("Super duper secret commands")]
     [RequireOwner]
-    public class OwnerModule : UmbreonBase<GuildCommandContext>
+    public class OwnerModule : UmbreonBase<UmbreonContext>
     {
         private readonly EvalService _eval;
 

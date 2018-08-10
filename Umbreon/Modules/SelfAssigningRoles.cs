@@ -21,7 +21,7 @@ namespace Umbreon.Modules
     [Remarks("This module can be disabled", "Module Code: Roles")]
     [ModuleType(Module.Roles)]
     [RequireEnabled]
-    public class SelfAssigningRoles : SelfAssigningRolesBase<GuildCommandContext>
+    public class SelfAssigningRoles : SelfAssigningRolesBase<UmbreonContext>
     {
         [Command("List", RunMode = RunMode.Async)]
         [Alias("")]

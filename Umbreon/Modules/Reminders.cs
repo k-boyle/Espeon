@@ -9,7 +9,7 @@ using Umbreon.Services;
 
 namespace Umbreon.Modules
 {
-    public class Reminders : UmbreonBase<GuildCommandContext>
+    public class Reminders : UmbreonBase<UmbreonContext>
     {
         private readonly RemindersService _reminders;
         private readonly DatabaseService _database;

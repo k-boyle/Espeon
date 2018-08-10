@@ -36,7 +36,7 @@ namespace Umbreon.Services
             var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(GetNamespaces());
             var globals = new Globals
             {
-                Context = context as GuildCommandContext,
+                Context = context as UmbreonContext,
                 Message = _message,
                 Services = services
             };

@@ -8,7 +8,7 @@ namespace Umbreon.Core.Entities
 {
     public class Globals
     {
-        public GuildCommandContext Context { get; set; }
+        public UmbreonContext Context { get; set; }
         public IServiceProvider Services { get; set; }
         public MessageService Message { get; set; }
 

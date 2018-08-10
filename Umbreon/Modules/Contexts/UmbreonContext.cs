@@ -1,10 +1,11 @@
-﻿using Discord;
+﻿using System.Net.Http;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
 namespace Umbreon.Modules.Contexts
 {
-    public class GuildCommandContext : ICommandContext
+    public class UmbreonContext : ICommandContext
     {
         public DiscordSocketClient Client { get; }
         public SocketGuild Guild { get; }
@@ -13,7 +14,9 @@ namespace Umbreon.Modules.Contexts
         public SocketGuildUser User { get; }
         public IUserMessage Message { get; }
 
-        public GuildCommandContext(DiscordSocketClient client, IUserMessage msg)
+        public HttpClient HttpClient;
+
+        public UmbreonContext(DiscordSocketClient client, IUserMessage msg, HttpClient httpClient)
         {
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
@@ -21,6 +24,7 @@ namespace Umbreon.Modules.Contexts
             Channel = msg.Channel as SocketTextChannel;
             User = msg.Author as SocketGuildUser;
             Message = msg;
+            HttpClient = httpClient;
         }
 
         IDiscordClient ICommandContext.Client => Client;

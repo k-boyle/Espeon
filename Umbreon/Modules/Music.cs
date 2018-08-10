@@ -14,7 +14,7 @@ namespace Umbreon.Modules
 {
     [Summary("Music commands")]
     [RequireMusic]
-    public class Music : MusicModuleBase<GuildCommandContext>
+    public class Music : MusicModuleBase<UmbreonContext>
     {
         //TODO add show queue
 

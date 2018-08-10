@@ -22,7 +22,7 @@ namespace Umbreon.Modules
     [RequireEnabled]
     [ModuleType(Module.Commands)]
     [Remarks("This module can be disabled", "Module Code: Commands")]
-    public class CustomCommands : CustomCommandsBase<GuildCommandContext>
+    public class CustomCommands : CustomCommandsBase<UmbreonContext>
     {
         [Command("List", RunMode = RunMode.Async)]
         [Alias("")]

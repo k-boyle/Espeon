@@ -15,7 +15,7 @@ namespace Umbreon.Modules
     [Summary("Change the server specific settings for the bot")]
     [RequireRole(SpecialRole.Admin, Group = "RequireAdmin")]
     [RequireOwner(Group = "RequireAdmin")]
-    public class ServerSettings : ServerSettingsBase<GuildCommandContext>
+    public class ServerSettings : ServerSettingsBase<UmbreonContext>
     {
         // TODO Welcome channel, welcome message, MOTDChannel, MOTDMessage
 
@@ -113,7 +113,7 @@ namespace Umbreon.Modules
             [Name("Enabled")]
             [Summary("true of false")] bool enabled)
         {
-            CurrentGuild.CloseCommandMatching = enabled;
+            CurrentGuild.UnkownCommandResult = enabled;
             await SendMessageAsync("Close command matching has been changed");
         }
     }

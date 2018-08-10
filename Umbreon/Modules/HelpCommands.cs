@@ -17,7 +17,7 @@ namespace Umbreon.Modules
 {
     [Name("Help")]
     [Summary("Help commands")]
-    public class HelpCommands : UmbreonBase<GuildCommandContext>
+    public class HelpCommands : UmbreonBase<UmbreonContext>
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
