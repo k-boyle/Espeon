@@ -1,7 +1,7 @@
-﻿using System.Net.Http;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System.Net.Http;
 
 namespace Umbreon.Modules.Contexts
 {

@@ -5,7 +5,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities;
 using Umbreon.Interactive;
@@ -80,7 +82,7 @@ namespace Umbreon.Services
             if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
-                var context = new UmbreonContext(_client, message);
+                var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
                 await HandleCommandAsync(context, argPos);
             }
         }

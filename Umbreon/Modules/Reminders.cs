@@ -9,6 +9,8 @@ using Umbreon.Services;
 
 namespace Umbreon.Modules
 {
+    [Name("Reminders")]
+    [Summary("Need to be reminded? These are your commands")]
     public class Reminders : UmbreonBase<UmbreonContext>
     {
         private readonly RemindersService _reminders;

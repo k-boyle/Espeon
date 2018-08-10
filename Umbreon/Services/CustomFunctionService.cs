@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Models.Database;
+using Umbreon.Modules.Contexts;
 using Umbreon.Preconditions;
 
 namespace Umbreon.Services
@@ -73,7 +74,7 @@ namespace Umbreon.Services
             var allFuncs = client?.Guilds.Select(x => _database.GetGuild(x.Id))
                 .SelectMany(y => y.CustomFunctions);
             var found = allFuncs?.FirstOrDefault(x => string.Equals(x.FunctionName, info.Name, StringComparison.CurrentCultureIgnoreCase));
-            await _eval.EvaluateAsync(context, found?.FunctionCallback, false, services);
+            await _eval.EvaluateAsync(context as UmbreonContext, found?.FunctionCallback, false, services);
         }
 
         public async Task NewFunc(ICommandContext context, CustomFunction function)

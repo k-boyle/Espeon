@@ -31,14 +31,15 @@ namespace Umbreon.Services
             _message = message;
         }
 
-        public async Task EvaluateAsync(ICommandContext context, string code, bool isEval, IServiceProvider services)
+        public async Task EvaluateAsync(UmbreonContext context, string code, bool isEval, IServiceProvider services)
         {
             var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(GetNamespaces());
             var globals = new Globals
             {
-                Context = context as UmbreonContext,
+                Context = context,
                 Message = _message,
-                Services = services
+                Services = services,
+                HttpClient = context.HttpClient
             };
             IUserMessage message = null;
             if (isEval)
