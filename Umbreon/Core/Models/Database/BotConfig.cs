@@ -7,5 +7,6 @@ namespace Umbreon.Core.Models.Database
         [BsonId(false)]
         public int Index { get; set; }
         public string BotToken { get; set; }
+        public string Giphy { get; set; }
     }
 }

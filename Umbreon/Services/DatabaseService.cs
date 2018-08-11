@@ -32,21 +32,34 @@ namespace Umbreon.Services
             {
                 var configCol = db.GetCollection<BotConfig>("config");
                 var config = configCol.FindAll().FirstOrDefault();
-                if (config is null || string.IsNullOrEmpty(config.BotToken))
+                if (config is null || string.IsNullOrEmpty(config.BotToken) || string.IsNullOrEmpty(config.Giphy))
                 {
                     configCol.EnsureIndex("0");
-                    Console.Write("Bot token was not found please input it: ");
-                    var token = Console.ReadLine();
-                    configCol.Upsert(new BotConfig
+                    var newConfig = new BotConfig
                     {
-                        BotToken = token,
-                        Index = 0
-                    });
-                    ConstantsHelper.BotToken = token;
+                        Index = 0,
+                        BotToken = config?.BotToken,
+                        Giphy = config?.Giphy
+                    };
+                    if(string.IsNullOrEmpty(newConfig.BotToken))
+                    {
+                        Console.Write("Bot token was not found please input it: ");
+                        var token = Console.ReadLine();
+                        newConfig.BotToken = token;
+                        ConstantsHelper.BotToken = token;
+                    }
+                    if (string.IsNullOrEmpty(newConfig.Giphy))
+                    {
+                        Console.Write("Please input your Giphy API key: ");
+                        var giphy = Console.ReadLine();
+                        newConfig.Giphy = giphy;
+                        ConstantsHelper.GiphyToken = giphy;
+                    }
+
+                    configCol.Upsert(newConfig);
                     _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, "Config has been added to the database");
                     return Task.CompletedTask;
                 }
-
                 ConstantsHelper.BotToken = config.BotToken;
             }
             return Task.CompletedTask;
@@ -94,9 +107,7 @@ namespace Umbreon.Services
             => GetGuild(context.Guild.Id);
 
         public GuildObject GetGuild(ulong guildId)
-        {
-            return _guilds[guildId];
-        }
+            => _guilds[guildId];
 
         public void UpdateGuild(GuildObject guild)
         {

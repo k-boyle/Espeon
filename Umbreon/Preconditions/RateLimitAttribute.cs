@@ -1,21 +1,24 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Umbreon.Preconditions
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
     public sealed class RatelimitAttribute : PreconditionAttribute
     {
-        private readonly uint _invokeLimit;
-        private readonly bool _noLimitInDMs;
-        private readonly bool _noLimitForAdmins;
         private readonly bool _applyPerGuild;
+        private readonly uint _invokeLimit;
         private readonly TimeSpan _invokeLimitPeriod;
-        private readonly ConcurrentDictionary<(ulong, ulong?), CommandTimeout> _invokeTracker = new ConcurrentDictionary<(ulong, ulong?), CommandTimeout>();
-        
+
+        private readonly ConcurrentDictionary<(ulong, ulong?), CommandTimeout> _invokeTracker =
+            new ConcurrentDictionary<(ulong, ulong?), CommandTimeout>();
+
+        private readonly bool _noLimitForAdmins;
+        private readonly bool _noLimitInDMs;
+
         public RatelimitAttribute(
             uint times,
             double period,
@@ -26,7 +29,7 @@ namespace Umbreon.Preconditions
             _noLimitInDMs = (flags & RatelimitFlags.NoLimitInDMs) == RatelimitFlags.NoLimitInDMs;
             _noLimitForAdmins = (flags & RatelimitFlags.NoLimitForAdmins) == RatelimitFlags.NoLimitForAdmins;
             _applyPerGuild = (flags & RatelimitFlags.ApplyPerGuild) == RatelimitFlags.ApplyPerGuild;
-            
+
             switch (measure)
             {
                 case Measure.Days:
@@ -58,30 +61,32 @@ namespace Umbreon.Preconditions
             var now = DateTime.UtcNow;
             var key = _applyPerGuild ? (context.User.Id, context.Guild?.Id) : (context.User.Id, null);
 
-            var timeout = (_invokeTracker.TryGetValue(key, out var t)
-                && ((now - t.FirstInvoke) < _invokeLimitPeriod))
-                    ? t : new CommandTimeout(now);
+            var timeout = _invokeTracker.TryGetValue(key, out var t)
+                          && now - t.FirstInvoke < _invokeLimitPeriod
+                ? t
+                : new CommandTimeout(now);
 
             timeout.TimesInvoked++;
 
             if (timeout.TimesInvoked > _invokeLimit)
-                return Task.FromResult(PreconditionResult.FromError($"This command is on cooldown please wait {(timeout.FirstInvoke.Add(_invokeLimitPeriod) - DateTime.UtcNow).Seconds}s"));
+                return Task.FromResult(PreconditionResult.FromError(
+                    $"This command is on cooldown please wait {(timeout.FirstInvoke.Add(_invokeLimitPeriod) - DateTime.UtcNow).Seconds}s"));
             _invokeTracker[key] = timeout;
             return Task.FromResult(PreconditionResult.FromSuccess());
         }
 
         private sealed class CommandTimeout
         {
-            public uint TimesInvoked { get; set; }
-            public DateTime FirstInvoke { get; }
-
             public CommandTimeout(DateTime timeStarted)
             {
                 FirstInvoke = timeStarted;
             }
+
+            public uint TimesInvoked { get; set; }
+            public DateTime FirstInvoke { get; }
         }
     }
-    
+
     public enum Measure
     {
         Days,
@@ -89,7 +94,7 @@ namespace Umbreon.Preconditions
         Minutes,
         Seconds
     }
-    
+
     [Flags]
     public enum RatelimitFlags
     {
