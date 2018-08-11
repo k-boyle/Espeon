@@ -4,7 +4,6 @@ using System;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Extensions;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 
 namespace Umbreon.Modules
@@ -12,7 +11,7 @@ namespace Umbreon.Modules
     [Group("bot")]
     [Name("Bot Support")]
     [Summary("Commands to give feedback/support for the bot")]
-    public class BotSupport : UmbreonBase<UmbreonContext>
+    public class BotSupport : UmbreonBase
     {
         [Command("Bug")]
         [Name("Bug Report")]

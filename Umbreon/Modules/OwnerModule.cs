@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Services;
 using Umbreon.TypeReaders;
@@ -14,7 +13,7 @@ namespace Umbreon.Modules
     [Name("Owner Commands")]
     [Summary("Super duper secret commands")]
     [RequireOwner]
-    public class OwnerModule : UmbreonBase<UmbreonContext>
+    public class OwnerModule : UmbreonBase
     {
         private readonly EvalService _eval;
 

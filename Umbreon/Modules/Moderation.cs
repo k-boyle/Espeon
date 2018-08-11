@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Extensions;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
 using Umbreon.TypeReaders;
@@ -17,7 +16,7 @@ namespace Umbreon.Modules
     [RequireRole(SpecialRole.Mod, Group = "RequireRole")]
     [RequireRole(SpecialRole.Admin, Group = "RequireRole")]
     [RequireGuildOwner(Group = "RequireRole")]
-    public class Moderation : UmbreonBase<UmbreonContext>
+    public class Moderation : UmbreonBase
     {
         // TODO mute, warnings
         // TODO promo users, demote users, annoucement

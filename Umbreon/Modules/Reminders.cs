@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Umbreon.Attributes;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Services;
 
@@ -11,7 +10,7 @@ namespace Umbreon.Modules
 {
     [Name("Reminders")]
     [Summary("Need to be reminded? These are your commands")]
-    public class Reminders : UmbreonBase<UmbreonContext>
+    public class Reminders : UmbreonBase
     {
         private readonly RemindersService _reminders;
         private readonly DatabaseService _database;

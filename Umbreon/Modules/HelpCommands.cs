@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Paginators.HelpPaginator;
 using Umbreon.Services;
@@ -17,7 +16,7 @@ namespace Umbreon.Modules
 {
     [Name("Help")]
     [Summary("Help commands")]
-    public class HelpCommands : UmbreonBase<UmbreonContext>
+    public class HelpCommands : UmbreonBase
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;

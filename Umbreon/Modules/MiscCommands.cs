@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Extensions;
-using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Paginators.CommandMenu;
 using Umbreon.Services;
@@ -17,7 +16,7 @@ namespace Umbreon.Modules
 {
     [Name("Misc Commands")]
     [Summary("Commands that don't fit into a category")]
-    public class MiscCommands : UmbreonBase<UmbreonContext>
+    public class MiscCommands : UmbreonBase
     {
         private readonly CommandService _commands;
 
