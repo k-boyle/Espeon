@@ -27,7 +27,10 @@
       <HintPath>Discord.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Core">
-      <HintPath>Discord.Net.Core.dll</HintPath>
+      <HintPath>..\..\Discord.Net-Casino\src\Discord.Net.Core\bin\Release\net46\Discord.Net.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Rest">
+      <HintPath>..\..\Discord.Net-Casino\src\Discord.Net.Rest\bin\Release\net46\Discord.Net.Rest.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.WebSocket">
       <HintPath>Discord.Net.WebSocket.dll</HintPath>
