@@ -11,6 +11,7 @@ namespace Umbreon.Core.Entities
         public ulong ChannelId { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
 
+        public int Identifier { get; set; }
         public TimeSpan When => TimeSpan.FromMinutes(5);
         public IRemoveableService Service { get; set; }
     }

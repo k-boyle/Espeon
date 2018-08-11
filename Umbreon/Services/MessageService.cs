@@ -23,7 +23,6 @@ namespace Umbreon.Services
 {
     [Service]
     public class MessageService : IRemoveableService
-
     {
         private readonly DiscordSocketClient _client;
         private readonly DatabaseService _database;
@@ -31,13 +30,14 @@ namespace Umbreon.Services
         private readonly InteractiveService _interactive;
         private readonly TimerService _timer;
         private readonly IServiceProvider _services;
+        private readonly Random _random;
 
         private const int CacheSize = 10;
 
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache =
             new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
 
-        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, IServiceProvider services)
+        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, IServiceProvider services, Random random)
         {
             _client = client;
             _database = database;
@@ -45,6 +45,7 @@ namespace Umbreon.Services
             _interactive = interactive;
             _timer = timer;
             _services = services;
+            _random = random;
         }
 
         public Task Remove(IRemoveable obj)
@@ -188,15 +189,20 @@ namespace Umbreon.Services
                     break;
             }
 
-            await callback.DisplayAsync().ConfigureAwait(false);
+            if (callback != null)
+            {
+                await callback.DisplayAsync().ConfigureAwait(false);
 
-            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
-                callback.Message.Id);
+                await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
+                    callback.Message.Id);
 
-            return callback.Message;
+                return callback.Message;
+            }
+
+            return null;
         }
 
-        public async Task<int> ClearMessages(ICommandContext context, int amount)
+        public async Task<int> ClearMessages(ICommandContext context, int amount) // TODO test this
         {
             if (!_messageCache.TryGetValue(context.User.Id, out var found)) return 0;
             amount = amount > found.Count ? found.Count + 1 : amount;
@@ -232,6 +238,8 @@ namespace Umbreon.Services
                 if (delIds.Contains(item.ResponseId)) continue;
                 newQueue.Enqueue(item);
             }
+
+            _timer.Remove(newQueue);
 
             if (newQueue.IsEmpty)
                 _messageCache.TryRemove(context.User.Id, out _);
@@ -274,7 +282,8 @@ namespace Umbreon.Services
                 ExecutingId = executingId,
                 ResponseId = responseId,
 
-                Service = this
+                Service = this,
+                Identifier = _random.Next()
             };
 
             found.Enqueue(newMessage);

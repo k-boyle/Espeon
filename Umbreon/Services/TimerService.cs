@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Umbreon.Attributes;
@@ -47,6 +48,24 @@ namespace Umbreon.Services
             {
                 _timer.Change(obj.When, TimeSpan.Zero);
             }
+        }
+
+        public void Remove(IRemoveable obj)
+        {
+            var newQueue = new ConcurrentQueue<IRemoveable>();
+            foreach (var item in _queue)
+            {
+                if(item.Identifier == obj.Identifier) continue;
+                newQueue.Enqueue(item);
+            }
+
+            _queue = newQueue;
+        }
+
+        public void Remove(IEnumerable<IRemoveable> objs)
+        {
+            var newCol = _queue.Except(objs);
+            _queue = new ConcurrentQueue<IRemoveable>(newCol);
         }
     }
 }

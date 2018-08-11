@@ -15,6 +15,7 @@ namespace Umbreon.Core.Models.Database.Guilds
         public ulong UserId { get; set; }
         public DateTime ToExecute { get; set; }
 
+        public int Identifier { get; set; }
         public TimeSpan When { get; set; }
         public IRemoveableService Service { get; set; }
     }

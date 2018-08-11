@@ -27,7 +27,8 @@ namespace Umbreon.Core
                     LogLevel = LogSeverity.Verbose,
                     CaseSensitiveCommands = false
                 })).
-                AddSingleton(new HttpClient());
+                AddSingleton(new HttpClient())
+                .AddSingleton(new Random());
             
             var services = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
                 .Where(y => y.GetCustomAttributes(typeof(ServiceAttribute), true).Length > 0);

@@ -16,18 +16,20 @@ namespace Umbreon.Services
         private readonly TimerService _timer;
         private readonly DiscordSocketClient _client;
         private readonly MessageService _message;
+        private readonly Random _random;
 
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Reminder>> _reminders = new ConcurrentDictionary<ulong, ConcurrentQueue<Reminder>>();
+        
+        public RemindersService() { }
 
-        public RemindersService(DatabaseService database, TimerService timer, DiscordSocketClient client, MessageService message)
+        public RemindersService(DatabaseService database, TimerService timer, DiscordSocketClient client, MessageService message, Random random)
         {
             _database = database;
             _timer = timer;
             _client = client;
             _message = message;
+            _random = random;
         }
-
-        public RemindersService() { }
 
         public async Task LoadReminders()
         {
@@ -73,7 +75,8 @@ namespace Umbreon.Services
                 Service = this,
                 UserId = userId,
                 ToExecute = DateTime.UtcNow + toExecute,
-                When = toExecute
+                When = toExecute,
+                Identifier = _random.Next()
             };
 
             _timer.Enqueue(reminder);
