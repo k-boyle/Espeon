@@ -1,12 +1,17 @@
 ﻿using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Core;
 using Umbreon.Extensions;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Paginators.CommandMenu;
+using Umbreon.Services;
 
 namespace Umbreon.Modules
 {
@@ -14,8 +19,6 @@ namespace Umbreon.Modules
     [Summary("Commands that don't fit into a category")]
     public class MiscCommands : UmbreonBase<UmbreonContext>
     {
-        // TODO reminders, admin/mod list
-
         private readonly CommandService _commands;
 
         public MiscCommands(CommandService commands)
@@ -68,6 +71,30 @@ namespace Umbreon.Modules
             }
 
             await SendPaginatedMessageAsync(new CommandMenuMessage(dict));
+        }
+
+        [Command("Admins")]
+        [Name("View Admins")]
+        [Summary("Gets a list of all the admins in the guild")]
+        [Usage("admins")]
+        public Task ListAdmins()
+            => SendMessageAsync("Your admins are:\n" +
+                                   $"{string.Join("\n", GetMembers(SpecialRole.Admin).Select(x => x.GetDisplayName()))}");
+
+        [Command("Mods")]
+        [Name("View Moderators")]
+        [Summary("Gets a list of all the mods in the guild")]
+        [Usage("mods")]
+        public Task ListMods()
+            => SendMessageAsync("Your mods are:\n" +
+                                   $"{string.Join("\n", GetMembers(SpecialRole.Mod).Select(x => x.GetDisplayName()))}");
+
+        private IEnumerable<SocketGuildUser> GetMembers(SpecialRole type)
+        {
+            var database = Services.GetService<DatabaseService>();
+            var guild = database.GetGuild(Context);
+            var role = Context.Guild.GetRole(type == SpecialRole.Admin ? guild.AdminRole : guild.ModRole);
+            return role.Members;
         }
     }
 }
