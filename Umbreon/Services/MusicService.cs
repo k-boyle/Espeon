@@ -1,11 +1,11 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using SharpLink;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Core.Entities;
 
 namespace Umbreon.Services
 {
@@ -18,10 +18,7 @@ namespace Umbreon.Services
 
         private LavalinkManager _lavalinkManager;
 
-        private
-            ConcurrentDictionary<ulong, (LavalinkPlayer player, bool isPaused, ulong channelId, ulong userId,
-                ConcurrentQueue<LavalinkTrack> queue)> _lavaCache =
-                new ConcurrentDictionary<ulong, (LavalinkPlayer, bool, ulong, ulong, ConcurrentQueue<LavalinkTrack>)>();
+        private ConcurrentDictionary<ulong, LavalinkObject> _lavaCache = new ConcurrentDictionary<ulong, LavalinkObject>();
         
         public MusicService(DiscordSocketClient client, LogService log, MessageService message)
         {
@@ -47,20 +44,32 @@ namespace Umbreon.Services
             _lavalinkManager.TrackEnd += TrackFinishedAsync;
         }
 
-        public (LavalinkPlayer, bool, ulong, ulong, ConcurrentQueue<LavalinkTrack>) GetGuild(ICommandContext context)
-        {
-            return _lavaCache.TryGetValue(context.Guild.Id, out var found) ? found : (null, false, 0, 0, null);
-        }
+        public LavalinkObject GetGuild(ICommandContext context)
+            => _lavaCache.TryGetValue(context.Guild.Id, out var found) ? found : null;
 
         public async Task JoinAsync(ICommandContext context)
         {
             if (_lavaCache.ContainsKey(context.Guild.Id))
                 await _lavalinkManager.LeaveAsync(context.Guild.Id);
             var player = await _lavalinkManager.JoinAsync((context.User as IGuildUser).VoiceChannel);
-            if (!_lavaCache.TryAdd(context.Guild.Id,
-                (player, false, context.Channel.Id, context.User.Id, new ConcurrentQueue<LavalinkTrack>())))
+            var newObj = new LavalinkObject
             {
-                _lavaCache[context.Guild.Id] = (player, false, context.Channel.Id, context.User.Id, _lavaCache[context.Guild.Id].queue);
+                ChannelId = context.Channel.Id,
+                IsPaused = false,
+                Player = player,
+                UserId = context.User.Id,
+                Queue = new ConcurrentQueue<LavalinkTrack>()
+            };
+            if (!_lavaCache.TryAdd(context.Guild.Id, newObj))
+            {
+                _lavaCache[context.Guild.Id] = new LavalinkObject
+                {
+                    ChannelId = context.Channel.Id,
+                    IsPaused = false,
+                    Player = player,
+                    Queue = _lavaCache[context.Guild.Id].Queue,
+                    UserId = context.User.Id
+                };
             }
         }
 
@@ -69,11 +78,11 @@ namespace Umbreon.Services
             if (!_lavaCache.ContainsKey(context.Guild.Id))
                 await JoinAsync(context);
             var currentGuild = _lavaCache[context.Guild.Id];
-            var player = currentGuild.player;
-            _lavaCache[context.Guild.Id].queue.Enqueue(track);
-            if (!player.Playing && !currentGuild.isPaused)
+            var player = currentGuild.Player;
+            _lavaCache[context.Guild.Id].Queue.Enqueue(track);
+            if (!player.Playing && !currentGuild.IsPaused)
                 await player.PlayAsync(track);
-            return _lavaCache[context.Guild.Id].queue.Count > 1;
+            return _lavaCache[context.Guild.Id].Queue.Count > 1;
         }
 
         public Task<LavalinkTrack> GetTrackAsync(string toSearch)
@@ -83,17 +92,17 @@ namespace Umbreon.Services
         {
             if (reason == "REPLACED") return;
             var guildId = player.VoiceChannel.GuildId;
-            _lavaCache[guildId].queue.TryDequeue(out _);
-            if (_lavaCache[guildId].queue.TryPeek(out var track))
+            _lavaCache[guildId].Queue.TryDequeue(out _);
+            if (_lavaCache[guildId].Queue.TryPeek(out var track))
             {
                 await player.PlayAsync(track);
-                var channel = _client.GetChannel(_lavaCache[guildId].channelId) as SocketTextChannel;
+                var channel = _client.GetChannel(_lavaCache[guildId].ChannelId) as SocketTextChannel;
                 var embed = new EmbedBuilder
                 {
                     Title = $"Now playing {track.Title}",
                     Color = Color.Red
                 };
-                await _message.NewMessageAsync(_lavaCache[guildId].userId, 0, channel.Id, string.Empty, embed: embed.Build());
+                await _message.NewMessageAsync(_lavaCache[guildId].UserId, 0, channel.Id, string.Empty, embed: embed.Build());
             }
             else
             {
@@ -111,49 +120,61 @@ namespace Umbreon.Services
         public async Task SetVolumeAsync(ICommandContext context, uint volume)
         {
             if (_lavaCache.TryGetValue(context.Guild.Id, out var currentGuild))
-                await currentGuild.player.SetVolumeAsync(volume);
+                await currentGuild.Player.SetVolumeAsync(volume);
         }
 
         public async Task PauseAsync(ICommandContext context)
         {
             if (!_lavaCache.TryGetValue(context.Guild.Id, out var currentGuild)) return;
-            if (!currentGuild.isPaused)
+            if (!currentGuild.IsPaused)
             {
-                await currentGuild.player.PauseAsync();
-                _lavaCache[context.Guild.Id] = (currentGuild.player, true, currentGuild.channelId, currentGuild.userId, currentGuild.queue);
+                await currentGuild.Player.PauseAsync();
+                _lavaCache[context.Guild.Id] = new LavalinkObject{
+                    Player = currentGuild.Player,
+                    IsPaused = true,
+                    ChannelId = currentGuild.ChannelId,
+                    UserId = currentGuild.UserId,
+                    Queue = currentGuild.Queue
+                };
             }
         }
 
         public async Task ResumeAsync(ICommandContext context)
         {
             if (!_lavaCache.TryGetValue(context.Guild.Id, out var currentGuild)) return;
-            if (currentGuild.isPaused)
+            if (currentGuild.IsPaused)
             {
-                await currentGuild.player.ResumeAsync();
-                _lavaCache[context.Guild.Id] = (currentGuild.player, false, currentGuild.channelId, currentGuild.userId, currentGuild.queue);
+                await currentGuild.Player.ResumeAsync();
+                _lavaCache[context.Guild.Id] = new LavalinkObject
+                {
+                    Player = currentGuild.Player,
+                    IsPaused = false,
+                    ChannelId = currentGuild.ChannelId,
+                    UserId = currentGuild.UserId,
+                    Queue = currentGuild.Queue
+                };
             }
         }
 
         public async Task SkipSongAsync(ICommandContext context)
         {
             if (!_lavaCache.TryGetValue(context.Guild.Id, out var currentGuild)) return;
-            currentGuild.queue.TryDequeue(out _);
-            if (currentGuild.queue.TryPeek(out var track))
+            currentGuild.Queue.TryDequeue(out _);
+            if (currentGuild.Queue.TryPeek(out var track))
             {
-                await currentGuild.player.PlayAsync(track);
-                var channel = _client.GetChannel(currentGuild.channelId) as SocketTextChannel;
+                await currentGuild.Player.PlayAsync(track);
                 var embed = new EmbedBuilder
                 {
                     Title = $"Now playing {track.Title}",
                     Color = Color.Red
                 };
-                await _message.NewMessageAsync(currentGuild.userId, 0, currentGuild.channelId, string.Empty,
+                await _message.NewMessageAsync(currentGuild.UserId, 0, currentGuild.ChannelId, string.Empty,
                     embed: embed.Build()); 
                 _lavaCache[context.Guild.Id] = currentGuild;
             }
             else
             {
-                await currentGuild.player.StopAsync();
+                await currentGuild.Player.StopAsync();
             }
         }
     }

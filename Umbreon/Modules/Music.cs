@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Extensions;
@@ -144,6 +145,21 @@ namespace Umbreon.Modules
         {
             CurrentGuild.MusicUsers.Remove(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been unapproved");
+        }
+
+        [Command("queue")]
+        [Summary("View the current song queue")]
+        [Usage("queue")]
+        [Name("Music Queue")]
+        public async Task ViewQueue()
+        {
+            var currentQueue = Music.GetGuild(Context).Queue;
+            await SendMessageAsync(string.Empty, embed: new EmbedBuilder
+            {
+                Title = "Current Queue",
+                Color = Color.Red,
+                Description = string.Join("\n", currentQueue.Select(x => x.Title))
+            }.Build());
         }
     }
 }
