@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="MoreLinq.Portable" Version="2.0.0-beta04" />
-    <PackageReference Include="SharpLink" Version="1.0.0-beta-0004" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,13 +27,16 @@
       <HintPath>Discord.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Core">
-      <HintPath>..\..\Discord.Net-Casino\src\Discord.Net.Core\bin\Release\net46\Discord.Net.Core.dll</HintPath>
+      <HintPath>Discord.Net.Core.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Rest">
-      <HintPath>..\..\Discord.Net-Casino\src\Discord.Net.Rest\bin\Release\net46\Discord.Net.Rest.dll</HintPath>
+      <HintPath>Discord.Net.Rest.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.WebSocket">
       <HintPath>Discord.Net.WebSocket.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpLink">
+      <HintPath>SharpLink.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -43,6 +46,9 @@
     </None>
     <None Update="Lavalink.jar">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="System.Interactive.Async.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
