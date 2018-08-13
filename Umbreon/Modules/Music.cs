@@ -17,8 +17,6 @@ namespace Umbreon.Modules
     [RequireMusic]
     public class Music : MusicModuleBase<UmbreonContext>
     {
-        //TODO add show queue
-
         [Command("join")]
         [Summary("Gets the bot to join your voice channel")]
         [Usage("music join")]
