@@ -33,12 +33,11 @@ namespace Umbreon.Modules
             var modules = _commands.Modules.Where(x => !string.Equals(x.Name, "help", StringComparison.CurrentCultureIgnoreCase)).OrderBy(y => y.Name);
             var pages = new List<Page>();
             var fields = new List<EmbedFieldBuilder>();
-            Page newPage;
             foreach (var module in modules)
             {
                 var remarks = module.Attributes.FirstOrDefault(x => x is RemarksAttribute) as RemarksAttribute;
                 fields.Clear();
-                newPage = new Page
+                var newPage = new Page
                 {
                     Fields = new List<EmbedFieldBuilder>()
                 };
@@ -59,7 +58,7 @@ namespace Umbreon.Modules
                     {
                         Name = $"Command: {cmd.Name}",
                         Value = $"**Summary**: {cmd.Summary}\n" +
-                                $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute).Example}"
+                                $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute)?.Example}"
                     });
                 }
 
@@ -112,7 +111,7 @@ namespace Umbreon.Modules
                 {
                     f.Name = cmd.Name;
                     f.Value = $"**Summary**: {cmd.Summary}\n" +
-                              $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute).Example}\n" +
+                              $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{(cmd.Attributes.FirstOrDefault(x => x is UsageAttribute) as UsageAttribute)?.Example}\n" +
                               $"**Parameter**: {string.Join("\n**Parameter**:", cmd.Parameters.Select(x => $"`{x.Name}` > {x.Summary}"))}";
                 });
             }
