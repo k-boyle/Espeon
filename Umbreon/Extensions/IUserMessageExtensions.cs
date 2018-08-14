@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Umbreon.Extensions
@@ -9,12 +10,7 @@ namespace Umbreon.Extensions
         //should be removed *soon*
         public static string GetJumpLink(this IUserMessage message) => $"https://discordapp.com/channels/{(message.Channel as IGuildChannel).Guild.Id}/{message.Channel.Id}/{message.Id}";
 
-        public static async Task AddReactionsAsync(this IUserMessage msg, IEnumerable<IEmote> emotes)
-        {
-            foreach (var emote in emotes)
-            {
-                await msg.AddReactionAsync(emote);
-            }
-        }
+        public static Task AddReactionsAsync(this IUserMessage msg, IEnumerable<IEmote> emotes)
+            => Task.WhenAll(emotes.Select(x => msg.AddReactionAsync(x)));
     }
 }

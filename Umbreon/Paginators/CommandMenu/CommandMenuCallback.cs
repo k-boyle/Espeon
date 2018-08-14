@@ -47,14 +47,7 @@ namespace Umbreon.Paginators.CommandMenu
             var message = await Context.Channel.SendMessageAsync(string.Empty, embed: BuildEmbed());
             Message = message;
             _interactive.AddReactionCallback(message, this);
-            _ = Task.Run(async () =>
-            {
-                foreach (var emoji in _properties.Emojis.Values)
-                    await message.AddReactionAsync(emoji, new RequestOptions
-                    {
-                        BypassBuckets = true
-                    });
-            });
+            _ = Task.Run(async () => { await message.AddReactionsAsync(_properties.Emojis.Values); });
             if (Timeout.HasValue && Timeout.Value != null)
                 _ = Task.Delay(Timeout.Value).ContinueWith(async _ =>
                 {
