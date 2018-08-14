@@ -83,6 +83,9 @@ namespace Umbreon.Services
             if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
+                guild.When = TimeSpan.FromDays(1);
+                _database.UpdateGuild(guild);
+
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
                 await HandleCommandAsync(context, argPos);
             }

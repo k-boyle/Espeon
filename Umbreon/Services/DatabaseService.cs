@@ -11,20 +11,26 @@ using Umbreon.Core;
 using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Helpers;
+using Umbreon.Interfaces;
 
 namespace Umbreon.Services
 {
     [Service]
-    public class DatabaseService
+    public class DatabaseService : IRemoveableService
     {
         private readonly DiscordSocketClient _client;
         private readonly LogService _logs;
+        private readonly Random _random;
+        private readonly TimerService _timer;
+
         private readonly ConcurrentDictionary<ulong, GuildObject> _guilds = new ConcurrentDictionary<ulong, GuildObject>();
 
-        public DatabaseService(DiscordSocketClient client, LogService logs)
+        public DatabaseService(DiscordSocketClient client, LogService logs, Random random, TimerService timer)
         {
             _client = client;
             _logs = logs;
+            _random = random;
+            _timer = timer;
         }
 
         public Task Initialize()
@@ -75,6 +81,7 @@ namespace Umbreon.Services
                 foreach (var guild in _client.Guilds)
                 {
                     var g = guilds.FindOne(x => x.GuildId == guild.Id) ?? NewGuild(guilds, guild);
+                    _timer.Enqueue(g);
                     _guilds.TryAdd(g.GuildId, g);
                     _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been loaded");
                 }
@@ -96,9 +103,12 @@ namespace Umbreon.Services
             if (!(guilds.FindOne(x => x.GuildId == guild.Id) is null)) return null;
             var newGuild = new GuildObject
             {
-                GuildId = guild.Id
+                GuildId = guild.Id,
+                Service = this,
+                When = TimeSpan.FromDays(1),
+                Identifier = _random.Next()
             };
-            guilds.Insert(newGuild);
+            guilds.Upsert(newGuild);
             _guilds.TryAdd(guild.Id, newGuild);
             _logs.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{guild.Name} has been added to the database");
             return newGuild;
@@ -108,15 +118,40 @@ namespace Umbreon.Services
             => GetGuild(context.Guild.Id);
 
         public GuildObject GetGuild(ulong guildId)
-            => _guilds[guildId];
+            => _guilds.TryGetValue(guildId, out var guild) ? guild : LoadGuild(guildId);
 
-        public void UpdateGuild(GuildObject guild)
+        private GuildObject LoadGuild(ulong guildId)
         {
             using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
             {
-                db.GetCollection<GuildObject>("guilds").Update(guild);
+                var guilds = db.GetCollection<GuildObject>("guilds");
+                var guild = guilds.FindOne(x => x.GuildId == guildId);
+                guild.When = TimeSpan.FromDays(1);
+                UpdateGuild(guild);
+                _guilds.TryAdd(guild.GuildId, guild);
+                return guild;
+            }
+        }
+
+        public void UpdateGuild(GuildObject guild)
+        {
+            _timer.Update(guild);
+
+            using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
+            {
+                db.GetCollection<GuildObject>("guilds").Upsert(guild);
                 _guilds[guild.GuildId] = guild;
             }
+        }
+
+        public Task Remove(IRemoveable obj)
+        {
+            if (obj is GuildObject guild)
+            {
+                _guilds.TryRemove(guild.GuildId, out _);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

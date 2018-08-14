@@ -50,7 +50,7 @@ namespace Umbreon.Services
             }
         }
 
-        public void Remove(IRemoveable obj)
+        private void Remove(IRemoveable obj)
         {
             var newQueue = new ConcurrentQueue<IRemoveable>();
             foreach (var item in _queue)
@@ -66,6 +66,12 @@ namespace Umbreon.Services
         {
             var newCol = _queue.Except(objs);
             _queue = new ConcurrentQueue<IRemoveable>(newCol);
+        }
+
+        public void Update(IRemoveable removeable)
+        {
+            Remove(removeable);
+            Enqueue(removeable);
         }
     }
 }

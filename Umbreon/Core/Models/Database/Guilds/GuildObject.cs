@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LiteDB;
+using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Models.Database.Guilds
 {
-    public class GuildObject
+    public class GuildObject : IRemoveable
     {
         [BsonId(false)]
         public ulong GuildId { get; set; }
@@ -37,5 +39,9 @@ namespace Umbreon.Core.Models.Database.Guilds
             84291986575613952
         };
         public List<Reminder> Reminders { get; set; } = new List<Reminder>();
+
+        public int Identifier { get; set; }
+        public TimeSpan When { get; set; }
+        public IRemoveableService Service { get; set; }
     }
 }
