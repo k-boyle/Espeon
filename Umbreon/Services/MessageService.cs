@@ -91,7 +91,7 @@ namespace Umbreon.Services
         public Task HandleMessageUpdateAsync(SocketMessage msg)
             => HandleMessageAsync(msg);
 
-        public async Task HandleCommandAsync(UmbreonContext context, int argPos)
+        private async Task HandleCommandAsync(UmbreonContext context, int argPos)
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
             await _commands.ExecuteAsync(context, argPos, _services);
@@ -189,20 +189,17 @@ namespace Umbreon.Services
                     break;
             }
 
-            if (callback != null)
-            {
-                await callback.DisplayAsync().ConfigureAwait(false);
+            if (callback == null) return null;
+            await callback.DisplayAsync().ConfigureAwait(false);
 
-                await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
-                    callback.Message.Id);
+            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
+                callback.Message.Id);
 
-                return callback.Message;
-            }
+            return callback.Message;
 
-            return null;
         }
 
-        public async Task<int> ClearMessages(ICommandContext context, int amount) // TODO test this
+        public async Task<int> ClearMessages(ICommandContext context, int amount)
         {
             if (!_messageCache.TryGetValue(context.User.Id, out var found)) return 0;
             amount = amount > found.Count ? found.Count + 1 : amount;
@@ -302,7 +299,7 @@ namespace Umbreon.Services
             return retrievedMessage as IUserMessage;
         }
 
-        private Task<IMessage> GetOrDownloadMessageAsync(ICommandContext context, ulong messageId)
+        private static Task<IMessage> GetOrDownloadMessageAsync(ICommandContext context, ulong messageId)
             => context.Channel.GetMessageAsync(messageId, CacheMode.CacheOnly) ??
                context.Channel.GetMessageAsync(messageId);
     }
