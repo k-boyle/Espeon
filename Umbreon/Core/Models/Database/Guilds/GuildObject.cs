@@ -1,8 +1,7 @@
-﻿using LiteDB;
-using System.Collections.Generic;
-using Umbreon.Core.Models.Database.Guilds;
+﻿using System.Collections.Generic;
+using LiteDB;
 
-namespace Umbreon.Core.Models.Database
+namespace Umbreon.Core.Models.Database.Guilds
 {
     public class GuildObject
     {

@@ -1,7 +1,7 @@
-﻿using LiteDB;
-using System;
+﻿using System;
+using LiteDB;
 
-namespace Umbreon.Core.Models.Database
+namespace Umbreon.Core.Models.Database.Guilds
 {
     public class Warning
     {

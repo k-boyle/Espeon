@@ -1,5 +1,5 @@
 ﻿using Discord.Commands;
-using Umbreon.Core.Models.Database;
+using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Services;
 
 namespace Umbreon.Modules.ModuleBases
