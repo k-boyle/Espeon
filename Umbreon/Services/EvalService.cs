@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -23,7 +22,8 @@ namespace Umbreon.Services
         {
             "Discord", "Discord.Commands", "Discord.WebSocket",
             "Microsoft.Extensions.DependencyInjection",
-            "System", "System.Collections.Generic", "System.Linq"
+            "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks",
+            "SharpLink"
         };
 
         public EvalService(MessageService message)
