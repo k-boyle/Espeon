@@ -38,7 +38,7 @@ namespace Umbreon.Preconditions
             if (roleId == 0 || !context.Guild.Roles.Select(x => x.Id).Contains(roleId))
                 return Task.FromResult(PreconditionResult.FromError($"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role"));
             var user = context.User as SocketGuildUser;
-            return user.HasRole(context, roleId)
+            return user.HasRole(roleId)
                 ? Task.FromResult(PreconditionResult.FromSuccess())
                 : Task.FromResult(PreconditionResult.FromError("You do not have the required role"));
         }
