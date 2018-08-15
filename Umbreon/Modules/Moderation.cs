@@ -19,9 +19,7 @@ namespace Umbreon.Modules
     public class Moderation : UmbreonBase
     {
         // TODO mute, warnings
-        // TODO promo users, demote users, annoucement
         // TODO nickname
-        // TODO add dm messages
 
         [Command("kick")]
         [Name("Kick User")]

@@ -6,15 +6,14 @@ using Umbreon.Core;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
-using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
 {
-    [Group("set")]
     [Name("Server Settings")]
     [Summary("Change the server specific settings for the bot")]
     [RequireRole(SpecialRole.Admin, Group = "RequireAdmin")]
     [RequireOwner(Group = "RequireAdmin")]
+    [RequireGuildOwner(Group = "RequireAdmin")]
     public class ServerSettings : ServerSettingsBase<UmbreonContext>
     {
         // TODO Welcome channel, welcome message, MOTDChannel, MOTDMessage
@@ -107,7 +106,6 @@ namespace Umbreon.Modules
         [Command("CommandMatching")]
         [Name("Close Command Matching")]
         [Summary("Choose whether the bot will try match failed commands to the best match")]
-        [Remarks("This can lead to unexpected results")]
         [Usage("set commandmatching false")]
         public async Task SetMatching(
             [Name("Enabled")]
@@ -115,6 +113,66 @@ namespace Umbreon.Modules
         {
             CurrentGuild.UnkownCommandResult = enabled;
             await SendMessageAsync("Close command matching has been changed");
+        }
+
+        [Command("mod")]
+        [Name("Moderator")]
+        [Summary("Promote a user to moderator")]
+        [Usage("mod @Umbreon")]
+        public async Task MakeMod(
+            [Name("User")]
+            [Summary("The user you want to promote")]
+            [Remainder] SocketGuildUser user)
+
+        {
+            var modRole = Context.Guild.GetRole(CurrentGuild.ModRole);
+            await user.AddRoleAsync(modRole);
+            await SendMessageAsync("User has been made a moderator");
+        }
+
+        [Command("admin")]
+        [Name("Admin")]
+        [Summary("Promote a user to admin")]
+        [Usage("admin @Umbreon")]
+        [RequireGuildOwner]
+        public async Task MakeAdmin(
+            [Name("User")]
+            [Summary("The user you want to promote")]
+            [Remainder] SocketGuildUser user)
+
+        {
+            var adminRole = Context.Guild.GetRole(CurrentGuild.AdminRole);
+            await user.AddRoleAsync(adminRole);
+            await SendMessageAsync("User has been made an admin");
+        }
+
+        [Command("demod")]
+        [Name("De-Moderator")]
+        [Summary("Demote a user from moderator")]
+        [Usage("demod @Umbreon")]
+        public async Task RemoveMod(
+            [Name("User")]
+            [Summary("The user you want to demote")]
+            [Remainder] SocketGuildUser user)
+        {
+            var modRole = Context.Guild.GetRole(CurrentGuild.ModRole);
+            await user.RemoveRoleAsync(modRole);
+            await SendMessageAsync("User has been demoted");
+        }
+
+        [Command("deadmin")]
+        [Name("De-Admin")]
+        [Summary("Demote a user from admin")]
+        [Usage("deadmin @Umbreon")]
+        [RequireGuildOwner]
+        public async Task RemoveAdmin(
+            [Name("User")]
+            [Summary("The user you want to demote")]
+            [Remainder] SocketGuildUser user)
+        {
+            var adminRole = Context.Guild.GetRole(CurrentGuild.AdminRole);
+            await user.RemoveRoleAsync(adminRole);
+            await SendMessageAsync("User has been demoted");
         }
     }
 }
