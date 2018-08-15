@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Helpers;
 using Umbreon.TypeReaders;
@@ -35,7 +34,7 @@ namespace Umbreon.Services
 
         public async Task InitialiseAsync()
         {
-            await _database.Initialize();
+            await DatabaseService.Initialize();
             await StartClient();
             _events.HookEvents();
             _timer.InitialiseTimer();

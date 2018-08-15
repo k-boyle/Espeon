@@ -40,7 +40,6 @@ namespace Umbreon.Services
             _client.Log += _logs.LogEvent;
             _client.Ready += async () =>
             {
-                await _database.LoadGuilds();
                 await _customCommands.LoadCmds(_client);
                 await _customFunctions.LoadFuncs(_client);
                 await _musicService.Initialise();
@@ -50,7 +49,6 @@ namespace Umbreon.Services
             _client.MessageUpdated += (_, msg, __) => _message.HandleMessageUpdateAsync(msg);
             _client.JoinedGuild += async guild =>
             {
-                _database.NewGuild(guild);
                 var channel = guild.GetDefaultChannel();
                 if (!(channel is null))
                 {
