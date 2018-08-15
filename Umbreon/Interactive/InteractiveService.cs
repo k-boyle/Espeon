@@ -13,10 +13,10 @@ namespace Umbreon.Interactive
     [Service]
     public class InteractiveService : IDisposable
     {
-        public DiscordSocketClient Discord { get; }
+        private DiscordSocketClient Discord { get; }
 
-        private Dictionary<ulong, IReactionCallback> _callbacks;
-        private TimeSpan _defaultTimeout;
+        private readonly Dictionary<ulong, IReactionCallback> _callbacks;
+        private readonly TimeSpan _defaultTimeout;
 
         public InteractiveService(DiscordSocketClient discord, TimeSpan? defaultTimeout = null)
         {
@@ -80,7 +80,7 @@ namespace Umbreon.Interactive
         public void RemoveReactionCallback(IMessage message)
             => RemoveReactionCallback(message.Id);
 
-        public void RemoveReactionCallback(ulong id)
+        private void RemoveReactionCallback(ulong id)
             => _callbacks.Remove(id);
 
         public void ClearReactionCallbacks()

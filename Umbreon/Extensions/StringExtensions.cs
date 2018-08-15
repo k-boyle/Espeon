@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 
 namespace Umbreon.Extensions

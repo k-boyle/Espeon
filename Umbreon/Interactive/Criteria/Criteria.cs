@@ -6,7 +6,7 @@ namespace Umbreon.Interactive.Criteria
 {
     public class Criteria<T> : ICriterion<T>
     {
-        private List<ICriterion<T>> _critiera = new List<ICriterion<T>>();
+        private readonly List<ICriterion<T>> _critiera = new List<ICriterion<T>>();
 
         public Criteria<T> AddCriterion(ICriterion<T> criterion)
         {
