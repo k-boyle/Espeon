@@ -8,7 +8,6 @@ using Umbreon.Modules.ModuleBases;
 
 namespace Umbreon.Modules
 {
-    [Group("bot")]
     [Name("Bot Support")]
     [Summary("Commands to give feedback/support for the bot")]
     public class BotSupport : UmbreonBase
@@ -16,7 +15,7 @@ namespace Umbreon.Modules
         [Command("Bug")]
         [Name("Bug Report")]
         [Summary("Submit a bug report. Please be as informative as possible")]
-        [Usage("bot bug Umbreon is 2 cwl")]
+        [Usage("bug Umbreon is 2 cwl")]
         public Task BugReport(
             [Name("Report")]
             [Summary("The bug, as descriptive as possible please")]
@@ -26,7 +25,7 @@ namespace Umbreon.Modules
         [Command("Feature")]
         [Name("Feature Request")]
         [Summary("Submit a feature request")]
-        [Usage("bot feature make umbreon cwler")]
+        [Usage("feature make umbreon cwler")]
         public Task FeatureReq(
             [Name("Request")]
             [Summary("The feature that you want")]
@@ -36,7 +35,7 @@ namespace Umbreon.Modules
         [Command("Source")]
         [Name("Bot Source")]
         [Summary("The source code for the bot")]
-        [Usage("bot source")]
+        [Usage("source")]
         public Task GetSource()
             => SendMessageAsync("https://github.com/purpledank/Umbreon");
     }

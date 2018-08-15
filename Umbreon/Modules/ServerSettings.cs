@@ -21,7 +21,7 @@ namespace Umbreon.Modules
         [Command("AddPrefix")]
         [Name("Add Prefix")]
         [Summary("Add a command prefix for the server")]
-        [Usage("set addprefix um!")]
+        [Usage("addprefix um!")]
         public async Task AddPrefix(
             [Name("New Prefix")]
             [Summary("The new prefix that you want to add")]
@@ -34,7 +34,7 @@ namespace Umbreon.Modules
         [Command("RemovePrefix")]
         [Name("Remove Prefix")]
         [Summary("Remove a command prefix for the server")]
-        [Usage("set removeprefix um!")]
+        [Usage("removeprefix um!")]
         public async Task RemovePrefix(
             [Name("The Prefix")]
             [Summary("The prefix that you want to remove")]
@@ -52,7 +52,7 @@ namespace Umbreon.Modules
         [Command("AdminRole")]
         [Name("Set Admin Role")]
         [Summary("Change which guild role will be designated as the admin role")]
-        [Usage("set adminrole admin")]
+        [Usage("adminrole admin")]
         public async Task SetAdmin(
             [Name("Admin Role")]
             [Summary("The role you want to make the admin role")]
@@ -65,7 +65,7 @@ namespace Umbreon.Modules
         [Command("ModRole")]
         [Name("Set Mod Role")]
         [Summary("Change which guild role will be designated as the mod role")]
-        [Usage("set modrole mod")]
+        [Usage("modrole mod")]
         public async Task SetMod(
             [Name("Mod Role")]
             [Summary("The role you want to make the mod role")]
@@ -78,7 +78,7 @@ namespace Umbreon.Modules
         [Command("Disable")]
         [Name("Disable Module")]
         [Summary("Disable one of the optional modules")]
-        [Usage("set disable Commands")]
+        [Usage("disable Commands")]
         public async Task DisableModule(
             [Name("Module")]
             [Summary("The module code of the module you want to disable")]
@@ -92,7 +92,7 @@ namespace Umbreon.Modules
         [Command("Enable")]
         [Name("Enable Module")]
         [Summary("Enable one of the optional modules")]
-        [Usage("set enable Commands")]
+        [Usage("enable Commands")]
         public async Task EnableModule(
             [Name("Module")]
             [Summary("The module code of the module you want to enable")]
@@ -106,7 +106,7 @@ namespace Umbreon.Modules
         [Command("CommandMatching")]
         [Name("Close Command Matching")]
         [Summary("Choose whether the bot will try match failed commands to the best match")]
-        [Usage("set commandmatching false")]
+        [Usage("commandmatching false")]
         public async Task SetMatching(
             [Name("Enabled")]
             [Summary("true of false")] bool enabled)
@@ -118,7 +118,7 @@ namespace Umbreon.Modules
         [Command("mod")]
         [Name("Moderator")]
         [Summary("Promote a user to moderator")]
-        [Usage("mod @Umbreon")]
+        [Usage("@Umbreon")]
         public async Task MakeMod(
             [Name("User")]
             [Summary("The user you want to promote")]
@@ -134,7 +134,8 @@ namespace Umbreon.Modules
         [Name("Admin")]
         [Summary("Promote a user to admin")]
         [Usage("admin @Umbreon")]
-        [RequireGuildOwner]
+        [RequireGuildOwner(Group = "admin")]
+        [RequireOwner(Group = "admin")]
         public async Task MakeAdmin(
             [Name("User")]
             [Summary("The user you want to promote")]
@@ -164,7 +165,8 @@ namespace Umbreon.Modules
         [Name("De-Admin")]
         [Summary("Demote a user from admin")]
         [Usage("deadmin @Umbreon")]
-        [RequireGuildOwner]
+        [RequireGuildOwner(Group = "admin")]
+        [RequireOwner(Group = "admin")]
         public async Task RemoveAdmin(
             [Name("User")]
             [Summary("The user you want to demote")]

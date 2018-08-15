@@ -19,7 +19,7 @@ namespace Umbreon.Modules
     {
         [Command("join")]
         [Summary("Gets the bot to join your voice channel")]
-        [Usage("music join")]
+        [Usage("join")]
         [Name("Join Channel")]
         public async Task JoinChannel()
         {
@@ -34,7 +34,7 @@ namespace Umbreon.Modules
 
         [Command("play")]
         [Summary("Plays the passed song")]
-        [Usage("music play https://www.youtube.com/watch?v=y6120QOlsfU")]
+        [Usage("play https://www.youtube.com/watch?v=y6120QOlsfU")]
         [Name("Play Song")]
         [RequireSameChannel]
         public async Task PlayMusic(
@@ -60,7 +60,7 @@ namespace Umbreon.Modules
 
         [Command("leave")]
         [Summary("Leave the current voice channel")]
-        [Usage("music leave")]
+        [Usage("leave")]
         [Name("Leave Channel")]
         [RequireSameChannel]
         public async Task LeaveChannel()
@@ -75,7 +75,7 @@ namespace Umbreon.Modules
 
         [Command("volume")]
         [Summary("Set the volume")]
-        [Usage("music volume 69")]
+        [Usage("volume 69")]
         [Name("Set Volume")]
         [RequireSameChannel]
         public async Task SetVolume(
@@ -89,7 +89,7 @@ namespace Umbreon.Modules
 
         [Command("pause")]
         [Summary("Pauses the current song")]
-        [Usage("music pause")]
+        [Usage("pause")]
         [Name("Pause Song")]
         [RequireSameChannel]
         public async Task Pause()
@@ -99,7 +99,7 @@ namespace Umbreon.Modules
 
         [Command("resume")]
         [Summary("Resumes a paused song")]
-        [Usage("music resume")]
+        [Usage("resume")]
         [Name("Resume Song")]
         [RequireSameChannel]
         public async Task Resume()
@@ -109,7 +109,7 @@ namespace Umbreon.Modules
 
         [Command("skip")]
         [Summary("Skips the current song")]
-        [Usage("music skip")]
+        [Usage("skip")]
         [Name("Skip Song")]
         [RequireSameChannel]
         public async Task Skip()
@@ -119,7 +119,7 @@ namespace Umbreon.Modules
 
         [Command("approve")]
         [Summary("Approve someone to use music commands")]
-        [Usage("music approve Umbreon")]
+        [Usage("approve Umbreon")]
         [Name("Approve User")]
         [RequireOwner]
         public async Task Approve(
@@ -133,7 +133,7 @@ namespace Umbreon.Modules
 
         [Command("unapprove")]
         [Summary("Unapprove a user for music commands")]
-        [Usage("music unapprove Umbreon")]
+        [Usage("unapprove Umbreon")]
         [Name("Unapprove User")]
         [RequireOwner]
         public async Task Unapprove(

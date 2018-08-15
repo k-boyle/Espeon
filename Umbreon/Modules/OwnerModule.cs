@@ -25,7 +25,7 @@ namespace Umbreon.Modules
         [Command("activity")]
         [Name("Set Activity")]
         [Summary("Change what activity the bot is doing")]
-        [Usage("cas activity watching")]
+        [Usage("activity watching")]
         public async Task SetPlaying(
             [Name("Activity")]
             [Summary("Listening, Streaming, Playing, Watching")]
@@ -41,7 +41,7 @@ namespace Umbreon.Modules
         [Command("Username")]
         [Name("Set Username")]
         [Summary("Change the bots username")]
-        [Usage("cas username Umbreon")]
+        [Usage("username Umbreon")]
         public async Task SetUsername(
             [Name("New Name")]
             [Summary("The new username for the bot")]
@@ -54,7 +54,7 @@ namespace Umbreon.Modules
         [Command("Message")]
         [Name("Message Guild")]
         [Summary("Send a message to the passed channel in a different guild")]
-        [Usage("cas message 123 hi there")]
+        [Usage("message 123 hi there")]
         public async Task SendMessage(
             [Name("Channel Id")]
             [Summary("Id of the channel you want to send the message to")] ulong channelId,
@@ -69,7 +69,7 @@ namespace Umbreon.Modules
         [Command("eval", RunMode = RunMode.Async)]
         [Name("Eval")]
         [Summary("Evaluate C# code")]
-        [Usage("cas eval Console.WriteLine(\"Umbreon is the bestest\");")]
+        [Usage("eval Console.WriteLine(\"Umbreon is the bestest\");")]
         public Task Eval(
             [Name("Code")]
             [Summary("The code you want to evaluate")]
@@ -81,7 +81,7 @@ namespace Umbreon.Modules
         [Command("flush")]
         [Name("Flush Reactions")]
         [Summary("Remove all callbacks from interactive")]
-        [Usage("cas flush")]
+        [Usage("flush")]
         public Task Flush()
         {
             Interactive.ClearReactionCallbacks();
@@ -91,7 +91,7 @@ namespace Umbreon.Modules
         [Command("gc")]
         [Name("Garbage Collect")]
         [Summary("Run garbage collection")]
-        [Usage("cas gc")]
+        [Usage("gc")]
         public Task GC()
         {
             System.GC.Collect();
