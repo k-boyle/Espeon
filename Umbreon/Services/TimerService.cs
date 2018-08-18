@@ -34,6 +34,11 @@ namespace Umbreon.Services
                     var service = _services.GetService(removeable.Service.GetType());
                     if(service is IRemoveableService removeableService)
                         await removeableService.Remove(removeable);
+
+                    if (_queue.TryPeek(out var next))
+                    {
+                        _timer.Change(next.When - DateTime.UtcNow, TimeSpan.Zero);
+                    }
                 }
 
                 _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, "Memory cleaned");
