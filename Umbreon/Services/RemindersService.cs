@@ -40,13 +40,12 @@ namespace Umbreon.Services
                 var reminders = _database.GetGuild(guild.Id).Reminders;
                 foreach (var reminder in reminders)
                 {
-                    if (reminder.ToExecute.ToUniversalTime() < DateTime.UtcNow)
+                    if (reminder.When.ToUniversalTime() < DateTime.UtcNow)
                     {
                         toRemove.Add(reminder);
                         continue;
                     }
 
-                    reminder.When = reminder.ToExecute.ToUniversalTime() - DateTime.UtcNow;
                     _timer.Enqueue(reminder);
                 }
             }
@@ -74,8 +73,7 @@ namespace Umbreon.Services
                 TheReminder = content,
                 Service = this,
                 UserId = userId,
-                ToExecute = DateTime.UtcNow + toExecute,
-                When = toExecute,
+                When = DateTime.UtcNow + toExecute,
                 Identifier = _random.Next()
             };
 

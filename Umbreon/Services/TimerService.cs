@@ -46,7 +46,7 @@ namespace Umbreon.Services
             _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
             if (_queue.TryPeek(out var obj))
             {
-                _timer.Change(obj.When, TimeSpan.Zero);
+                _timer.Change(obj.When - DateTime.UtcNow, TimeSpan.Zero);
             }
         }
 

@@ -5,7 +5,7 @@ namespace Umbreon.Interfaces
     public interface IRemoveable
     {
         int Identifier { get; }
-        TimeSpan When { get; }
+        DateTime When { get; }
         IRemoveableService Service { get; }
     }
 }

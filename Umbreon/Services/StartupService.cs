@@ -17,16 +17,14 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-        private readonly DatabaseService _database;
         private readonly EventsService _events;
         private readonly TimerService _timer;
         private readonly IServiceProvider _services;
 
-        public StartupService(DiscordSocketClient client, CommandService commands, DatabaseService database, EventsService events, TimerService timer, IServiceProvider services)
+        public StartupService(DiscordSocketClient client, CommandService commands, EventsService events, TimerService timer, IServiceProvider services)
         {
             _client = client;
             _commands = commands;
-            _database = database;
             _events = events;
             _timer = timer;
             _services = services;

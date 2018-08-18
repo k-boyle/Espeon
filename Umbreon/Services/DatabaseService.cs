@@ -49,7 +49,7 @@ namespace Umbreon.Services
             {
                 var guilds = db.GetCollection<GuildObject>("guilds");
                 var guild = guilds.FindOne(x => x.GuildId == toLoad.Id) ?? NewGuild(toLoad);
-                guild.When = TimeSpan.FromDays(1);
+                guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
                 _guilds.TryAdd(toLoad.Id, guild);
                 _timer.Update(guild);
                 return guild;
@@ -81,7 +81,7 @@ namespace Umbreon.Services
                 db.GetCollection<GuildObject>("guilds").Upsert(guild);
                 _guilds[guild.GuildId] = guild;
             }
-        }
+        } 
 
         public Task Remove(IRemoveable obj)
         {

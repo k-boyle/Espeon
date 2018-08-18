@@ -41,7 +41,7 @@ namespace Umbreon.Core.Models.Database.Guilds
         public List<Reminder> Reminders { get; set; } = new List<Reminder>();
 
         public int Identifier { get; set; }
-        public TimeSpan When { get; set; }
+        public DateTime When { get; set; }
         public IRemoveableService Service { get; set; }
     }
 }
