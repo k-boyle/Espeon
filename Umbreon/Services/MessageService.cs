@@ -55,7 +55,7 @@ namespace Umbreon.Services
             var newQueue = new ConcurrentQueue<Message>();
             foreach (var item in found)
             {
-                if(item.ResponseId == message.ResponseId) continue;
+                if (item.ResponseId == message.ResponseId) continue;
                 newQueue.Enqueue(item);
             }
 
@@ -73,7 +73,8 @@ namespace Umbreon.Services
 
             var guild = _database.GetGuild(channel.Guild.Id);
 
-            if (guild.BlacklistedUsers.Contains(message.Author.Id) || guild.RestrictedChannels.Contains(channel.Id) ||
+            if (guild.BlacklistedUsers.Contains(message.Author.Id) ||
+                guild.RestrictedChannels.Contains(channel.Id) ||
                 guild.UseWhiteList && !guild.WhiteListedUsers.Contains(message.Author.Id)) return;
 
             var prefixes = guild.Prefixes;
@@ -83,7 +84,7 @@ namespace Umbreon.Services
             if (message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
-                guild.When = TimeSpan.FromDays(1);
+                guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
                 _database.UpdateGuild(guild);
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
@@ -107,23 +108,38 @@ namespace Umbreon.Services
             switch (result.Error)
             {
                 case CommandError.UnknownCommand:
+                    if (guild.UnkownCommandResult)
+                    {
+                        var prefixes = guild.Prefixes;
+                        var argPos = 0;
+                        if (context.Message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
+                            prefixes.Any(x => context.Message.HasStringPrefix(x, ref argPos))) ;
+
+                        var i = 1;
+                        var commands = _commands.Search(context, argPos).Commands.Select(x => $"{i++}{x.Command.Aliases.First()}").ToArray();
+                        await SendMessageAsync(context, "Command not found, did you mean:\n" +
+                                                        $"{string.Join("\n", commands, 0, 3)}");
+                    }
 
                     break;
+
                 case CommandError.ParseFailed:
+                    await SendMessageAsync(context, "Failed to parse command");
                     break;
+
                 case CommandError.BadArgCount:
+                    var usage = command.Attributes.OfType<UsageAttribute>().Single().Example;
+                    await SendMessageAsync(context, $"Wrong command usage, here have an example:\n{usage}");
                     break;
-                case CommandError.ObjectNotFound:
-                    break;
-                case CommandError.MultipleMatches:
-                    break;
+
                 case CommandError.UnmetPrecondition:
+                    await SendMessageAsync(context, result.ErrorReason);
                     break;
+
                 case CommandError.Exception:
-                    break;
-                case CommandError.Unsuccessful:
-                    break;
-                default:
+                    await SendMessageAsync(context,
+                        "There was an unexpected result... The error has been reported, try again, if this persists please wait until a fix is released");
+                    await NewMessageAsync(0, 0, 463299724326469634, result.ErrorReason);
                     break;
             }
         }
