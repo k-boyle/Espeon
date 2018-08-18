@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Discord.Commands;
 using Umbreon.Attributes;
+using Umbreon.Helpers;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
 
@@ -44,6 +46,31 @@ namespace Umbreon.Modules
             var msg = await SendMessageAsync("Fetching...");
             var joke = (await SendRequest("http://api.icndb.com/jokes/random"))["value"]["joke"];
             await msg.ModifyAsync(x => x.Content = $"{joke}");
+        }
+
+        [Command("gif", RunMode = RunMode.Async)]
+        [Name("Gif")]
+        [Summary("Gets a random gif")]
+        [Ratelimit(1, 10, Measure.Seconds)]
+        [Usage("gif party")]
+        public async Task GetGif(
+            [Name("Search")]
+            [Summary("Your search parameter")]
+            [Remainder] string search)
+        {
+            var msg = await SendMessageAsync("Fetching...");
+            var req = await SendRequest($"https://api.giphy.com/v1/gifs/random?api_key={ConstantsHelper.GiphyToken}&rating=r&tag={search.Replace(" ", " + ")}");
+            if (!req["data"].Any())
+            {
+                await msg.ModifyAsync(x => x.Content = "No gif found");
+                return;
+            }
+
+            var gif = req["data"]["image_original_url"];
+            var stream = await GetStream($"{gif}");
+            await msg.DeleteAsync();
+            await Context.Channel.SendFileAsync(stream, "gif.gif", string.Empty);
+            Stream.Dispose();
         }
     }
 }
