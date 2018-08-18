@@ -46,10 +46,8 @@ namespace Umbreon.Services
                 await _commandService.RemoveModuleAsync(found);
 
             var cmds = GetCmds(guildId);
-            var created = await _commandService.CreateModuleAsync(guildId.ToString(), module =>
+            var created = await _commandService.CreateModuleAsync("", module =>
             {
-                module.WithName(guildId.ToString());
-                module.AddAliases("");
                 module.AddPrecondition(new RequireGuildAttribute(guildId));
                 module.WithSummary("The custom commands for this server");
 
@@ -64,13 +62,14 @@ namespace Umbreon.Services
                 }
             });
 
-            _modules.TryAdd(guildId, created);
+            if (!_modules.TryAdd(guildId, created))
+                _modules[guildId] = created;
         }
 
         private async Task CommandCallback(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
         {
             await _message.SendMessageAsync(context, GetCmds(context).FirstOrDefault(x =>
-                string.Equals(x.CommandName, info.Name, StringComparison.CurrentCultureIgnoreCase)).CommandValue);
+                string.Equals(x.CommandName, info.Name, StringComparison.CurrentCultureIgnoreCase))?.CommandValue);
         }
 
         public async Task CreateCmd(ICommandContext context, string cmdName, string cmdValue)

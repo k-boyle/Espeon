@@ -21,7 +21,7 @@ namespace Umbreon.Services
         private readonly EvalService _eval;
         private readonly LogService _logs;
         private const string Name = "Created Functions";
-        private ModuleInfo module = null;
+        private ModuleInfo _module;
 
         public CustomFunctionService(DatabaseService database, CommandService commandService, EvalService eval, LogService logs)
         {
@@ -39,13 +39,13 @@ namespace Umbreon.Services
 
         private async Task AddFuncs(BaseSocketClient client)
         {
-            if (!(module is null))
-                await _commandService.RemoveModuleAsync(module);
+            if (!(_module is null))
+                await _commandService.RemoveModuleAsync(_module);
 
             var allFunctions = client.Guilds.Select(x => _database.GetGuild(x.Id))
                 .SelectMany(y => y.CustomFunctions);
 
-            module = await _commandService.CreateModuleAsync(Name, module =>
+            _module = await _commandService.CreateModuleAsync(Name, module =>
             {
                 module.WithSummary("Custom functions for the bot");
                 module.AddAliases("");
