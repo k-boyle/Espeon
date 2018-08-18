@@ -18,7 +18,7 @@ namespace Umbreon.Services
     public class EvalService
     {
         private readonly MessageService _message;
-        private readonly IEnumerable<string> Usings = new[]
+        private readonly IEnumerable<string> _usings = new[]
         {
             "Discord", "Discord.Commands", "Discord.WebSocket",
             "Microsoft.Extensions.DependencyInjection",
@@ -49,7 +49,7 @@ namespace Umbreon.Services
             try
             {
                 var eval = await CSharpScript.EvaluateAsync(
-                    $"{string.Join("", Usings.Select(x => $"using {x};"))} {code}", scriptOptions, globals,
+                    $"{string.Join("", _usings.Select(x => $"using {x};"))} {code}", scriptOptions, globals,
                     typeof(Globals));
                 sw.Stop();
                 if (isEval)
