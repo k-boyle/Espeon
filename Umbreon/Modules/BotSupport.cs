@@ -20,7 +20,7 @@ namespace Umbreon.Modules
             [Name("Report")]
             [Summary("The bug, as descriptive as possible please")]
             [Remainder] string report)
-            => (Context.Client.GetChannel(463299724326469634) as SocketTextChannel).SendMessageAsync($"{DateTime.UtcNow.TimeOfDay} : {Context.User.GetDisplayName()} : {Context.Guild.Name} : {Context.Channel.Name}({Context.Channel.Id}) - {report}");
+            => (Context.Client.GetChannel(463299724326469634) as SocketTextChannel)?.SendMessageAsync($"{DateTime.UtcNow.TimeOfDay} : {Context.User.GetDisplayName()} : {Context.Guild.Name} : {Context.Channel.Name}({Context.Channel.Id}) - {report}");
 
         [Command("Feature")]
         [Name("Feature Request")]
@@ -30,7 +30,7 @@ namespace Umbreon.Modules
             [Name("Request")]
             [Summary("The feature that you want")]
             [Remainder] string feature)
-            => (Context.Client.GetChannel(463300066740797463) as SocketTextChannel).SendMessageAsync($"{DateTime.UtcNow.TimeOfDay} : {Context.User.GetDisplayName()} : {Context.Guild.Name} : {Context.Channel.Name}({Context.Channel.Id}) - {feature}");
+            => (Context.Client.GetChannel(463300066740797463) as SocketTextChannel)?.SendMessageAsync($"{DateTime.UtcNow.TimeOfDay} : {Context.User.GetDisplayName()} : {Context.Guild.Name} : {Context.Channel.Name}({Context.Channel.Id}) - {feature}");
 
         [Command("Source")]
         [Name("Bot Source")]
