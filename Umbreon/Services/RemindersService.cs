@@ -37,7 +37,7 @@ namespace Umbreon.Services
 
             foreach (var guild in _client.Guilds)
             {
-                var reminders = _database.GetGuild(guild.Id).Reminders;
+                var reminders = _database.TempLoad(guild).Reminders;
                 foreach (var reminder in reminders)
                 {
                     if (reminder.When.ToUniversalTime() < DateTime.UtcNow)

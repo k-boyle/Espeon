@@ -52,6 +52,7 @@ namespace Umbreon.Services
                 guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
                 _guilds.TryAdd(toLoad.Id, guild);
                 _timer.Update(guild);
+                _log.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{toLoad.Name} has been loaded into cache");
                 return guild;
             }
         }
