@@ -12,7 +12,7 @@ namespace Umbreon.TypeReaders
         {
             var cmdService = services.GetService<CustomCommandsService>();
             var currentCmds = cmdService.GetCmds(context);
-            return Task.FromResult(cmdService.TryParse(currentCmds, input, out var foundCmd) ? TypeReaderResult.FromSuccess(foundCmd) : TypeReaderResult.FromError(CommandError.ParseFailed, "Custom command not found"));
+            return Task.FromResult(CustomCommandsService.TryParse(currentCmds, input, out var foundCmd) ? TypeReaderResult.FromSuccess(foundCmd) : TypeReaderResult.FromError(CommandError.ParseFailed, "Custom command not found"));
         }
     }
 }

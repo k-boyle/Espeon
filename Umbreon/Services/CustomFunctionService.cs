@@ -42,13 +42,13 @@ namespace Umbreon.Services
             if (!(_module is null))
                 await _commandService.RemoveModuleAsync(_module);
 
-            var allFunctions = client.Guilds.Select(x => _database.GetGuild(x.Id))
+            var allFunctions = client.Guilds.Select(x => _database.TempLoad(x))
                 .SelectMany(y => y.CustomFunctions);
 
-            _module = await _commandService.CreateModuleAsync(Name, module =>
+            _module = await _commandService.CreateModuleAsync("", module =>
             {
                 module.WithSummary("Custom functions for the bot");
-                module.AddAliases("");
+                module.WithName(Name);
 
                 foreach (var func in allFunctions)
                 {

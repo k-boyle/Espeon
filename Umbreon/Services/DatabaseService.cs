@@ -74,6 +74,24 @@ namespace Umbreon.Services
             }
         }
 
+        public GuildObject TempLoad(IGuild guild)
+        {
+            using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
+            {
+                var guilds = db.GetCollection<GuildObject>("guilds");
+                var foundGuild = guilds.FindOne(x => x.GuildId == guild.Id);
+                if (!(foundGuild is null)) return foundGuild;
+                foundGuild = new GuildObject
+                {
+                    GuildId = guild.Id,
+                    Identifier = _random.Next(),
+                    Service = this,
+                };
+                foundGuild.WhiteListedUsers.Add(guild.OwnerId);
+                return foundGuild;
+            }
+        }
+
         public void UpdateGuild(GuildObject guild)
         {
             using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))

@@ -12,6 +12,7 @@ using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
@@ -166,7 +167,7 @@ namespace Umbreon.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (Commands.TryParse(CurrentCmds, reply.Content, out var targetCommand))
+            if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
             {
                 await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
@@ -232,7 +233,7 @@ namespace Umbreon.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (Commands.TryParse(CurrentCmds, reply.Content, out var targetCommand))
+            if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
             {
                 await Commands.RemoveCmd(Context, targetCommand.CommandName);
                 await SendMessageAsync("Command has been removed");

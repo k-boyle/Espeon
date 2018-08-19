@@ -34,22 +34,23 @@ namespace Umbreon.Services
         {
             foreach (var guild in client.Guilds)
             {
-                await NewCmds(guild.Id);
+                await NewCmds(guild);
             }
 
             _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, "Custom commands have been loaded");
         }
 
-        private async Task NewCmds(ulong guildId)
+        private async Task NewCmds(IGuild guild)
         {
-            if (_modules.TryGetValue(guildId, out var found))
+            if (_modules.TryGetValue(guild.Id, out var found))
                 await _commandService.RemoveModuleAsync(found);
 
-            var cmds = GetCmds(guildId);
+            var cmds = _database.TempLoad(guild).CustomCommands;
             var created = await _commandService.CreateModuleAsync("", module =>
             {
-                module.AddPrecondition(new RequireGuildAttribute(guildId));
+                module.AddPrecondition(new RequireGuildAttribute(guild.Id));
                 module.WithSummary("The custom commands for this server");
+                module.WithName(guild.Name);
 
                 foreach (var cmd in cmds)
                 {
@@ -62,8 +63,8 @@ namespace Umbreon.Services
                 }
             });
 
-            if (!_modules.TryAdd(guildId, created))
-                _modules[guildId] = created;
+            if (!_modules.TryAdd(guild.Id, created))
+                _modules[guild.Id] = created;
         }
 
         private async Task CommandCallback(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
@@ -82,7 +83,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomCommands.Add(newCmd);
             _database.UpdateGuild(guild);
-            await NewCmds(context.Guild.Id);
+            await NewCmds(context.Guild);
         }
 
         public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
@@ -101,7 +102,7 @@ namespace Umbreon.Services
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
             _database.UpdateGuild(guild);
-            await NewCmds(context.Guild.Id);
+            await NewCmds(context.Guild);
         }
 
         public bool IsReserved(string toCheck)
@@ -130,7 +131,7 @@ namespace Umbreon.Services
             return outStr;
         }
 
-        public bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)
+        public static bool TryParse(IEnumerable<CustomCommand> cmds, string cmdName, out CustomCommand cmd)
         {
             cmd = cmds.FirstOrDefault(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             return !(cmd is null);
