@@ -29,7 +29,7 @@ namespace Umbreon.Services
             _database.UpdateGuild(guild);
         }
 
-        public bool HasRole(IEnumerable<ulong> roles, ulong roleToCheck)
+        public static bool HasRole(IEnumerable<ulong> roles, ulong roleToCheck)
             => roles.Contains(roleToCheck);
 
         public IEnumerable<ulong> GetRoles(ICommandContext context)

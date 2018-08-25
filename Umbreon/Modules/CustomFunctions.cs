@@ -37,7 +37,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            await Funcs.NewFunc(Context, func);
+            await Funcs.NewFuncAsync(Context, func);
             await SendMessageAsync("Function has been created");
         }
 
@@ -56,7 +56,7 @@ namespace Umbreon.Modules
                 await SendMessageAsync("Function not found");
                 return;
             }
-            await Funcs.RemoveFunc(Context, found);
+            await Funcs.RemoveFuncAsync(Context, found);
             await SendMessageAsync("Function has been removed");
         }
 
@@ -90,7 +90,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            await Funcs.UpdateFunction(Context, found, func);
+            await Funcs.UpdateFunctionAsync(Context, found, func);
             await SendMessageAsync("Function has been updated");
         }
     }

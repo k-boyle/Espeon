@@ -33,20 +33,20 @@ namespace Umbreon.Services
         public async Task InitialiseAsync()
         {
             await DatabaseService.Initialize();
-            await StartClient();
+            await StartClientAsync();
             _events.HookEvents();
             _timer.InitialiseTimer();
-            await LoadCommands();
+            await LoadCommandsAsync();
             await Task.Delay(-1);
         }
 
-        private async Task StartClient()
+        private async Task StartClientAsync()
         {
             await _client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
             await _client.StartAsync();
         }
 
-        private async Task LoadCommands()
+        private async Task LoadCommandsAsync()
         {
             _commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
             _commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());

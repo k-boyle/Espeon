@@ -85,7 +85,7 @@ namespace Umbreon.Modules
             reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var cmdValue = reply.Content;
-            await Commands.CreateCmd(Context, cmdName, cmdValue);
+            await Commands.CreateCmdAsync(Context, cmdName, cmdValue);
             await SendMessageAsync("Command has been created");
         }
 
@@ -117,7 +117,7 @@ namespace Umbreon.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var cmdValue = reply.Content;
-            await Commands.CreateCmd(Context, cmdName, cmdValue);
+            await Commands.CreateCmdAsync(Context, cmdName, cmdValue);
             await SendMessageAsync("Command has been created");
         }
 
@@ -150,7 +150,7 @@ namespace Umbreon.Modules
                 return;
             }
 
-            await Commands.CreateCmd(Context, cmdName, cmdValue);
+            await Commands.CreateCmdAsync(Context, cmdName, cmdValue);
             await SendMessageAsync("Command has been created");
         }
 
@@ -235,7 +235,7 @@ namespace Umbreon.Modules
 
             if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
             {
-                await Commands.RemoveCmd(Context, targetCommand.CommandName);
+                await Commands.RemoveCmdAsync(Context, targetCommand.CommandName);
                 await SendMessageAsync("Command has been removed");
                 return;
             }
@@ -256,7 +256,7 @@ namespace Umbreon.Modules
             [Remainder] CustomCommand cmd
             )
         {
-            await Commands.RemoveCmd(Context, cmd.CommandName);
+            await Commands.RemoveCmdAsync(Context, cmd.CommandName);
             await SendMessageAsync("Command has been removed");
         }
     }

@@ -17,7 +17,7 @@ namespace Umbreon.TypeReaders
             var levenTags = currentTags.Where(x => StringHelper.CalcLevenshteinDistance(x.TagName, input) < 5);
             var containsTags = currentTags.Where(x => x.TagName.Contains(input));
             var totalTags = levenTags.Concat(containsTags);
-            return Task.FromResult(tagService.TryParse(currentTags, input, out var foundTag) ? TypeReaderResult.FromSuccess(foundTag) : TypeReaderResult.FromError(CommandError.ParseFailed, 
+            return Task.FromResult(TagService.TryParse(currentTags, input, out var foundTag) ? TypeReaderResult.FromSuccess(foundTag) : TypeReaderResult.FromError(CommandError.ParseFailed, 
                 ("Tag not found did you mean?\n" + $"{string.Join("\n", totalTags.Select(x => x.TagName))}")));
         }
     }

@@ -11,6 +11,7 @@ using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Modules
@@ -63,7 +64,7 @@ namespace Umbreon.Modules
             [Summary("The role you want to add")]
             [Remainder] SocketRole roleToAdd)
         {
-            if (SelfRoles.HasRole(CurrentRoles, roleToAdd.Id))
+            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToAdd.Id))
             {
                 await Context.User.AddRoleAsync(roleToAdd);
                 await SendMessageAsync("Role has been added");
@@ -83,7 +84,7 @@ namespace Umbreon.Modules
             [Summary("The role you want to remove")]
             [Remainder] SocketRole roleToRemove)
         {
-            if (SelfRoles.HasRole(CurrentRoles, roleToRemove.Id))
+            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToRemove.Id))
             {
                 await Context.User.RemoveRoleAsync(roleToRemove);
                 await SendMessageAsync("Role has been removed");
@@ -105,7 +106,7 @@ namespace Umbreon.Modules
             [Summary("The new role want that you want to add to the self assigning roles")]
             [Remainder] SocketRole roleToAdd)
         {
-            if (!SelfRoles.HasRole(CurrentRoles, roleToAdd.Id))
+            if (!SelfAssigningRolesService.HasRole(CurrentRoles, roleToAdd.Id))
             {
                 SelfRoles.AddNewSelfRole(Context, roleToAdd.Id);
             }
@@ -125,7 +126,7 @@ namespace Umbreon.Modules
             [Summary("The old role want that you want to remove from the self assigning roles")]
             [Remainder] SocketRole roleToRemove)
         {
-            if (SelfRoles.HasRole(CurrentRoles, roleToRemove.Id))
+            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToRemove.Id))
             {
                 SelfRoles.RemoveSelfRole(Context, roleToRemove.Id);
             }

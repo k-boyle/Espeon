@@ -31,13 +31,13 @@ namespace Umbreon.Services
             _logs = logs;
         }
 
-        public async Task LoadFuncs(BaseSocketClient client)
+        public async Task LoadFuncsAsync(BaseSocketClient client)
         {
-            await AddFuncs(client);
+            await AddFuncsAsync(client);
             _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomFuncs, "Custom functions have been loaded");
         }
 
-        private async Task AddFuncs(BaseSocketClient client)
+        private async Task AddFuncsAsync(BaseSocketClient client)
         {
             if (!(_module is null))
                 await _commandService.RemoveModuleAsync(_module);
@@ -52,7 +52,7 @@ namespace Umbreon.Services
 
                 foreach (var func in allFunctions)
                 {
-                    module.AddCommand(func.FunctionName, FunctionCallback, function =>
+                    module.AddCommand(func.FunctionName, FunctionCallbackAsync, function =>
                     {
                         function.WithName(func.FunctionName);
                         function.WithSummary(func.Summary);
@@ -68,7 +68,7 @@ namespace Umbreon.Services
             });
         }
 
-        private async Task FunctionCallback(ICommandContext context, object[] _, IServiceProvider services, CommandInfo info)
+        private async Task FunctionCallbackAsync(ICommandContext context, object[] _, IServiceProvider services, CommandInfo info)
         {
             var client = context.Client as BaseSocketClient;
             var allFuncs = client?.Guilds.Select(x => _database.GetGuild(x.Id))
@@ -77,28 +77,28 @@ namespace Umbreon.Services
             await _eval.EvaluateAsync(context as UmbreonContext, found?.FunctionCallback, false, services);
         }
 
-        public async Task NewFunc(ICommandContext context, CustomFunction function)
+        public async Task NewFuncAsync(ICommandContext context, CustomFunction function)
         {
             var guild = _database.GetGuild(context);
             guild.CustomFunctions.Add(function);
             _database.UpdateGuild(guild);
-            await LoadFuncs(context.Client as BaseSocketClient);
+            await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
-        public async Task RemoveFunc(ICommandContext context, CustomFunction function)
+        public async Task RemoveFuncAsync(ICommandContext context, CustomFunction function)
         {
             var guild = _database.GetGuild(context);
             guild.CustomFunctions.Remove(function);
             _database.UpdateGuild(guild);
-            await LoadFuncs(context.Client as BaseSocketClient);
+            await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
-        public async Task UpdateFunction(ICommandContext context, CustomFunction before, CustomFunction after)
+        public async Task UpdateFunctionAsync(ICommandContext context, CustomFunction before, CustomFunction after)
         {
             var guild = _database.GetGuild(context);
             guild.CustomFunctions[guild.CustomFunctions.IndexOf(before)] = after;
             _database.UpdateGuild(guild);
-            await LoadFuncs(context.Client as BaseSocketClient);
+            await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
         public IEnumerable<CustomFunction> GetFuncs(ICommandContext context)

@@ -27,7 +27,7 @@ namespace Umbreon.Services
             _message = message;
         }
 
-        public async Task Initialise()
+        public async Task InitialiseAsync()
         {
             _lavalinkManager = new LavalinkManager(_client, new LavalinkManagerConfig
             {

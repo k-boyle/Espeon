@@ -77,6 +77,9 @@ namespace Umbreon.Services
 
         public GuildObject TempLoad(IGuild guild)
         {
+            if (_guilds.TryGetValue(guild.Id, out var found))
+                return found;
+
             using (var db = new LiteDatabase(ConstantsHelper.DatabaseDir))
             {
                 var guilds = db.GetCollection<GuildObject>("guilds");
@@ -102,7 +105,7 @@ namespace Umbreon.Services
             }
         } 
 
-        public Task Remove(IRemoveable obj)
+        public Task RemoveAsync(IRemoveable obj)
         {
             if (obj is GuildObject guild)
             {

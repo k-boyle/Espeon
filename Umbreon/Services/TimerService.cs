@@ -33,7 +33,7 @@ namespace Umbreon.Services
                 {
                     var service = _services.GetService(removeable.Service.GetType());
                     if(service is IRemoveableService removeableService)
-                        await removeableService.Remove(removeable);
+                        await removeableService.RemoveAsync(removeable);
 
                     if (_queue.TryPeek(out var next))
                     {
@@ -52,6 +52,7 @@ namespace Umbreon.Services
             if (!_queue.TryPeek(out var obj)) return;
             _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"obj.When: {obj.When}");
             _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"DateTime.UtcNow: {DateTime.UtcNow}");
+            _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"Object type {obj.GetType()}");
             _timer.Change(obj.When - DateTime.UtcNow, TimeSpan.Zero);
         }
 

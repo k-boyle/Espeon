@@ -48,7 +48,7 @@ namespace Umbreon.Services
             _random = random;
         }
 
-        public Task Remove(IRemoveable obj)
+        public Task RemoveAsync(IRemoveable obj)
         {
             if (!(obj is Message message)) return Task.CompletedTask;
             if (!_messageCache.TryGetValue(message.UserId, out var found)) return Task.CompletedTask;
@@ -71,7 +71,7 @@ namespace Umbreon.Services
             if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
                 !(msg is SocketUserMessage message)) return;
 
-            var guild = _database.GetGuild(channel.Guild.Id);
+            var guild = _database.TempLoad(channel.Guild);
 
             if (guild.BlacklistedUsers.Contains(message.Author.Id) ||
                 guild.RestrictedChannels.Contains(channel.Id) ||
@@ -85,6 +85,7 @@ namespace Umbreon.Services
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
                 guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
+                _timer.Update(guild);
                 _database.UpdateGuild(guild);
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
@@ -101,7 +102,7 @@ namespace Umbreon.Services
             await _commands.ExecuteAsync(context, argPos, _services);
         }
 
-        public async Task CommandExecuted(CommandInfo command, ICommandContext context, IResult result)
+        public async Task CommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
         {
             if (result.IsSuccess) return;
             var guild = _database.GetGuild(context);
@@ -218,7 +219,7 @@ namespace Umbreon.Services
 
         }
 
-        public async Task<int> ClearMessages(ICommandContext context, int amount)
+        public async Task<int> ClearMessagesAsync(ICommandContext context, int amount)
         {
             if (!_messageCache.TryGetValue(context.User.Id, out var found)) return 0;
             amount = amount > found.Count ? found.Count + 1 : amount;

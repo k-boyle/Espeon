@@ -31,7 +31,7 @@ namespace Umbreon.Services
             _random = random;
         }
 
-        public async Task LoadReminders()
+        public async Task LoadRemindersAsync()
         {
             var toRemove = new List<Reminder>();
 
@@ -51,10 +51,10 @@ namespace Umbreon.Services
             }
 
             foreach (var reminder in toRemove)
-                await Remove(reminder);
+                await RemoveAsync(reminder);
         }
 
-        public async Task Remove(IRemoveable obj)
+        public async Task RemoveAsync(IRemoveable obj)
         {
             if (!(obj is Reminder reminder)) return;
             var user = _client.GetGuild(reminder.GuildId).GetUser(reminder.UserId);

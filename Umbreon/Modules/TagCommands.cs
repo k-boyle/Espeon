@@ -7,13 +7,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
-using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Modules.Contexts;
 using Umbreon.Modules.ModuleBases;
 using Umbreon.Preconditions;
+using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 // TODO tag claiming, searching and mod stuff
@@ -205,7 +205,7 @@ namespace Umbreon.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
+            if (TagService.TryParse(CurrentTags, reply.Content, out var targetTag))
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {
@@ -280,7 +280,7 @@ namespace Umbreon.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (Tags.TryParse(CurrentTags, reply.Content, out var targetTag))
+            if (TagService.TryParse(CurrentTags, reply.Content, out var targetTag))
             {
                 if (targetTag.TagOwner != Context.User.Id)
                 {

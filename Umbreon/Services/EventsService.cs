@@ -40,10 +40,10 @@ namespace Umbreon.Services
             _client.Log += _logs.LogEvent;
             _client.Ready += async () =>
             {
-                await _customCommands.LoadCmds(_client);
-                await _customFunctions.LoadFuncs(_client);
-                await _musicService.Initialise();
-                await _reminders.LoadReminders();
+                await _customCommands.LoadCmdsAsync(_client);
+                await _customFunctions.LoadFuncsAsync(_client);
+                //await _musicService.Initialise();
+                await _reminders.LoadRemindersAsync();
             };
             _client.MessageReceived += _message.HandleMessageAsync;
             _client.MessageUpdated += (_, msg, __) => _message.HandleMessageUpdateAsync(msg);
@@ -67,7 +67,7 @@ namespace Umbreon.Services
                 }
             };
             _commands.Log += _logs.LogEvent;
-            _commands.CommandExecuted += _message.CommandExecuted;
+            _commands.CommandExecuted += _message.CommandExecutedAsync;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Umbreon.Modules.ModuleBases
             => Message.SendPaginatedMessageAsync(Context, paginator);
 
         protected Task<int> ClearMessages(int amount)
-            => Message.ClearMessages(Context, amount);
+            => Message.ClearMessagesAsync(Context, amount);
 
         protected Task DeleteMessageAsync(IUserMessage message)
             => Message.DeleteMessageAsync(Context, message);

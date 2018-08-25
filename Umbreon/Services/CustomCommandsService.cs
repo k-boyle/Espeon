@@ -30,17 +30,17 @@ namespace Umbreon.Services
             _logs = logs;
         }
 
-        public async Task LoadCmds(DiscordSocketClient client)
+        public async Task LoadCmdsAsync(DiscordSocketClient client)
         {
             foreach (var guild in client.Guilds)
             {
-                await NewCmds(guild);
+                await NewCmdsAsync(guild);
             }
 
             _logs.NewLogEvent(LogSeverity.Info, LogSource.CustomCmds, "Custom commands have been loaded");
         }
 
-        private async Task NewCmds(IGuild guild)
+        private async Task NewCmdsAsync(IGuild guild)
         {
             if (_modules.TryGetValue(guild.Id, out var found))
                 await _commandService.RemoveModuleAsync(found);
@@ -54,7 +54,7 @@ namespace Umbreon.Services
 
                 foreach (var cmd in cmds)
                 {
-                    module.AddCommand(cmd.CommandName, CommandCallback, command =>
+                    module.AddCommand(cmd.CommandName, CommandCallbackAsync, command =>
                     {
                         command.AddAttributes(new UsageAttribute($"{cmd.CommandName}"));
                         command.WithSummary("This is a custom command");
@@ -67,13 +67,13 @@ namespace Umbreon.Services
                 _modules[guild.Id] = created;
         }
 
-        private async Task CommandCallback(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
+        private async Task CommandCallbackAsync(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
         {
             await _message.SendMessageAsync(context, GetCmds(context).FirstOrDefault(x =>
                 string.Equals(x.CommandName, info.Name, StringComparison.CurrentCultureIgnoreCase))?.CommandValue);
         }
 
-        public async Task CreateCmd(ICommandContext context, string cmdName, string cmdValue)
+        public async Task CreateCmdAsync(ICommandContext context, string cmdName, string cmdValue)
         {
             var newCmd = new CustomCommand
             {
@@ -83,7 +83,7 @@ namespace Umbreon.Services
             var guild = _database.GetGuild(context);
             guild.CustomCommands.Add(newCmd);
             _database.UpdateGuild(guild);
-            await NewCmds(context.Guild);
+            await NewCmdsAsync(context.Guild);
         }
 
         public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
@@ -95,14 +95,14 @@ namespace Umbreon.Services
             _database.UpdateGuild(guild);
         }
 
-        public async Task RemoveCmd(ICommandContext context, string cmdName)
+        public async Task RemoveCmdAsync(ICommandContext context, string cmdName)
         {
             var guild = _database.GetGuild(context);
             var targetCmd = guild.CustomCommands.Find(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
             _database.UpdateGuild(guild);
-            await NewCmds(context.Guild);
+            await NewCmdsAsync(context.Guild);
         }
 
         public bool IsReserved(string toCheck)

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbreon.Attributes;
-using Umbreon.Core.Models.Database;
 using Umbreon.Core.Models.Database.Guilds;
 
 namespace Umbreon.Services
@@ -61,7 +60,7 @@ namespace Umbreon.Services
             return _database.GetGuild(context).Tags;
         }
 
-        public bool TryParse(IEnumerable<Tag> tags, string tagName, out Tag tag)
+        public static bool TryParse(IEnumerable<Tag> tags, string tagName, out Tag tag)
         {
             tag = tags.FirstOrDefault(x =>
                 string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));

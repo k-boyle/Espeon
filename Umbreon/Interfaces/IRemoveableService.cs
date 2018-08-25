@@ -4,6 +4,6 @@ namespace Umbreon.Interfaces
 {
     public interface IRemoveableService
     {
-        Task Remove(IRemoveable obj);
+        Task RemoveAsync(IRemoveable obj);
     }
 }

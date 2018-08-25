@@ -70,11 +70,6 @@ namespace Umbreon.Services
                 await _message.SendMessageAsync(context,
                     $"There was an error. Please report this!\n```{Format.Sanitize(ex.ToString().Substring(0, 500))}```");
             }
-            finally
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
         }
 
         private static IEnumerable<string> GetNamespaces()
