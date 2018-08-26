@@ -9,8 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Commands.Contexts;
 using Umbreon.Core.Entities;
-using Umbreon.Modules.Contexts;
 
 namespace Umbreon.Services
 {

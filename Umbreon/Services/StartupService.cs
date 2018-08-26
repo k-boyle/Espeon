@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core.Models.Database.Guilds;
+using Umbreon.Commands.TypeReaders;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Helpers;
-using Umbreon.TypeReaders;
 
 namespace Umbreon.Services
 {

@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Commands.Contexts;
+using Umbreon.Commands.Preconditions;
 using Umbreon.Core;
-using Umbreon.Core.Models.Database.Guilds;
-using Umbreon.Modules.Contexts;
-using Umbreon.Preconditions;
+using Umbreon.Core.Entities.Guild;
 
 namespace Umbreon.Services
 {

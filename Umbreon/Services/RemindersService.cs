@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core.Models.Database.Guilds;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Interfaces;
 
 namespace Umbreon.Services

@@ -2,7 +2,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Umbreon.Modules.Contexts;
+using Umbreon.Commands.Contexts;
 using Umbreon.Services;
 
 namespace Umbreon.Core.Entities

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbreon.Attributes;
-using Umbreon.Core.Models.Database.Guilds;
+using Umbreon.Core.Entities.Guild;
 
 namespace Umbreon.Services
 {

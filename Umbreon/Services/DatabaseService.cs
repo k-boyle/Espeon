@@ -9,7 +9,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Core;
-using Umbreon.Core.Models.Database.Guilds;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Helpers;
 using Umbreon.Interfaces;
 
