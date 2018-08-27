@@ -84,7 +84,7 @@ namespace Umbreon.Commands.Modules
         public async Task Help([Remainder] IEnumerable<CommandInfo> commands)
         {
             var filtered = commands.Where(x => !string.Equals(x.Name, "help", StringComparison.CurrentCultureIgnoreCase));
-            if (!filtered.Any()) return;
+            if (filtered.Count() == 0) return;
             var results = new List<CommandInfo>();
             foreach (var cmd in filtered)
             {
@@ -92,7 +92,7 @@ namespace Umbreon.Commands.Modules
                 results.Add(cmd);
             }
 
-            if (!results.Any()) return;
+            if (results.Count == 0) return;
 
             var builder = new EmbedBuilder
             {

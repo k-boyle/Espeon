@@ -33,7 +33,7 @@ namespace Umbreon.Commands.Modules
         [Usage("cmd list")]
         public async Task ListCmds()
         {
-            if (!CurrentCmds.Any())
+            if (CurrentCmds.Count() == 0)
             {
                 await SendMessageAsync("No custom commands currently for this server");
                 return;
