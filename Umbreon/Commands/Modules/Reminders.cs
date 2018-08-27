@@ -42,7 +42,7 @@ namespace Umbreon.Commands.Modules
             var users = reminders.Where(x => x.UserId == Context.User.Id);
             var i = 1;
             await SendMessageAsync($"Your current reminders are:\n" +
-                                   $"{(users.Any() ? string.Join("\n", users.Select(x => (x.TheReminder.Length > 100 ? $"**{i++}**: {x.TheReminder.Substring(0, 100)}..." : $"**{i++}**:{x.TheReminder}"))) : "None")}");
+                                   $"{(users.Count() > 0 ? string.Join("\n", users.Select(x => (x.TheReminder.Length > 100 ? $"**{i++}**: {x.TheReminder.Substring(0, 100)}..." : $"**{i++}**:{x.TheReminder}"))) : "None")}");
         }
     }
 }

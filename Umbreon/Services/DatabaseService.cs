@@ -1,12 +1,12 @@
 ﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using LiteDB;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Entities.Guild;

@@ -32,7 +32,7 @@ namespace Umbreon.Commands.Modules
         [Priority(0)]
         public async Task ListRoles()
         {
-            if (!CurrentRoles.Any())
+            if (CurrentRoles.Count() == 0)
             {
                 await SendMessageAsync("There are no available self assigning roles");
                 return;

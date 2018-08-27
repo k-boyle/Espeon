@@ -50,7 +50,7 @@ namespace Umbreon.Commands.Modules
         [Usage("tag list")]
         public async Task ListTags()
         {
-            if (!CurrentTags.Any())
+            if (CurrentTags.Count() == 0)
             {
                 await SendMessageAsync("There are no tags for this server currently");
                 return;

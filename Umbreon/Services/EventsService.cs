@@ -42,7 +42,7 @@ namespace Umbreon.Services
             {
                 await _customCommands.LoadCmdsAsync(_client);
                 await _customFunctions.LoadFuncsAsync(_client);
-                //await _musicService.Initialise();
+                //await _musicService.InitialiseAsync();
                 await _reminders.LoadRemindersAsync();
             };
             _client.MessageReceived += _message.HandleMessageAsync;

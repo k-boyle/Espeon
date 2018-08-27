@@ -14,7 +14,7 @@ namespace Umbreon.Commands.Preconditions
         {
             var database = services.GetService<DatabaseService>();
             var guild = database.GetGuild(context);
-            if (!guild.DisabledModules.Any())
+            if (guild.DisabledModules.Count == 0)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             var moduleType = command.Module.Attributes.FirstOrDefault(x => x is ModuleTypeAttribute) as ModuleTypeAttribute;
             return guild.DisabledModules.Contains(moduleType.Type) ? Task.FromResult(PreconditionResult.FromError(new FailedResult("This module has been disabled", false, CommandError.UnmetPrecondition))) : Task.FromResult(PreconditionResult.FromSuccess());
