@@ -71,22 +71,22 @@ namespace Umbreon.Commands.Modules
             if (CurrentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
-                await SendMessageAsync("This command already exists");
+                await NewMessageAsync("This command already exists");
                 return;
             }
 
             if (ReservedWords.Any(x => string.Equals(x, cmdName, StringComparison.CurrentCultureIgnoreCase)) || Commands.IsReserved(cmdName))
             {
-                await SendMessageAsync("This is a reserved word, command cannot be created");
+                await NewMessageAsync("This is a reserved word, command cannot be created");
                 return;
             }
 
-            await SendMessageAsync("What do you want the command response to be? [reply with `cancel` to cancel creation]");
+            await NewMessageAsync("What do you want the command response to be? [reply with `cancel` to cancel creation]");
             reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var cmdValue = reply.Content;
             await Commands.CreateCmdAsync(Context, cmdName, cmdValue);
-            await SendMessageAsync("Command has been created");
+            await NewMessageAsync("Command has been created");
         }
 
         [Command("Create", RunMode = RunMode.Async)]
@@ -98,7 +98,8 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Create(
             [Name("Command Name")]
-                [Summary("The name of the command that you want to create")]string cmdName)
+            [Summary("The name of the command that you want to create")]
+            [Remainder] string cmdName)
         {
             if (CurrentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
@@ -118,7 +119,7 @@ namespace Umbreon.Commands.Modules
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var cmdValue = reply.Content;
             await Commands.CreateCmdAsync(Context, cmdName, cmdValue);
-            await SendMessageAsync("Command has been created");
+            await NewMessageAsync("Command has been created");
         }
 
         [Command("Create")]
@@ -130,12 +131,10 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Create(
             [Name("Command Name")]
-                [Summary("The name of the command you want to create")]
-                string cmdName,
+            [Summary("The name of the command you want to create")] string cmdName,
             [Name("Command Value")]
-                [Summary("The response you want from the command")]
-                [Remainder]
-                string cmdValue)
+            [Summary("The response you want from the command")]
+            [Remainder] string cmdValue)
         {
             if (CurrentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
@@ -169,12 +168,12 @@ namespace Umbreon.Commands.Modules
 
             if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
             {
-                await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
+                await NewMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
                 var newValue = reply.Content;
                 Commands.UpdateCommand(Context, targetCommand.CommandName, newValue);
-                await SendMessageAsync("Command has been modified");
+                await NewMessageAsync("Command has been modified");
                 return;
             }
 
@@ -190,15 +189,15 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Modify(
             [Name("Command Name")]
-                [Summary("The Command you wanna modify")]
-                [Remainder]CustomCommand cmd)
+            [Summary("The Command you wanna modify")]
+            [Remainder] CustomCommand cmd)
         {
             await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var newValue = reply.Content;
             Commands.UpdateCommand(Context, cmd.CommandName, newValue);
-            await SendMessageAsync("Command has been modified");
+            await NewMessageAsync("Command has been modified");
         }
 
         [Command("Modify")]
@@ -210,11 +209,10 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Modify(
             [Name("Command Name")]
-                [Summary("The name of the Command you want to modify")]
-                CustomCommand cmd,
+            [Summary("The name of the Command you want to modify")] CustomCommand cmd,
             [Name("Command Value")]
-                [Summary("The new value that you want the Command to have")]
-                [Remainder] string cmdValue)
+            [Summary("The new value that you want the Command to have")]
+            [Remainder] string cmdValue)
         {
             Commands.UpdateCommand(Context, cmd.CommandName, cmdValue);
             await SendMessageAsync("Command has been modified");
@@ -236,11 +234,11 @@ namespace Umbreon.Commands.Modules
             if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
             {
                 await Commands.RemoveCmdAsync(Context, targetCommand.CommandName);
-                await SendMessageAsync("Command has been removed");
+                await NewMessageAsync("Command has been removed");
                 return;
             }
 
-            await SendMessageAsync("Command was not found");
+            await NewMessageAsync("Command was not found");
         }
 
         [Command("Remove")]
@@ -253,8 +251,7 @@ namespace Umbreon.Commands.Modules
         public async Task Remove(
             [Name("Command Name")]
             [Summary("The name of the command that you want to remove")]
-            [Remainder] CustomCommand cmd
-            )
+            [Remainder] CustomCommand cmd)
         {
             await Commands.RemoveCmdAsync(Context, cmd.CommandName);
             await SendMessageAsync("Command has been removed");

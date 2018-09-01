@@ -48,6 +48,9 @@ namespace Umbreon.Commands.ModuleBases
         protected Task<IUserMessage> SendMessageAsync(string content, bool isTTS = false, Embed embed = null)
             => Message.SendMessageAsync(Context, content, isTTS, embed);
 
+        protected Task<IUserMessage> NewMessageAsync(string content, bool isTTS = false, Embed embed = null)
+            => Message.NewMessageAsync(Context, content, isTTS, embed);
+
         protected Task<IUserMessage> SendPaginatedMessageAsync(BasePaginator paginator)
             => Message.SendPaginatedMessageAsync(Context, paginator);
 
