@@ -26,16 +26,14 @@ namespace Umbreon.Paginators.HelpPaginator
         public IUserMessage Message { get; private set; }
         public ICommandContext Context { get; }
         public RunMode RunMode => RunMode.Sync;
-        public ICriterion<SocketReaction> Criterion { get; }
+        public ICriterion<SocketReaction> Criterion => new EnsureReactionFromSourceUserCriterion();
         public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
 
         public HelpPaginatedCallback(InteractiveService interactive,
-            ICommandContext sourceContext,
-            HelpPaginatedMessage pager, ICriterion<SocketReaction> criterion = null)
+            ICommandContext sourceContext, HelpPaginatedMessage pager)
         {
             _interactive = interactive;
             Context = sourceContext;
-            Criterion = criterion ?? new EmptyCriterion<SocketReaction>();
             _pager = pager;
             _pages = _pager.Pages.Count();
         }
