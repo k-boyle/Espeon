@@ -27,7 +27,12 @@ namespace Umbreon.Commands.Modules
         [Summary("Set a reminder for yourself")]
         [Usage("reminder 30m get dinner out of the oven")]
         [Alias("remindme")]
-        public async Task Reminder(TimeSpan when, [Remainder] string content)
+        public async Task Reminder(
+            [Name("When")]
+            [Summary("The time at which you want to be reminded. #d#h#m#s")] TimeSpan when, 
+            [Name("Reminder")]
+            [Summary("What you want to be reminded about")]
+            [Remainder] string content)
         {
             _reminders.CreateReminder($"{content}\n\n{Context.Message.GetJumpUrl()}", Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
             await SendMessageAsync("Reminder has been created");
