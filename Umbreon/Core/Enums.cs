@@ -4,7 +4,9 @@
     {
         Tags,
         Commands,
-        Roles
+        Roles,
+        Games,
+        Fun
     }
 
     public enum LogSource
