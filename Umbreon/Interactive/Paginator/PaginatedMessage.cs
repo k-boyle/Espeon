@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System.Collections.Generic;
 using Umbreon.Paginators;
+using Colour = Discord.Color;
 
 namespace Umbreon.Interactive.Paginator
 {
@@ -11,7 +12,7 @@ namespace Umbreon.Interactive.Paginator
         public string Content { get; set; } = "";
 
         public EmbedAuthorBuilder Author { get; set; } = null;
-        public Color Color { get; set; } = Color.Default;
+        public Colour Color { get; set; } = Colour.Default;
         public string Title { get; set; } = "";
 
         public PaginatedAppearanceOptions Options { get; set; } = PaginatedAppearanceOptions.Default;

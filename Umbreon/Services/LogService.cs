@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using ConsoleColour = System.ConsoleColor;
 
 namespace Umbreon.Services
 {
@@ -41,22 +42,22 @@ namespace Umbreon.Services
             switch (severity)
             {
                 case LogSeverity.Critical:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColour.DarkRed;
                     break;
                 case LogSeverity.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColour.Red;
                     break;
                 case LogSeverity.Warning:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.ForegroundColor = ConsoleColour.DarkYellow;
                     break;
                 case LogSeverity.Info:
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.ForegroundColor = ConsoleColour.DarkGreen;
                     break;
                 case LogSeverity.Verbose:
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.ForegroundColor = ConsoleColour.Green;
                     break;
                 case LogSeverity.Debug:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.ForegroundColor = ConsoleColour.Magenta;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -82,7 +83,7 @@ namespace Umbreon.Services
             Console.Write("]");
 
             Console.Write("[");
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.ForegroundColor = ConsoleColour.Cyan;
             if (source.Length < 11)
             {
                 var builder = new StringBuilder(11);

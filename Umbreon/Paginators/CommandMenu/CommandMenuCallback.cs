@@ -11,6 +11,7 @@ using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
+using Colour = Discord.Color;
 
 namespace Umbreon.Paginators.CommandMenu
 {
@@ -160,7 +161,7 @@ namespace Umbreon.Paginators.CommandMenu
                     IconUrl = Context.User.GetAvatarOrDefaultUrl(),
                     Name = (Context.User as SocketGuildUser).GetDisplayName()
                 },
-                Color = Color.DarkTeal,
+                Color = Colour.DarkTeal,
                 Title = "Umbreon's Command Menu",
                 Description = "A menu to help you navigate and use commands",
                 Timestamp = DateTimeOffset.UtcNow,

@@ -15,6 +15,7 @@ using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
+using Colour = Discord.Color;
 
 // TODO tag claiming, searching and mod stuff
 
@@ -63,7 +64,7 @@ namespace Umbreon.Commands.Modules
                     IconUrl = Context.User.GetAvatarOrDefaultUrl(),
                     Name = Context.User.GetDisplayName()
                 },
-                Color = Color.DarkPurple,
+                Color = Colour.DarkPurple,
                 Title = "Available tags for this server",
                 Options = new PaginatedAppearanceOptions(),
                 Pages = pages
@@ -90,7 +91,7 @@ namespace Umbreon.Commands.Modules
                     IconUrl = user.GetDefaultAvatarUrl(),
                     Name = user.GetDisplayName()
                 },
-                Color = Color.Blue,
+                Color = Colour.Blue,
                 Fields = new List<EmbedFieldBuilder>
                 {
                     new EmbedFieldBuilder

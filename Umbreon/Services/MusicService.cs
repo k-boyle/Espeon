@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities;
+using Colour = Discord.Color;
 
 namespace Umbreon.Services
 {
@@ -100,7 +101,7 @@ namespace Umbreon.Services
                 var embed = new EmbedBuilder
                 {
                     Title = $"Now playing {track.Title}",
-                    Color = Color.Red
+                    Color = Colour.Red
                 };
                 await _message.NewMessageAsync(_lavaCache[guildId].UserId, 0, channel.Id, string.Empty, embed: embed.Build());
             }
@@ -166,7 +167,7 @@ namespace Umbreon.Services
                 var embed = new EmbedBuilder
                 {
                     Title = $"Now playing {track.Title}",
-                    Color = Color.Red
+                    Color = Colour.Red
                 };
                 await _message.NewMessageAsync(currentGuild.UserId, 0, currentGuild.ChannelId, string.Empty,
                     embed: embed.Build()); 

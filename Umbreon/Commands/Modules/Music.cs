@@ -10,6 +10,7 @@ using Umbreon.Commands.ModuleBases;
 using Umbreon.Commands.Preconditions;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Extensions;
+using Colour = Discord.Color;
 
 namespace Umbreon.Commands.Modules
 {
@@ -53,7 +54,7 @@ namespace Umbreon.Commands.Modules
             var embed = new EmbedBuilder
             {
                 Title = res ? $"{track.Title} added to queue" : $"Now playing {track.Title}",
-                Color = Color.Red
+                Color = Colour.Red
             };
             await SendMessageAsync(string.Empty, embed: embed.Build());
         }
@@ -155,7 +156,7 @@ namespace Umbreon.Commands.Modules
             await SendMessageAsync(string.Empty, embed: new EmbedBuilder
             {
                 Title = "Current Queue",
-                Color = Color.Red,
+                Color = Colour.Red,
                 Description = string.Join("\n", currentQueue.Select(x => x.Title))
             }.Build());
         }

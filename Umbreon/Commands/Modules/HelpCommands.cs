@@ -11,6 +11,7 @@ using Umbreon.Interactive.Paginator;
 using Umbreon.Paginators.HelpPaginator;
 using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
+using Colour = Discord.Color;
 
 namespace Umbreon.Commands.Modules
 {
@@ -101,7 +102,7 @@ namespace Umbreon.Commands.Modules
                     IconUrl = Context.User.GetAvatarOrDefaultUrl(),
                     Name = Context.User.GetDisplayName()
                 },
-                Color = Color.Gold,
+                Color = Colour.Gold,
                 Timestamp = DateTimeOffset.UtcNow
             };
 

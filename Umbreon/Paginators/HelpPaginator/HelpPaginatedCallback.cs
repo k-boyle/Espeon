@@ -11,6 +11,7 @@ using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
 using Umbreon.Interactive.Paginator;
+using Colour = Discord.Color;
 
 namespace Umbreon.Paginators.HelpPaginator
 {
@@ -159,7 +160,7 @@ namespace Umbreon.Paginators.HelpPaginator
         {
             return new EmbedBuilder()
                 .WithAuthor(_pager.Author)
-                .WithColor(Color.Gold)
+                .WithColor(Colour.Gold)
                 .WithDescription($"Type {_pager.Prefix}help CommandName to view more help for that command!\n" +
                                  $"e.g. {_pager.Prefix}help create tag")
                 .AddField(GetPage(_pager.Pages, _page - 1).Title)

@@ -13,6 +13,7 @@ using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
 using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
+using Colour = Discord.Color;
 
 namespace Umbreon.Commands.Modules
 {
@@ -46,7 +47,7 @@ namespace Umbreon.Commands.Modules
                     IconUrl = Context.User.GetAvatarOrDefaultUrl(),
                     Name = Context.User.GetDisplayName()
                 },
-                Color = Color.LightOrange,
+                Color = Colour.LightOrange,
                 Title = "Available roles for this server",
                 Options = new PaginatedAppearanceOptions(),
                 Pages = pages
