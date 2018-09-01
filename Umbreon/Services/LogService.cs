@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
@@ -15,6 +16,7 @@ namespace Umbreon.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         public LogService(DiscordSocketClient client, CommandService commands)
         {
@@ -22,8 +24,10 @@ namespace Umbreon.Services
             _commands = commands;
         }
 
-        public Task LogEvent(LogMessage log)
+        public async Task LogEvent(LogMessage log)
         {
+            await _semaphore.WaitAsync();
+
             var source = log.Source;
             var message = log.Message;
             var exception = log.Exception?.InnerException;
@@ -107,12 +111,12 @@ namespace Umbreon.Services
             }
 
             Console.WriteLine();
-            return Task.CompletedTask;
+            _semaphore.Release();
         }
 
         public void NewLogEvent(LogSeverity serverity, LogSource source, string message)
         {
-            LogEvent(new LogMessage(serverity, source.ToString(), message));
+            _ = LogEvent(new LogMessage(serverity, source.ToString(), message));
         }
     }
 }
