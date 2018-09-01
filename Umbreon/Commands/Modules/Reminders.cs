@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
@@ -28,7 +29,7 @@ namespace Umbreon.Commands.Modules
         [Alias("remindme")]
         public async Task Reminder(TimeSpan when, [Remainder] string content)
         {
-            _reminders.CreateReminder(content, Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
+            _reminders.CreateReminder($"{content}\n\n{Context.Message.GetJumpUrl()}", Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
             await SendMessageAsync("Reminder has been created");
         }
 
