@@ -66,6 +66,9 @@ namespace Umbreon.Commands.Games
 
         public async Task StartAsync()
         {
+            var message = await _message.SendMessageAsync(Context, "Starting blackjack...");
+            Message = message;
+
             _playerCards.Add(DrawCard());
             _playerCards.Add(DrawCard());
 
@@ -77,14 +80,18 @@ namespace Umbreon.Commands.Games
 
             _dealerCards.Add(DrawCard());
 
-            var message = await _message.SendMessageAsync(Context, string.Empty, embed: BuildEmbed());
+            await message.ModifyAsync(x =>
+            {
+                x.Content = string.Empty;
+                x.Embed = BuildEmbed();
+            });
+
             _ = message.AddReactionsAsync(new RequestOptions
             {
                 BypassBuckets = true
             },
                 _hit,
                 _stop);
-            Message = message;
             Interactive.AddReactionCallback(Message, this);
             _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(_ =>
             {
@@ -164,7 +171,11 @@ namespace Umbreon.Commands.Games
 
         public async Task EndAsync()
         {
-            await Message.ModifyAsync(x => x.Embed = BuildEmbed());
+            await Message.ModifyAsync(x =>
+            {
+                x.Content = string.Empty;
+                x.Embed = BuildEmbed();
+            });
 
             var playerTotal = _playerCards.Sum(x => x.value);
             if (playerTotal > 21)
