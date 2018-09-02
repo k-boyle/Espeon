@@ -5,6 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Core;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
 using Umbreon.Services;
 
@@ -20,7 +21,7 @@ namespace Umbreon.Commands.Preconditions
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var database = services.GetService<DatabaseService>();
-            var guild = database.GetGuild(context);
+            var guild = database.GetObject<GuildObject>("guilds", context.Guild.Id);
             ulong roleId;
             switch (_role)
             {

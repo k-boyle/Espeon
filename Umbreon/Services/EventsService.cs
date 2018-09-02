@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Linq;
 using Umbreon.Attributes;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
 
 namespace Umbreon.Services
@@ -62,7 +63,7 @@ namespace Umbreon.Services
                         Color = new Color(0, 0, 0),
                         ThumbnailUrl = _client.CurrentUser.GetDefaultAvatarUrl(),
                         Description = $"Hello! I am {guild.CurrentUser.GetDisplayName()} and I have just been added to your guild!\n" +
-                                      $"Type {_database.GetGuild(guild.Id).Prefixes.First()}help to see all my available commands!"
+                                      $"Type {_database.GetObject<GuildObject>("guilds", guild.Id).Prefixes.First()}help to see all my available commands!"
                     }.Build());
                 }
             };

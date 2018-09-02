@@ -19,9 +19,9 @@ namespace Umbreon.Services
 
         public void UseTag(ICommandContext context, string tagName)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Find(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)).Uses++;
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public void CreateTag(ICommandContext context, string tagName, string tagValue)
@@ -34,31 +34,29 @@ namespace Umbreon.Services
                 CreatedAt = DateTime.UtcNow,
                 Uses = 0
             };
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Add(newTag);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public void UpdateTag(ICommandContext context, string tagName, string tagValue)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Find(x => x.TagName == tagName).TagValue = tagValue;
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public void DeleteTag(ICommandContext context, string tagName)
         {
             var targetTag = GetTags(context).FirstOrDefault(x =>
                 string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Remove(targetTag);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public IEnumerable<Tag> GetTags(ICommandContext context)
-        {
-            return _database.GetGuild(context).Tags;
-        }
+            => _database.GetObject<GuildObject>("guilds", context.Guild.Id).Tags;
 
         public static bool TryParse(IEnumerable<Tag> tags, string tagName, out Tag tag)
         {

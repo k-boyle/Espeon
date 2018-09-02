@@ -37,7 +37,7 @@ namespace Umbreon.Services
 
             foreach (var guild in _client.Guilds)
             {
-                var reminders = _database.TempLoad(guild).Reminders;
+                var reminders = _database.TempLoad<GuildObject>("guilds", guild.Id).Reminders;
                 foreach (var reminder in reminders)
                 {
                     if (reminder.When.ToUniversalTime() < DateTime.UtcNow)
@@ -59,9 +59,9 @@ namespace Umbreon.Services
             if (!(obj is Reminder reminder)) return;
             var user = _client.GetGuild(reminder.GuildId).GetUser(reminder.UserId);
             await _message.NewMessageAsync(reminder.UserId, 0, reminder.ChannelId, $"{user.Mention} you wanted me to remind you:\n{reminder.TheReminder}");
-            var guild = _database.GetGuild(reminder.GuildId);
+            var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.RemoveAt(guild.Reminders.FindIndex(x => x.Id == reminder.Id));
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public void CreateReminder(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
@@ -79,9 +79,9 @@ namespace Umbreon.Services
 
             _timer.Enqueue(reminder);
 
-            var guild = _database.GetGuild(guildId);
+            var guild = _database.GetObject<GuildObject>("guilds", guildId);
             guild.Reminders.Add(reminder);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
     }
 }

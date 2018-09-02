@@ -42,7 +42,7 @@ namespace Umbreon.Services
             if (!(_module is null))
                 await _commandService.RemoveModuleAsync(_module);
 
-            var allFunctions = client.Guilds.Select(x => _database.TempLoad(x))
+            var allFunctions = client.Guilds.Select(x => _database.TempLoad<GuildObject>("guilds", x.Id))
                 .SelectMany(y => y.CustomFunctions);
 
             _module = await _commandService.CreateModuleAsync("", module =>
@@ -71,7 +71,7 @@ namespace Umbreon.Services
         private async Task FunctionCallbackAsync(ICommandContext context, object[] _, IServiceProvider services, CommandInfo info)
         {
             var client = context.Client as BaseSocketClient;
-            var allFuncs = client?.Guilds.Select(x => _database.GetGuild(x.Id))
+            var allFuncs = client?.Guilds.Select(x => _database.GetObject<GuildObject>("guilds", x.Id))
                 .SelectMany(y => y.CustomFunctions);
             var found = allFuncs?.FirstOrDefault(x => string.Equals(x.FunctionName, info.Name, StringComparison.CurrentCultureIgnoreCase));
             await _eval.EvaluateAsync(context as UmbreonContext, found?.FunctionCallback, false, services);
@@ -79,25 +79,25 @@ namespace Umbreon.Services
 
         public async Task NewFuncAsync(ICommandContext context, CustomFunction function)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions.Add(function);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
         public async Task RemoveFuncAsync(ICommandContext context, CustomFunction function)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions.Remove(function);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
         public async Task UpdateFunctionAsync(ICommandContext context, CustomFunction before, CustomFunction after)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions[guild.CustomFunctions.IndexOf(before)] = after;
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
@@ -105,7 +105,7 @@ namespace Umbreon.Services
             => GetFuncs(context.Guild.Id);
 
         private IEnumerable<CustomFunction> GetFuncs(ulong guildId)
-            => _database.GetGuild(guildId).CustomFunctions;
+            => _database.GetObject<GuildObject>("guilds", guildId).CustomFunctions;
 
         private string RemoveGroupName(string inStr)
         {

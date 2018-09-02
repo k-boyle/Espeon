@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using LiteDB;
 using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Entities.Guild
 {
-    public class GuildObject : IRemoveable
+    public class GuildObject : BaseObject, IRemoveable
     {
-        [BsonId(false)]
-        public ulong GuildId { get; set; }
-        
         public ulong AdminRole { get; set; }
         public ulong ModRole { get; set; }
         public ulong WelcomeChannel { get; set; } = 0; // TODO
@@ -39,9 +35,5 @@ namespace Umbreon.Core.Entities.Guild
             84291986575613952
         };
         public List<Reminder> Reminders { get; set; } = new List<Reminder>();
-
-        public int Identifier { get; set; }
-        public DateTime When { get; set; }
-        public IRemoveableService Service { get; set; }
     }
 }

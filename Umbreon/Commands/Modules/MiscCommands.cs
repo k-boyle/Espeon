@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Core;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
 using Umbreon.Paginators.CommandMenu;
 using Umbreon.Services;
@@ -91,7 +92,7 @@ namespace Umbreon.Commands.Modules
         private IEnumerable<SocketGuildUser> GetMembers(SpecialRole type)
         {
             var database = Services.GetService<DatabaseService>();
-            var guild = database.GetGuild(Context);
+            var guild = database.GetObject<GuildObject>("guilds", Context.Guild.Id);
             var role = Context.Guild.GetRole(type == SpecialRole.Admin ? guild.AdminRole : guild.ModRole);
             return role.Members;
         }

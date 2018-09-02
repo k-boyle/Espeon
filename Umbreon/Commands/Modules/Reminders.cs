@@ -5,6 +5,7 @@ using Discord;
 using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Services;
 
 namespace Umbreon.Commands.Modules
@@ -44,7 +45,7 @@ namespace Umbreon.Commands.Modules
         [Usage("reminders")]
         public async Task ListReminders()
         {
-            var reminders = _database.GetGuild(Context.Guild.Id).Reminders;
+            var reminders = _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Reminders;
             var users = reminders.Where(x => x.UserId == Context.User.Id);
             var i = 1;
             await SendMessageAsync($"Your current reminders are:\n" +

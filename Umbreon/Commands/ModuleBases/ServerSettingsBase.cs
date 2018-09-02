@@ -12,12 +12,12 @@ namespace Umbreon.Commands.ModuleBases
 
         protected override void BeforeExecute(CommandInfo command)
         {
-            CurrentGuild = Database.GetGuild(Context);
+            CurrentGuild = Database.GetObject<GuildObject>("guilds", Context.Guild.Id);
         }
 
         protected override void AfterExecute(CommandInfo command)
         {
-            Database.UpdateGuild(CurrentGuild);
+            Database.UpdateObject(CurrentGuild, "guilds");
         }
     }
 }

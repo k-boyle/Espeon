@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Paginators.HelpPaginator;
@@ -59,7 +60,7 @@ namespace Umbreon.Commands.Modules
                     {
                         Name = $"Command: {cmd.Name}",
                         Value = $"**Summary**: {cmd.Summary}\n" +
-                                $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}"
+                                $"**Example Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}"
                     });
                 }
 
@@ -75,7 +76,7 @@ namespace Umbreon.Commands.Modules
                 },
                 Options = PaginatedAppearanceOptions.Default,
                 Pages = pages,
-                Prefix = _database.GetGuild(Context).Prefixes.First(),
+                Prefix = _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First(),
             };
 
             await SendPaginatedMessageAsync(paginatedMessage);
@@ -112,7 +113,7 @@ namespace Umbreon.Commands.Modules
                 {
                     f.Name = cmd.Name;
                     f.Value = $"**Summary**: {cmd.Summary}\n" +
-                              $"**Example Usage**: {_database.GetGuild(Context).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
+                              $"**Example Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
                               $"**Parameter**: {string.Join("\n**Parameter**:", cmd.Parameters.Select(x => $"`{x.Name}` > {x.Summary}"))}";
                 });
             }

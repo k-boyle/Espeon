@@ -45,7 +45,7 @@ namespace Umbreon.Services
             if (_modules.TryGetValue(guild.Id, out var found))
                 await _commandService.RemoveModuleAsync(found);
 
-            var cmds = _database.TempLoad(guild).CustomCommands;
+            var cmds = _database.TempLoad<GuildObject>("guilds", guild.Id).CustomCommands;
             var created = await _commandService.CreateModuleAsync("", module =>
             {
                 module.AddPrecondition(new RequireGuildAttribute(guild.Id));
@@ -80,28 +80,28 @@ namespace Umbreon.Services
                 CommandName = cmdName,
                 CommandValue = cmdValue
             };
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomCommands.Add(newCmd);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
             await NewCmdsAsync(context.Guild);
         }
 
         public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomCommands
                 .Find(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase))
                 .CommandValue = newValue;
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
         }
 
         public async Task RemoveCmdAsync(ICommandContext context, string cmdName)
         {
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             var targetCmd = guild.CustomCommands.Find(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
-            _database.UpdateGuild(guild);
+            _database.UpdateObject(guild, "guilds");
             await NewCmdsAsync(context.Guild);
         }
 
@@ -141,6 +141,6 @@ namespace Umbreon.Services
             => GetCmds(context.Guild.Id);
 
         private IEnumerable<CustomCommand> GetCmds(ulong guildId)
-            => _database.GetGuild(guildId).CustomCommands;
+            => _database.GetObject<GuildObject>("guilds", guildId).CustomCommands;
     }
 }

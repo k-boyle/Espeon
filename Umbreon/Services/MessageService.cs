@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Core.Entities;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Paginator;
@@ -71,7 +72,7 @@ namespace Umbreon.Services
             if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
                 !(msg is SocketUserMessage message)) return;
 
-            var guild = _database.TempLoad(channel.Guild);
+            var guild = _database.TempLoad<GuildObject>("guilds", channel.Guild.Id);
 
             if (guild.BlacklistedUsers.Contains(message.Author.Id) ||
                 guild.RestrictedChannels.Contains(channel.Id) ||
@@ -86,7 +87,7 @@ namespace Umbreon.Services
             {
                 guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
                 _timer.Update(guild);
-                _database.UpdateGuild(guild);
+                _database.UpdateObject(guild, "guilds");
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
                 await HandleCommandAsync(context, argPos);
@@ -105,7 +106,7 @@ namespace Umbreon.Services
         public async Task CommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
         {
             if (result.IsSuccess) return;
-            var guild = _database.GetGuild(context);
+            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             switch (result.Error)
             {
                 case CommandError.UnknownCommand:
