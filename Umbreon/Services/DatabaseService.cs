@@ -30,6 +30,8 @@ namespace Umbreon.Services
             _log = log;
         }
 
+        public DatabaseService() { }
+
         public static Task Initialize()
         {
             var config = JObject.Parse(File.ReadAllText(ConstantsHelper.ConfigDir));
