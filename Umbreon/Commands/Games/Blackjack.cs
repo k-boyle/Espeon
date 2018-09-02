@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace Umbreon.Commands.Games
         private IUserMessage Message { get; set; }
         private InteractiveService Interactive { get; }
         private GamesService Games { get; }
+        private CandyService Candy { get; }
 
         private readonly IReadOnlyDictionary<string, int> _cards = new Dictionary<string, int>
         {
@@ -42,7 +44,10 @@ namespace Umbreon.Commands.Games
             { "queen", 10 },
             { "king", 10 }
         };
-        
+
+        private readonly int _bet;
+        private bool _inGame = true;
+
         private readonly IReadOnlyCollection<string> _suits = new[] { "❤", "♦", "♣", "♠" };
 
         private readonly Queue<(string suit, string card, int value)> _deck;
@@ -55,13 +60,15 @@ namespace Umbreon.Commands.Games
 
         private readonly MessageService _message;
 
-        public Blackjack(ICommandContext context, MessageService message, InteractiveService interactive, GamesService games, Random random)
+        public Blackjack(ICommandContext context, int bet, IServiceProvider services)
         {
             Context = context;
-            _message = message;
-            Interactive = interactive;
-            Games = games;
-            _deck = new Queue<(string, string, int)>((from suit in _suits from card in _cards select (suit, card.Key, card.Value)).OrderBy(_ => random.Next()));
+            _bet = bet;
+            _message = services.GetService<MessageService>();
+            Interactive = services.GetService<InteractiveService>();
+            Games = services.GetService<GamesService>();
+            Candy = services.GetService<CandyService>();
+            _deck = new Queue<(string, string, int)>((from suit in _suits from card in _cards select (suit, card.Key, card.Value)).OrderBy(_ => services.GetService<Random>().Next()));
         }
 
         public async Task StartAsync()
@@ -93,9 +100,19 @@ namespace Umbreon.Commands.Games
                 _hit,
                 _stop);
             Interactive.AddReactionCallback(Message, this);
-            _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(_ =>
+            _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(async _ =>
             {
                 Interactive.RemoveReactionCallback(Message);
+                if (_inGame)
+                {
+                    await Message.ModifyAsync(x =>
+                    {
+                        x.Content = string.Empty;
+                        x.Embed = TimeoutEmbed();
+                    });
+                    Candy.UpdateCandies(Context.User.Id, false, -_bet);
+                    _inGame = false;
+                }
                 _ = Message.RemoveAllReactionsAsync();
             });
         }
@@ -155,7 +172,8 @@ namespace Umbreon.Commands.Games
             var builder = new EmbedBuilder
             {
                 Title = "Blackjack",
-                Description = $"A game of blackjack. Click {_hit} to hit or {_stop} to stay\n",
+                Description = $"You have bet {_bet}🍬 candies\n" +
+                              $"A game of blackjack. Click {_hit} to hit or {_stop} to stay\n",
                 Color = Colour.Default
             };
             builder.AddField("Player", $"Your cards are: {string.Join(", ", _playerCards.Select(x => $"[{x.card} of {x.suit}]"))}\n" +
@@ -181,6 +199,7 @@ namespace Umbreon.Commands.Games
             if (playerTotal > 21)
             {
                 await Message.ModifyAsync(x => x.Embed = LoseEmbed());
+                Candy.UpdateCandies(Context.User.Id, false, -_bet);
                 Games.LeaveGame(Context.User.Id);
                 return;
             }
@@ -195,30 +214,36 @@ namespace Umbreon.Commands.Games
                 if (dealerTotal <= 21) continue;
                 {
                     if (_dealerCards.All(x => x.card != "ace"))
+                        break;
+
+                    while (dealerTotal > 21 && _dealerCards.Any(x => x.card == "ace" && x.value == 11))
                     {
-                        await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                    }
-                    else
-                    {
-                        while (dealerTotal > 21 && _dealerCards.Any(x => x.card == "ace" && x.value == 11))
-                        {
-                            var first = _dealerCards.First(x => x.card == "ace");
-                            _dealerCards[_dealerCards.IndexOf(first)] = (first.suit, first.card, 1);
-                            dealerTotal = _dealerCards.Sum(x => x.value);
-                        }
+                        var first = _dealerCards.First(x => x.card == "ace");
+                        _dealerCards[_dealerCards.IndexOf(first)] = (first.suit, first.card, 1);
+                        dealerTotal = _dealerCards.Sum(x => x.value);
                     }
                 }
             }
 
             if (dealerTotal > 21)
+            {
                 await Message.ModifyAsync(x => x.Embed = WinEmbed());
+                Candy.UpdateCandies(Context.User.Id, false, (int)(1.5 * _bet));
+            }
             else if (dealerTotal > playerTotal)
+            {
                 await Message.ModifyAsync(x => x.Embed = LoseEmbed());
+                Candy.UpdateCandies(Context.User.Id, false, -_bet);
+            }
             else if (dealerTotal < playerTotal)
+            {
                 await Message.ModifyAsync(x => x.Embed = WinEmbed());
+                Candy.UpdateCandies(Context.User.Id, false, (int)(1.5 * _bet));
+            }
             else if (dealerTotal == playerTotal)
                 await Message.ModifyAsync(x => x.Embed = DrawEmbed());
 
+            _inGame = false;
             Games.LeaveGame(Context.User.Id);
         }
 
@@ -226,7 +251,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = "I win!",
+                    Description = $"I win! You lose {_bet}🍬 candies!",
                     Color = Colour.Red
                 }
                 .AddField("Player",
@@ -241,7 +266,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = "You win!",
+                    Description = $"You win! You win {(int)(1.5 * _bet)}🍬 candies!",
                     Color = Colour.Green
                 }
                 .AddField("Player",
@@ -256,8 +281,23 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = "We draw!",
+                    Description = "We draw! You don't win/lose any candies!",
                     Color = Colour.Orange
+                }
+                .AddField("Player",
+                    $"Your cards are: {string.Join(", ", _playerCards.Select(y => $"[{y.card} of {y.suit}]"))}\n" +
+                    $"For a total of: {_playerCards.Sum(x => x.value)}")
+                .AddField("Umbreon",
+                    $"My cards are: {string.Join(", ", _dealerCards.Select(y => $"[{y.card} of {y.suit}]"))}\n" +
+                    $"For a total of: {_dealerCards.Sum(x => x.value)}")
+                .Build();
+
+        private Embed TimeoutEmbed()
+            => new EmbedBuilder
+                {
+                    Title = "Blackjack Result",
+                    Description = $"You took too long to respond, so I win! You lose {_bet}🍬 candies!",
+                    Color = Colour.Red
                 }
                 .AddField("Player",
                     $"Your cards are: {string.Join(", ", _playerCards.Select(y => $"[{y.card} of {y.suit}]"))}\n" +
