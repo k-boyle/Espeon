@@ -50,7 +50,7 @@ namespace Umbreon.Services
                 collection.Upsert(found);
                 _timer.Update(found);
                 _cache.TryAdd(found.Id, found);
-                _log.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{found.Id}:{found.GetType()} has been loaded into the database");
+                _log.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{found.Id}:{found.GetType()} has been loaded into the cache");
                 return found;
             }
         }
