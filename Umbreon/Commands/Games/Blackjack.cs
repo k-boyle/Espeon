@@ -110,7 +110,7 @@ namespace Umbreon.Commands.Games
                         x.Content = string.Empty;
                         x.Embed = TimeoutEmbed();
                     });
-                    Candy.UpdateCandies(Context.User.Id, false, -_bet);
+                    Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
                     _inGame = false;
                 }
                 _ = Message.RemoveAllReactionsAsync();
@@ -199,8 +199,9 @@ namespace Umbreon.Commands.Games
             if (playerTotal > 21)
             {
                 await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                Candy.UpdateCandies(Context.User.Id, false, -_bet);
+                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
                 Games.LeaveGame(Context.User.Id);
+                _inGame = false;
                 return;
             }
 
@@ -228,17 +229,17 @@ namespace Umbreon.Commands.Games
             if (dealerTotal > 21)
             {
                 await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                Candy.UpdateCandies(Context.User.Id, false, (int)(1.5 * _bet));
+                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int)(0.5 * _bet));
             }
             else if (dealerTotal > playerTotal)
             {
                 await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                Candy.UpdateCandies(Context.User.Id, false, -_bet);
+                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
             }
             else if (dealerTotal < playerTotal)
             {
                 await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                Candy.UpdateCandies(Context.User.Id, false, (int)(1.5 * _bet));
+                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int)(0.5 * _bet));
             }
             else if (dealerTotal == playerTotal)
                 await Message.ModifyAsync(x => x.Embed = DrawEmbed());
@@ -266,7 +267,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You win! You win {(int)(1.5 * _bet)}🍬 candies!",
+                    Description = $"You win! You win {(int)(0.5 * _bet)}🍬 candies!",
                     Color = Colour.Green
                 }
                 .AddField("Player",

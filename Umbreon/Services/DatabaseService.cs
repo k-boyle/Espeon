@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using LiteDB;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Umbreon.Attributes;
@@ -83,6 +86,14 @@ namespace Umbreon.Services
 
         public T GetObject<T>(string name, ulong id) where T : BaseObject, new() 
             => _cache.TryGetValue(id, out var found) ? (T) found : LoadObject<T>(name, id);
+
+        public static IEnumerable<T> GrabAllData<T>(string name) where T : BaseObject
+        {
+            using (var db = new LiteDatabase(DatabaseDir))
+            {
+                return db.GetCollection<T>(name).FindAll();
+            }
+        }
 
         public Task RemoveAsync(IRemoveable obj)
         {

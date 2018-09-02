@@ -74,7 +74,7 @@ namespace Umbreon.Services
             if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
                 !(msg is SocketUserMessage message)) return;
 
-            if (_random.Next(100) < 30)
+            if (_random.Next(100) < 10)
             {
                 _candy.UpdateCandies(message.Author.Id, false, 1);
             }

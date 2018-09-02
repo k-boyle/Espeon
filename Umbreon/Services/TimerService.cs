@@ -50,9 +50,6 @@ namespace Umbreon.Services
             _queue.Enqueue(removeable);
             _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
             if (!_queue.TryPeek(out var obj)) return;
-            _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"obj.When: {obj.When}");
-            _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"DateTime.UtcNow: {DateTime.UtcNow}");
-            _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, $"Object type {obj.GetType()}");
             _timer.Change(obj.When - DateTime.UtcNow, TimeSpan.Zero);
         }
 

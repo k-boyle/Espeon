@@ -23,6 +23,13 @@ namespace Umbreon.Services
             _database.UpdateObject(user, "users");
         }
 
+        public void SetCandies(ulong id, int amount)
+        {
+            var user = _database.GetObject<UserObject>("users", id);
+            user.RareCandies = amount;
+            _database.UpdateObject(user, "users");
+        }
+
         public bool CanClaim(ulong id)
         {
             var user = _database.GetObject<UserObject>("users", id);
