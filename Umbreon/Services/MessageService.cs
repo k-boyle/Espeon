@@ -30,6 +30,7 @@ namespace Umbreon.Services
         private readonly CommandService _commands;
         private readonly InteractiveService _interactive;
         private readonly TimerService _timer;
+        private readonly CandyService _candy;
         private readonly IServiceProvider _services;
         private readonly Random _random;
 
@@ -38,13 +39,14 @@ namespace Umbreon.Services
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache =
             new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
 
-        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, IServiceProvider services, Random random)
+        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, CandyService candy, IServiceProvider services, Random random)
         {
             _client = client;
             _database = database;
             _commands = commands;
             _interactive = interactive;
             _timer = timer;
+            _candy = candy;
             _services = services;
             _random = random;
         }
@@ -71,6 +73,11 @@ namespace Umbreon.Services
         {
             if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
                 !(msg is SocketUserMessage message)) return;
+
+            if (_random.Next(100) < 30)
+            {
+                _candy.UpdateCandies(message.Author.Id, false, 1);
+            }
 
             var guild = _database.TempLoad<GuildObject>("guilds", channel.Guild.Id);
 
