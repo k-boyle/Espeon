@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbreon.Interfaces;
+﻿using System.Collections.Generic;
 
 namespace Umbreon.Core.Entities.Guild
 {
-    public class GuildObject : BaseObject, IRemoveable
+    public class GuildObject : BaseObject
     {
         public ulong AdminRole { get; set; }
         public ulong ModRole { get; set; }

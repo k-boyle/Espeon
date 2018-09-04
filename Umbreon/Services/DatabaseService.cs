@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using LiteDB;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Umbreon.Attributes;
@@ -20,6 +18,7 @@ namespace Umbreon.Services
     public class DatabaseService : IRemoveableService
     {
         private const string DatabaseDir = "./Database.db";
+        private const string ConfigDir = "./config.json";
         private readonly ConcurrentDictionary<ulong, BaseObject> _cache = new ConcurrentDictionary<ulong, BaseObject>();
 
         private readonly Random _random;
@@ -37,7 +36,7 @@ namespace Umbreon.Services
 
         public static Task Initialize()
         {
-            var config = JObject.Parse(File.ReadAllText(ConstantsHelper.ConfigDir));
+            var config = JObject.Parse(File.ReadAllText(ConfigDir));
             ConstantsHelper.BotToken = $"{config["token"]}";
             ConstantsHelper.GiphyToken = $"{config["giphy"]}";
             return Task.CompletedTask;
