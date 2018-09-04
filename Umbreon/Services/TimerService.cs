@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Interfaces;
@@ -27,13 +28,11 @@ namespace Umbreon.Services
 
         public void InitialiseTimer()
         {
-            _timer = new Timer(async _ =>
+            _timer = new Timer(_ =>
             {
                 if (_queue.TryDequeue(out var removeable))
                 {
-                    var service = _services.GetService(removeable.Service.GetType());
-                    if(service is IRemoveableService removeableService)
-                        await removeableService.RemoveAsync(removeable);
+                    _ = HandleRemoveableAsync(removeable);
 
                     if (_queue.TryPeek(out var next))
                     {
@@ -50,7 +49,19 @@ namespace Umbreon.Services
             _queue.Enqueue(removeable);
             _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
             if (!_queue.TryPeek(out var obj)) return;
+            while (obj.When - DateTime.UtcNow <= TimeSpan.Zero)
+            {
+                _ = HandleRemoveableAsync(obj);
+                if (!_queue.TryPeek(out obj)) return;
+            }
             _timer.Change(obj.When - DateTime.UtcNow, TimeSpan.Zero);
+        }
+
+        private async Task HandleRemoveableAsync(IRemoveable removeable)
+        {
+            var service = _services.GetService(removeable.Service.GetType());
+            if (service is IRemoveableService removeableService)
+                await removeableService.RemoveAsync(removeable);
         }
 
         private void Remove(IRemoveable obj)
