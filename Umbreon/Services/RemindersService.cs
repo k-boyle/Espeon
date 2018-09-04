@@ -61,7 +61,7 @@ namespace Umbreon.Services
             await _message.NewMessageAsync(reminder.UserId, 0, reminder.ChannelId, $"{user.Mention} you wanted me to remind you:\n{reminder.TheReminder}");
             var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.RemoveAt(guild.Reminders.FindIndex(x => x.Id == reminder.Id));
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public void CreateReminder(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
@@ -81,7 +81,7 @@ namespace Umbreon.Services
 
             var guild = _database.GetObject<GuildObject>("guilds", guildId);
             guild.Reminders.Add(reminder);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
     }
 }

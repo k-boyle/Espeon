@@ -20,14 +20,14 @@ namespace Umbreon.Services
             user.RareCandies += amount;
             if (isClaim)
                 user.LastClaimed = DateTime.UtcNow;
-            _database.UpdateObject(user, "users");
+            _database.UpdateObject("users", user);
         }
 
         public void SetCandies(ulong id, int amount)
         {
             var user = _database.GetObject<UserObject>("users", id);
             user.RareCandies = amount;
-            _database.UpdateObject(user, "users");
+            _database.UpdateObject("users", user);
         }
 
         public bool CanClaim(ulong id)

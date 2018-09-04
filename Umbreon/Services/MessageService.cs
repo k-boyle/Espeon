@@ -94,7 +94,7 @@ namespace Umbreon.Services
             {
                 guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
                 _timer.Update(guild);
-                _database.UpdateObject(guild, "guilds");
+                _database.UpdateObject("guilds", guild);
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
                 await HandleCommandAsync(context, argPos);

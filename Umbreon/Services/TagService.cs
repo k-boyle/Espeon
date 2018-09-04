@@ -21,7 +21,7 @@ namespace Umbreon.Services
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Find(x => string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase)).Uses++;
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public void CreateTag(ICommandContext context, string tagName, string tagValue)
@@ -36,14 +36,14 @@ namespace Umbreon.Services
             };
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Add(newTag);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public void UpdateTag(ICommandContext context, string tagName, string tagValue)
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Find(x => x.TagName == tagName).TagValue = tagValue;
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public void DeleteTag(ICommandContext context, string tagName)
@@ -52,7 +52,7 @@ namespace Umbreon.Services
                 string.Equals(x.TagName, tagName, StringComparison.CurrentCultureIgnoreCase));
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.Tags.Remove(targetTag);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public IEnumerable<Tag> GetTags(ICommandContext context)

@@ -82,7 +82,7 @@ namespace Umbreon.Services
             };
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomCommands.Add(newCmd);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
             await NewCmdsAsync(context.Guild);
         }
 
@@ -92,7 +92,7 @@ namespace Umbreon.Services
             guild.CustomCommands
                 .Find(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase))
                 .CommandValue = newValue;
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public async Task RemoveCmdAsync(ICommandContext context, string cmdName)
@@ -101,7 +101,7 @@ namespace Umbreon.Services
             var targetCmd = guild.CustomCommands.Find(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
             await NewCmdsAsync(context.Guild);
         }
 

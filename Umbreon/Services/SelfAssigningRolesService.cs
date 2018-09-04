@@ -20,14 +20,14 @@ namespace Umbreon.Services
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.SelfAssigningRoles.Add(roleId);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public void RemoveSelfRole(ICommandContext context, ulong roleId)
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.SelfAssigningRoles.Remove(roleId);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
         }
 
         public static bool HasRole(IEnumerable<ulong> roles, ulong roleToCheck)

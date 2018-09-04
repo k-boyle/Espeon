@@ -17,7 +17,7 @@ namespace Umbreon.Commands.ModuleBases
 
         protected override void AfterExecute(CommandInfo command)
         {
-            Database.UpdateObject(CurrentGuild, "guilds");
+            Database.UpdateObject("guilds", CurrentGuild);
         }
     }
 }

@@ -81,7 +81,7 @@ namespace Umbreon.Services
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions.Add(function);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
@@ -89,7 +89,7 @@ namespace Umbreon.Services
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions.Remove(function);
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 
@@ -97,7 +97,7 @@ namespace Umbreon.Services
         {
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             guild.CustomFunctions[guild.CustomFunctions.IndexOf(before)] = after;
-            _database.UpdateObject(guild, "guilds");
+            _database.UpdateObject("guilds", guild);
             await LoadFuncsAsync(context.Client as BaseSocketClient);
         }
 

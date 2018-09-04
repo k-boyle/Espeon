@@ -19,7 +19,7 @@ namespace Umbreon.Commands.ModuleBases
         protected override void AfterExecute(CommandInfo command)
         {
             if(command.Name.Equals("Approve User", StringComparison.CurrentCultureIgnoreCase))
-                Database.UpdateObject(CurrentGuild, "guilds");
+                Database.UpdateObject("guilds", CurrentGuild);
         }
     }
 }
