@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -15,7 +16,7 @@ namespace Umbreon.Interactive
     {
         private DiscordSocketClient Discord { get; }
 
-        private readonly Dictionary<ulong, IReactionCallback> _callbacks;
+        private readonly ConcurrentDictionary<ulong, IReactionCallback> _callbacks;
         private readonly TimeSpan _defaultTimeout;
 
         public InteractiveService(DiscordSocketClient discord, TimeSpan? defaultTimeout = null)
@@ -23,7 +24,7 @@ namespace Umbreon.Interactive
             Discord = discord;
             Discord.ReactionAdded += HandleReactionAsync;
 
-            _callbacks = new Dictionary<ulong, IReactionCallback>();
+            _callbacks = new ConcurrentDictionary<ulong, IReactionCallback>();
             _defaultTimeout = defaultTimeout ?? TimeSpan.FromSeconds(15);
         }
 
@@ -81,7 +82,7 @@ namespace Umbreon.Interactive
             => RemoveReactionCallback(message.Id);
 
         private void RemoveReactionCallback(ulong id)
-            => _callbacks.Remove(id);
+            => _callbacks.TryRemove(id, out _);
 
         public void ClearReactionCallbacks()
             => _callbacks.Clear();

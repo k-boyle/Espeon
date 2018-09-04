@@ -47,7 +47,7 @@ namespace Umbreon.Commands.Modules
                 return;
             }
 
-            var amount = _random.Next(10);
+            var amount = _random.Next(1, 11);
             _candy.UpdateCandies(Context.User.Id, true, amount);
             await SendMessageAsync($"You have received {amount}🍬 rare cand{(amount > 1 ? "ies" : "y")}!");
         }

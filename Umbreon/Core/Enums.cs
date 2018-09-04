@@ -2,7 +2,6 @@
 {
     public enum Module
     {
-        Tags,
         Commands,
         Roles,
         Games,
@@ -13,7 +12,6 @@
     {
         Database,
         CustomCmds,
-        CustomFuncs,
         Timer
     }
 
@@ -21,5 +19,11 @@
     {
         Admin,
         Mod
+    }
+
+    public enum Face
+    {
+        Heads,
+        Tails
     }
 }
