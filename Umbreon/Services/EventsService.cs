@@ -16,13 +16,12 @@ namespace Umbreon.Services
         private readonly DatabaseService _database;
         private readonly LogService _logs;
         private readonly CustomCommandsService _customCommands;
-        private readonly CustomFunctionService _customFunctions;
         private readonly MusicService _musicService;
         private readonly MessageService _message;
         private readonly RemindersService _reminders;
 
         public EventsService(DiscordSocketClient client, CommandService commands, DatabaseService database, LogService logs, 
-            CustomCommandsService customCommands, CustomFunctionService customFunctions, MusicService musicService, 
+            CustomCommandsService customCommands, MusicService musicService, 
             MessageService message, RemindersService reminders)
         {
             _client = client;
@@ -30,7 +29,6 @@ namespace Umbreon.Services
             _database = database;
             _logs = logs;
             _customCommands = customCommands;
-            _customFunctions = customFunctions;
             _musicService = musicService;
             _message = message;
             _reminders = reminders;
@@ -42,7 +40,6 @@ namespace Umbreon.Services
             _client.Ready += async () =>
             {
                 await _customCommands.LoadCmdsAsync(_client);
-                await _customFunctions.LoadFuncsAsync(_client);
                 //await _musicService.InitialiseAsync();
                 await _reminders.LoadRemindersAsync();
             };
