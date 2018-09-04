@@ -75,7 +75,7 @@ namespace Umbreon.Services
             }
         }
 
-        public void UpdateObject<T>(T obj, string name) where T : BaseObject
+        public void UpdateObject<T>(string name, T obj) where T : BaseObject
         {
             using (var db = new LiteDatabase(DatabaseDir))
             {
