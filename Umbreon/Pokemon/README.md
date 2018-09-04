@@ -1,0 +1,1 @@
+Credit for these files goes to https://github.com/PokeAPI/pokeapi
