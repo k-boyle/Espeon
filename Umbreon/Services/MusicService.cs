@@ -19,7 +19,7 @@ namespace Umbreon.Services
 
         private LavalinkManager _lavalinkManager;
 
-        private ConcurrentDictionary<ulong, LavalinkObject> _lavaCache = new ConcurrentDictionary<ulong, LavalinkObject>();
+        private readonly ConcurrentDictionary<ulong, LavalinkObject> _lavaCache = new ConcurrentDictionary<ulong, LavalinkObject>();
         
         public MusicService(DiscordSocketClient client, LogService log, MessageService message)
         {

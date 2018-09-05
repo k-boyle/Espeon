@@ -1,10 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.Guild;
@@ -15,43 +16,38 @@ namespace Umbreon.Services
     [Service]
     public class StartupService
     {
-        private readonly DiscordSocketClient _client;
-        private readonly CommandService _commands;
-        private readonly EventsService _events;
-        private readonly TimerService _timer;
         private readonly IServiceProvider _services;
 
-        public StartupService(DiscordSocketClient client, CommandService commands, EventsService events, TimerService timer, IServiceProvider services)
+        public StartupService(IServiceProvider services)
         {
-            _client = client;
-            _commands = commands;
-            _events = events;
-            _timer = timer;
             _services = services;
         }
 
         public async Task InitialiseAsync()
         {
+            _services.GetService<PokemonService>().Initialize();
             await DatabaseService.Initialize();
             await StartClientAsync();
-            _events.HookEvents();
-            _timer.InitialiseTimer();
+            _services.GetService<EventsService>().HookEvents();
+            _services.GetRequiredService<TimerService>().InitialiseTimer();
             await LoadCommandsAsync();
             await Task.Delay(-1);
         }
 
         private async Task StartClientAsync()
         {
-            await _client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
-            await _client.StartAsync();
+            var client = _services.GetService<DiscordSocketClient>();
+            await client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
+            await client.StartAsync();
         }
 
         private async Task LoadCommandsAsync()
         {
-            _commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
-            _commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
-            _commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            var commands = _services.GetService<CommandService>();
+            commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
+            commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
+            commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }
 }

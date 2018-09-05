@@ -17,8 +17,6 @@ namespace Umbreon.Services
         private readonly DiscordSocketClient _client;
         private readonly MessageService _message;
         private readonly Random _random;
-
-        private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Reminder>> _reminders = new ConcurrentDictionary<ulong, ConcurrentQueue<Reminder>>();
         
         public RemindersService() { }
 

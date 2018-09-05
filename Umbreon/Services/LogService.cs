@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Text;
@@ -15,15 +13,7 @@ namespace Umbreon.Services
     [Service]
     public class LogService
     {
-        private readonly DiscordSocketClient _client;
-        private readonly CommandService _commands;
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-
-        public LogService(DiscordSocketClient client, CommandService commands)
-        {
-            _client = client;
-            _commands = commands;
-        }
 
         public async Task LogEvent(LogMessage log)
         {
