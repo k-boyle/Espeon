@@ -1,4 +1,4 @@
 ﻿namespace Umbreon.Paginators
 {
-    public class BasePaginator { }
+    public abstract class BasePaginator { }
 }
