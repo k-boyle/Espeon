@@ -69,7 +69,7 @@ namespace Umbreon.Commands.Games
             _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(_ =>
             {
                 Interactive.RemoveReactionCallback(Message);
-                if (_accepted)
+                if (!_accepted)
                 {
                     _ = _message.NewMessageAsync(Context, $"{_target.Mention} you didn't respond in time");
                 }
@@ -114,7 +114,7 @@ namespace Umbreon.Commands.Games
                                 continue;
                             }
 
-                            if (_defender > 0)
+                            if (_defender >= 0)
                             {
                                 _ = EndAsync();
                                 return;
@@ -146,7 +146,8 @@ namespace Umbreon.Commands.Games
             var winner = _random.Next(total) < _challenger;
 
             await _message.NewMessageAsync(Context, $"{(winner ? Context.User.Mention : _target.Mention)} you win the wager! You win {(winner ? _defender : _challenger)}🍬 rare candies!");
-            _candy.UpdateCandies(winner ? Context.User.Id : _target.Id, false, winner ? _defender : _challenger);
+            _candy.UpdateCandies(Context.User.Id, false, winner ? _challenger : -_challenger);
+            _candy.UpdateCandies(_target.Id, false, winner ? -_defender : _defender);
             _game.LeaveGame(Context.User.Id);
         }
     }

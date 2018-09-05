@@ -62,6 +62,7 @@ namespace Umbreon.Commands.Modules
         [Summary("Flip a coin")]
         [Name("Coin Flip")]
         [Usage("coinflip heads 100")]
+        [RequireGame(false)]
         public async Task CoinFlip(
             [Name("Face")]
             [Summary("Heads or tails")] Face choice,
@@ -85,6 +86,7 @@ namespace Umbreon.Commands.Modules
         [Summary("Flip a coin")]
         [Name("Coin Flip")]
         [Usage("coinflip all heads")]
+        [RequireGame(false)]
         public Task CoinFlipAll(
             [Name("Face")]
             [Summary("Heads or tails")] Face choice)
@@ -94,6 +96,7 @@ namespace Umbreon.Commands.Modules
         [Summary("Challenge someone to a duel")]
         [Name("Duel")]
         [Usage("Duel Umbreon 100")]
+        [RequireGame(false)]
         public async Task Duel(
             [Name("User")]
             [Summary("The user you want to duel")] SocketGuildUser user,
