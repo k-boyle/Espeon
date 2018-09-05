@@ -99,8 +99,7 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Create(
             [Name("Command Name")]
-            [Summary("The name of the command that you want to create")]
-            [Remainder] string cmdName)
+            [Summary("The name of the command that you want to create")] string cmdName)
         {
             if (CurrentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
@@ -190,8 +189,7 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Modify(
             [Name("Command Name")]
-            [Summary("The Command you wanna modify")]
-            [Remainder] CustomCommand cmd)
+            [Summary("The Command you wanna modify")] CustomCommand cmd)
         {
             await SendMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
