@@ -126,10 +126,9 @@ namespace Umbreon.Commands.Games
                 });
             }
 
-            if (emoji.Equals(_cross))
-            {
-                await EndAsync();
-            }
+            if (!emoji.Equals(_cross)) return true;
+            _accepted = true;
+            _ = EndAsync();
 
             return true;
         }
