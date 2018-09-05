@@ -39,6 +39,7 @@ namespace Umbreon.Services
             var config = JObject.Parse(File.ReadAllText(ConfigDir));
             ConstantsHelper.BotToken = $"{config["token"]}";
             ConstantsHelper.GiphyToken = $"{config["giphy"]}";
+            ConstantsHelper.PokemonLimit = int.Parse($"{config["pokemonlimit"]}");
             return Task.CompletedTask;
         }
 

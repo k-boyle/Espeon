@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.Guild;
+using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Helpers;
 
 namespace Umbreon.Services
@@ -25,8 +26,8 @@ namespace Umbreon.Services
 
         public async Task InitialiseAsync()
         {
-            _services.GetService<PokemonService>().Initialize();
             await DatabaseService.Initialize();
+            _services.GetService<PokemonService>().Initialize();
             await StartClientAsync();
             _services.GetService<EventsService>().HookEvents();
             _services.GetRequiredService<TimerService>().InitialiseTimer();
@@ -47,6 +48,7 @@ namespace Umbreon.Services
             commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
             commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
             commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
+            commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }

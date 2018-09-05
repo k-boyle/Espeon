@@ -12,7 +12,8 @@
     {
         Database,
         CustomCmds,
-        Timer
+        Timer,
+        Pokemon
     }
 
     public enum SpecialRole

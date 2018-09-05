@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbreon.Core.Entities.Guild;
 
 namespace Umbreon.Extensions
 {
@@ -55,5 +54,8 @@ namespace Umbreon.Extensions
 
             return strings;
         }
+
+        public static string FirstLetterToUpper(this string str)
+            => str.First().ToString().ToUpper() + str.Substring(1);
     }
 }
