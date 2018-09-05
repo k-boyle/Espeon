@@ -81,5 +81,26 @@ namespace Umbreon.Commands.Modules
                 Color = Colour.Blue
             }.Build());
         }
+
+        [Command("gift")]
+        [Name("Gift Candies")]
+        [Summary("Send candies to someone")]
+        [Usage("gift Umbreon 20")]
+        public async Task GiftCandies(
+            [Name("User")]
+            [Summary("The user you want to gift")] SocketGuildUser user,
+            [Name("Amount")]
+            [Summary("The amount you want to gift")] uint amount)
+        {
+            if (amount > _candy.GetCandies(Context.User.Id))
+            {
+                await SendMessageAsync("You don't have enough rare candies");
+                return;
+            }
+
+            _candy.UpdateCandies(Context.User.Id, false, (int)-amount);
+            _candy.UpdateCandies(user.Id, false, (int)amount);
+            await SendMessageAsync("Your gift basket has been made and sent");
+        }
     }
 }
