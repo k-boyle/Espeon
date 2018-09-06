@@ -34,7 +34,7 @@ namespace Umbreon.Services
 
         public DatabaseService() { }
 
-        public static Task Initialize()
+        public static Task Initialise()
         {
             var config = JObject.Parse(File.ReadAllText(ConfigDir));
             ConstantsHelper.BotToken = $"{config["token"]}";

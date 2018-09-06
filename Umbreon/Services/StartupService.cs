@@ -26,8 +26,8 @@ namespace Umbreon.Services
 
         public async Task InitialiseAsync()
         {
-            await DatabaseService.Initialize();
-            _services.GetService<PokemonService>().Initialize();
+            await DatabaseService.Initialise();
+            _services.GetService<PokemonDataService>().Initialise();
             await StartClientAsync();
             _services.GetService<EventsService>().HookEvents();
             _services.GetRequiredService<TimerService>().InitialiseTimer();

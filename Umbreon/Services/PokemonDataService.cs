@@ -13,13 +13,13 @@ using Colour = Discord.Color;
 namespace Umbreon.Services
 {
     [Service]
-    public class PokemonService
+    public class PokemonDataService
     {
         private const string DataDir = "./Pokemon/pokemon_species.json";
         private const string EvolDir = "./Pokemon/pokemon_evolution.json";
         private const string ImageDir = "./Pokemon/Sprites";
 
-        private readonly Dictionary<int, Colour> _colours = new Dictionary<int, Color>
+        private readonly IReadOnlyDictionary<int, Colour> _colours = new Dictionary<int, Colour>
         {
             { 1, Colour.Default },
             { 2, Colour.Blue },
@@ -35,19 +35,19 @@ namespace Umbreon.Services
 
         private PokemonData[] _data;
         private EvolutionData[] _evol;
-
+        
         private readonly LogService _log;
 
-        public PokemonService(LogService log)
+        public PokemonDataService(LogService log)
         {
             _log = log;
         }
 
-        public void Initialize()
+        public void Initialise()
         {
             _data = PokemonData.FromJson(File.ReadAllText(DataDir)).Where(x => x.Id <= ConstantsHelper.PokemonLimit).ToArray();
             _evol = EvolutionData.FromJson(File.ReadAllText(EvolDir)).Where(x => x.Id <= ConstantsHelper.PokemonLimit).ToArray();
-            _log.NewLogEvent(LogSeverity.Info, LogSource.Pokemon, "Pokemon data has been initialized");
+            _log.NewLogEvent(LogSeverity.Info, LogSource.Pokemon, "Pokemon data has been Initialised");
         }
 
         public PokemonData GetData(int id)
