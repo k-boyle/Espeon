@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Discord;
 using Discord.WebSocket;
-using System.Collections.Concurrent;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities.Guild;
+using Umbreon.Extensions;
 using Umbreon.Interfaces;
+using Colour = Discord.Color;
 
 namespace Umbreon.Services
 {
@@ -56,7 +58,16 @@ namespace Umbreon.Services
         {
             if (!(obj is Reminder reminder)) return;
             var user = _client.GetGuild(reminder.GuildId).GetUser(reminder.UserId);
-            await _message.NewMessageAsync(reminder.UserId, 0, reminder.ChannelId, $"{user.Mention} you wanted me to remind you:\n{reminder.TheReminder}");
+            await _message.NewMessageAsync(reminder.UserId, 0, reminder.ChannelId, $"{user.Mention}", embed: new EmbedBuilder
+            {
+                Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = user.GetAvatarOrDefaultUrl(),
+                    Name = user.GetDisplayName()
+                },
+                Color = Colour.DarkBlue,
+                Description = reminder.TheReminder
+            }.Build());
             var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.RemoveAt(guild.Reminders.FindIndex(x => x.Id == reminder.Id));
             _database.UpdateObject("guilds", guild);
