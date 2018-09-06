@@ -54,10 +54,10 @@ namespace Umbreon.Services
             => _data.FirstOrDefault(x => x.Id == id);
 
         public PokemonData GetData(string name)
-            => _data.FirstOrDefault(x => string.Equals(x.Identifier, name, StringComparison.CurrentCultureIgnoreCase));
+            => _data.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase));
 
         public static Stream GetImage(PokemonData pokemon)
-            => GetImage((int)pokemon.Id);
+            => GetImage(pokemon.Id);
 
         public static Stream GetImage(int id)
         {
@@ -66,7 +66,7 @@ namespace Umbreon.Services
         }
 
         public Colour GetColour(PokemonData pokemon)
-            => GetColour((int)pokemon.ColorId);
+            => GetColour(pokemon.ColorId);
 
         public Colour GetColour(int key)
             => _colours[key];
@@ -79,9 +79,12 @@ namespace Umbreon.Services
             foreach (var found in foundEvolutions)
             {
                 var evolveData = _evol.FirstOrDefault(x => x.EvolvedSpeciesId == found.Id);
-                var evolvesAt = evolveData?.MinimumLevel.Integer;
-                yield return new KeyValuePair<PokemonData, int>(found, (int?)evolvesAt ?? 0);
+                var evolvesAt = evolveData?.MinimumLevel;
+                yield return new KeyValuePair<PokemonData, int>(found, evolvesAt ?? 0);
             }
         }
+
+        public IEnumerable<PokemonData> GetAllData()
+            => _data;
     }
 }

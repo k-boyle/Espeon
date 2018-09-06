@@ -8,5 +8,7 @@ namespace Umbreon.Core.Entities.User
         public DateTime LastClaimed { get; set; } = DateTime.UtcNow.AddDays(-1);
 
         public PlayingData Data { get; set; } = new PlayingData();
+
+        public Bag Bag { get; set; } = new Bag();
     }
 }

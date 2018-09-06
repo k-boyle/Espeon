@@ -50,6 +50,7 @@ namespace Umbreon.Services
             commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
             commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
             commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
+            commands.AddTypeReader(typeof(Habitat), new HabitatTypeReader());
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }

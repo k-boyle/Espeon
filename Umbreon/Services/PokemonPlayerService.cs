@@ -23,9 +23,24 @@ namespace Umbreon.Services
             { 4, "Mountain" },
             { 5, "Rare" },
             { 6, "Rough-terrain" },
-            { 7, "sea" },
+            { 7, "Sea" },
             { 8, "Urban" },
-            { 9, "Water-edge" }
+            { 9, "Water-edge" },
+            { 10, "-" }
+        };
+
+        private readonly IReadOnlyDictionary<int, string> _habitatImages = new Dictionary<int, string>
+        {
+            { 1, "https://cdn.bulbagarden.net/upload/8/85/HGSS_Union_Cave-Day.png" },
+            { 2, "https://cdn.bulbagarden.net/upload/8/8c/HGSS_Viridian_Forest-Day.png" },
+            { 3, "http://orig15.deviantart.net/514e/f/2014/298/5/1/pokemon_x_and_y_battle_background_11_by_phoenixoflight92-d843okx.png" },
+            { 4, "https://cdn.bulbagarden.net/upload/8/83/Twist_Mountain_anime.png" },
+            { 5, "https://vignette.wikia.nocookie.net/pokemon-fighters-ex-roblox/images/a/a2/Rare_Candy.png/revision/latest?cb=20180410175601" },
+            { 6, "https://pm1.narvii.com/5874/57112bd7b5ad3bc1c02a010422fab2819ccfbf59_hq.jpg" },
+            { 7, "https://cdn.bulbagarden.net/upload/1/19/HGSS_Whirl_Islands-Day.png" },
+            { 8, "https://i.imgur.com/8R1Iv7j.png" },
+            { 9, "https://pm1.narvii.com/6160/772d9919f79ccac25925e822170d9273ab5fcda8_hq.jpg" },
+            { 10, "-" }
         };
 
         public PokemonPlayerService(DatabaseService database, LogService log)
@@ -64,5 +79,8 @@ namespace Umbreon.Services
 
         public DateTime GetTravel(ulong id)
             => _data.TryGetValue(id, out var player) ? player.LastMoved : DateTime.UtcNow.AddMinutes(-10);
+
+        public string GetImageUrl(int id)
+            => _habitatImages[id];
     }
 }
