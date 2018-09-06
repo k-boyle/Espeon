@@ -49,10 +49,14 @@ namespace Umbreon.Paginators.CommandMenu
             var message = await Context.Channel.SendMessageAsync(string.Empty, embed: BuildEmbed());
             Message = message;
             _interactive.AddReactionCallback(message, this);
-            _ = Task.Run(async () => { await message.AddReactionsAsync(_properties.Emojis.Values, new RequestOptions
+            _ = Task.Run(async () =>
             {
-                BypassBuckets = true
-            }); });
+                foreach (var emote in _properties.Emojis.Values)
+                    await Message.AddReactionAsync(emote, new RequestOptions
+                    {
+                        BypassBuckets = true
+                    });
+            });
             if (Timeout.HasValue)
                 _ = Task.Delay(Timeout.Value).ContinueWith(async _ =>
                 {
