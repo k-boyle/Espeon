@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Extensions;
+using Umbreon.Helpers;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
@@ -54,7 +55,7 @@ namespace Umbreon.Commands.Games
                 Description = $"You have been challenged to a duel! React with {_check} to accept, or {_cross} to decline!",
                 Color = Color.Red
             }
-                .AddField($"Challenger: {(Context.User as IGuildUser).GetDisplayName()}", $"Challenger has wagered {_challenger}🍬 rare candies")
+                .AddField($"Challenger: {(Context.User as IGuildUser).GetDisplayName()}", $"Challenger has wagered {_challenger}{EmotesHelper.Emotes["candy"]} rare candies")
                 .Build());
 
             await Message.AddReactionsAsync(new RequestOptions
@@ -110,7 +111,7 @@ namespace Umbreon.Commands.Games
                             {
                                 _defender = -1;
                                 await _message.NewMessageAsync(Context,
-                                    $"You only have {_candy.GetCandies(_target.Id)}🍬 candies, try again");
+                                    $"You only have {_candy.GetCandies(_target.Id)}{EmotesHelper.Emotes["candy"]} candies, try again");
                                 continue;
                             }
 
@@ -144,7 +145,7 @@ namespace Umbreon.Commands.Games
             var total = _challenger + _defender;
             var winner = _random.Next(total) < _challenger;
 
-            await _message.NewMessageAsync(Context, $"{(winner ? Context.User.Mention : _target.Mention)} you win the wager! You win {(winner ? _defender : _challenger)}🍬 rare candies!");
+            await _message.NewMessageAsync(Context, $"{(winner ? Context.User.Mention : _target.Mention)} you win the wager! You win {(winner ? _defender : _challenger)}{EmotesHelper.Emotes["candy"]} rare candies!");
             _candy.UpdateCandies(Context.User.Id, false, winner ? _challenger : -_challenger);
             _candy.UpdateCandies(_target.Id, false, winner ? -_defender : _defender);
             _game.LeaveGame(Context.User.Id);

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbreon.Helpers;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
@@ -137,7 +138,7 @@ namespace Umbreon.Callbacks
             {
                 if (habit.Key == 5)
                 {
-                    stringBuilder.AppendLine($"{_emojis.FirstOrDefault(x => x.Value == habit.Key).Key}: {habit.Value} - 10🍬 rare candies");
+                    stringBuilder.AppendLine($"{_emojis.FirstOrDefault(x => x.Value == habit.Key).Key}: {habit.Value} - 10{EmotesHelper.Emotes["candy"]} rare candies");
                     continue;
                 }
 

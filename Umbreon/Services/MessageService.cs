@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -167,7 +168,7 @@ namespace Umbreon.Services
 
             if (perms.ManageMessages)
                 await message.RemoveAllReactionsAsync();
-
+            
             await message.ModifyAsync(x =>
             {
                 x.Content = content;
@@ -186,8 +187,22 @@ namespace Umbreon.Services
         {
             if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
             var response = await channel.SendMessageAsync(content, isTTS, embed);
-            await NewItem(userId, channelId, response.CreatedAt, executingId, response.Id);
+            await NewItemAsync(userId, channelId, response.CreatedAt, executingId, response.Id, false);
 
+            return response;
+        }
+
+        public Task<IUserMessage> SendFileAsync(ICommandContext context, Stream stream, string content = null,
+            bool isTTS = false,
+            Embed embed = null)
+            => SendFileAsync(context.User.Id, context.Message.Id, context.Channel.Id, stream, content, isTTS, embed);
+
+        public async Task<IUserMessage> SendFileAsync(ulong userId, ulong executingId, ulong channelId, Stream stream, string content = null, bool isTTS = false,
+            Embed embed = null)
+        {
+            if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
+            var response = await channel.SendFileAsync(stream, "image.png", content, isTTS, embed);
+            await NewItemAsync(userId, channelId, response.CreatedAt, executingId, response.Id, true);
             return response;
         }
 
@@ -220,8 +235,8 @@ namespace Umbreon.Services
             if (callback == null) return null;
             await callback.DisplayAsync().ConfigureAwait(false);
 
-            await NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
-                callback.Message.Id);
+            await NewItemAsync(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
+                callback.Message.Id, false);
 
             return callback.Message;
 
@@ -292,7 +307,7 @@ namespace Umbreon.Services
             }
         }
 
-        private Task NewItem(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId)
+        private Task NewItemAsync(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId, bool attachedFile)
         {
             _messageCache.TryAdd(userId, new ConcurrentQueue<Message>());
             if (!_messageCache.TryGetValue(userId, out var found)) return null;
@@ -306,6 +321,7 @@ namespace Umbreon.Services
                 CreatedAt = createdAt,
                 ExecutingId = executingId,
                 ResponseId = responseId,
+                AttachedFile = attachedFile,
 
                 Service = this,
                 Identifier = _random.Next()
@@ -323,6 +339,7 @@ namespace Umbreon.Services
             if (!_messageCache.TryGetValue(context.User.Id, out var queue)) return null;
             var found = queue.FirstOrDefault(x => x.ExecutingId == context.Message.Id);
             if (found is null) return null;
+            if (found.AttachedFile) return null;
             var retrievedMessage = await GetOrDownloadMessageAsync(context, found.ResponseId);
             return retrievedMessage as IUserMessage;
         }

@@ -54,6 +54,10 @@ namespace Umbreon.Commands.ModuleBases
         protected Task<IUserMessage> SendPaginatedMessageAsync(BasePaginator paginator)
             => Message.SendPaginatedMessageAsync(Context, paginator);
 
+        protected Task<IUserMessage> SendFileAsync(Stream stream, string content = null, bool isTTS = false,
+            Embed embed = null)
+            => Message.SendFileAsync(Context, stream, content, isTTS, embed);
+
         protected Task<int> ClearMessages(int amount)
             => Message.ClearMessagesAsync(Context, amount);
 
@@ -62,5 +66,7 @@ namespace Umbreon.Commands.ModuleBases
 
         protected Task<SocketMessage> NextMessageAsync(bool fromSourceUser = true, bool inSourceChannel = true, TimeSpan? timeout = null)
             => Interactive.NextMessageAsync(Context, fromSourceUser, inSourceChannel, timeout);
+
+        
     }
 }

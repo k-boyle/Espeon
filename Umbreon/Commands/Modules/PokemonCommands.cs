@@ -16,18 +16,19 @@ namespace Umbreon.Commands.Modules
 {
     [Name("Pokemon Commands")]
     [Summary("Commands that allow you to play Umbreon Go")]
-    public class PokemonCommands : UmbreonBase
+    public partial class PokemonCommands : UmbreonBase
     {
         private readonly PokemonDataService _data;
         private readonly PokemonPlayerService _player;
         private readonly CandyService _candy;
         private const string BaseUrl = "https://bulbapedia.bulbagarden.net/wiki/";
 
-        public PokemonCommands(PokemonDataService data, PokemonPlayerService player, CandyService candy)
+        public PokemonCommands(PokemonDataService data, PokemonPlayerService player, CandyService candy, Random random)
         {
             _data = data;
             _player = player;
             _candy = candy;
+            _random = random;
         }
 
         [Command("data")]
@@ -57,7 +58,7 @@ namespace Umbreon.Commands.Modules
                 builder.AddField("Evolution Chain:", string.Join("\n", evolutionData.Select(x => $"{x.Key.Name.FirstLetterToUpper()} \t({x.Key.Id.ToString().PadLeft(3, '0')}) \t{(x.Value == 0 ? "" : $"at level {x.Value}")}")));
             }
 
-            await Context.Channel.SendFileAsync(image, "image.png", string.Empty, embed: builder.Build());
+            await SendFileAsync(image, string.Empty, embed: builder.Build());
         }
 
         [Command("travel")]

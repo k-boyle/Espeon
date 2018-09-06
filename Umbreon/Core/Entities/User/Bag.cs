@@ -5,6 +5,13 @@ namespace Umbreon.Core.Entities.User
 {
     public class Bag
     {
-        public List<BaseBall> PokeBalls { get; set; } = new List<BaseBall>();
+        public List<BaseBall> PokeBalls { get; set; } = new List<BaseBall>
+        {
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall()
+        };
     }
 }

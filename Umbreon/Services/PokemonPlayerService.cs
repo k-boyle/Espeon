@@ -15,6 +15,7 @@ namespace Umbreon.Services
         private readonly LogService _log;
 
         private readonly ConcurrentDictionary<ulong, PlayingData> _data = new ConcurrentDictionary<ulong, PlayingData>();
+
         private readonly IReadOnlyDictionary<int, string> _habitats = new Dictionary<int, string>
         {
             { 1, "Cave" },
@@ -82,5 +83,8 @@ namespace Umbreon.Services
 
         public string GetImageUrl(int id)
             => _habitatImages[id];
+
+        public UserObject GetCurrentPlayer(ulong id)
+            => _database.GetObject<UserObject>("users", id);
     }
 }

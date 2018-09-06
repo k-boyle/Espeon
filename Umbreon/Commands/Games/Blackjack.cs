@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Extensions;
+using Umbreon.Helpers;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
@@ -172,7 +173,7 @@ namespace Umbreon.Commands.Games
             var builder = new EmbedBuilder
             {
                 Title = "Blackjack",
-                Description = $"You have bet {_bet}🍬 candies\n" +
+                Description = $"You have bet {_bet}{EmotesHelper.Emotes["candy"]} candies\n" +
                               $"A game of blackjack. Click {_hit} to hit or {_stop} to stay\n",
                 Color = Colour.Default
             };
@@ -252,7 +253,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"I win! You lose {_bet}🍬 candies!",
+                    Description = $"I win! You lose {_bet}{EmotesHelper.Emotes["candy"]} candies!",
                     Color = Colour.Red
                 }
                 .AddField("Player",
@@ -267,7 +268,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You win! You win {(int)(0.5 * _bet)}🍬 candies!",
+                    Description = $"You win! You win {(int)(0.5 * _bet)}{EmotesHelper.Emotes["candy"]} candies!",
                     Color = Colour.Green
                 }
                 .AddField("Player",
@@ -297,7 +298,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You took too long to respond, so I win! You lose {_bet}🍬 candies!",
+                    Description = $"You took too long to respond, so I win! You lose {_bet}{EmotesHelper.Emotes["candy"]} candies!",
                     Color = Colour.Red
                 }
                 .AddField("Player",
