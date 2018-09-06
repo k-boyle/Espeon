@@ -1,9 +1,11 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using Discord.Commands;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Callbacks;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Extensions;
@@ -13,12 +15,14 @@ namespace Umbreon.Commands.Modules
 {
     public class PokemonCommands : UmbreonBase
     {
-        private readonly PokemonService _pokemon;
+        private readonly PokemonDataService _data;
+        private readonly PokemonPlayerService _player;
         private const string BaseUrl = "https://bulbapedia.bulbagarden.net/wiki/";
-
-        public PokemonCommands(PokemonService pokemon)
+        
+        public PokemonCommands(PokemonDataService data, PokemonPlayerService player)
         {
-            _pokemon = pokemon;
+            _data = data;
+            _player = player;
         }
 
         [Command("data")]
@@ -30,12 +34,12 @@ namespace Umbreon.Commands.Modules
             [Summary("The name/id of the pokemon you want data on")]
             [Remainder] PokemonData pokemon)
         {
-            var image = PokemonService.GetImage(pokemon);
-            var evolutionData = _pokemon.GetEvolutions(pokemon).ToImmutableArray();
+            var image = PokemonDataService.GetImage(pokemon);
+            var evolutionData = _data.GetEvolutions(pokemon).ToImmutableArray();
             var builder = new EmbedBuilder
             {
                 Title = $"{pokemon.Identifier.FirstLetterToUpper()}",
-                Color = _pokemon.GetColour(pokemon),
+                Color = _data.GetColour(pokemon),
                 ThumbnailUrl = $"{(image is null ? "" : "attachment://image.png")}",
                 Url = $"{BaseUrl}{pokemon.Identifier}_(Pokémon)",
                 Description = $"Catch rate: {pokemon.CaptureRate}\n" +
@@ -48,6 +52,22 @@ namespace Umbreon.Commands.Modules
             }
 
             await Context.Channel.SendFileAsync(image, "image.png", string.Empty, embed: builder.Build());
+        }
+
+        [Command("travel")]
+        [Name("Travel")]
+        [Summary("Move to a different area")]
+        [Usage("travel")]
+        public async Task Travel()
+        {
+            if (_player.GetTravel(Context.User.Id).ToUniversalTime().AddMinutes(10) > DateTime.UtcNow)
+            {
+                await SendMessageAsync($"You can only travel once every 10 minutes. You can travel in {(_player.GetTravel(Context.User.Id).ToUniversalTime().AddMinutes(10) - DateTime.UtcNow).Humanize()}");
+                return;
+            }
+
+            var map = new TravelMenu(Context, Services);
+            await map.DisplayAsync();
         }
     }
 }

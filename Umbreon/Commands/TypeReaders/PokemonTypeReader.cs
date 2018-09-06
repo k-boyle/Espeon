@@ -12,7 +12,7 @@ namespace Umbreon.Commands.TypeReaders
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            var pokemonService = services.GetService<PokemonService>();
+            var pokemonService = services.GetService<PokemonDataService>();
             var data = int.TryParse(input, out var id) ? pokemonService.GetData(id) : pokemonService.GetData(input);
             if (data.Id > ConstantsHelper.PokemonLimit)
                 return Task.FromResult(
