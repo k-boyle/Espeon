@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Discord;
 using Umbreon.Attributes;
 using Umbreon.Core;
+using Umbreon.Core.Entities.Pokemon;
+using Umbreon.Core.Entities.Pokemon.Pokeballs;
 using Umbreon.Core.Entities.User;
 
 namespace Umbreon.Services
@@ -86,5 +89,31 @@ namespace Umbreon.Services
 
         public UserObject GetCurrentPlayer(ulong id)
             => _database.GetObject<UserObject>("users", id);
+
+        public void UseBall(UserObject user, BaseBall ball)
+        {
+            user.Bag.PokeBalls.Remove(ball);
+            _database.UpdateObject<UserObject>("users", user);
+        }
+
+        public void UpdateDexEntry(UserObject user, PokemonData pokemon)
+        {
+            var entry = user.Pokedex.FirstOrDefault(x => x.Id == pokemon.Id);
+            if(entry is null)
+            {
+                user.Pokedex.Add(new PokedexEntry
+                {
+                    Id = pokemon.Id,
+                    Caught = true,
+                    Count = 1
+                });
+            }
+            else
+            {
+                user.Pokedex[user.Pokedex.IndexOf(entry)].Count++;
+            }
+
+            _database.UpdateObject<UserObject>("users", user);
+        }
     }
 }

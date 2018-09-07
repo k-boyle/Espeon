@@ -17,7 +17,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 1,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 2,
@@ -37,7 +38,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 2,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 3,
@@ -57,7 +59,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 3,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 4,
@@ -77,7 +80,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 4,
-      "conquest_order": 109
+      "conquest_order": 109,
+      "encounter_rate": 2
     },
     {
       "id": 5,
@@ -97,7 +101,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 5,
-      "conquest_order": 110
+      "conquest_order": 110,
+      "encounter_rate": 1
     },
     {
       "id": 6,
@@ -117,7 +122,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 6,
-      "conquest_order": 111
+      "conquest_order": 111,
+      "encounter_rate": 0
     },
     {
       "id": 7,
@@ -137,7 +143,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 7,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 8,
@@ -157,7 +164,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 8,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 9,
@@ -177,7 +185,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 9,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 10,
@@ -197,7 +206,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 10,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 11,
@@ -217,7 +227,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 11,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 7
     },
     {
       "id": 12,
@@ -237,7 +248,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 12,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 13,
@@ -257,7 +269,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 13,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 14,
@@ -277,7 +290,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 14,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 7
     },
     {
       "id": 15,
@@ -297,7 +311,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 1,
       "order": 15,
-      "conquest_order": 177
+      "conquest_order": 177,
+      "encounter_rate": 3
     },
     {
       "id": 16,
@@ -317,7 +332,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 16,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 17,
@@ -337,7 +353,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 17,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 18,
@@ -357,7 +374,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 18,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 19,
@@ -377,7 +395,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 19,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 20,
@@ -397,7 +416,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 20,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 21,
@@ -417,7 +437,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 21,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 22,
@@ -437,7 +458,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 22,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 23,
@@ -457,7 +479,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 23,
-      "conquest_order": 54
+      "conquest_order": 54,
+      "encounter_rate": 5
     },
     {
       "id": 24,
@@ -477,7 +500,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 24,
-      "conquest_order": 55
+      "conquest_order": 55,
+      "encounter_rate": 3
     },
     {
       "id": 25,
@@ -497,7 +521,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 26,
-      "conquest_order": 16
+      "conquest_order": 16,
+      "encounter_rate": 6
     },
     {
       "id": 26,
@@ -517,7 +542,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 27,
-      "conquest_order": 17
+      "conquest_order": 17,
+      "encounter_rate": 2
     },
     {
       "id": 27,
@@ -537,7 +563,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 28,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 28,
@@ -557,7 +584,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 29,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 29,
@@ -577,7 +605,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 30,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 30,
@@ -597,7 +626,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 31,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 31,
@@ -617,7 +647,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 32,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 32,
@@ -637,7 +668,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 33,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 33,
@@ -657,7 +689,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 34,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 34,
@@ -677,7 +710,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 35,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 35,
@@ -697,7 +731,8 @@
       "growth_rate_id": 3,
       "forms_switchable": 0,
       "order": 37,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 36,
@@ -717,7 +752,8 @@
       "growth_rate_id": 3,
       "forms_switchable": 0,
       "order": 38,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 37,
@@ -737,7 +773,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 39,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 38,
@@ -757,7 +794,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 40,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 39,
@@ -777,7 +815,8 @@
       "growth_rate_id": 3,
       "forms_switchable": 0,
       "order": 42,
-      "conquest_order": 21
+      "conquest_order": 21,
+      "encounter_rate": 5
     },
     {
       "id": 40,
@@ -797,7 +836,8 @@
       "growth_rate_id": 3,
       "forms_switchable": 0,
       "order": 43,
-      "conquest_order": 22
+      "conquest_order": 22,
+      "encounter_rate": 3
     },
     {
       "id": 41,
@@ -817,7 +857,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 44,
-      "conquest_order": 23
+      "conquest_order": 23,
+      "encounter_rate": 8
     },
     {
       "id": 42,
@@ -837,7 +878,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 45,
-      "conquest_order": 24
+      "conquest_order": 24,
+      "encounter_rate": 4
     },
     {
       "id": 43,
@@ -857,7 +899,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 47,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 7
     },
     {
       "id": 44,
@@ -877,7 +920,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 48,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 45,
@@ -897,7 +941,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 49,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 46,
@@ -917,7 +962,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 51,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 47,
@@ -937,7 +983,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 52,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 48,
@@ -957,7 +1004,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 53,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 49,
@@ -977,7 +1025,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 54,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 50,
@@ -997,7 +1046,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 55,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 7
     },
     {
       "id": 51,
@@ -1017,7 +1067,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 56,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 52,
@@ -1037,7 +1088,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 57,
-      "conquest_order": 58
+      "conquest_order": 58,
+      "encounter_rate": 8
     },
     {
       "id": 53,
@@ -1057,7 +1109,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 58,
-      "conquest_order": 59
+      "conquest_order": 59,
+      "encounter_rate": 4
     },
     {
       "id": 54,
@@ -1077,7 +1130,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 59,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 55,
@@ -1097,7 +1151,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 60,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 56,
@@ -1117,7 +1172,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 61,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 57,
@@ -1137,7 +1193,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 62,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 58,
@@ -1157,7 +1214,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 63,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 59,
@@ -1177,7 +1235,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 64,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 60,
@@ -1197,7 +1256,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 65,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 61,
@@ -1217,7 +1277,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 66,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 62,
@@ -1237,7 +1298,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 67,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 63,
@@ -1257,7 +1319,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 69,
-      "conquest_order": 127
+      "conquest_order": 127,
+      "encounter_rate": 8
     },
     {
       "id": 64,
@@ -1277,7 +1340,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 70,
-      "conquest_order": 128
+      "conquest_order": 128,
+      "encounter_rate": 4
     },
     {
       "id": 65,
@@ -1297,7 +1361,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 71,
-      "conquest_order": 129
+      "conquest_order": 129,
+      "encounter_rate": 0
     },
     {
       "id": 66,
@@ -1317,7 +1382,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 72,
-      "conquest_order": 98
+      "conquest_order": 98,
+      "encounter_rate": 8
     },
     {
       "id": 67,
@@ -1337,7 +1403,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 73,
-      "conquest_order": 99
+      "conquest_order": 99,
+      "encounter_rate": 4
     },
     {
       "id": 68,
@@ -1357,7 +1424,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 74,
-      "conquest_order": 100
+      "conquest_order": 100,
+      "encounter_rate": 0
     },
     {
       "id": 69,
@@ -1377,7 +1445,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 75,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 70,
@@ -1397,7 +1466,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 76,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 71,
@@ -1417,7 +1487,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 77,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 72,
@@ -1437,7 +1508,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 78,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 73,
@@ -1457,7 +1529,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 79,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 74,
@@ -1477,7 +1550,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 80,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 75,
@@ -1497,7 +1571,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 81,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 76,
@@ -1517,7 +1592,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 82,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 0
     },
     {
       "id": 77,
@@ -1537,7 +1613,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 83,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 78,
@@ -1557,7 +1634,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 84,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 79,
@@ -1577,7 +1655,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 85,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 80,
@@ -1597,7 +1676,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 1,
       "order": 86,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 81,
@@ -1617,7 +1697,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 88,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 82,
@@ -1637,7 +1718,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 89,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 83,
@@ -1657,7 +1739,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 91,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 5
     },
     {
       "id": 84,
@@ -1677,7 +1760,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 92,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 85,
@@ -1697,7 +1781,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 93,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 86,
@@ -1717,7 +1802,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 94,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 87,
@@ -1737,7 +1823,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 95,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 88,
@@ -1757,7 +1844,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 96,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 89,
@@ -1777,7 +1865,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 97,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 90,
@@ -1797,7 +1886,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 98,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 91,
@@ -1817,7 +1907,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 99,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 92,
@@ -1837,7 +1928,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 100,
-      "conquest_order": 112
+      "conquest_order": 112,
+      "encounter_rate": 8
     },
     {
       "id": 93,
@@ -1857,7 +1949,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 101,
-      "conquest_order": 113
+      "conquest_order": 113,
+      "encounter_rate": 4
     },
     {
       "id": 94,
@@ -1877,7 +1970,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 1,
       "order": 102,
-      "conquest_order": 114
+      "conquest_order": 114,
+      "encounter_rate": 0
     },
     {
       "id": 95,
@@ -1897,7 +1991,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 103,
-      "conquest_order": 175
+      "conquest_order": 175,
+      "encounter_rate": 8
     },
     {
       "id": 96,
@@ -1917,7 +2012,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 105,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 6
     },
     {
       "id": 97,
@@ -1937,7 +2033,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 106,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 3
     },
     {
       "id": 98,
@@ -1957,7 +2054,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 107,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 99,
@@ -1977,7 +2075,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 108,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 100,
@@ -1997,7 +2096,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 109,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 101,
@@ -2017,7 +2117,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 110,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 102,
@@ -2037,7 +2138,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 111,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 103,
@@ -2057,7 +2159,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 112,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 104,
@@ -2077,7 +2180,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 113,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 105,
@@ -2097,7 +2201,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 114,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 106,
@@ -2117,7 +2222,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 116,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 107,
@@ -2137,7 +2243,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 117,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 108,
@@ -2157,7 +2264,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 119,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 109,
@@ -2177,7 +2285,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 121,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 110,
@@ -2197,7 +2306,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 122,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 111,
@@ -2217,7 +2327,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 123,
-      "conquest_order": 160
+      "conquest_order": 160,
+      "encounter_rate": 8
     },
     {
       "id": 112,
@@ -2237,7 +2348,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 124,
-      "conquest_order": 161
+      "conquest_order": 161,
+      "encounter_rate": 4
     },
     {
       "id": 113,
@@ -2257,7 +2369,8 @@
       "growth_rate_id": 3,
       "forms_switchable": 0,
       "order": 127,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 114,
@@ -2277,7 +2390,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 129,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 115,
@@ -2297,7 +2411,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 1,
       "order": 131,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 116,
@@ -2317,7 +2432,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 132,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 117,
@@ -2337,7 +2453,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 133,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 118,
@@ -2357,7 +2474,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 135,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 119,
@@ -2377,7 +2495,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 136,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 120,
@@ -2397,7 +2516,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 137,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 8
     },
     {
       "id": 121,
@@ -2417,11 +2537,12 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 138,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 122,
-      "identifier": "mr-mime",
+      "identifier": "mr. mime",
       "generation_id": 1,
       "evolves_from_species_id": 439,
       "evolution_chain_id": 57,
@@ -2437,7 +2558,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 140,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 123,
@@ -2457,7 +2579,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 141,
-      "conquest_order": 188
+      "conquest_order": 188,
+      "encounter_rate": 4
     },
     {
       "id": 124,
@@ -2477,7 +2600,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 144,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 125,
@@ -2497,7 +2621,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 146,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 126,
@@ -2517,7 +2642,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 149,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 127,
@@ -2537,7 +2663,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 1,
       "order": 151,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 128,
@@ -2557,7 +2684,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 152,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 129,
@@ -2577,7 +2705,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 153,
-      "conquest_order": 13
+      "conquest_order": 13,
+      "encounter_rate": 10
     },
     {
       "id": 130,
@@ -2597,7 +2726,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 1,
       "order": 154,
-      "conquest_order": 14
+      "conquest_order": 14,
+      "encounter_rate": 1
     },
     {
       "id": 131,
@@ -2617,7 +2747,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 155,
-      "conquest_order": 190
+      "conquest_order": 190,
+      "encounter_rate": 1
     },
     {
       "id": 132,
@@ -2637,7 +2768,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 156,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 133,
@@ -2657,7 +2789,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 157,
-      "conquest_order": 1
+      "conquest_order": 1,
+      "encounter_rate": 4
     },
     {
       "id": 134,
@@ -2677,7 +2810,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 158,
-      "conquest_order": 2
+      "conquest_order": 2,
+      "encounter_rate": 0
     },
     {
       "id": 135,
@@ -2697,7 +2831,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 159,
-      "conquest_order": 3
+      "conquest_order": 3,
+      "encounter_rate": 0
     },
     {
       "id": 136,
@@ -2717,7 +2852,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 160,
-      "conquest_order": 4
+      "conquest_order": 4,
+      "encounter_rate": 0
     },
     {
       "id": 137,
@@ -2737,7 +2873,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 166,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 138,
@@ -2757,7 +2894,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 169,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 139,
@@ -2777,7 +2915,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 170,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 140,
@@ -2797,7 +2936,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 171,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 4
     },
     {
       "id": 141,
@@ -2817,7 +2957,8 @@
       "growth_rate_id": 2,
       "forms_switchable": 0,
       "order": 172,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 142,
@@ -2837,7 +2978,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 1,
       "order": 173,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 2
     },
     {
       "id": 143,
@@ -2857,7 +2999,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 175,
-      "conquest_order": 179
+      "conquest_order": 179,
+      "encounter_rate": 2
     },
     {
       "id": 144,
@@ -2877,7 +3020,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 176,
-      "conquest_order": 192
+      "conquest_order": 192,
+      "encounter_rate": 1
     },
     {
       "id": 145,
@@ -2897,7 +3041,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 177,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 146,
@@ -2917,7 +3062,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 178,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 147,
@@ -2937,7 +3083,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 179,
-      "conquest_order": 76
+      "conquest_order": 76,
+      "encounter_rate": 2
     },
     {
       "id": 148,
@@ -2957,7 +3104,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 180,
-      "conquest_order": 77
+      "conquest_order": 77,
+      "encounter_rate": 1
     },
     {
       "id": 149,
@@ -2977,7 +3125,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 0,
       "order": 181,
-      "conquest_order": 78
+      "conquest_order": 78,
+      "encounter_rate": 0
     },
     {
       "id": 150,
@@ -2997,7 +3146,8 @@
       "growth_rate_id": 1,
       "forms_switchable": 1,
       "order": 182,
-      "conquest_order": 196
+      "conquest_order": 196,
+      "encounter_rate": 1
     },
     {
       "id": 151,
@@ -3017,7 +3167,8 @@
       "growth_rate_id": 4,
       "forms_switchable": 0,
       "order": 183,
-      "conquest_order": ""
+      "conquest_order": "",
+      "encounter_rate": 1
     },
     {
       "id": 152,

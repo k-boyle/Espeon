@@ -29,8 +29,9 @@ namespace Umbreon.Commands.Modules
             foreach (var pokemon in available)
                 for (var i = 0; i < pokemon.EncounterRate; i++)
                     availableList.Add(pokemon.Id);
-            var encounter = available.FirstOrDefault(x => x.Id == availableList[_random.Next(availableList.Count)]);
-            var enc = new Encounter(Context, encounter, player, Services);
+            var ran = _random.Next(availableList.Count);
+            var encounter = available.FirstOrDefault(x => x.Id == availableList[ran]);
+            var enc = new Encounter(Context, encounter, Context.User.Id, Services);
             await enc.SetupAsync();
         }
     }

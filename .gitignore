@@ -275,3 +275,7 @@ application\.yml
 Lavalink\.jar
 
 Umbreon/config\.json
+
+Umbreon/\.vscode/launch\.json
+
+Umbreon/\.vscode/tasks\.json

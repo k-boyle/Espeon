@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Umbreon.Core.Entities.Pokemon;
 
 namespace Umbreon.Core.Entities.User
 {
@@ -10,5 +12,7 @@ namespace Umbreon.Core.Entities.User
         public PlayingData Data { get; set; } = new PlayingData();
 
         public Bag Bag { get; set; } = new Bag();
+
+        public List<PokedexEntry> Pokedex { get; set; } = new List<PokedexEntry>();
     }
 }
