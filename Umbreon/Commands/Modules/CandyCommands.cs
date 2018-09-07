@@ -34,7 +34,7 @@ namespace Umbreon.Commands.Modules
         [Summary("See how many rare candies you have")]
         [Usage("candies")]
         public Task CandyCount()
-            => SendMessageAsync($"You have {_candy.GetCandies(Context.User.Id)}{EmotesHelper.Emotes["candy"]} rare candies");
+            => SendMessageAsync($"You have {_candy.GetCandies(Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
 
         [Command("claim")]
         [Name("Claim Candies")]
@@ -46,13 +46,13 @@ namespace Umbreon.Commands.Modules
             {
                 var remaining = _database.GetObject<UserObject>("users", Context.User.Id).LastClaimed.AddHours(23) - DateTime.UtcNow;
 
-                await SendMessageAsync($"You have already claimed your candies {EmotesHelper.Emotes["candy"]} today. Please wait {remaining.Humanize()}");
+                await SendMessageAsync($"You have already claimed your candies{EmotesHelper.Emotes["rarecandy"]} today. Please wait {remaining.Humanize()}");
                 return;
             }
 
             var amount = _random.Next(1, 11);
             _candy.UpdateCandies(Context.User.Id, true, amount);
-            await SendMessageAsync($"You have received {amount}{EmotesHelper.Emotes["candy"]} rare cand{(amount > 1 ? "ies" : "y")}!");
+            await SendMessageAsync($"You have received {amount}{EmotesHelper.Emotes["rarecandy"]} rare cand{(amount > 1 ? "ies" : "y")}!");
         }
 
         [Command("treat")]
@@ -65,7 +65,7 @@ namespace Umbreon.Commands.Modules
             user = user ?? Context.User;
 
             _candy.UpdateCandies(user.Id, false, amount);
-            await SendMessageAsync($"{user.GetDisplayName()} has been sent {amount}{EmotesHelper.Emotes["candy"]} rare cand{(amount > 1 ? "ies" : "y")}");
+            await SendMessageAsync($"{user.GetDisplayName()} has been sent {amount}{EmotesHelper.Emotes["rarecandy"]} rare cand{(amount > 1 ? "ies" : "y")}");
         }
 
         [Command("leaderboard")]

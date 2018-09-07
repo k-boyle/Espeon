@@ -114,6 +114,7 @@ namespace Umbreon.Services
         public async Task CommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
         {
             if (result.IsSuccess) return;
+            /*
             var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
             switch (result.Error)
             {
@@ -151,7 +152,9 @@ namespace Umbreon.Services
                         "There was an unexpected result... The error has been reported, try again, if this persists please wait until a fix is released");
                     await NewMessageAsync(0, 0, 463299724326469634, result.ErrorReason);
                     break;
-            }
+            }*/
+
+            await context.Channel.SendMessageAsync(result.ErrorReason ?? "\\:)");
         }
 
         public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false,

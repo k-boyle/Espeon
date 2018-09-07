@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Core.Entities.Pokemon.Pokeballs;
 using Umbreon.Core.Entities.User;
@@ -28,15 +28,23 @@ namespace Umbreon.Callbacks
 
         private readonly PokemonData _encounter;
         private readonly ulong _playerId;
-        private UserObject _user => _player.GetCurrentPlayer(_playerId);
+        private UserObject User => _player.GetCurrentPlayer(_playerId);
+        private int Pokeballs => User.Bag.PokeBalls.Count(x => x is Pokeball);
+        private int Greatballs => User.Bag.PokeBalls.Count(x => x is GreatBall);
+        private int Ultraballs => User.Bag.PokeBalls.Count(x => x is UltraBall);
+
         private readonly InteractiveService _interactive;
         private readonly MessageService _messageService;
         private readonly PokemonPlayerService _player;
         private readonly PokemonDataService _data;
         private IUserMessage _message;
-        private Random _random;
+        private readonly Random _random;
 
-        private bool caught;
+        private bool _caught;
+        private int _attemps;
+        private readonly int _fleeCount;
+
+        private readonly List<string> _battleLog = new List<string>();
 
         public Encounter(ICommandContext context, PokemonData encounter, ulong playerId, IServiceProvider services)
         {
@@ -48,6 +56,9 @@ namespace Umbreon.Callbacks
             _player = services.GetService<PokemonPlayerService>();
             _data = services.GetService<PokemonDataService>();
             _random = services.GetService<Random>();
+
+            _player.SetEncounter(Context.User.Id, true);
+            _fleeCount = _random.Next(1, 5);
         }
 
         public async Task SetupAsync()
@@ -57,15 +68,25 @@ namespace Umbreon.Callbacks
 
             _ = Task.Run(async () =>
             {
-                await _message.AddReactionAsync(EmotesHelper.Emotes["pokeball"], new RequestOptions
-                {
-                    BypassBuckets = true
-                });
-                await _message.AddReactionAsync(EmotesHelper.Emotes["greatball"], new RequestOptions
-                {
-                    BypassBuckets = true
-                });
-                await _message.AddReactionAsync(EmotesHelper.Emotes["ultraball"], new RequestOptions
+                if(Pokeballs > 0)
+                    await _message.AddReactionAsync(EmotesHelper.Emotes["pokeball"], new RequestOptions
+                    {
+                        BypassBuckets = true
+                    });
+
+                if(Greatballs > 0)
+                    await _message.AddReactionAsync(EmotesHelper.Emotes["greatball"], new RequestOptions
+                    {
+                        BypassBuckets = true
+                    });
+
+                if(Ultraballs > 0)
+                    await _message.AddReactionAsync(EmotesHelper.Emotes["ultraball"], new RequestOptions
+                    {
+                        BypassBuckets = true
+                    });
+
+                await _message.AddReactionAsync(new Emoji("❌"), new RequestOptions
                 {
                     BypassBuckets = true
                 });
@@ -73,12 +94,16 @@ namespace Umbreon.Callbacks
 
             _interactive.AddReactionCallback(_message, this);
 
-            _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(_ =>
+            _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(async _ =>
             {
                 _interactive.RemoveReactionCallback(_message);
                 _ = _message.RemoveAllReactionsAsync();
-                if(!caught)
-                    _ = _messageService.NewMessageAsync(Context, $"The wild {_encounter.Name} escaped");
+                if (!_caught)
+                {
+                    _battleLog.Add($"The wild {_encounter.Name.FirstLetterToUpper()} has fled!");
+                    await _message.ModifyAsync(x => x.Embed = BuildEmbed());
+                }
+                _player.SetEncounter(Context.User.Id, false);
             });
 
         }
@@ -91,19 +116,19 @@ namespace Umbreon.Callbacks
                 Color = _data.GetColour(_encounter), 
                 ThumbnailUrl = "attachment://image.png"
             };
-
-            var balls = _user.Bag.PokeBalls;
-
+            
             builder.AddField($"A {_encounter.Name.FirstLetterToUpper()} appeared!", 
                 $"Catch rate: {_encounter.CaptureRate}\n" +
                 $"Encounter rate: {_encounter.EncounterRate}", 
                 true);
 
             builder.AddField("Bag", 
-                $"{EmotesHelper.Emotes["pokeball"]} Pokeballs: {balls.Count(x => x is NormalBall)}\n" +
-                $"{EmotesHelper.Emotes["greatball"]} Greatballs: {balls.Count(x => x is GreatBall)}\n" +
-                $"{EmotesHelper.Emotes["ultraball"]} Ultaballs: {balls.Count(x => x is UltraBall)}",
+                $"{EmotesHelper.Emotes["pokeball"]} Pokeballs: {Pokeballs}\n" +
+                $"{EmotesHelper.Emotes["greatball"]} Greatballs: {Greatballs}\n" +
+                $"{EmotesHelper.Emotes["ultraball"]} Ultraballs: {Ultraballs}",
                 true);
+
+            builder.AddField("Capture Log", _battleLog.Count > 0 ? string.Join('\n', _battleLog) : "\u200b");
 
             return builder.Build();
         }
@@ -112,41 +137,93 @@ namespace Umbreon.Callbacks
         {
             var emote = reaction.Emote;
 
+
+            BaseBall ball = null;
+
             if (emote.Equals(EmotesHelper.Emotes["pokeball"]))
             {
-                if(_user.Bag.PokeBalls.Count(x => x is NormalBall) == 0)
+                if(Pokeballs == 0)
                 {
-                    await _messageService.NewMessageAsync(Context, "You don't have have any Pokeballs left");
+                    _battleLog.Add("You are out of Pokeballs");
                     return false;
                 }
 
-                var ball = _user.Bag.PokeBalls.FirstOrDefault(x => x is NormalBall) as NormalBall;
-                UseBall(ball);
+                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is Pokeball) as Pokeball;
+            }
 
-                if(IsCaptured(ball))
+            if (emote.Equals(EmotesHelper.Emotes["greatball"]))
+            {
+                if (Greatballs == 0)
                 {
-                    _ = CapturePokemonAsync();
-                    return true;
+                    _battleLog.Add("You are out of Great balls");
+                    return false;
                 }
 
-                await _messageService.NewMessageAsync(Context, $"Darn! The {_encounter.Name} escaped");
-                await _message.ModifyAsync(x => x.Embed = BuildEmbed());
-                _ = _message.RemoveReactionAsync(emote, Context.User);
+                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is GreatBall) as GreatBall;
             }
+
+            if (emote.Equals(EmotesHelper.Emotes["ultraball"]))
+            {
+                if (Pokeballs == 0)
+                {
+                    _battleLog.Add("You are out of Ultra balls");
+                    return false;
+                }
+
+                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is UltraBall) as UltraBall;
+            }
+
+            if (emote.Equals(new Emoji("❌")))
+            {
+                await EndEncounter("You have fled");
+                return true;
+            }
+
+            UseBall(ball);
+            _attemps++;
+
+            if (IsCaptured(ball))
+            {
+                _ = CapturePokemonAsync();
+                return true;
+            }
+
+            if (_attemps == _fleeCount)
+            {
+                await EndEncounter($"The wild {_encounter.Name.FirstLetterToUpper()} has fled!");
+                return true;
+            }
+
+            if (Pokeballs == Greatballs && Greatballs == Ultraballs && Ultraballs == 0)
+            {
+                await EndEncounter("You are out of balls");
+                return true;
+            }
+
+            _battleLog.Add($"{_encounter.Name.FirstLetterToUpper()} escaped the ball!");
+            await _message.ModifyAsync(x => x.Embed = BuildEmbed());
+            _ = _message.RemoveReactionAsync(emote, Context.User);
 
             return false;
         }
 
+        private async Task EndEncounter(string logMessage)
+        {
+            _caught = true;
+            _player.SetEncounter(Context.User.Id, false);
+            _ = _message.RemoveAllReactionsAsync();
+            _battleLog.Add(logMessage);
+            await _message.ModifyAsync(x => x.Embed = BuildEmbed());
+        }
+
         private async Task CapturePokemonAsync()
         {
-            caught = true;
-            _ = _message.RemoveAllReactionsAsync();
-            _player.UpdateDexEntry(_user, _encounter);
-            await _messageService.NewMessageAsync(Context, $"{_encounter.Name} has been caught!");  
+            _player.UpdateDexEntry(User, _encounter);
+            await EndEncounter($"{_encounter.Name.FirstLetterToUpper()} has been captured!");
         }
 
         private void UseBall(BaseBall ball)
-            => _player.UseBall(_user, ball);
+            => _player.UseBall(User, ball);
 
         private bool IsCaptured(BaseBall ball)
         {

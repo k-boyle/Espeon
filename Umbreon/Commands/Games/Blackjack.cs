@@ -173,7 +173,7 @@ namespace Umbreon.Commands.Games
             var builder = new EmbedBuilder
             {
                 Title = "Blackjack",
-                Description = $"You have bet {_bet}{EmotesHelper.Emotes["candy"]} candies\n" +
+                Description = $"You have bet {_bet}{EmotesHelper.Emotes["rarecandy"]} candies\n" +
                               $"A game of blackjack. Click {_hit} to hit or {_stop} to stay\n",
                 Color = Colour.Default
             };
@@ -253,7 +253,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"I win! You lose {_bet}{EmotesHelper.Emotes["candy"]} candies!",
+                    Description = $"I win! You lose {_bet}{EmotesHelper.Emotes["rarecandy"]} candies!",
                     Color = Colour.Red
                 }
                 .AddField("Player",
@@ -268,7 +268,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You win! You win {(int)(0.5 * _bet)}{EmotesHelper.Emotes["candy"]} candies!",
+                    Description = $"You win! You win {(int)(0.5 * _bet)}{EmotesHelper.Emotes["rarecandy"]} candies!",
                     Color = Colour.Green
                 }
                 .AddField("Player",
@@ -298,7 +298,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You took too long to respond, so I win! You lose {_bet}{EmotesHelper.Emotes["candy"]} candies!",
+                    Description = $"You took too long to respond, so I win! You lose {_bet}{EmotesHelper.Emotes["rarecandy"]} candies!",
                     Color = Colour.Red
                 }
                 .AddField("Player",

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,7 @@ namespace Umbreon.Services
         private readonly LogService _log;
 
         private readonly ConcurrentDictionary<ulong, PlayingData> _data = new ConcurrentDictionary<ulong, PlayingData>();
+        private readonly ConcurrentDictionary<ulong, bool> _inEncounter = new ConcurrentDictionary<ulong, bool>();
 
         private readonly IReadOnlyDictionary<int, string> _habitats = new Dictionary<int, string>
         {
@@ -113,7 +114,13 @@ namespace Umbreon.Services
                 user.Pokedex[user.Pokedex.IndexOf(entry)].Count++;
             }
 
-            _database.UpdateObject<UserObject>("users", user);
+            _database.UpdateObject("users", user);
         }
+
+        public void SetEncounter(ulong id, bool encounter)
+            => _inEncounter[id] = encounter;
+
+        public bool InEncounter(ulong id)
+            => _inEncounter.TryGetValue(id, out var res) && res;
     }
 }

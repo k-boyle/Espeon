@@ -138,7 +138,7 @@ namespace Umbreon.Callbacks
             {
                 if (habit.Key == 5)
                 {
-                    stringBuilder.AppendLine($"{_emojis.FirstOrDefault(x => x.Value == habit.Key).Key}: {habit.Value} - 10{EmotesHelper.Emotes["candy"]} rare candies");
+                    stringBuilder.AppendLine($"{_emojis.FirstOrDefault(x => x.Value == habit.Key).Key}: {habit.Value} - 10{EmotesHelper.Emotes["rarecandy"]} rare candies");
                     continue;
                 }
 
