@@ -55,7 +55,6 @@ namespace Umbreon.Services
                 }
             };
             commands.Log += logs.LogEvent;
-            commands.CommandExecuted += message.CommandExecutedAsync;
         }
     }
 }

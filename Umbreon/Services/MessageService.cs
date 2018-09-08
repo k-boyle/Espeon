@@ -108,54 +108,13 @@ namespace Umbreon.Services
         private async Task HandleCommandAsync(UmbreonContext context, int argPos)
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
-            await _commands.ExecuteAsync(context, argPos, _services);
+            var result = await _commands.ExecuteAsync(context, argPos, _services);
+            if (!result.IsSuccess)
+                await HandleErrorAsync(context, result);
         }
 
-        public async Task CommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
-        {
-            if (result.IsSuccess) return;
-            /*
-            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
-            switch (result.Error)
-            {
-                case CommandError.UnknownCommand:
-                    if (guild.UnkownCommandResult)
-                    {
-                        var prefixes = guild.Prefixes;
-                        var argPos = 0;
-                        if (context.Message.HasMentionPrefix(_client.CurrentUser, ref argPos) ||
-                            prefixes.Any(x => context.Message.HasStringPrefix(x, ref argPos))) ;
-
-                        var i = 1;
-                        var commands = _commands.Search(context, argPos).Commands.Select(x => $"{i++}{x.Command.Aliases.First()}").ToArray();
-                        await SendMessageAsync(context, "Command not found, did you mean:\n" +
-                                                        $"{string.Join("\n", commands, 0, 3)}");
-                    }
-
-                    break;
-
-                case CommandError.ParseFailed:
-                    await SendMessageAsync(context, "Failed to parse command");
-                    break;
-
-                case CommandError.BadArgCount:
-                    var usage = command.Attributes.OfType<UsageAttribute>().Single().Example;
-                    await SendMessageAsync(context, $"Wrong command usage, here have an example:\n{usage}");
-                    break;
-
-                case CommandError.UnmetPrecondition:
-                    await SendMessageAsync(context, result.ErrorReason);
-                    break;
-
-                case CommandError.Exception:
-                    await SendMessageAsync(context,
-                        "There was an unexpected result... The error has been reported, try again, if this persists please wait until a fix is released");
-                    await NewMessageAsync(0, 0, 463299724326469634, result.ErrorReason);
-                    break;
-            }*/
-
-            await context.Channel.SendMessageAsync(result.ErrorReason ?? "\\:)");
-        }
+        private Task HandleErrorAsync(ICommandContext context, IResult result)
+            => NewMessageAsync(context, result.ErrorReason);
 
         public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false,
             Embed embed = null)
