@@ -75,6 +75,7 @@ namespace Umbreon.Commands.Games
                     _ = _message.NewMessageAsync(Context, $"{_target.Mention} you didn't respond in time");
                 }
                 _ = Message.RemoveAllReactionsAsync();
+                _game.LeaveGame(Context.User.Id);
             });
         }
 

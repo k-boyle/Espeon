@@ -114,6 +114,7 @@ namespace Umbreon.Commands.Games
                     Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
                     _inGame = false;
                 }
+                Games.LeaveGame(Context.User.Id);
                 _ = Message.RemoveAllReactionsAsync();
             });
         }
@@ -190,6 +191,7 @@ namespace Umbreon.Commands.Games
 
         public async Task EndAsync()
         {
+            _ = Message.RemoveAllReactionsAsync();
             await Message.ModifyAsync(x =>
             {
                 x.Content = string.Empty;
