@@ -1,12 +1,10 @@
-﻿using Discord;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core;
 using Umbreon.Interfaces;
 
 namespace Umbreon.Services
@@ -14,15 +12,13 @@ namespace Umbreon.Services
     [Service]
     public class TimerService
     {
-        private readonly LogService _log;
         private readonly IServiceProvider _services;
 
         private Timer _timer;
         private ConcurrentQueue<IRemoveable> _queue = new ConcurrentQueue<IRemoveable>();
         
-        public TimerService(LogService log, IServiceProvider services)
+        public TimerService(IServiceProvider services)
         {
-            _log = log;
             _services = services;
         }
 
@@ -39,8 +35,7 @@ namespace Umbreon.Services
                         _timer.Change(next.When - DateTime.UtcNow, TimeSpan.Zero);
                     }
                 }
-
-                _log.NewLogEvent(LogSeverity.Verbose, LogSource.Timer, "Memory cleaned");
+                
             }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         }
 
