@@ -148,7 +148,7 @@ namespace Umbreon.Callbacks
                     return false;
                 }
 
-                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is NormalBall) as NormalBall;
+                ball = User.Bag.PokeBalls.OfType<NormalBall>().FirstOrDefault();
             }
 
             if (emote.Equals(EmotesHelper.Emotes["greatball"]))
@@ -159,7 +159,7 @@ namespace Umbreon.Callbacks
                     return false;
                 }
 
-                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is GreatBall) as GreatBall;
+                ball = User.Bag.PokeBalls.OfType<GreatBall>().FirstOrDefault();
             }
 
             if (emote.Equals(EmotesHelper.Emotes["ultraball"]))
@@ -170,7 +170,7 @@ namespace Umbreon.Callbacks
                     return false;
                 }
 
-                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is UltraBall) as UltraBall;
+                ball = User.Bag.PokeBalls.OfType<UltraBall>().FirstOrDefault();
             }
 
             if (emote.Equals(new Emoji("❌")))
