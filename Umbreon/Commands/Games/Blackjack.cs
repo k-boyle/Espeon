@@ -191,6 +191,8 @@ namespace Umbreon.Commands.Games
 
         public async Task EndAsync()
         {
+            _inGame = false;
+            Games.LeaveGame(Context.User.Id);
             _ = Message.RemoveAllReactionsAsync();
             await Message.ModifyAsync(x =>
             {
@@ -246,9 +248,6 @@ namespace Umbreon.Commands.Games
             }
             else if (dealerTotal == playerTotal)
                 await Message.ModifyAsync(x => x.Embed = DrawEmbed());
-
-            _inGame = false;
-            Games.LeaveGame(Context.User.Id);
         }
 
         private Embed LoseEmbed()
