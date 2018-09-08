@@ -7,11 +7,11 @@ namespace Umbreon.Core.Entities.User
     {
         public List<BaseBall> PokeBalls { get; set; } = new List<BaseBall>
         {
-            new Pokeball(),
-            new Pokeball(),
-            new Pokeball(),
-            new Pokeball(),
-            new Pokeball()
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall(),
+            new NormalBall()
         };
     }
 }

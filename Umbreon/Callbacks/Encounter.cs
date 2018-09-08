@@ -29,7 +29,7 @@ namespace Umbreon.Callbacks
         private readonly PokemonData _encounter;
         private readonly ulong _playerId;
         private UserObject User => _player.GetCurrentPlayer(_playerId);
-        private int Pokeballs => User.Bag.PokeBalls.Count(x => x is Pokeball);
+        private int Pokeballs => User.Bag.PokeBalls.Count(x => x is NormalBall);
         private int Greatballs => User.Bag.PokeBalls.Count(x => x is GreatBall);
         private int Ultraballs => User.Bag.PokeBalls.Count(x => x is UltraBall);
 
@@ -148,7 +148,7 @@ namespace Umbreon.Callbacks
                     return false;
                 }
 
-                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is Pokeball) as Pokeball;
+                ball = User.Bag.PokeBalls.FirstOrDefault(x => x is NormalBall) as NormalBall;
             }
 
             if (emote.Equals(EmotesHelper.Emotes["greatball"]))
