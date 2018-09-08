@@ -11,6 +11,7 @@ namespace Umbreon.Helpers
             { "pokeball", Emote.Parse("<:pokeball:487332258290860041>") },
             { "greatball", Emote.Parse("<:greatball:487332755454164993>") },
             { "ultraball", Emote.Parse("<:ultraball:487333008601251850>") },
+            { "masterball", Emote.Parse("<:masterball:488077901632372736>") },
             { "rarecandy", Emote.Parse("<:candy:487333156329095168>") }
         };
     }

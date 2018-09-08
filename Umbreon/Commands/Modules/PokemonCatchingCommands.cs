@@ -38,5 +38,15 @@ namespace Umbreon.Commands.Modules
             var enc = new Encounter(Context, encounter, Context.User.Id, Services);
             await enc.SetupAsync();
         }
+
+        [Command("shop")]
+        [Name("Shop")]
+        [Summary("View the buyable items")]
+        [Usage("shop")]
+        public async Task Shop()
+        {
+            var shop = new Shop(Context, Services);
+            await shop.DisplayAsync();
+        }
     }
 }

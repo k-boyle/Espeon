@@ -1,5 +1,8 @@
-﻿namespace Umbreon.Core.Entities.Pokemon.Pokeballs
+﻿using Umbreon.Attributes;
+
+namespace Umbreon.Core.Entities.Pokemon.Pokeballs
 {
+    [ShopItem("Greatball", "<:greatball:487332755454164993>", 5)]
     public class GreatBall : BaseBall
     {
         public override int Cost => 5;

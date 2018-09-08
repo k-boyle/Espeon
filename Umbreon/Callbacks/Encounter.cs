@@ -32,6 +32,7 @@ namespace Umbreon.Callbacks
         private int Pokeballs => User.Bag.PokeBalls.Count(x => x is NormalBall);
         private int Greatballs => User.Bag.PokeBalls.Count(x => x is GreatBall);
         private int Ultraballs => User.Bag.PokeBalls.Count(x => x is UltraBall);
+        private int Masterballs => User.Bag.PokeBalls.Count(x => x is MasterBall);
 
         private readonly InteractiveService _interactive;
         private readonly MessageService _messageService;
@@ -86,6 +87,12 @@ namespace Umbreon.Callbacks
                         BypassBuckets = true
                     });
 
+                if (Masterballs > 0)
+                    await _message.AddReactionAsync(EmotesHelper.Emotes["masterball"], new RequestOptions
+                    {
+                        BypassBuckets = true
+                    });
+
                 await _message.AddReactionAsync(new Emoji("❌"), new RequestOptions
                 {
                     BypassBuckets = true
@@ -125,7 +132,8 @@ namespace Umbreon.Callbacks
             builder.AddField("Bag", 
                 $"{EmotesHelper.Emotes["pokeball"]} Pokeballs: {Pokeballs}\n" +
                 $"{EmotesHelper.Emotes["greatball"]} Greatballs: {Greatballs}\n" +
-                $"{EmotesHelper.Emotes["ultraball"]} Ultraballs: {Ultraballs}",
+                $"{EmotesHelper.Emotes["ultraball"]} Ultraballs: {Ultraballs}\n" +
+                $"{EmotesHelper.Emotes["masterball"]} Masterballs: {Masterballs}",
                 true);
 
             builder.AddField("Capture Log", _battleLog.Count > 0 ? string.Join('\n', _battleLog) : "\u200b");
@@ -164,13 +172,24 @@ namespace Umbreon.Callbacks
 
             if (emote.Equals(EmotesHelper.Emotes["ultraball"]))
             {
-                if (Pokeballs == 0)
+                if (Ultraballs == 0)
                 {
                     _battleLog.Add("You are out of Ultra balls");
                     return false;
                 }
 
                 ball = User.Bag.PokeBalls.OfType<UltraBall>().FirstOrDefault();
+            }
+
+            if (emote.Equals(EmotesHelper.Emotes["masterball"]))
+            {
+                if (Masterballs == 0)
+                {
+                    _battleLog.Add("You are out of Master balls");
+                    return false;
+                }
+
+                ball = User.Bag.PokeBalls.OfType<MasterBall>().FirstOrDefault();
             }
 
             if (emote.Equals(new Emoji("❌")))

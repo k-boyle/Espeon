@@ -94,7 +94,35 @@ namespace Umbreon.Services
         public void UseBall(UserObject user, BaseBall ball)
         {
             user.Bag.PokeBalls.Remove(ball);
-            _database.UpdateObject<UserObject>("users", user);
+            _database.UpdateObject("users", user);
+        }
+
+        public void AddItem(ulong userId, ShopItemAttribute item)
+        {
+            var user = GetCurrentPlayer(userId);
+            switch (item.ItemName)
+            {
+                case "Pokeball":
+                    user.Bag.PokeBalls.Add(new NormalBall());
+                    break;
+
+                case "Greatball":
+                    user.Bag.PokeBalls.Add(new GreatBall());
+                    break;
+
+                case "Ultraball":
+                    user.Bag.PokeBalls.Add(new UltraBall());
+                    break;
+
+                case "Masterball":
+                    user.Bag.PokeBalls.Add(new MasterBall());
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(item));
+            }
+
+            _database.UpdateObject("users", user);
         }
 
         public void UpdateDexEntry(UserObject user, PokemonData pokemon)
