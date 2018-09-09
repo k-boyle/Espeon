@@ -16,7 +16,7 @@ namespace Umbreon.Services
 
         private Timer _timer;
         private ConcurrentQueue<IRemoveable> _queue = new ConcurrentQueue<IRemoveable>();
-        
+
         public TimerService(IServiceProvider services)
         {
             _services = services;
@@ -26,16 +26,9 @@ namespace Umbreon.Services
         {
             _timer = new Timer(_ =>
             {
-                if (_queue.TryDequeue(out var removeable))
-                {
-                    _ = HandleRemoveableAsync(removeable);
-
-                    if (_queue.TryPeek(out var next))
-                    {
-                        _timer.Change(next.When - DateTime.UtcNow, TimeSpan.Zero);
-                    }
-                }
-                
+                if (!_queue.TryDequeue(out var removeable)) return;
+                HandleRemoveableAsync(removeable);
+                SetTimer();
             }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         }
 
@@ -43,28 +36,35 @@ namespace Umbreon.Services
         {
             _queue.Enqueue(removeable);
             _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
-            if (!_queue.TryPeek(out var obj)) return;
-            while (obj.When - DateTime.UtcNow <= TimeSpan.Zero)
-            {
-                _ = HandleRemoveableAsync(obj);
-                if (!_queue.TryPeek(out obj)) return;
-            }
-            _timer.Change(obj.When - DateTime.UtcNow, TimeSpan.Zero);
+            if (!_queue.TryPeek(out _)) return;
+            SetTimer();
         }
 
-        private async Task HandleRemoveableAsync(IRemoveable removeable)
+        private void SetTimer()
         {
-            var service = _services.GetService(removeable.Service.GetType());
-            if (service is IRemoveableService removeableService)
-                await removeableService.RemoveAsync(removeable);
+            IRemoveable removeable;
+            while (_queue.TryDequeue(out removeable) && removeable.When - DateTime.UtcNow < TimeSpan.Zero)
+            {
+                HandleRemoveableAsync(removeable);
+            }
+
+            _timer.Change(removeable.When - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
         }
+
+        private void HandleRemoveableAsync(IRemoveable removeable)
+            => _ = Task.Run(async () =>
+             {
+                 var service = _services.GetService(removeable.Service.GetType());
+                 if (service is IRemoveableService removeableService)
+                     await removeableService.RemoveAsync(removeable);
+             });
 
         private void Remove(IRemoveable obj)
         {
             var newQueue = new ConcurrentQueue<IRemoveable>();
             foreach (var item in _queue)
             {
-                if(item.Identifier == obj.Identifier) continue;
+                if (item.Identifier == obj.Identifier) continue;
                 newQueue.Enqueue(item);
             }
 
