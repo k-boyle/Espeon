@@ -36,16 +36,16 @@ namespace Umbreon.Services
         {
             _queue.Enqueue(removeable);
             _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
-            if (!_queue.TryPeek(out _)) return;
             SetTimer();
         }
 
         private void SetTimer()
         {
             IRemoveable removeable;
-            while (_queue.TryDequeue(out removeable) && removeable.When - DateTime.UtcNow < TimeSpan.Zero)
+            while (_queue.TryPeek(out removeable) && removeable.When - DateTime.UtcNow < TimeSpan.Zero)
             {
-                HandleRemoveableAsync(removeable);
+                if(_queue.TryDequeue(out removeable))
+                    HandleRemoveableAsync(removeable);
             }
 
             _timer.Change(removeable.When - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
