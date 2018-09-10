@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities.Guild;
 using Umbreon.Services;

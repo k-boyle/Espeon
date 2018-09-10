@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 using Umbreon.Extensions;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Commands.Preconditions;
 using Umbreon.Extensions;
 

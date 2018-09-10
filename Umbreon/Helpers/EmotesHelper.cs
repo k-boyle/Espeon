@@ -1,5 +1,5 @@
-﻿using System;
-using Discord;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 
 namespace Umbreon.Helpers

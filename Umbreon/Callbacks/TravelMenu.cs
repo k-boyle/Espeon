@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;

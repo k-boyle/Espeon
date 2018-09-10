@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Extensions;

@@ -1,9 +1,9 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;

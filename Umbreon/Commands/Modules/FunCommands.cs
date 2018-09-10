@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Discord.Commands;
+using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Commands.Preconditions;

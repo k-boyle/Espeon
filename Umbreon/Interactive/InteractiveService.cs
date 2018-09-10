@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Interactive.Callbacks;

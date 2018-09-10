@@ -1,5 +1,5 @@
-﻿using System;
-using LiteDB;
+﻿using LiteDB;
+using System;
 using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Entities.Guild

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Discord.Commands;
+﻿using Discord.Commands;
+using System.Collections.Generic;
 using Umbreon.Services;
 
 namespace Umbreon.Commands.ModuleBases

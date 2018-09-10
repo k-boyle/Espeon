@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Criteria;
 

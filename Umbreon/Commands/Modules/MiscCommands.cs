@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Core;

@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 using Umbreon.Attributes;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.Guild;

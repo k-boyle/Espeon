@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
+using System;
+using System.IO;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Umbreon.Commands.Contexts;
 using Umbreon.Interactive;
 using Umbreon.Paginators;

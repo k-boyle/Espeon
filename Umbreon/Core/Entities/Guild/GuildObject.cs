@@ -8,7 +8,6 @@ namespace Umbreon.Core.Entities.Guild
         public ulong ModRole { get; set; }
         public ulong WelcomeChannel { get; set; } = 0; // TODO
         public string WelcomeMessage { get; set; } // TODO
-        public bool UnkownCommandResult { get; set; } = false;
         public bool UseWhiteList { get; set; } = false; // TODO
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
         public List<Module> DisabledModules { get; set; } = new List<Module>();
@@ -17,7 +16,6 @@ namespace Umbreon.Core.Entities.Guild
             "um!"
         };
         public List<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
-        public List<Warning> Warnings { get; set; } = new List<Warning>(); // TODO
         public List<ulong> BlacklistedUsers { get; set; } = new List<ulong>(); // TODO
         public List<ulong> WhiteListedUsers { get; set; } = new List<ulong>
         {

@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using Discord.Commands;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Interfaces;
 

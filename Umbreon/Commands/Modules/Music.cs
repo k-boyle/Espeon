@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Commands.ModuleBases;

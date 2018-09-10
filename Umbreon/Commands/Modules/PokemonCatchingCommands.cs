@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Callbacks;
 using Umbreon.Commands.Preconditions;

@@ -1,6 +1,6 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;

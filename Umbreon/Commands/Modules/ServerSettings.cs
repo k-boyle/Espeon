@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Commands.ModuleBases;
@@ -102,19 +102,7 @@ namespace Umbreon.Commands.Modules
                 CurrentGuild.DisabledModules.Remove(type);
             await SendMessageAsync("Module has been enabled");
         }
-
-        [Command("CommandMatching")]
-        [Name("Close Command Matching")]
-        [Summary("Choose whether the bot will try match failed commands to the best match")]
-        [Usage("commandmatching false")]
-        public async Task SetMatching(
-            [Name("Enabled")]
-            [Summary("true of false")] bool enabled)
-        {
-            CurrentGuild.UnkownCommandResult = enabled;
-            await SendMessageAsync("Close command matching has been changed");
-        }
-
+        
         [Command("mod")]
         [Name("Moderator")]
         [Summary("Promote a user to moderator")]

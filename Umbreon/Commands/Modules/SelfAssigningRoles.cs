@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using MoreLinq;
+using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Commands.ModuleBases;
@@ -12,8 +12,8 @@ using Umbreon.Core;
 using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
-using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 using Colour = Discord.Color;
+using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Commands.Modules
 {

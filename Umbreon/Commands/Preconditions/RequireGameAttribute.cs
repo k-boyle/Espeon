@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Services;
 
 namespace Umbreon.Commands.Preconditions

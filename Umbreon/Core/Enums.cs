@@ -12,7 +12,6 @@
     {
         Database,
         CustomCmds,
-        Timer,
         Pokemon
     }
 
