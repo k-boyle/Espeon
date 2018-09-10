@@ -33,7 +33,7 @@ namespace Umbreon.Services
         public bool CanClaim(ulong id)
         {
             var user = _database.GetObject<UserObject>("users", id);
-            return DateTime.UtcNow - user.LastClaimed > TimeSpan.FromHours(23);
+            return DateTime.UtcNow - user.LastClaimed > TimeSpan.FromHours(8);
         }
 
         public int GetCandies(ulong id)
