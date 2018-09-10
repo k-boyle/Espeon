@@ -33,8 +33,11 @@ namespace Umbreon.Commands.Modules
         [Name("Candies")]
         [Summary("See how many rare candies you have")]
         [Usage("candies")]
-        public Task CandyCount()
-            => SendMessageAsync($"You have {_candy.GetCandies(Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
+        public Task CandyCount(
+            [Name("User")]
+            [Summary("The user you want to see the candies for. Leave blank for yourself")]
+            [Remainder] SocketGuildUser user = null)
+            => SendMessageAsync($"{(user is null ? "You have" : $"{user.GetDisplayName()} has")} {_candy.GetCandies(user?.Id ?? Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
 
         [Command("claim")]
         [Name("Claim Candies")]
@@ -44,7 +47,7 @@ namespace Umbreon.Commands.Modules
         {
             if (!_candy.CanClaim(Context.User.Id))
             {
-                var remaining = _database.GetObject<UserObject>("users", Context.User.Id).LastClaimed.AddHours(23) - DateTime.UtcNow;
+                var remaining = _database.GetObject<UserObject>("users", Context.User.Id).LastClaimed.AddHours(8) - DateTime.UtcNow;
 
                 await SendMessageAsync($"You have already claimed your candies{EmotesHelper.Emotes["rarecandy"]} today. Please wait {remaining.Humanize()}");
                 return;
