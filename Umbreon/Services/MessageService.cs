@@ -109,12 +109,43 @@ namespace Umbreon.Services
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
             var result = await _commands.ExecuteAsync(context, argPos, _services);
-            if (!result.IsSuccess)
+            if (!result.Result.IsSuccess)
                 await HandleErrorAsync(context, result);
         }
 
-        private Task HandleErrorAsync(ICommandContext context, IResult result)
-            => NewMessageAsync(context, result.ErrorReason);
+        private async Task HandleErrorAsync(ICommandContext context, (IResult Result, CommandInfo Command) result)
+        {
+            var usage = result.Command.Attributes.OfType<UsageAttribute>().FirstOrDefault();
+
+            switch (result.Result.Error)
+            {
+                case CommandError.ParseFailed:
+                    await NewMessageAsync(context, $"I failed to parse your argument, this command is meant to be used like; `{usage?.Example}`");
+                    break;
+
+                case CommandError.BadArgCount:
+                    await NewMessageAsync(context, $"You didn't give me enough arguments, this command is meant to be used like; `{usage?.Example}`");
+                    break;
+
+                case CommandError.UnmetPrecondition:
+                    await NewMessageAsync(context, $"Uhoh, you don't have the right permissions to use this command, you need; {result.Result.ErrorReason}");
+                    break;
+
+                case CommandError.Exception:
+                    if (result.Result.ErrorReason.Contains("502"))
+                    {
+                        await NewMessageAsync(context, "Discord did a goof, try again");
+                        break;
+                    }
+
+                    await NewMessageAsync(context, "Something unexpected happened... The error has been forwarded to the proper authorities");
+                    if (_client.GetChannel(463299724326469634) is SocketTextChannel channel)
+                    {
+                        await channel.SendMessageAsync(result.Result.ErrorReason);
+                    }
+                    break;
+            }
+        }
 
         public async Task<IUserMessage> SendMessageAsync(ICommandContext context, string content, bool isTTS = false,
             Embed embed = null)
