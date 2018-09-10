@@ -20,7 +20,7 @@ namespace Umbreon.Commands.Preconditions
             var games = services.GetService<GamesService>();
             return Task.FromResult(games.InGame(context) == _inGame
                 ? PreconditionResult.FromSuccess()
-                : PreconditionResult.FromError($"You must {(_inGame ? "not " : "")}be in a game to use this command"));
+                : PreconditionResult.FromError($"You must {(!_inGame ? "not " : "")}be in a game to use this command"));
         }
     }
 }
