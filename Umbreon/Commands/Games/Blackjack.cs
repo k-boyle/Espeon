@@ -189,65 +189,77 @@ namespace Umbreon.Commands.Games
         private (string suit, string card, int value) DrawCard()
             => _deck.Dequeue();
 
-        public async Task EndAsync()
+        public Task EndAsync()
         {
-            _inGame = false;
-            Games.LeaveGame(Context.User.Id);
-            _ = Message.RemoveAllReactionsAsync();
-            await Message.ModifyAsync(x =>
+            _ = Task.Run(async () =>
             {
-                x.Content = string.Empty;
-                x.Embed = BuildEmbed();
+                try
+                {
+                    _inGame = false;
+                    Games.LeaveGame(Context.User.Id);
+                    _ = Message.RemoveAllReactionsAsync();
+                    await Message.ModifyAsync(x =>
+                    {
+                        x.Content = string.Empty;
+                        x.Embed = BuildEmbed();
+                    });
+
+                    var playerTotal = _playerCards.Sum(x => x.value);
+                    if (playerTotal > 21)
+                    {
+                        await Message.ModifyAsync(x => x.Embed = LoseEmbed());
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
+                        Games.LeaveGame(Context.User.Id);
+                        _inGame = false;
+                        return;
+                    }
+
+                    var dealerTotal = _dealerCards.Sum(x => x.value);
+                    while (dealerTotal < 17)
+                    {
+                        var (suit, card, value) = DrawCard();
+                        _dealerCards.Add((suit, card, value));
+                        dealerTotal = _dealerCards.Sum(x => x.value);
+
+                        if (dealerTotal <= 21) continue;
+                        {
+                            if (_dealerCards.All(x => x.card != "ace"))
+                                break;
+
+                            while (dealerTotal > 21 && _dealerCards.Any(x => x.card == "ace" && x.value == 11))
+                            {
+                                var first = _dealerCards.First(x => x.card == "ace");
+                                _dealerCards[_dealerCards.IndexOf(first)] = (first.suit, first.card, 1);
+                                dealerTotal = _dealerCards.Sum(x => x.value);
+                            }
+                        }
+                    }
+
+                    if (dealerTotal > 21)
+                    {
+                        await Message.ModifyAsync(x => x.Embed = WinEmbed());
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (0.5 * _bet));
+                    }
+                    else if (dealerTotal > playerTotal)
+                    {
+                        await Message.ModifyAsync(x => x.Embed = LoseEmbed());
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
+                    }
+                    else if (dealerTotal < playerTotal)
+                    {
+                        await Message.ModifyAsync(x => x.Embed = WinEmbed());
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (0.5 * _bet));
+                    }
+                    else if (dealerTotal == playerTotal)
+                        await Message.ModifyAsync(x => x.Embed = DrawEmbed());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             });
 
-            var playerTotal = _playerCards.Sum(x => x.value);
-            if (playerTotal > 21)
-            {
-                await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
-                Games.LeaveGame(Context.User.Id);
-                _inGame = false;
-                return;
-            }
-
-            var dealerTotal = _dealerCards.Sum(x => x.value);
-            while (dealerTotal < 17)
-            {
-                var (suit, card, value) = DrawCard();
-                _dealerCards.Add((suit, card, value));
-                dealerTotal = _dealerCards.Sum(x => x.value);
-
-                if (dealerTotal <= 21) continue;
-                {
-                    if (_dealerCards.All(x => x.card != "ace"))
-                        break;
-
-                    while (dealerTotal > 21 && _dealerCards.Any(x => x.card == "ace" && x.value == 11))
-                    {
-                        var first = _dealerCards.First(x => x.card == "ace");
-                        _dealerCards[_dealerCards.IndexOf(first)] = (first.suit, first.card, 1);
-                        dealerTotal = _dealerCards.Sum(x => x.value);
-                    }
-                }
-            }
-
-            if (dealerTotal > 21)
-            {
-                await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int)(0.5 * _bet));
-            }
-            else if (dealerTotal > playerTotal)
-            {
-                await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) - _bet);
-            }
-            else if (dealerTotal < playerTotal)
-            {
-                await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int)(0.5 * _bet));
-            }
-            else if (dealerTotal == playerTotal)
-                await Message.ModifyAsync(x => x.Embed = DrawEmbed());
+            return Task.CompletedTask;
         }
 
         private Embed LoseEmbed()
