@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
@@ -143,6 +143,10 @@ namespace Umbreon.Services
                     {
                         await channel.SendMessageAsync(result.Result.ErrorReason);
                     }
+                    break;
+
+                case CommandError.Unsuccessful:
+                    await NewMessageAsync(context, result.Result.ErrorReason);
                     break;
             }
         }
