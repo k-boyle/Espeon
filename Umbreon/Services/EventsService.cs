@@ -7,6 +7,7 @@ using System.Linq;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
+using Umbreon.Helpers;
 
 namespace Umbreon.Services
 {
@@ -49,7 +50,7 @@ namespace Umbreon.Services
                         },
                         Color = new Color(0, 0, 0),
                         ThumbnailUrl = client.CurrentUser.GetDefaultAvatarUrl(),
-                        Description = $"Hello! I am {guild.CurrentUser.GetDisplayName()} and I have just been added to your guild!\n" +
+                        Description = $"Hello! I am Umbreon{EmotesHelper.Emotes["umbreon"]} and I have just been added to your guild!\n" +
                                       $"Type {_services.GetService<DatabaseService>().GetObject<GuildObject>("guilds", guild.Id).Prefixes.First()}help to see all my available commands!"
                     }.Build());
                 }
