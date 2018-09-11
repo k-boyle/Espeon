@@ -129,7 +129,6 @@ namespace Umbreon.Commands.Games
             }
 
             if (!emoji.Equals(_cross)) return true;
-            _accepted = true;
             _ = EndAsync();
 
             return true;
@@ -139,6 +138,7 @@ namespace Umbreon.Commands.Games
         {
             if (!_accepted)
             {
+                _accepted = true;
                 await _message.NewMessageAsync(Context, $"{(Context.User as IGuildUser).GetDisplayName()} {_target.GetDisplayName()} has declined your wager");
                 return;
             }
