@@ -75,34 +75,6 @@ namespace Umbreon.Commands.Modules
             await SendMessageAsync("Mod role has been set");
         }
 
-        [Command("Disable")]
-        [Name("Disable Module")]
-        [Summary("Disable one of the optional modules")]
-        [Usage("disable Commands")]
-        public async Task DisableModule(
-            [Name("Module")]
-            [Summary("The module code of the module you want to disable")]
-            [Remainder] Module type)
-        {
-            if (!CurrentGuild.DisabledModules.Contains(type))
-                CurrentGuild.DisabledModules.Add(type);
-            await SendMessageAsync("Module has been disabled");
-        }
-
-        [Command("Enable")]
-        [Name("Enable Module")]
-        [Summary("Enable one of the optional modules")]
-        [Usage("enable Commands")]
-        public async Task EnableModule(
-            [Name("Module")]
-            [Summary("The module code of the module you want to enable")]
-            [Remainder] Module type)
-        {
-            if (CurrentGuild.DisabledModules.Contains(type))
-                CurrentGuild.DisabledModules.Remove(type);
-            await SendMessageAsync("Module has been enabled");
-        }
-        
         [Command("mod")]
         [Name("Moderator")]
         [Summary("Promote a user to moderator")]

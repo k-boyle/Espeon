@@ -4,15 +4,12 @@ using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Commands.Preconditions;
-using Umbreon.Core;
 using Umbreon.Helpers;
 
 namespace Umbreon.Commands.Modules
 {
     [Name("Fun Commands")]
     [Summary("Umbreon has a fun side")]
-    [ModuleType(Module.Fun)]
-    [RequireEnabled]
     public class FunCommands : UmbreonBase
     {
         [Command("Catfact", RunMode = RunMode.Async)]

@@ -10,7 +10,6 @@ namespace Umbreon.Core.Entities.Guild
         public string WelcomeMessage { get; set; } // TODO
         public bool UseWhiteList { get; set; } = false; // TODO
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
-        public List<Module> DisabledModules { get; set; } = new List<Module>();
         public List<string> Prefixes { get; set; } = new List<string>
         {
             "um!"

@@ -21,8 +21,6 @@ namespace Umbreon.Commands.Modules
     [Group("Cmd")]
     [Name("Custom Commands")]
     [Summary("Create custom commands for your server")]
-    [RequireEnabled]
-    [ModuleType(Module.Commands)]
     [Remarks("This module can be disabled", "Module Code: Commands")]
     public class CustomCommands : CustomCommandsBase<UmbreonContext>
     {

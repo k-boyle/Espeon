@@ -21,8 +21,6 @@ namespace Umbreon.Commands.Modules
     [Name("Self Assigning Roles")]
     [Summary("Roles that users can add/remove to/from themselves")]
     [Remarks("This module can be disabled", "Module Code: Roles")]
-    [ModuleType(Module.Roles)]
-    [RequireEnabled]
     public class SelfAssigningRoles : SelfAssigningRolesBase<UmbreonContext>
     {
         [Command("List", RunMode = RunMode.Async)]

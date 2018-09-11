@@ -14,7 +14,6 @@ namespace Umbreon.Commands.Modules
 {
     [Name("Games")]
     [Summary("Some small games to play in the guild")]
-    [ModuleType(Module.Games)]
     public class Games : UmbreonBase
     {
         private readonly GamesService _games;

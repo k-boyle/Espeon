@@ -1,13 +1,5 @@
 ﻿namespace Umbreon.Core
 {
-    public enum Module
-    {
-        Commands,
-        Roles,
-        Games,
-        Fun
-    }
-
     public enum LogSource
     {
         Database,
