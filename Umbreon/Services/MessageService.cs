@@ -1,6 +1,7 @@
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Core.Entities;
@@ -19,7 +19,6 @@ using Umbreon.Interactive.Paginator;
 using Umbreon.Interfaces;
 using Umbreon.Paginators;
 using Umbreon.Paginators.CommandMenu;
-using Umbreon.Paginators.HelpPaginator;
 
 namespace Umbreon.Services
 {
@@ -165,7 +164,7 @@ namespace Umbreon.Services
 
             if (perms.ManageMessages)
                 await message.RemoveAllReactionsAsync();
-            
+
             await message.ModifyAsync(x =>
             {
                 x.Content = content;
@@ -216,10 +215,6 @@ namespace Umbreon.Services
 
             switch (paginator)
             {
-                case HelpPaginatedMessage help:
-                    callback = new HelpPaginatedCallback(_interactive, context, help);
-                    break;
-
                 case CommandMenuMessage cmd:
                     callback = new CommandMenuCallback(_commands, _services, _interactive, cmd, this, context);
                     break;

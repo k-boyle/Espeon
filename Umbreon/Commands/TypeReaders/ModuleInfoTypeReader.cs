@@ -12,15 +12,18 @@ namespace Umbreon.Commands.TypeReaders
     {
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            var commands = services.GetService<CommandService>();
-            var modules = commands.Modules;
-            var targetModule = modules.FirstOrDefault(x => string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
-            return targetModule is null
-                ? TypeReaderResult.FromError(new FailedResult("Module not found", false,
-                    CommandError.ObjectNotFound))
-                : (await targetModule.CheckPermissionsAsync(context, services)).IsSuccess
-                    ? TypeReaderResult.FromSuccess(targetModule) 
-                    : TypeReaderResult.FromError(new FailedResult("You do not have permission to use this module", false, CommandError.UnmetPrecondition));
+            var service = services.GetService<CommandService>();
+            var modules = service.Modules;
+            var found = modules.FirstOrDefault(x =>
+                string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
+
+            if(found is null)
+                return TypeReaderResult.FromError(new FailedResult("Module not found", CommandError.Unsuccessful));
+
+            if(!(await found.CheckPermissionsAsync(context, services)).IsSuccess)
+                return TypeReaderResult.FromError(new FailedResult("You cann't execute any commands in this module", CommandError.Unsuccessful));
+
+            return found.Name == "Help" ? TypeReaderResult.FromError(new FailedResult("Module not found", CommandError.Unsuccessful)) : TypeReaderResult.FromSuccess(found);
         }
     }
 }

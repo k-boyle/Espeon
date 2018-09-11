@@ -1,27 +1,27 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
-using Umbreon.Interactive.Paginator;
-using Umbreon.Paginators.HelpPaginator;
+using Umbreon.Helpers;
 using Umbreon.Services;
-using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 using Colour = Discord.Color;
+using Remarks = Umbreon.Attributes.RemarksAttribute;
+using RemarksAttribute = Discord.Commands.RemarksAttribute;
 
 namespace Umbreon.Commands.Modules
 {
     [Name("Help")]
-    [Summary("Help commands")]
     public class HelpCommands : UmbreonBase
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
+        private string Prefix => _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First();
 
         public HelpCommands(CommandService commands, DatabaseService database)
         {
@@ -30,95 +30,97 @@ namespace Umbreon.Commands.Modules
         }
 
         [Command("help")]
-        public async Task HelpCmd()
+        public async Task Help()
         {
-            var modules = _commands.Modules.Where(x => !string.Equals(x.Name, "help", StringComparison.CurrentCultureIgnoreCase)).OrderBy(y => y.Name);
-            var pages = new List<Page>();
-            var fields = new List<EmbedFieldBuilder>();
+            var modules = _commands.Modules.Where(x => x.Name != "Help");
+            var canExecute = new List<ModuleInfo>();
             foreach (var module in modules)
-            {
-                var remarks = module.Attributes.FirstOrDefault(x => x is RemarksAttribute) as RemarksAttribute;
-                fields.Clear();
-                var newPage = new Page
-                {
-                    Fields = new List<EmbedFieldBuilder>()
-                };
-                if(!(await module.CheckPermissionsAsync(Context, Services)).IsSuccess) continue;
+                if ((await module.CheckPermissionsAsync(Context, Services)).IsSuccess)
+                    canExecute.Add(module);
 
-                newPage.Title = new EmbedFieldBuilder
-                {
-                    Name = $"Module: {(ulong.TryParse(module.Name, out _) ? Context.Guild.Name : module.Name)}",
-                    Value = $"**Summary**: {module.Summary}\n" +
-                            $"{(!(remarks is null) ? $"**Remark**:{string.Join("\n**Remark**:", remarks.RemarkStrings)}" : "")}\n"
-                };
+            var builder = Embed();
+            builder.WithFooter($"You can view help on a specific module by doing {Prefix}help module");
+            builder.AddField("Modules", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
 
-                foreach (var cmd in module.Commands)
-                {
-                    if(!(await cmd.CheckPreconditionsAsync(Context, Services)).IsSuccess) continue;
-                    
-                    newPage.Fields.Add(new EmbedFieldBuilder
-                    {
-                        Name = $"Command: {cmd.Name}",
-                        Value = $"**Summary**: {cmd.Summary}\n" +
-                                $"**Example Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}"
-                    });
-                }
-
-                pages.Add(newPage);
-            }
-
-            var paginatedMessage = new HelpPaginatedMessage
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = Context.User.GetAvatarOrDefaultUrl(),
-                    Name = Context.User.GetDisplayName()
-                },
-                Options = PaginatedAppearanceOptions.Default,
-                Pages = pages,
-                Prefix = _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First(),
-            };
-
-            await SendPaginatedMessageAsync(paginatedMessage);
+            await SendMessageAsync(string.Empty, embed: builder.Build());
         }
 
         [Command("help")]
-        public async Task Help([Remainder] IEnumerable<CommandInfo> commands)
+        [Priority(1)]
+        public async Task Help([Remainder] ModuleInfo module)
         {
-            var filtered = commands.Where(x => !string.Equals(x.Name, "help", StringComparison.CurrentCultureIgnoreCase));
-            if (filtered.Count() == 0) return;
-            var results = new List<CommandInfo>();
-            foreach (var cmd in filtered)
+            var commands = module.Commands;
+            var canExecute = new List<CommandInfo>();
+            foreach (var command in commands)
+                if ((await command.CheckPreconditionsAsync(Context, Services)).IsSuccess)
+                    canExecute.Add(command);
+
+            if (canExecute.Count == 0)
             {
-                if (!(await cmd.CheckPreconditionsAsync(Context, Services)).IsSuccess) continue;
-                results.Add(cmd);
+                await SendMessageAsync("You can't execute any commands in this module");
+                return;
             }
 
-            if (results.Count == 0) return;
+            var remarks = module.Attributes.OfType<Remarks>().FirstOrDefault();
+            var builder = Embed();
+            builder.WithFooter($"You can view help on a specific command by doing {Prefix}help command");
+            builder.AddField($"{module.Name} Information", $"**Summary**: {module.Summary}" +
+                                                           $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}")}");
+            builder.AddField("Commands", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Aliases.FirstOrDefault())}`")));
 
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = Context.User.GetAvatarOrDefaultUrl(),
-                    Name = Context.User.GetDisplayName()
-                },
-                Color = Colour.Gold,
-                Timestamp = DateTimeOffset.UtcNow
-            };
+            await SendMessageAsync(string.Empty, embed: builder.Build());
+        }
 
-            foreach (var cmd in results)
+        [Command("help")]
+        [Priority(2)]
+        public async Task Help([Remainder] IEnumerable<CommandInfo> commands)
+        {
+            var builder = Embed();
+            builder.WithFooter($"We must go deeper! {Prefix}deeper command");
+
+            foreach (var command in commands)
             {
-                builder.AddField(f =>
-                {
-                    f.Name = cmd.Name;
-                    f.Value = $"**Summary**: {cmd.Summary}\n" +
-                              $"**Example Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{cmd.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
-                              $"**Parameter**: {string.Join("\n**Parameter**:", cmd.Parameters.Select(x => $"`{x.Name}` > {x.Summary}"))}";
-                });
+                var usage = command.Attributes.OfType<UsageAttribute>().FirstOrDefault();
+                var remarks = command.Attributes.OfType<Remarks>().FirstOrDefault();
+
+                builder.AddField(command.Name, $"**Usage**: {Prefix}{usage?.Example}\n" +
+                                               $"**Summary**: {command.Summary}" +
+                                               $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}\n")}" +
+                                               $"{(command.Aliases.Count > 1 ? $"\n**Aliases**: {string.Join(", ", command.Aliases.Select(x => $"`{Format.Sanitize(x)}`"))}" : "")}");
             }
 
             await SendMessageAsync(string.Empty, embed: builder.Build());
         }
+
+        [Command("deeper")]
+        public async Task Deeper([Remainder] IEnumerable<CommandInfo> commands)
+        {
+            var builder = Embed();
+            builder.WithFooter("You're at the core... Going deeper would just be going back");
+
+            foreach (var command in commands)
+            {
+                builder.AddField(command.Name, $"**Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{command.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
+                                               $"**Summary**: {command.Summary}\n" +
+                                               $"**Parameter**: {string.Join("\n**Parameter**: ", command.Parameters.Select(x => $"`{x.Name}` - {x.Summary}"))}");
+            }
+
+            await SendMessageAsync(string.Empty, embed: builder.Build());
+        }
+
+        private EmbedBuilder Embed()
+            => new EmbedBuilder
+            {
+                Color = new Colour(255, 255, 39),
+                Title = "Umbreon's help",
+                Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = Context.User.GetAvatarOrDefaultUrl(),
+                    Name = Context.User.GetDisplayName()
+                },
+                ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
+                Timestamp = DateTimeOffset.UtcNow,
+                Description = $"Hello, my name is Umbreon{EmotesHelper.Emotes["umbreon"]}! You can invoke my commands either by mentioning me or using the `{Format.Sanitize(Prefix)}` prefix!"
+            };
     }
 }
