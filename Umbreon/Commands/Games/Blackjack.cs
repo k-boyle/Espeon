@@ -47,6 +47,7 @@ namespace Umbreon.Commands.Games
         };
 
         private readonly int _bet;
+        private const float Payout = 1;
         private bool _inGame = true;
 
         private readonly IReadOnlyCollection<string> _suits = new[] { "❤", "♦", "♣", "♠" };
@@ -238,7 +239,7 @@ namespace Umbreon.Commands.Games
                     if (dealerTotal > 21)
                     {
                         await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (0.5 * _bet));
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (Payout * _bet));
                     }
                     else if (dealerTotal > playerTotal)
                     {
@@ -248,7 +249,7 @@ namespace Umbreon.Commands.Games
                     else if (dealerTotal < playerTotal)
                     {
                         await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (0.5 * _bet));
+                        Candy.SetCandies(Context.User.Id, Candy.GetCandies(Context.User.Id) + (int) (Payout * _bet));
                     }
                     else if (dealerTotal == playerTotal)
                         await Message.ModifyAsync(x => x.Embed = DrawEmbed());
