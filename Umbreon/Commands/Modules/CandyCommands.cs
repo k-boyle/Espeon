@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Commands.ModuleBases;
+using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.User;
 using Umbreon.Extensions;
 using Umbreon.Helpers;
@@ -31,7 +32,7 @@ namespace Umbreon.Commands.Modules
 
         [Command("candies")]
         [Name("Candies")]
-        [Summary("See how many rare candies you have")]
+        [Summary("See how many rare candies someone has")]
         [Usage("candies Umbreon")]
         public Task CandyCount(
             [Name("User")]
@@ -61,9 +62,9 @@ namespace Umbreon.Commands.Modules
         [Command("treat")]
         [Name("Send Treats")]
         [Summary("Give a user some rare candies")]
-        [Usage("treat Umbreon 100")]
+        [Usage("treat 100 Umbreon")]
         [RequireOwner]
-        public async Task GiveCandies(int amount, [Remainder] SocketGuildUser user = null)
+        public async Task GiveCandies([OverrideTypeReader(typeof(CandyTypeReader))] int amount, [Remainder] SocketGuildUser user = null)
         {
             user = user ?? Context.User;
 
@@ -96,7 +97,8 @@ namespace Umbreon.Commands.Modules
             [Name("User")]
             [Summary("The user you want to gift")] SocketGuildUser user,
             [Name("Amount")]
-            [Summary("The amount you want to gift")] uint amount)
+            [Summary("The amount you want to gift")]
+            [OverrideTypeReader(typeof(CandyTypeReader))] int amount)
         {
             if (amount > _candy.GetCandies(Context.User.Id))
             {
