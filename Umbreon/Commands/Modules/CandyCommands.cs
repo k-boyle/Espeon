@@ -32,7 +32,7 @@ namespace Umbreon.Commands.Modules
         [Command("candies")]
         [Name("Candies")]
         [Summary("See how many rare candies you have")]
-        [Usage("candies")]
+        [Usage("candies Umbreon")]
         public Task CandyCount(
             [Name("User")]
             [Summary("The user you want to see the candies for. Leave blank for yourself")]
