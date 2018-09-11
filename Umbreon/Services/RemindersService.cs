@@ -69,7 +69,7 @@ namespace Umbreon.Services
                 Description = reminder.TheReminder
             }.Build());
             var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
-            guild.Reminders.Remove(reminder);
+            guild.Reminders.Remove(guild.Reminders.Find(x => x.Identifier == reminder.Identifier));
             _database.UpdateObject("guilds", guild);
         }
 
