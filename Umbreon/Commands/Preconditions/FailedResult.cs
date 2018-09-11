@@ -6,13 +6,12 @@ namespace Umbreon.Commands.Preconditions
     {
         public CommandError? Error { get; }
         public string ErrorReason { get; }
-        public bool IsSuccess { get; }
+        public bool IsSuccess { get; } = false;
 
-        public FailedResult(string errorReason, bool isSuccess, CommandError? error)
+        public FailedResult(string errorReason, CommandError? error)
         {
             Error = error;
             ErrorReason = errorReason;
-            IsSuccess = isSuccess;
         }
     }
 }

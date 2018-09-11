@@ -12,6 +12,6 @@ namespace Umbreon.Commands.Preconditions
             IServiceProvider services)
             => Task.FromResult(!services.GetService<PokemonPlayerService>().InEncounter(context.User.Id) ? 
                 PreconditionResult.FromSuccess() :  
-                PreconditionResult.FromError(new FailedResult("You are already in an encounter", false, CommandError.UnmetPrecondition)));
+                PreconditionResult.FromError(new FailedResult("You are already in an encounter", CommandError.UnmetPrecondition)));
     }
 }

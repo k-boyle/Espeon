@@ -22,13 +22,12 @@ namespace Umbreon.Commands.TypeReaders
             {
                 if (id < 0 || id > 9)
                     return Task.FromResult(TypeReaderResult.FromError(new FailedResult("Area code can only be from 1-9",
-                        false, CommandError.ParseFailed)));
+                        CommandError.ParseFailed)));
             }
             else
             {
                 if (habitats.All(x => !string.Equals(x.Value, input, StringComparison.CurrentCultureIgnoreCase)))
-                    return Task.FromResult(TypeReaderResult.FromError(new FailedResult("Area code not be found", false,
-                        CommandError.ParseFailed)));
+                    return Task.FromResult(TypeReaderResult.FromError(new FailedResult("Area code not be found", CommandError.ParseFailed)));
                 id = habitats.FirstOrDefault(x => string.Equals(x.Value, input, StringComparison.CurrentCultureIgnoreCase)).Key;
             }
 
