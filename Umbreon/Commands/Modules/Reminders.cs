@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -27,7 +28,7 @@ namespace Umbreon.Commands.Modules
         [Name("Set Reminder")]
         [Summary("Set a reminder for yourself")]
         [Usage("reminder 30m get dinner out of the oven")]
-        [Alias("remindme")]
+        [Alias("remindme", "remind")]
         public async Task Reminder(
             [Name("When")]
             [Summary("The time at which you want to be reminded. #d#h#m#s")] TimeSpan when, 
@@ -46,10 +47,10 @@ namespace Umbreon.Commands.Modules
         public async Task ListReminders()
         {
             var reminders = _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Reminders;
-            var users = reminders.Where(x => x.UserId == Context.User.Id);
+            var users = reminders.Where(x => x.UserId == Context.User.Id).ToImmutableList();
             var i = 1;
             await SendMessageAsync($"Your current reminders are:\n" +
-                                   $"{(users.Count() > 0 ? string.Join("\n", users.Select(x => (x.TheReminder.Length > 100 ? $"**{i++}**: {x.TheReminder.Substring(0, 100)}..." : $"**{i++}**:{x.TheReminder}"))) : "None")}");
+                                   $"{(users.Count > 0 ? string.Join("\n", users.Select(x => (x.TheReminder.Length > 100 ? $"**{i++}**: {x.TheReminder.Substring(0, 100)}..." : $"**{i++}**:{x.TheReminder}"))) : "None")}");
         }
     }
 }
