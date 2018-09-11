@@ -13,14 +13,12 @@ using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
 using Colour = Discord.Color;
-using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Commands.Modules
 {
     [Group("Roles")]
     [Name("Self Assigning Roles")]
     [Summary("Roles that users can add/remove to/from themselves")]
-    [Remarks("This module can be disabled", "Module Code: Roles")]
     public class SelfAssigningRoles : SelfAssigningRolesBase<UmbreonContext>
     {
         [Command("List", RunMode = RunMode.Async)]

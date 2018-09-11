@@ -14,14 +14,12 @@ using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
 using Colour = Discord.Color;
-using RemarksAttribute = Umbreon.Attributes.RemarksAttribute;
 
 namespace Umbreon.Commands.Modules
 {
     [Group("Cmd")]
     [Name("Custom Commands")]
     [Summary("Create custom commands for your server")]
-    [Remarks("This module can be disabled", "Module Code: Commands")]
     public class CustomCommands : CustomCommandsBase<UmbreonContext>
     {
         [Command("List", RunMode = RunMode.Async)]

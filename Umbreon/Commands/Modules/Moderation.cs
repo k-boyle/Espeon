@@ -7,7 +7,6 @@ using Umbreon.Commands.ModuleBases;
 using Umbreon.Commands.Preconditions;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Core;
-using Umbreon.Extensions;
 
 namespace Umbreon.Commands.Modules
 {
@@ -34,7 +33,6 @@ namespace Umbreon.Commands.Modules
             [Summary("The reason for kicking them")]
             [Remainder] string reason = null)
         {
-            await userToKick.TrySendDMAsync($"You have been kicked from {Context.Guild.Name} {(reason is null ? "" : $"for; {reason}")}");
             await userToKick.KickAsync(reason);
             await SendMessageAsync("User has been kicked");
         }
@@ -55,7 +53,6 @@ namespace Umbreon.Commands.Modules
             [Summary("The reason for banning them")]
             [Remainder] string reason = null)
         {
-            await userToBan.TrySendDMAsync($"You have been banned from {Context.Guild.Name} {(reason is null ? "" : $"for; {reason}")}");
             await Context.Guild.AddBanAsync(userToBan, pruneAmount, reason);
             await SendMessageAsync("User has been banned");
         }
