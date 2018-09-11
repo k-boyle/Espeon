@@ -33,6 +33,7 @@ namespace Umbreon.Commands.Modules
             => (Context.Client.GetChannel(463300066740797463) as SocketTextChannel)?.SendMessageAsync($"{DateTime.UtcNow.TimeOfDay} : {Context.User.GetDisplayName()} : {Context.Guild.Name} : {Context.Channel.Name}({Context.Channel.Id}) - {feature}");
 
         [Command("Source")]
+        [Alias("sauce")]
         [Name("Bot Source")]
         [Summary("The source code for the bot")]
         [Usage("source")]
