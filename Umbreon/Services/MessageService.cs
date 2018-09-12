@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -140,7 +140,7 @@ namespace Umbreon.Services
                     await NewMessageAsync(context, "Something unexpected happened... The error has been forwarded to the proper authorities");
                     if (_client.GetChannel(463299724326469634) is SocketTextChannel channel)
                     {
-                        await channel.SendMessageAsync(result.Result.ErrorReason);
+                        await channel.SendMessageAsync($"{context.Message} - {result.Result.ErrorReason}");
                     }
                     break;
 
