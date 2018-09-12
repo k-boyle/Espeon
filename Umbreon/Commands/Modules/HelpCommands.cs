@@ -42,7 +42,7 @@ namespace Umbreon.Commands.Modules
             builder.WithFooter($"You can view help on a specific module by doing {Prefix}help module");
             builder.AddField("Modules", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
 
-            await SendMessageAsync(string.Empty, embed: builder.Build());
+            await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
         [Command("help")]
@@ -68,7 +68,7 @@ namespace Umbreon.Commands.Modules
                                                            $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}")}");
             builder.AddField("Commands", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Aliases.FirstOrDefault())}`")));
 
-            await SendMessageAsync(string.Empty, embed: builder.Build());
+            await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
         [Command("help")]
@@ -89,7 +89,7 @@ namespace Umbreon.Commands.Modules
                                                $"{(command.Aliases.Count > 1 ? $"\n**Aliases**: {string.Join(", ", command.Aliases.Select(x => $"`{Format.Sanitize(x)}`"))}" : "")}");
             }
 
-            await SendMessageAsync(string.Empty, embed: builder.Build());
+            await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
         [Command("deeper")]
@@ -105,7 +105,7 @@ namespace Umbreon.Commands.Modules
                                                $"**Parameter**: {string.Join("\n**Parameter**: ", command.Parameters.Select(x => $"`{x.Name}` - {x.Summary}"))}");
             }
 
-            await SendMessageAsync(string.Empty, embed: builder.Build());
+            await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
         private EmbedBuilder Embed()
