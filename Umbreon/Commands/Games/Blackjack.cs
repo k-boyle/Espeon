@@ -282,7 +282,7 @@ namespace Umbreon.Commands.Games
             => new EmbedBuilder
                 {
                     Title = "Blackjack Result",
-                    Description = $"You win! You win {(int)(0.5 * _bet)}{EmotesHelper.Emotes["rarecandy"]} candies!",
+                    Description = $"You win! You win {(int)(Payout * _bet)}{EmotesHelper.Emotes["rarecandy"]} candies!",
                     Color = Colour.Green
                 }
                 .AddField("Player",
