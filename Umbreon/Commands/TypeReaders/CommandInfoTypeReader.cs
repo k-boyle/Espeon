@@ -15,7 +15,9 @@ namespace Umbreon.Commands.TypeReaders
             var service = services.GetService<CommandService>();
             var commands = service.Commands;
             var matching = commands.Where(x =>
-                string.Equals(input, x.Name, StringComparison.CurrentCultureIgnoreCase));
+                string.Equals(input, x.Name, StringComparison.CurrentCultureIgnoreCase) || 
+                x.Name.IndexOf(input, StringComparison.CurrentCultureIgnoreCase) >= 0 || 
+                x.Aliases.Any(y => y.IndexOf(input, StringComparison.CurrentCultureIgnoreCase) >= 0));
 
             var canExecute = new List<CommandInfo>();
             foreach (var command in matching)
