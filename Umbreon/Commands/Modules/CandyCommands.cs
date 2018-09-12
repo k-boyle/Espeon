@@ -64,7 +64,7 @@ namespace Umbreon.Commands.Modules
         [Summary("Give a user some rare candies")]
         [Usage("treat 100 Umbreon")]
         [RequireOwner]
-        public async Task GiveCandies([OverrideTypeReader(typeof(CandyTypeReader))] int amount, [Remainder] SocketGuildUser user = null)
+        public async Task GiveCandies(int amount, [Remainder] SocketGuildUser user = null)
         {
             user = user ?? Context.User;
 
