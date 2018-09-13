@@ -14,6 +14,9 @@ namespace Umbreon.Commands.TypeReaders
             var candy = services.GetService<CandyService>();
             var user = candy.GetCandies(context.User.Id);
 
+            if (string.Equals(input, "NaN")) //JS meme
+                return Task.FromResult(TypeReaderResult.FromSuccess(0));
+
             if (string.Equals(input, "all", StringComparison.CurrentCultureIgnoreCase))
                 return Task.FromResult(TypeReaderResult.FromSuccess(user));
 
