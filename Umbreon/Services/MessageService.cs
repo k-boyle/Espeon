@@ -13,6 +13,7 @@ using Umbreon.Attributes;
 using Umbreon.Commands.Contexts;
 using Umbreon.Core.Entities;
 using Umbreon.Core.Entities.Guild;
+using Umbreon.Extensions;
 using Umbreon.Interactive;
 using Umbreon.Interactive.Callbacks;
 using Umbreon.Interactive.Paginator;
@@ -97,17 +98,18 @@ namespace Umbreon.Services
                 _database.UpdateObject("guilds", guild);
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
-                await HandleCommandAsync(context, argPos);
+                var command = message.Content.Substring(argPos).RemoveExtraSpaces();
+                await HandleCommandAsync(context, command);
             }
         }
 
         public Task HandleMessageUpdateAsync(SocketMessage msg)
             => HandleMessageAsync(msg);
 
-        private async Task HandleCommandAsync(UmbreonContext context, int argPos)
+        private async Task HandleCommandAsync(UmbreonContext context, string command)
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
-            var result = await _commands.ExecuteAsync(context, argPos, _services);
+            var result = await _commands.ExecuteAsync(context, command, _services);
             if (!result.Result.IsSuccess)
                 await HandleErrorAsync(context, result);
         }

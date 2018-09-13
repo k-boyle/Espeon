@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -37,7 +38,7 @@ namespace Umbreon.Extensions
                     {
                         if (line[0] != '`')
                         {
-                            var temp = line.Substring(0, line.IndexOf("`"));
+                            var temp = line.Substring(0, line.IndexOf("`", StringComparison.CurrentCultureIgnoreCase));
                             sb.AppendLine(temp);
                         }
                         strings.Add(sb.ToString());
@@ -57,5 +58,19 @@ namespace Umbreon.Extensions
 
         public static string FirstLetterToUpper(this string str)
             => str.First().ToString().ToUpper() + str.Substring(1);
+
+        public static string RemoveExtraSpaces(this string str)
+        {
+            var split = str.Split(' ');
+            var builder = new StringBuilder();
+
+            foreach (var value in split)
+            {
+                if(value.Length == 0) continue;
+                builder.Append(builder.Length == 0 ? value : $" {value}");
+            }
+
+            return builder.ToString();
+        }
     }
 }
