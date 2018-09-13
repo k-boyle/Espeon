@@ -35,7 +35,7 @@ namespace Umbreon.Services
         private readonly IServiceProvider _services;
         private readonly Random _random;
 
-        private const int CacheSize = 10;
+        private const int CacheSize = 20;
 
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache =
             new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
