@@ -37,11 +37,11 @@ namespace Umbreon.Commands.Preconditions
             }
 
             if (roleId == 0 || !context.Guild.Roles.Select(x => x.Id).Contains(roleId))
-                return Task.FromResult(PreconditionResult.FromError($"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role"));
+                return Task.FromResult(PreconditionResult.FromError(command, $"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role"));
             var user = context.User as SocketGuildUser;
             return user.HasRole(roleId)
-                ? Task.FromResult(PreconditionResult.FromSuccess())
-                : Task.FromResult(PreconditionResult.FromError("You do not have the required role"));
+                ? Task.FromResult(PreconditionResult.FromSuccess(command))
+                : Task.FromResult(PreconditionResult.FromError(command, "You do not have the required role"));
         }
     }
 }

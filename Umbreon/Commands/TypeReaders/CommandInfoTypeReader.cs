@@ -4,13 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbreon.Commands.Preconditions;
 
 namespace Umbreon.Commands.TypeReaders
 {
     public class CommandInfoTypeReader : TypeReader
     {
-        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
         {
             var service = services.GetService<CommandService>();
             var commands = service.Commands;
@@ -20,13 +19,13 @@ namespace Umbreon.Commands.TypeReaders
                 x.Aliases.Any(y => y.IndexOf(input, StringComparison.CurrentCultureIgnoreCase) >= 0));
 
             var canExecute = new List<CommandInfo>();
-            foreach (var command in matching)
-                if ((await command.CheckPreconditionsAsync(context, services)).IsSuccess && command.Name != "help")
-                    canExecute.Add(command);
+            foreach (var cmd in matching)
+                if ((await cmd.CheckPreconditionsAsync(context, services)).IsSuccess && cmd.Name != "help")
+                    canExecute.Add(cmd);
 
             return canExecute.Count == 0
-                ? TypeReaderResult.FromError(new FailedResult("No commands found", CommandError.Unsuccessful))
-                : TypeReaderResult.FromSuccess(canExecute);
+                ? TypeReaderResult.FromError(command, CommandError.Unsuccessful, "Failed to find any commands")
+                : TypeReaderResult.FromSuccess(command, canExecute);
         }
     }
 }

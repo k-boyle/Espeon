@@ -14,8 +14,8 @@ namespace Umbreon.Commands.Preconditions
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             return context.Guild.Id == _guildId
-                ? Task.FromResult(PreconditionResult.FromSuccess())
-                : Task.FromResult(PreconditionResult.FromError(PreconditionResult.FromError(new FailedResult("Unknown Command", CommandError.UnknownCommand))));
+                ? Task.FromResult(PreconditionResult.FromSuccess(command))
+                : Task.FromResult(PreconditionResult.FromError(command, "Command not found"));
         }
     }
 }

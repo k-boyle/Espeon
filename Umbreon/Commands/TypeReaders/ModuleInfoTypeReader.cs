@@ -3,14 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbreon.Commands.Preconditions;
 using Umbreon.Extensions;
 
 namespace Umbreon.Commands.TypeReaders
 {
     public class ModuleInfoTypeReader : TypeReader
     {
-        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
         {
             var service = services.GetService<CommandService>();
             var modules = service.Modules;
@@ -18,12 +17,12 @@ namespace Umbreon.Commands.TypeReaders
                 string.Equals(x.Name, input, StringComparison.CurrentCultureIgnoreCase));
 
             if(found is null)
-                return TypeReaderResult.FromError(new FailedResult("Module not found", CommandError.Unsuccessful));
+                return TypeReaderResult.FromError(command, CommandError.ParseFailed, "Module not found");
 
             if(!(await found.CheckPermissionsAsync(context, services)).IsSuccess)
-                return TypeReaderResult.FromError(new FailedResult("You cann't execute any commands in this module", CommandError.Unsuccessful));
+                return TypeReaderResult.FromError(command, CommandError.Unsuccessful, "You can't execute any commands in this module");
 
-            return found.Name == "Help" ? TypeReaderResult.FromError(new FailedResult("Module not found", CommandError.Unsuccessful)) : TypeReaderResult.FromSuccess(found);
+            return found.Name == "Help" ? TypeReaderResult.FromError(command, CommandError.ParseFailed, "Module not found") : TypeReaderResult.FromSuccess(command, found);
         }
     }
 }

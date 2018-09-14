@@ -8,10 +8,10 @@ namespace Umbreon.Commands.Preconditions
 {
     public class RequireEncounterAttribute : PreconditionAttribute
     {
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo _,
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,
             IServiceProvider services)
             => Task.FromResult(!services.GetService<PokemonPlayerService>().InEncounter(context.User.Id) ? 
-                PreconditionResult.FromSuccess() :  
-                PreconditionResult.FromError(new FailedResult("You are already in an encounter", CommandError.UnmetPrecondition)));
+                PreconditionResult.FromSuccess(command) :  
+                PreconditionResult.FromError(command, "You are already in an encounter"));
     }
 }

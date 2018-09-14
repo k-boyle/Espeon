@@ -110,15 +110,16 @@ namespace Umbreon.Services
         {
             if (!context.Guild.CurrentUser.GetPermissions(context.Channel).SendMessages) return;
             var result = await _commands.ExecuteAsync(context, command, _services);
-            if (!result.Result.IsSuccess)
+            if (!result.IsSuccess)
                 await HandleErrorAsync(context, result);
         }
 
-        private async Task HandleErrorAsync(ICommandContext context, (IResult Result, CommandInfo Command) result)
+        //IResult.Command is from my custom implementation of Discord.Net.Commands
+        private async Task HandleErrorAsync(ICommandContext context, IResult result)
         {
-            var usage = result.Command.Attributes.OfType<UsageAttribute>().FirstOrDefault();
+            var usage = result.Command?.Attributes.OfType<UsageAttribute>().FirstOrDefault();
 
-            switch (result.Result.Error)
+            switch (result.Error)
             {
                 case CommandError.ParseFailed:
                     await NewMessageAsync(context, $"I failed to parse your argument, this command is meant to be used like; `{usage?.Example}`");
@@ -129,11 +130,11 @@ namespace Umbreon.Services
                     break;
 
                 case CommandError.UnmetPrecondition:
-                    await NewMessageAsync(context, $"Uhoh, you don't have the right permissions to use this command, you need; {result.Result.ErrorReason}");
+                    await NewMessageAsync(context, $"Uhoh, you don't have the right permissions to use this command, you need; {result.ErrorReason}");
                     break;
 
                 case CommandError.Exception:
-                    if (result.Result.ErrorReason.Contains("502"))
+                    if (result.ErrorReason.Contains("502"))
                     {
                         await NewMessageAsync(context, "Discord did a goof, try again");
                         break;
@@ -142,12 +143,12 @@ namespace Umbreon.Services
                     await NewMessageAsync(context, "Something unexpected happened... The error has been forwarded to the proper authorities");
                     if (_client.GetChannel(463299724326469634) is SocketTextChannel channel)
                     {
-                        await channel.SendMessageAsync($"{context.Message} - {result.Result.ErrorReason}");
+                        await channel.SendMessageAsync($"{context.Message} - {result.ErrorReason}");
                     }
                     break;
 
                 case CommandError.Unsuccessful:
-                    await NewMessageAsync(context, result.Result.ErrorReason);
+                    await NewMessageAsync(context, result.ErrorReason);
                     break;
             }
         }

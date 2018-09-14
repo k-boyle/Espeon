@@ -53,10 +53,10 @@ namespace Umbreon.Commands.Preconditions
             IServiceProvider services)
         {
             if (_noLimitInDMs && context.Channel is IPrivateChannel)
-                return Task.FromResult(PreconditionResult.FromSuccess());
+                return Task.FromResult(PreconditionResult.FromSuccess(command));
 
             if (_noLimitForAdmins && context.User is IGuildUser gu && gu.GuildPermissions.Administrator)
-                return Task.FromResult(PreconditionResult.FromSuccess());
+                return Task.FromResult(PreconditionResult.FromSuccess(command));
 
             var now = DateTime.UtcNow;
             var key = _applyPerGuild ? (context.User.Id, context.Guild?.Id) : (context.User.Id, null);
@@ -69,10 +69,10 @@ namespace Umbreon.Commands.Preconditions
             timeout.TimesInvoked++;
 
             if (timeout.TimesInvoked > _invokeLimit)
-                return Task.FromResult(PreconditionResult.FromError(
+                return Task.FromResult(PreconditionResult.FromError(command, 
                     $"This command is on cooldown please wait {(timeout.FirstInvoke.Add(_invokeLimitPeriod) - DateTime.UtcNow).Seconds}s"));
             _invokeTracker[key] = timeout;
-            return Task.FromResult(PreconditionResult.FromSuccess());
+            return Task.FromResult(PreconditionResult.FromSuccess(command));
         }
 
         private sealed class CommandTimeout

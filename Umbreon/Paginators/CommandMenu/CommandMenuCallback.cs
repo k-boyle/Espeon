@@ -136,8 +136,8 @@ namespace Umbreon.Paginators.CommandMenu
                         {
                             var result = await _commands.ExecuteAsync(Context,
                                 $"{selectedCommand.Aliases.FirstOrDefault()} {paramValues}", _services);
-                            if (!result.Result.IsSuccess)
-                                await Context.Channel.SendMessageAsync(result.Result.ErrorReason);
+                            if (!result.IsSuccess)
+                                await Context.Channel.SendMessageAsync(result.ErrorReason);
                         }
 
                         _executing = false;

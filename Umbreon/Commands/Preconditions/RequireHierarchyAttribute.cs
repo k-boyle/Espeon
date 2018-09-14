@@ -12,12 +12,12 @@ namespace Umbreon.Commands.Preconditions
             var currentUser = (context as SocketCommandContext)?.Guild.CurrentUser;
             if (value is SocketGuildUser guildUser)
             {
-                return Task.FromResult(currentUser.Hierarchy > guildUser.Hierarchy
-                    ? PreconditionResult.FromSuccess()
-                    : PreconditionResult.FromError("You don't have hierarchy over this user"));
+                return Task.FromResult(currentUser?.Hierarchy > guildUser.Hierarchy
+                    ? PreconditionResult.FromSuccess(parameter.Command)
+                    : PreconditionResult.FromError(parameter.Command, "You don't have hierarchy over this user"));
             }
 
-            return Task.FromResult(PreconditionResult.FromError("This error shouldn't exist"));
+            return Task.FromResult(PreconditionResult.FromError(parameter.Command, "This error shouldn't exist"));
         }
     }
 }

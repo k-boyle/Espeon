@@ -8,10 +8,10 @@ namespace Umbreon.Commands.TypeReaders
 {
     public class CodeTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
         {
             var foundCodes = input.GetCodes().ToImmutableArray();
-            return Task.FromResult(TypeReaderResult.FromSuccess(foundCodes.Length > 0 ? string.Join("\n", foundCodes) : input));
+            return Task.FromResult(TypeReaderResult.FromSuccess(command, foundCodes.Length > 0 ? string.Join("\n", foundCodes) : input));
         }
     }
 }

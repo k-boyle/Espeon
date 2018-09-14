@@ -14,8 +14,8 @@ namespace Umbreon.Commands.Preconditions
             var database = services.GetService<DatabaseService>();
             var guild = database.GetObject<GuildObject>("guilds", context.Guild.Id);
             return guild.MusicUsers.Contains(context.User.Id)
-                ? Task.FromResult(PreconditionResult.FromSuccess())
-                : Task.FromResult(PreconditionResult.FromError(new FailedResult("You do not have the permissions to use this command", CommandError.UnmetPrecondition)));
+                ? Task.FromResult(PreconditionResult.FromSuccess(command))
+                : Task.FromResult(PreconditionResult.FromError(command, "You don't have permission to use this command"));
         }
     }
 }

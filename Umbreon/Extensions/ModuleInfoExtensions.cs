@@ -30,15 +30,15 @@ namespace Umbreon.Extensions
                             results.Add(await precondition.CheckPermissionsAsync(context, null, services));
 
                         if (!results.Any(x => x.IsSuccess))
-                            return PreconditionGroupResult.FromError(
+                            return PreconditionGroupResult.FromError(null,
                                 $"{type} precondition group {preconditionGroup.Key} failed", results);
                     }
                 }
-                return PreconditionResult.FromSuccess();
+                return PreconditionResult.FromSuccess(null); //having null is hacky but better than selecting a random command
             }
 
             var moduleResult = await CheckGroups(module.Preconditions, "Module");
-            return !moduleResult.IsSuccess ? moduleResult : PreconditionResult.FromSuccess();
+            return !moduleResult.IsSuccess ? moduleResult : PreconditionResult.FromSuccess(null);
         }
     }
 }

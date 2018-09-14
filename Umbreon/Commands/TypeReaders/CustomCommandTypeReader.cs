@@ -8,11 +8,13 @@ namespace Umbreon.Commands.TypeReaders
 {
     public class CustomCommandTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
         {
             var cmdService = services.GetService<CustomCommandsService>();
             var currentCmds = cmdService.GetCmds(context);
-            return Task.FromResult(CustomCommandsService.TryParse(currentCmds, input, out var foundCmd) ? TypeReaderResult.FromSuccess(foundCmd) : TypeReaderResult.FromError(CommandError.ParseFailed, "Custom command not found"));
+            return Task.FromResult(CustomCommandsService.TryParse(currentCmds, input, out var foundCmd) ? 
+                TypeReaderResult.FromSuccess(command, foundCmd) : 
+                TypeReaderResult.FromError(command, CommandError.ParseFailed, "Custom command not found"));
         }
     }
 }
