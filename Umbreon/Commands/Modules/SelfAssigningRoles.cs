@@ -5,10 +5,10 @@ using MoreLinq;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Commands.Contexts;
 using Umbreon.Commands.ModuleBases;
 using Umbreon.Commands.Preconditions;
 using Umbreon.Core;
+using Umbreon.Core.Entities.Guild;
 using Umbreon.Extensions;
 using Umbreon.Interactive.Paginator;
 using Umbreon.Services;
@@ -19,8 +19,15 @@ namespace Umbreon.Commands.Modules
     [Group("Roles")]
     [Name("Self Assigning Roles")]
     [Summary("Roles that users can add/remove to/from themselves")]
-    public class SelfAssigningRoles : SelfAssigningRolesBase<UmbreonContext>
+    public class SelfAssigningRoles : UmbreonBase
     {
+        private readonly DatabaseService _database;
+
+        public SelfAssigningRoles(DatabaseService database)
+        {
+            _database = database;
+        }
+
         [Command("List", RunMode = RunMode.Async)]
         [Alias("")]
         [Name("List Roles")]
@@ -29,13 +36,16 @@ namespace Umbreon.Commands.Modules
         [Priority(0)]
         public async Task ListRoles()
         {
-            if (CurrentRoles.Count() == 0)
+            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var currentRoles = guild.SelfAssigningRoles;
+
+            if (currentRoles.Count == 0)
             {
                 await SendMessageAsync("There are no available self assigning roles");
                 return;
             }
 
-            var pages = CurrentRoles.Select(x => Context.Guild.GetRole(x)).Select(x => x.Name).Batch(10).Select(y => string.Join("\n", y));
+            var pages = currentRoles.Select(x => Context.Guild.GetRole(x)).Select(x => x.Name).Batch(10).Select(y => string.Join("\n", y));
             var paginator = new PaginatedMessage
             {
                 Author = new EmbedAuthorBuilder
@@ -61,7 +71,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to add")]
             [Remainder] SocketRole roleToAdd)
         {
-            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToAdd.Id))
+            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var currentRoles = guild.SelfAssigningRoles;
+
+            if (currentRoles.Contains(roleToAdd.Id))
             {
                 await Context.User.AddRoleAsync(roleToAdd);
                 await SendMessageAsync("Role has been added");
@@ -81,7 +94,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to remove")]
             [Remainder] SocketRole roleToRemove)
         {
-            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToRemove.Id))
+            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var currentRoles = guild.SelfAssigningRoles;
+
+            if (currentRoles.Contains(roleToRemove.Id))
             {
                 await Context.User.RemoveRoleAsync(roleToRemove);
                 await SendMessageAsync("Role has been removed");
@@ -103,9 +119,13 @@ namespace Umbreon.Commands.Modules
             [Summary("The new role want that you want to add to the self assigning roles")]
             [Remainder] SocketRole roleToAdd)
         {
-            if (!SelfAssigningRolesService.HasRole(CurrentRoles, roleToAdd.Id))
+            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var currentRoles = guild.SelfAssigningRoles;
+
+            if (!currentRoles.Contains(roleToAdd.Id))
             {
-                SelfRoles.AddNewSelfRole(Context, roleToAdd.Id);
+                currentRoles.Add(roleToAdd.Id);
+                _database.UpdateObject("guilds", guild);
             }
 
             await SendMessageAsync("New self role has been added");
@@ -123,9 +143,13 @@ namespace Umbreon.Commands.Modules
             [Summary("The old role want that you want to remove from the self assigning roles")]
             [Remainder] SocketRole roleToRemove)
         {
-            if (SelfAssigningRolesService.HasRole(CurrentRoles, roleToRemove.Id))
+            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var currentRoles = guild.SelfAssigningRoles;
+
+            if (currentRoles.Contains(roleToRemove.Id))
             {
-                SelfRoles.RemoveSelfRole(Context, roleToRemove.Id);
+                currentRoles.Remove(roleToRemove.Id);
+                _database.UpdateObject("guilds", guild);
             }
 
             await SendMessageAsync("Old self role has been removed");
