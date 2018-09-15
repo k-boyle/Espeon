@@ -1,7 +1,6 @@
 ﻿using Discord;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -52,43 +51,13 @@ namespace Umbreon.Services
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            const int sevLength = 8;
-            if (severity.ToString().Length < sevLength)
-            {
-                var builder = new StringBuilder(sevLength);
-                builder.Append(severity.ToString());
-                builder.Append(' ', sevLength - severity.ToString().Length);
-                Console.Write($"{builder}");
-            }
-            else if (severity.ToString().Length > sevLength)
-            {
-                Console.Write($"{severity.ToString().Substring(0, sevLength)}");
-            }
-            else
-            {
-                Console.Write(severity.ToString());
-            }
+            Console.Write($"{severity, -8}");
             Console.ResetColor();
             Console.Write("]");
 
             Console.Write("[");
             Console.ForegroundColor = ConsoleColour.Cyan;
-            if (source.Length < 11)
-            {
-                var builder = new StringBuilder(11);
-                builder.Append(source);
-                builder.Append(' ', 11 - source.Length);
-                Console.Write($"{builder}");
-            }
-            else if (source.Length > 11)
-            {
-                Console.Write($"{source.Substring(0, 11)}");
-            }
-            else
-            {
-                Console.Write(source);
-            }
+            Console.Write($"{source, -11}");
             Console.ResetColor();
             Console.Write("] ");
 
@@ -97,7 +66,7 @@ namespace Umbreon.Services
 
             if (!string.IsNullOrEmpty(exception?.ToString()))
             {
-                Console.Write(log.Exception.ToString());
+                Console.Write(log.Exception?.ToString());
                 Console.Write(exception);
             }
 
@@ -106,8 +75,6 @@ namespace Umbreon.Services
         }
 
         public void NewLogEvent(LogSeverity serverity, LogSource source, string message)
-        {
-            _ = LogEvent(new LogMessage(serverity, source.ToString(), message));
-        }
+            => _ = LogEvent(new LogMessage(serverity, source.ToString(), message));
     }
 }
