@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Services;
 
 namespace Umbreon.Core
 {
@@ -37,7 +36,8 @@ namespace Umbreon.Core
 
             var builtProvider = serviceCollection.BuildServiceProvider();
 
-            await builtProvider.GetService<StartupService>().InitialiseAsync();
+            var startup = new BotCore(builtProvider);
+            await startup.RunBotAsync();
         }
     }
 }

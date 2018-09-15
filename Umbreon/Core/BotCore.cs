@@ -3,25 +3,53 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Umbreon.Attributes;
+using System.Reflection;
+using System.Threading.Tasks;
+using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.Guild;
+using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Extensions;
 using Umbreon.Helpers;
+using Umbreon.Services;
 
-namespace Umbreon.Services
+namespace Umbreon.Core
 {
-    [Service]
-    public class EventsService
+    public class BotCore
     {
         private readonly IServiceProvider _services;
 
-        public EventsService(IServiceProvider services)
+        public BotCore(IServiceProvider services)
         {
             _services = services;
         }
 
-        public void HookEvents()
+        public async Task RunBotAsync()
+        {
+            await DatabaseService.InitialiseAsync();
+            _services.GetService<PokemonDataService>().Initialise();
+            _services.GetService<PokemonPlayerService>().Initialise();
+
+            HookEvents();
+            var client = _services.GetService<DiscordSocketClient>();
+            await client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
+            await client.StartAsync();
+
+            _services.GetRequiredService<TimerService>().InitialiseTimer();
+            var commands = _services.GetService<CommandService>();
+
+            commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
+            commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
+            commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
+            commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
+            commands.AddTypeReader(typeof(Habitat), new HabitatTypeReader());
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+
+            await Task.Delay(-1);
+        }
+
+        private void HookEvents()
         {
             var client = _services.GetService<DiscordSocketClient>();
             var logs = _services.GetService<LogService>();
