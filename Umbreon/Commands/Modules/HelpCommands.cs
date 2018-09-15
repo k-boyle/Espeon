@@ -12,7 +12,6 @@ using Umbreon.Helpers;
 using Umbreon.Services;
 using Colour = Discord.Color;
 using Remarks = Umbreon.Attributes.RemarksAttribute;
-using RemarksAttribute = Discord.Commands.RemarksAttribute;
 
 namespace Umbreon.Commands.Modules
 {

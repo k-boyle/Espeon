@@ -17,7 +17,7 @@ using Colour = Discord.Color;
 
 namespace Umbreon.Commands.Modules
 {
-    [Group("Cmd")]
+    [Group("cmd")]
     [Name("Custom Commands")]
     [Summary("Create custom commands for your server")]
     public class CustomCommands : CustomCommandsBase<UmbreonContext>

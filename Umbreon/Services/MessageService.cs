@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -267,14 +268,14 @@ namespace Umbreon.Services
             }
 
             var newQueue = new ConcurrentQueue<Message>();
-            var delIds = retrieved.Select(x => x.Id);
+            var delIds = retrieved.Select(x => x.Id).ToImmutableList();
             foreach (var item in found)
             {
                 if (delIds.Contains(item.ResponseId)) continue;
                 newQueue.Enqueue(item);
             }
 
-            _timer.Remove(newQueue);
+            _timer.RemoveRange(newQueue);
 
             if (newQueue.IsEmpty)
                 _messageCache.TryRemove(context.User.Id, out _);

@@ -60,7 +60,7 @@ namespace Umbreon.Commands.Modules
         {
             var msg = await SendMessageAsync("Fetching...");
             var req = await SendRequest($"https://api.giphy.com/v1/gifs/random?api_key={ConstantsHelper.GiphyToken}&rating=r&tag={search.Replace(" ", " + ")}");
-            if (req["data"].Count() == 0)
+            if (!req["data"].Any())
             {
                 await msg.ModifyAsync(x => x.Content = "No gif found");
                 return;
