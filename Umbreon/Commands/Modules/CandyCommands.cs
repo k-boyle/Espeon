@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Humanizer;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace Umbreon.Commands.Modules
             => SendMessageAsync($"{(user is null ? "You have" : $"{user.GetDisplayName()} has")} {_candy.GetCandies(user?.Id ?? Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
 
         [Command("claim")]
+        [Alias("c")]
         [Name("Claim Candies")]
         [Summary("Claim your daily reward of rare candies")]
         [Usage("claim")]
@@ -48,9 +50,9 @@ namespace Umbreon.Commands.Modules
         {
             if (!_candy.CanClaim(Context.User.Id))
             {
-                var remaining = _database.GetObject<UserObject>("users", Context.User.Id).LastClaimed.AddHours(8) - DateTime.UtcNow;
+                var remaining = _database.GetObject<UserObject>("users", Context.User.Id).LastClaimed.ToUniversalTime().AddHours(8) - DateTime.UtcNow;
 
-                await SendMessageAsync($"You have already claimed your candies{EmotesHelper.Emotes["rarecandy"]} today. Please wait {remaining.Humanize()}");
+                await SendMessageAsync($"You recently claimed your candies{EmotesHelper.Emotes["rarecandy"]}, wait {remaining.Humanize(2)}");
                 return;
             }
 
