@@ -71,7 +71,7 @@ namespace Umbreon.Services
             _queue = newQueue;
         }
 
-        public void Remove(IEnumerable<IRemoveable> objs)
+        public void RemoveRange(IEnumerable<IRemoveable> objs)
         {
             var newCol = _queue.Except(objs);
             _queue = new ConcurrentQueue<IRemoveable>(newCol);
