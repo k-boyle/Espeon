@@ -32,20 +32,12 @@ namespace Umbreon.Core
             _services.GetService<PokemonPlayerService>().Initialise();
 
             HookEvents();
+            await SetupCommandsAsync();
+
             var client = _services.GetService<DiscordSocketClient>();
             await client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
             await client.StartAsync();
-
-            _services.GetRequiredService<TimerService>().InitialiseTimer();
-            var commands = _services.GetService<CommandService>();
-
-            commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
-            commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
-            commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
-            commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
-            commands.AddTypeReader(typeof(Habitat), new HabitatTypeReader());
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-
+            
             await Task.Delay(-1);
         }
 
@@ -84,6 +76,18 @@ namespace Umbreon.Core
                 }
             };
             commands.Log += logs.LogEvent;
+        }
+
+        private async Task SetupCommandsAsync()
+        {
+            var commands = _services.GetService<CommandService>();
+
+            commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
+            commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
+            commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
+            commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
+            commands.AddTypeReader(typeof(Habitat), new HabitatTypeReader());
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }
 }

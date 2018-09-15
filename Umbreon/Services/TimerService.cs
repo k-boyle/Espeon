@@ -14,16 +14,13 @@ namespace Umbreon.Services
     {
         private readonly IServiceProvider _services;
 
-        private Timer _timer;
+        private readonly Timer _timer;
         private ConcurrentQueue<IRemoveable> _queue = new ConcurrentQueue<IRemoveable>();
 
         public TimerService(IServiceProvider services)
         {
             _services = services;
-        }
 
-        public void InitialiseTimer()
-        {
             _timer = new Timer(_ =>
             {
                 if (!_queue.TryDequeue(out var removeable)) return;
@@ -54,6 +51,7 @@ namespace Umbreon.Services
         private void HandleRemoveableAsync(IRemoveable removeable)
             => _ = Task.Run(async () =>
              {
+                 //anti-pattern, needs changing
                  var service = _services.GetService(removeable.Service.GetType());
                  if (service is IRemoveableService removeableService)
                      await removeableService.RemoveAsync(removeable);
