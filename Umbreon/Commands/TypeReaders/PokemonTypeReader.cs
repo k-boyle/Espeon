@@ -2,11 +2,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
+using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Helpers;
 using Umbreon.Services;
 
 namespace Umbreon.Commands.TypeReaders
 {
+    [TypeReader(typeof(PokemonData))]
     public class PokemonTypeReader : TypeReader
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)

@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
 
 namespace Umbreon.Commands.TypeReaders
 {
+    [TypeReader(typeof(IEnumerable<CommandInfo>))]
     public class CommandInfoTypeReader : TypeReader
     {
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)

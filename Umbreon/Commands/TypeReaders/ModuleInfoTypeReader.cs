@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
 using Umbreon.Extensions;
 
 namespace Umbreon.Commands.TypeReaders
 {
+    [TypeReader(typeof(ModuleInfo))]
     public class ModuleInfoTypeReader : TypeReader
     {
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)

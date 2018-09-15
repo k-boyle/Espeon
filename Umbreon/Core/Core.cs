@@ -3,10 +3,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
+using Umbreon.Helpers;
 
 namespace Umbreon.Core
 {
@@ -28,9 +28,9 @@ namespace Umbreon.Core
                 }))
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random());
-            
-            var services = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
-                .Where(y => y.GetCustomAttributes(typeof(ServiceAttribute), true).Length > 0);
+
+            var services = AssemblyHelper.GetAllTypesWithAttribute<ServiceAttribute>();
+
             foreach (var service in services)
                 serviceCollection.AddSingleton(service);
 

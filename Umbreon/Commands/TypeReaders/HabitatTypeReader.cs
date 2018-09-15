@@ -4,11 +4,13 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
 using Umbreon.Core.Entities.Pokemon;
 using Umbreon.Services;
 
 namespace Umbreon.Commands.TypeReaders
 {
+    [TypeReader(typeof(Habitat))]
     public class HabitatTypeReader : TypeReader
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)

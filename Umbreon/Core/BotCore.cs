@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Umbreon.Attributes;
 using Umbreon.Commands.TypeReaders;
 using Umbreon.Core.Entities.Guild;
 using Umbreon.Core.Entities.Pokemon;
@@ -82,11 +83,14 @@ namespace Umbreon.Core
         {
             var commands = _services.GetService<CommandService>();
 
-            commands.AddTypeReader(typeof(ModuleInfo), new ModuleInfoTypeReader());
-            commands.AddTypeReader(typeof(IEnumerable<CommandInfo>), new CommandInfoTypeReader());
-            commands.AddTypeReader(typeof(CustomCommand), new CustomCommandTypeReader());
-            commands.AddTypeReader(typeof(PokemonData), new PokemonTypeReader());
-            commands.AddTypeReader(typeof(Habitat), new HabitatTypeReader());
+            var typereaders = AssemblyHelper.GetAllTypesWithAttribute<TypeReaderAttribute>();
+
+            foreach (var typereader in typereaders)
+            {
+                var attribute = typereader.GetCustomAttributes().OfType<TypeReaderAttribute>().FirstOrDefault();
+                commands.AddTypeReader(attribute?.TargetType, (TypeReader)Activator.CreateInstance(typereader));
+            }
+            
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
     }
