@@ -42,6 +42,7 @@ namespace Umbreon.Services
             while (_queue.TryPeek(out removeable))
             {
                 if (!(removeable.When.ToUniversalTime() - DateTime.UtcNow < TimeSpan.Zero)) break;
+                if(!_queue.TryDequeue(out removeable)) continue;
                 await HandleRemoveableAsync(removeable);
             }
 
