@@ -13,6 +13,8 @@ namespace Umbreon.Core.Entities.Guild
             _service = service;
         }
 
+        public Reminder() { }
+
         public string TheReminder { get; set; }
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
