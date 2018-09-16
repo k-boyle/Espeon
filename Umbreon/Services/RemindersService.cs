@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace Umbreon.Services
         private readonly DiscordSocketClient _client;
         private readonly MessageService _message;
         private readonly Random _random;
-        
+
         public RemindersService() { }
 
         public RemindersService(DatabaseService database, TimerService timer, DiscordSocketClient client, MessageService message, Random random)
@@ -33,7 +33,7 @@ namespace Umbreon.Services
 
         public async Task LoadRemindersAsync()
         {
-            var toRemove = new List<Reminder>();
+            var toRemind = new List<Reminder>();
 
             foreach (var guild in _client.Guilds)
             {
@@ -42,7 +42,7 @@ namespace Umbreon.Services
                 {
                     if (reminder.When.ToUniversalTime() < DateTime.UtcNow)
                     {
-                        toRemove.Add(reminder);
+                        toRemind.Add(reminder);
                         continue;
                     }
 
@@ -50,11 +50,11 @@ namespace Umbreon.Services
                 }
             }
 
-            foreach (var reminder in toRemove)
-                await RemoveAsync(reminder);
+            foreach (var reminder in toRemind)
+                await RemindAsync(reminder);
         }
 
-        public async Task RemoveAsync(IRemoveable obj)
+        public async Task RemindAsync(IRemoveable obj)
         {
             if (!(obj is Reminder reminder)) return;
             var user = _client.GetGuild(reminder.GuildId).GetUser(reminder.UserId);
@@ -68,9 +68,16 @@ namespace Umbreon.Services
                 Color = Colour.DarkBlue,
                 Description = reminder.TheReminder
             }.Build());
+            await RemoveAsync(reminder);
+        }
+
+        public Task RemoveAsync(IRemoveable obj)
+        {
+            var reminder = (Reminder)obj;
             var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.Remove(guild.Reminders.Find(x => x.Identifier == reminder.Identifier));
             _database.UpdateObject("guilds", guild);
+            return Task.CompletedTask;
         }
 
         public void CreateReminder(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
