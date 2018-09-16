@@ -1,5 +1,4 @@
-﻿using Discord;
-using LiteDB;
+﻿using LiteDB;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -7,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
-using Umbreon.Core;
 using Umbreon.Core.Entities;
 using Umbreon.Helpers;
 using Umbreon.Interfaces;
@@ -23,13 +21,11 @@ namespace Umbreon.Services
 
         private readonly Random _random;
         private readonly TimerService _timer;
-        private readonly LogService _log;
 
-        public DatabaseService(Random random, TimerService timer, LogService log)
+        public DatabaseService(Random random, TimerService timer)
         {
             _random = random;
             _timer = timer;
-            _log = log;
         }
 
         public DatabaseService() { }
@@ -43,45 +39,44 @@ namespace Umbreon.Services
             return Task.CompletedTask;
         }
 
-        private async Task<T> LoadObject<T>(string name, ulong id) where T : BaseObject, new()
+        private async Task<T> AddToCacheAsync<T>(string name, ulong id) where T : BaseObject, new()
+        {
+            var obj = LoadFromDatabase<T>(name, id);
+            obj.When = DateTime.UtcNow.AddDays(1);
+
+            var instance = CreateInstance(obj);
+            _cache.TryAdd(instance.Id, instance);
+            await _timer.UpdateAsync(instance);
+            return instance;
+        }
+
+        private T LoadFromDatabase<T>(string name, ulong id) where T : BaseObject, new()
         {
             using (var db = new LiteDatabase(DatabaseDir))
             {
                 var collection = db.GetCollection<T>(name);
-                var found = collection.FindOne(x => x.Id == id) ?? NewObject<T>(id);
-                found.When = DateTime.UtcNow.AddDays(1);
-                collection.Upsert(found);
-                await _timer.UpdateAsync(found);
-                _cache.TryAdd(found.Id, found);
-                _log.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{found.Id}:{found.GetType()} has been loaded into the cache");
-                return found;
+                var loaded = collection.FindOne(x => x.Id == id);
+
+                if (!(loaded is null)) return loaded;
+                loaded = NewObject<T>(id);
+                collection.Upsert(loaded);
+
+                return loaded;
             }
         }
 
         private T NewObject<T>(ulong id) where T : BaseObject, new()
-        {
-            var newObj = new T
-            {
-                Id = id,
-                Identifier = _random.Next()
-            };
+            => new T {Id = id, Identifier = _random.Next() };
 
-            var returnObj = (T)Activator.CreateInstance(typeof(T), newObj, this);
-            return returnObj;
-        }
+        private T CreateInstance<T>(T obj) where T : BaseObject
+            => (T) Activator.CreateInstance(typeof(T), obj, this);
 
         public T TempLoad<T>(string name, ulong id) where T : BaseObject, new()
         {
             if (_cache.TryGetValue(id, out var found))
                 return (T)found;
 
-            using (var db = new LiteDatabase(DatabaseDir))
-            {
-                var collection = db.GetCollection<T>(name);
-                found = collection.FindOne(x => x.Id == id) ?? NewObject<T>(id);
-                collection.Upsert((T)found);
-                return (T)found;
-            }
+            return LoadFromDatabase<T>(name, id);
         }
 
         public void UpdateObject<T>(string name, T obj) where T : BaseObject
@@ -94,7 +89,7 @@ namespace Umbreon.Services
         }
 
         public async Task<T> GetObjectAsync<T>(string name, ulong id) where T : BaseObject, new()
-            => _cache.TryGetValue(id, out var found) ? (T)found : await LoadObject<T>(name, id);
+            => _cache.TryGetValue(id, out var found) ? (T) found : await AddToCacheAsync<T>(name, id);
 
         public static IEnumerable<T> GrabAllData<T>(string name) where T : BaseObject
         {
