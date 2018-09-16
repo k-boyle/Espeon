@@ -2,6 +2,7 @@
 using Discord.Commands;
 using MoreLinq;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbreon.Attributes;
@@ -30,13 +31,14 @@ namespace Umbreon.Commands.Modules
         [Usage("cmd list")]
         public async Task ListCmds()
         {
-            if (CurrentCmds.Count() == 0)
+            var currentCmds = (await CurrentCmds).ToImmutableList();
+            if (currentCmds.Count == 0)
             {
                 await SendMessageAsync("No custom commands currently for this server");
                 return;
             }
 
-            var pages = CurrentCmds.Select(x => x.CommandName).Batch(10).Select(y => string.Join("\n", y));
+            var pages = currentCmds.Select(x => x.CommandName).Batch(10).Select(y => string.Join("\n", y));
             var paginator = new PaginatedMessage
             {
                 Author = new EmbedAuthorBuilder
@@ -61,11 +63,12 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Create()
         {
+            var currentCmds = (await CurrentCmds).ToImmutableList();
             await SendMessageAsync("What do you want the command to be called? [reply with `cancel` to cancel creation]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var cmdName = reply.Content;
-            if (CurrentCmds.Any(x =>
+            if (currentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
                 await NewMessageAsync("This command already exists");
@@ -97,7 +100,8 @@ namespace Umbreon.Commands.Modules
             [Name("Command Name")]
             [Summary("The name of the command that you want to create")] string cmdName)
         {
-            if (CurrentCmds.Any(x =>
+            var currentCmds = (await CurrentCmds).ToImmutableList();
+            if (currentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
                 await SendMessageAsync("This command already exists");
@@ -132,7 +136,8 @@ namespace Umbreon.Commands.Modules
             [Summary("The response you want from the command")]
             [Remainder] string cmdValue)
         {
-            if (CurrentCmds.Any(x =>
+            var currentCmds = (await CurrentCmds).ToImmutableList();
+            if (currentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
                 await SendMessageAsync("This command already exists");
@@ -158,11 +163,12 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Modify()
         {
+            var currentCmds = (await CurrentCmds).ToImmutableList();
             await SendMessageAsync("Which Command do you want to edit? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
+            if (CustomCommandsService.TryParse(currentCmds, reply.Content, out var targetCommand))
             {
                 await NewMessageAsync("What do you want the new response to be? [reply with `cancel` to cancel modification]");
                 reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
@@ -222,11 +228,12 @@ namespace Umbreon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Remove()
         {
+            var currentCmds = (await CurrentCmds).ToImmutableList();
             await SendMessageAsync("Which Command do you want to remove? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
 
-            if (CustomCommandsService.TryParse(CurrentCmds, reply.Content, out var targetCommand))
+            if (CustomCommandsService.TryParse(currentCmds, reply.Content, out var targetCommand))
             {
                 await Commands.RemoveCmdAsync(Context, targetCommand.CommandName);
                 await NewMessageAsync("Command has been removed");
