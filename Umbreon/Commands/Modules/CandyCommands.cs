@@ -35,11 +35,11 @@ namespace Umbreon.Commands.Modules
         [Name("Candies")]
         [Summary("See how many rare candies someone has")]
         [Usage("candies Umbreon")]
-        public Task CandyCount(
+        public async Task CandyCount(
             [Name("User")]
             [Summary("The user you want to see the candies for. Leave blank for yourself")]
             [Remainder] SocketGuildUser user = null)
-            => SendMessageAsync($"{(user is null ? "You have" : $"{user.GetDisplayName()} has")} {_candy.GetCandiesAsync(user?.Id ?? Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
+            => await SendMessageAsync($"{(user is null ? "You have" : $"{user.GetDisplayName()} has")} {await _candy.GetCandiesAsync(user?.Id ?? Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
 
         [Command("claim")]
         [Alias("c")]
