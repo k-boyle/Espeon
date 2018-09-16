@@ -5,11 +5,7 @@ namespace Umbreon.Core.Entities.Guild
 {
     public class GuildObject : BaseObject
     {
-        public GuildObject(BaseObject baseObj) : base(baseObj)
-        {
-        }
-
-        public GuildObject(IRemoveableService service) : base(service)
+        public GuildObject(BaseObject baseObj, IRemoveableService service) : base(baseObj, service)
         {
         }
 

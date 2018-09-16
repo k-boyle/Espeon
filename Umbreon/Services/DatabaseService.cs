@@ -66,7 +66,7 @@ namespace Umbreon.Services
                 Identifier = _random.Next()
             };
 
-            var returnObj = (T)Activator.CreateInstance(typeof(T), newObj);
+            var returnObj = (T)Activator.CreateInstance(typeof(T), newObj, this);
             return returnObj;
         }
 

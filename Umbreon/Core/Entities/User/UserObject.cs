@@ -7,11 +7,7 @@ namespace Umbreon.Core.Entities.User
 {
     public class UserObject : BaseObject
     {
-        public UserObject(BaseObject baseObj) : base(baseObj)
-        {
-        }
-
-        public UserObject(IRemoveableService service) : base(service)
+        public UserObject(BaseObject baseObj, IRemoveableService service) : base(baseObj, service)
         {
         }
 

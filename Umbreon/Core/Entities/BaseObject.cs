@@ -9,17 +9,12 @@ namespace Umbreon.Core.Entities
     {
         private readonly IRemoveableService _service;
 
-        protected BaseObject(BaseObject baseObj)
+        protected BaseObject(BaseObject baseObj, IRemoveableService service)
         {
-            _service = baseObj._service;
+            _service = service;
             Id = baseObj.Id;
             Identifier = baseObj.Identifier;
             When = baseObj.When;
-        }
-
-        protected BaseObject(IRemoveableService service)
-        {
-            _service = service;
         }
 
         protected BaseObject() { }
