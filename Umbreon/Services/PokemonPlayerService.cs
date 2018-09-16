@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core;
 using Umbreon.Core.Entities.Pokemon;
@@ -64,7 +65,7 @@ namespace Umbreon.Services
         public IReadOnlyDictionary<int, string> GetHabitats()
             => _habitats;
 
-        public void SetArea(ulong id, int area)
+        public async Task SetAreaAsync(ulong id, int area)
         {
             var newData = new PlayingData
             {
@@ -74,7 +75,7 @@ namespace Umbreon.Services
 
             _data[id] = newData;
 
-            var user = _database.GetObject<UserObject>("users", id);
+            var user = await _database.GetObjectAsync<UserObject>("users", id);
             user.Data = newData;
             _database.UpdateObject("users", user);
         }
@@ -88,8 +89,8 @@ namespace Umbreon.Services
         public string GetImageUrl(int id)
             => _habitatImages[id];
 
-        public UserObject GetCurrentPlayer(ulong id)
-            => _database.GetObject<UserObject>("users", id);
+        public Task<UserObject> GetCurrentPlayer(ulong id)
+            => _database.GetObjectAsync<UserObject>("users", id);
 
         public void UseBall(UserObject user, BaseBall ball)
         {
@@ -97,9 +98,9 @@ namespace Umbreon.Services
             _database.UpdateObject("users", user);
         }
 
-        public void AddItem(ulong userId, ShopItemAttribute item)
+        public async Task AddItemAsync(ulong userId, ShopItemAttribute item)
         {
-            var user = GetCurrentPlayer(userId);
+            var user = await GetCurrentPlayer(userId);
             switch (item.ItemName)
             {
                 case "Pokeball":

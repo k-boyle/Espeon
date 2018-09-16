@@ -18,10 +18,10 @@ namespace Umbreon.Commands.Preconditions
         public RequireRoleAttribute(SpecialRole role)
             => _role = role;
 
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var database = services.GetService<DatabaseService>();
-            var guild = database.GetObject<GuildObject>("guilds", context.Guild.Id);
+            var guild = await database.GetObjectAsync<GuildObject>("guilds", context.Guild.Id);
             ulong roleId;
             switch (_role)
             {
@@ -37,11 +37,11 @@ namespace Umbreon.Commands.Preconditions
             }
 
             if (roleId == 0 || !context.Guild.Roles.Select(x => x.Id).Contains(roleId))
-                return Task.FromResult(PreconditionResult.FromError(command, $"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role"));
+                return PreconditionResult.FromError(command, $"{_role} role not found. Please do `{guild.Prefixes.First()}set {_role}Role` to setup this role");
             var user = context.User as SocketGuildUser;
             return user.HasRole(roleId)
-                ? Task.FromResult(PreconditionResult.FromSuccess(command))
-                : Task.FromResult(PreconditionResult.FromError(command, "You do not have the required role"));
+                ? PreconditionResult.FromSuccess(command)
+                : PreconditionResult.FromError(command, "You do not have the required role");
         }
     }
 }

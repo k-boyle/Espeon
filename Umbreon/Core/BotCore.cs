@@ -72,7 +72,7 @@ namespace Umbreon.Core
                         Color = new Color(0, 0, 0),
                         ThumbnailUrl = client.CurrentUser.GetDefaultAvatarUrl(),
                         Description = $"Hello! I am Umbreon{EmotesHelper.Emotes["umbreon"]} and I have just been added to your guild!\n" +
-                                      $"Type {_services.GetService<DatabaseService>().GetObject<GuildObject>("guilds", guild.Id).Prefixes.First()}help to see all my available commands!"
+                                      $"Type {(await _services.GetService<DatabaseService>().GetObjectAsync<GuildObject>("guilds", guild.Id)).Prefixes.First()}help to see all my available commands!"
                     }.Build());
                 }
             };

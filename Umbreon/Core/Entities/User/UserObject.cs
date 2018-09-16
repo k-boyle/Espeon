@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbreon.Core.Entities.Pokemon;
+using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Entities.User
 {
     public class UserObject : BaseObject
     {
+        public UserObject(BaseObject baseObj, IRemoveableService service) : base(baseObj, service)
+        {
+        }
+
+        public UserObject() { }
+
         public int RareCandies { get; set; } = 10;
         public DateTime LastClaimed { get; set; } = DateTime.UtcNow.AddDays(-1);
 

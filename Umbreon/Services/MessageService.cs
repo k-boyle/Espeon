@@ -73,12 +73,13 @@ namespace Umbreon.Services
 
         public async Task HandleMessageAsync(SocketMessage msg)
         {
-            if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
+            if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) ||
+                !(msg.Channel is SocketGuildChannel channel) ||
                 !(msg is SocketUserMessage message)) return;
 
             if (_random.Next(100) < 10)
             {
-                _candy.UpdateCandies(message.Author.Id, false, 1);
+                await _candy.UpdateCandiesAsync(message.Author.Id, false, 1);
             }
 
             var guild = _database.TempLoad<GuildObject>("guilds", channel.Guild.Id);
@@ -95,8 +96,8 @@ namespace Umbreon.Services
                 prefixes.Any(x => message.HasStringPrefix(x, ref argPos)))
             {
                 guild.When = DateTime.UtcNow + TimeSpan.FromDays(1);
-                _timer.Update(guild);
                 _database.UpdateObject("guilds", guild);
+                await _timer.UpdateAsync(guild);
 
                 var context = new UmbreonContext(_client, message, _services.GetService<HttpClient>());
                 var command = message.Content.Substring(argPos).RemoveExtraSpaces();
@@ -275,7 +276,7 @@ namespace Umbreon.Services
                 newQueue.Enqueue(item);
             }
 
-            _timer.RemoveRange(newQueue);
+            await _timer.RemoveRangeAsync(newQueue);
 
             if (newQueue.IsEmpty)
                 _messageCache.TryRemove(context.User.Id, out _);
@@ -303,14 +304,14 @@ namespace Umbreon.Services
             }
         }
 
-        private Task NewItemAsync(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId, bool attachedFile)
+        private async Task NewItemAsync(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId, bool attachedFile)
         {
             _messageCache.TryAdd(userId, new ConcurrentQueue<Message>());
-            if (!_messageCache.TryGetValue(userId, out var found)) return null;
+            if (!_messageCache.TryGetValue(userId, out var found)) return;
             if (found.Count >= CacheSize)
                 found.TryDequeue(out _);
 
-            var newMessage = new Message
+            var newMessage = new Message(this)
             {
                 UserId = userId,
                 ChannelId = channelId,
@@ -318,16 +319,13 @@ namespace Umbreon.Services
                 ExecutingId = executingId,
                 ResponseId = responseId,
                 AttachedFile = attachedFile,
-
-                Service = this,
                 Identifier = _random.Next()
             };
 
             found.Enqueue(newMessage);
 
-            _timer.Enqueue(newMessage);
+            await _timer.EnqueueAsync(newMessage);
             _messageCache[userId] = found;
-            return Task.CompletedTask;
         }
 
         private async Task<IUserMessage> GetExistingMessageAsync(ICommandContext context)

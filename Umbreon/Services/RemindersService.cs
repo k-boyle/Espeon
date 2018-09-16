@@ -46,7 +46,7 @@ namespace Umbreon.Services
                         continue;
                     }
 
-                    _timer.Enqueue(reminder);
+                    await _timer.EnqueueAsync(reminder);
                 }
             }
 
@@ -68,27 +68,26 @@ namespace Umbreon.Services
                 Color = Colour.DarkBlue,
                 Description = reminder.TheReminder
             }.Build());
-            var guild = _database.GetObject<GuildObject>("guilds", reminder.GuildId);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.Remove(guild.Reminders.Find(x => x.Identifier == reminder.Identifier));
             _database.UpdateObject("guilds", guild);
         }
 
-        public void CreateReminder(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
+        public async Task CreateReminderAsync(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
         {
-            var reminder = new Reminder
+            var reminder = new Reminder(this)
             {
                 ChannelId = channelId,
                 GuildId = guildId,
                 TheReminder = content,
-                Service = this,
                 UserId = userId,
                 When = DateTime.UtcNow + toExecute,
                 Identifier = _random.Next()
             };
 
-            _timer.Enqueue(reminder);
+            await _timer.EnqueueAsync(reminder);
 
-            var guild = _database.GetObject<GuildObject>("guilds", guildId);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", guildId);
             guild.Reminders.Add(reminder);
             _database.UpdateObject("guilds", guild);
         }

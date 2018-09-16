@@ -20,7 +20,9 @@ namespace Umbreon.Commands.Modules
     {
         private readonly CommandService _commands;
         private readonly DatabaseService _database;
-        private string Prefix => _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First();
+
+        private async Task<string> GetPrefixAsync()
+            => (await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id)).Prefixes.First();
 
         public HelpCommands(CommandService commands, DatabaseService database)
         {
@@ -37,8 +39,8 @@ namespace Umbreon.Commands.Modules
                 if ((await module.CheckPermissionsAsync(Context, Services)).IsSuccess)
                     canExecute.Add(module);
 
-            var builder = Embed();
-            builder.WithFooter($"You can view help on a specific module by doing {Prefix}help module");
+            var builder = await Embed();
+            builder.WithFooter($"You can view help on a specific module by doing {await GetPrefixAsync()}help module");
             builder.AddField("Modules", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
 
             await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
@@ -61,8 +63,8 @@ namespace Umbreon.Commands.Modules
             }
 
             var remarks = module.Attributes.OfType<Remarks>().FirstOrDefault();
-            var builder = Embed();
-            builder.WithFooter($"You can view help on a specific command by doing {Prefix}help command");
+            var builder = await Embed();
+            builder.WithFooter($"You can view help on a specific command by doing {await GetPrefixAsync()}help command");
             builder.AddField($"{module.Name} Information", $"**Summary**: {module.Summary}" +
                                                            $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}")}");
             builder.AddField("Commands", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Aliases.FirstOrDefault())}`")));
@@ -74,15 +76,15 @@ namespace Umbreon.Commands.Modules
         [Priority(2)]
         public async Task Help([Remainder] IEnumerable<CommandInfo> commands)
         {
-            var builder = Embed();
-            builder.WithFooter($"We must go deeper! {Prefix}deeper command");
+            var builder = await Embed();
+            builder.WithFooter($"We must go deeper! {await GetPrefixAsync()}deeper command");
 
             foreach (var command in commands)
             {
                 var usage = command.Attributes.OfType<UsageAttribute>().FirstOrDefault();
                 var remarks = command.Attributes.OfType<Remarks>().FirstOrDefault();
 
-                builder.AddField(command.Name, $"**Usage**: {Prefix}{usage?.Example}\n" +
+                builder.AddField(command.Name, $"**Usage**: {await GetPrefixAsync()}{usage?.Example}\n" +
                                                $"**Summary**: {command.Summary}" +
                                                $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}\n")}" +
                                                $"{(command.Aliases.Count > 1 ? $"\n**Aliases**: {string.Join(", ", command.Aliases.Select(x => $"`{Format.Sanitize(x)}`"))}" : "")}");
@@ -94,12 +96,12 @@ namespace Umbreon.Commands.Modules
         [Command("deeper")]
         public async Task Deeper([Remainder] IEnumerable<CommandInfo> commands)
         {
-            var builder = Embed();
+            var builder = await Embed();
             builder.WithFooter("You're at the core... Going deeper would just be going back");
 
             foreach (var command in commands)
             {
-                builder.AddField(command.Name, $"**Usage**: {_database.GetObject<GuildObject>("guilds", Context.Guild.Id).Prefixes.First()}{command.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
+                builder.AddField(command.Name, $"**Usage**: {await GetPrefixAsync()}{command.Attributes.OfType<UsageAttribute>().Single().Example}\n" +
                                                $"**Summary**: {command.Summary}\n" +
                                                $"**Parameter**: {string.Join("\n**Parameter**: ", command.Parameters.Select(x => $"`{x.Name}` - {x.Summary}"))}");
             }
@@ -107,7 +109,7 @@ namespace Umbreon.Commands.Modules
             await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
-        private EmbedBuilder Embed()
+        private async Task<EmbedBuilder> Embed()
             => new EmbedBuilder
             {
                 Color = new Colour(255, 255, 39),
@@ -119,7 +121,7 @@ namespace Umbreon.Commands.Modules
                 },
                 ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
                 Timestamp = DateTimeOffset.UtcNow,
-                Description = $"Hello, my name is Umbreon{EmotesHelper.Emotes["umbreon"]}! You can invoke my commands either by mentioning me or using the `{Format.Sanitize(Prefix)}` prefix!"
+                Description = $"Hello, my name is Umbreon{EmotesHelper.Emotes["umbreon"]}! You can invoke my commands either by mentioning me or using the `{Format.Sanitize(await GetPrefixAsync())}` prefix!"
             };
     }
 }

@@ -36,7 +36,7 @@ namespace Umbreon.Commands.Modules
         [Priority(0)]
         public async Task ListRoles()
         {
-            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var currentRoles = guild.SelfAssigningRoles;
 
             if (currentRoles.Count == 0)
@@ -71,7 +71,7 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to add")]
             [Remainder] SocketRole roleToAdd)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var currentRoles = guild.SelfAssigningRoles;
 
             if (currentRoles.Contains(roleToAdd.Id))
@@ -94,7 +94,7 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to remove")]
             [Remainder] SocketRole roleToRemove)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var currentRoles = guild.SelfAssigningRoles;
 
             if (currentRoles.Contains(roleToRemove.Id))
@@ -119,7 +119,7 @@ namespace Umbreon.Commands.Modules
             [Summary("The new role want that you want to add to the self assigning roles")]
             [Remainder] SocketRole roleToAdd)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var currentRoles = guild.SelfAssigningRoles;
 
             if (!currentRoles.Contains(roleToAdd.Id))
@@ -143,7 +143,7 @@ namespace Umbreon.Commands.Modules
             [Summary("The old role want that you want to remove from the self assigning roles")]
             [Remainder] SocketRole roleToRemove)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var currentRoles = guild.SelfAssigningRoles;
 
             if (currentRoles.Contains(roleToRemove.Id))

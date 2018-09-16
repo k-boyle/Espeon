@@ -102,7 +102,7 @@ namespace Umbreon.Callbacks
 
             if (_emojis[emoji] == 5)
             {
-                if (_candy.GetCandies(Context.User.Id) < 10)
+                if (await _candy.GetCandiesAsync(Context.User.Id) < 10)
                 {
                     await _message.NewMessageAsync(Context, "You don't have enough candies to enter this zone");
                     _ = Message.RemoveReactionAsync(emoji, Context.User);
@@ -110,7 +110,7 @@ namespace Umbreon.Callbacks
                 }
             }
 
-            _player.SetArea(Context.User.Id, _emojis[emoji]);
+            await _player.SetAreaAsync(Context.User.Id, _emojis[emoji]);
             await Message.ModifyAsync(x =>
             {
                 x.Embed = null;

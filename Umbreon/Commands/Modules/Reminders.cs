@@ -36,7 +36,7 @@ namespace Umbreon.Commands.Modules
             [Summary("What you want to be reminded about")]
             [Remainder] string content)
         {
-            _reminders.CreateReminder($"{content}\n\n{Context.Message.GetJumpUrl()}", Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
+            await _reminders.CreateReminderAsync($"{content}\n\n{Context.Message.GetJumpUrl()}", Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
             await SendMessageAsync("Reminder has been created");
         }
 
@@ -46,10 +46,10 @@ namespace Umbreon.Commands.Modules
         [Usage("reminders")]
         public async Task ListReminders()
         {
-            var reminders = _database.GetObject<GuildObject>("guilds", Context.Guild.Id).Reminders;
+            var reminders = (await _database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id)).Reminders;
             var users = reminders.Where(x => x.UserId == Context.User.Id).ToImmutableList();
             var i = 1;
-            await SendMessageAsync($"Your current reminders are:\n" +
+            await SendMessageAsync("Your current reminders are:\n" +
                                    $"{(users.Count > 0 ? string.Join("\n", users.Select(x => (x.TheReminder.Length > 100 ? $"**{i++}**: {x.TheReminder.Substring(0, 100)}..." : $"**{i++}**:{x.TheReminder}"))) : "None")}");
         }
     }

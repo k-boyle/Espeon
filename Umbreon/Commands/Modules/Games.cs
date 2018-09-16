@@ -56,7 +56,7 @@ namespace Umbreon.Commands.Modules
         {
             var flip = _random.Next(100) > 50 ? Face.Heads : Face.Tails;
 
-            _candy.UpdateCandies(Context.User.Id, false, flip == choice ? (int)(0.5 * amount) : -(int)amount);
+            await _candy.UpdateCandiesAsync(Context.User.Id, false, flip == choice ? (int)(0.5 * amount) : -(int)amount);
             await SendMessageAsync($"It was {flip}! {(flip == choice ? "You win!" : "You lose!")}");
         }
 

@@ -27,8 +27,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The new prefix that you want to add")]
             [Remainder] string newPrefix)
         {
-            CurrentGuild.Prefixes.Add(newPrefix);
+            var guild = await CurrentGuild;
+            guild.Prefixes.Add(newPrefix);
             await SendMessageAsync("Prefix has been added");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("RemovePrefix")]
@@ -40,13 +42,15 @@ namespace Umbreon.Commands.Modules
             [Summary("The prefix that you want to remove")]
             [Remainder] string newPrefix)
         {
-            if (CurrentGuild.Prefixes.Count == 1)
+            var guild = await CurrentGuild;
+            if (guild.Prefixes.Count == 1)
             {
                 await SendMessageAsync("This is the last prefix for the server you cannot remove it");
                 return;
             }
-            CurrentGuild.Prefixes.Remove(newPrefix);
+            guild.Prefixes.Remove(newPrefix);
             await SendMessageAsync("Prefix has been removed");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("AdminRole")]
@@ -58,8 +62,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to make the admin role")]
             [Remainder] SocketRole adminRole)
         {
-            CurrentGuild.AdminRole = adminRole.Id;
+            var guild = await CurrentGuild;
+            guild.AdminRole = adminRole.Id;
             await SendMessageAsync("Admin role has been set");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("ModRole")]
@@ -71,8 +77,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The role you want to make the mod role")]
             [Remainder] SocketRole modRole)
         {
-            CurrentGuild.ModRole = modRole.Id;
+            var guild = await CurrentGuild;
+            guild.ModRole = modRole.Id;
             await SendMessageAsync("Mod role has been set");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("mod")]
@@ -83,11 +91,12 @@ namespace Umbreon.Commands.Modules
             [Name("User")]
             [Summary("The user you want to promote")]
             [Remainder] SocketGuildUser user)
-
         {
-            var modRole = Context.Guild.GetRole(CurrentGuild.ModRole);
+            var guild = await CurrentGuild;
+            var modRole = Context.Guild.GetRole(guild.ModRole);
             await user.AddRoleAsync(modRole);
             await SendMessageAsync("User has been made a moderator");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("admin")]
@@ -100,11 +109,12 @@ namespace Umbreon.Commands.Modules
             [Name("User")]
             [Summary("The user you want to promote")]
             [Remainder] SocketGuildUser user)
-
         {
-            var adminRole = Context.Guild.GetRole(CurrentGuild.AdminRole);
+            var guild = await CurrentGuild;
+            var adminRole = Context.Guild.GetRole(guild.AdminRole);
             await user.AddRoleAsync(adminRole);
             await SendMessageAsync("User has been made an admin");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("demod")]
@@ -116,9 +126,11 @@ namespace Umbreon.Commands.Modules
             [Summary("The user you want to demote")]
             [Remainder] SocketGuildUser user)
         {
-            var modRole = Context.Guild.GetRole(CurrentGuild.ModRole);
+            var guild = await CurrentGuild;
+            var modRole = Context.Guild.GetRole(guild.ModRole);
             await user.RemoveRoleAsync(modRole);
             await SendMessageAsync("User has been demoted");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("deadmin")]
@@ -132,9 +144,11 @@ namespace Umbreon.Commands.Modules
             [Summary("The user you want to demote")]
             [Remainder] SocketGuildUser user)
         {
-            var adminRole = Context.Guild.GetRole(CurrentGuild.AdminRole);
+            var guild = await CurrentGuild;
+            var adminRole = Context.Guild.GetRole(guild.AdminRole);
             await user.RemoveRoleAsync(adminRole);
             await SendMessageAsync("User has been demoted");
+            Database.UpdateObject("guilds", guild);
         }
     }
 }

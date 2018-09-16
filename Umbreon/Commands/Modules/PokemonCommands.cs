@@ -101,14 +101,14 @@ namespace Umbreon.Commands.Modules
 
             if (habitat.Id == 5)
             {
-                if (_candy.GetCandies(Context.User.Id) < 10)
+                if (await _candy.GetCandiesAsync(Context.User.Id) < 10)
                 {
                     await SendMessageAsync("You don't have enough candies to enter this zone");
                     return;
                 }
             }
 
-            _player.SetArea(Context.User.Id, habitat.Id);
+            await _player.SetAreaAsync(Context.User.Id, habitat.Id);
             await SendMessageAsync($"You have traveled to {habitat.Name} area");
         }
 
