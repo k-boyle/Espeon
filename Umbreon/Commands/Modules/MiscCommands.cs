@@ -77,22 +77,22 @@ namespace Umbreon.Commands.Modules
         [Name("View Admins")]
         [Summary("Gets a list of all the admins in the guild")]
         [Usage("admins")]
-        public Task ListAdmins()
-            => SendMessageAsync("Your admins are:\n" +
-                                   $"{string.Join("\n", GetMembers(SpecialRole.Admin).Select(x => x.GetDisplayName()))}");
+        public async Task ListAdmins()
+            => await SendMessageAsync("Your admins are:\n" +
+                                   $"{string.Join("\n", (await GetMembersAsync(SpecialRole.Admin)).Select(x => x.GetDisplayName()))}");
 
         [Command("Mods")]
         [Name("View Moderators")]
         [Summary("Gets a list of all the mods in the guild")]
         [Usage("mods")]
-        public Task ListMods()
-            => SendMessageAsync("Your mods are:\n" +
-                                   $"{string.Join("\n", GetMembers(SpecialRole.Mod).Select(x => x.GetDisplayName()))}");
+        public async Task ListMods()
+            => await SendMessageAsync("Your mods are:\n" +
+                                   $"{string.Join("\n", (await GetMembersAsync(SpecialRole.Mod)).Select(x => x.GetDisplayName()))}");
 
-        private IEnumerable<SocketGuildUser> GetMembers(SpecialRole type)
+        private async Task<IEnumerable<SocketGuildUser>> GetMembersAsync(SpecialRole type)
         {
             var database = Services.GetService<DatabaseService>();
-            var guild = database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            var guild = await database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
             var role = Context.Guild.GetRole(type == SpecialRole.Admin ? guild.AdminRole : guild.ModRole);
             return role.Members;
         }

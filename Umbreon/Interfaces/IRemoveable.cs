@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Umbreon.Interfaces
 {
@@ -6,6 +7,6 @@ namespace Umbreon.Interfaces
     {
         int Identifier { get; }
         DateTime When { get; }
-        IRemoveableService Service { get; }
+        Task RemoveAsync();
     }
 }

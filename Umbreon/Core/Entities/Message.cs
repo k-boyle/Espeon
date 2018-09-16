@@ -1,10 +1,20 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Entities
 {
     public class Message : IRemoveable
     {
+        private readonly IRemoveableService _service;
+
+        public Message(IRemoveableService service)
+        {
+            _service = service;
+        }
+
+        public Message() { }
+
         public ulong UserId { get; set; }
         public ulong ExecutingId { get; set; }
         public ulong ResponseId { get; set; }
@@ -14,6 +24,8 @@ namespace Umbreon.Core.Entities
 
         public int Identifier { get; set; }
         public DateTime When => DateTime.UtcNow + TimeSpan.FromMinutes(5);
-        public IRemoveableService Service { get; set; }
+
+        public Task RemoveAsync()
+            => _service.RemoveAsync(this);
     }
 }

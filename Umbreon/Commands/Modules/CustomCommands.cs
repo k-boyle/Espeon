@@ -168,7 +168,7 @@ namespace Umbreon.Commands.Modules
                 reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
                 if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
                 var newValue = reply.Content;
-                Commands.UpdateCommand(Context, targetCommand.CommandName, newValue);
+                await Commands.UpdateCommandAsync(Context, targetCommand.CommandName, newValue);
                 await NewMessageAsync("Command has been modified");
                 return;
             }
@@ -191,7 +191,7 @@ namespace Umbreon.Commands.Modules
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
             var newValue = reply.Content;
-            Commands.UpdateCommand(Context, cmd.CommandName, newValue);
+            await Commands.UpdateCommandAsync(Context, cmd.CommandName, newValue);
             await NewMessageAsync("Command has been modified");
         }
 
@@ -209,7 +209,7 @@ namespace Umbreon.Commands.Modules
             [Summary("The new value that you want the Command to have")]
             [Remainder] string cmdValue)
         {
-            Commands.UpdateCommand(Context, cmd.CommandName, cmdValue);
+            await Commands.UpdateCommandAsync(Context, cmd.CommandName, cmdValue);
             await SendMessageAsync("Command has been modified");
         }
 

@@ -108,11 +108,11 @@ namespace Umbreon.Commands.Games
 
                         if (int.TryParse(response.Content, out _defender))
                         {
-                            if (_defender > _candy.GetCandies(_target.Id))
+                            if (_defender > await _candy.GetCandiesAsync(_target.Id))
                             {
                                 _defender = -1;
                                 await _message.NewMessageAsync(Context,
-                                    $"You only have {_candy.GetCandies(_target.Id)}{EmotesHelper.Emotes["rarecandy"]} candies, try again");
+                                    $"You only have {_candy.GetCandiesAsync(_target.Id)}{EmotesHelper.Emotes["rarecandy"]} candies, try again");
                                 continue;
                             }
 
@@ -147,8 +147,8 @@ namespace Umbreon.Commands.Games
             var winner = _random.Next(total) < _challenger;
 
             await _message.NewMessageAsync(Context, $"{(winner ? Context.User.Mention : _target.Mention)} you win the wager! You win {(winner ? _defender : _challenger)}{EmotesHelper.Emotes["rarecandy"]} rare candies!");
-            _candy.UpdateCandies(Context.User.Id, false, winner ? _challenger : -_challenger);
-            _candy.UpdateCandies(_target.Id, false, winner ? -_defender : _defender);
+            await _candy.UpdateCandiesAsync(Context.User.Id, false, winner ? _challenger : -_challenger);
+            await _candy.UpdateCandiesAsync(_target.Id, false, winner ? -_defender : _defender);
             _game.LeaveGame(Context.User.Id);
         }
     }

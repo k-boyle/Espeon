@@ -56,7 +56,7 @@ namespace Umbreon.Callbacks
                 {
                     var attr = item.GetCustomAttributes().OfType<ShopItemAttribute>().FirstOrDefault();
 
-                    if(_candy.GetCandies(Context.User.Id) < attr?.Price)
+                    if(await _candy.GetCandiesAsync(Context.User.Id) < attr?.Price)
                         continue;
 
                     await _message.AddReactionAsync(attr?.Emote, new RequestOptions
@@ -88,7 +88,7 @@ namespace Umbreon.Callbacks
             
             var sb = new StringBuilder();
 
-            sb.AppendLine($"Candies: {_candy.GetCandies(Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]}");
+            sb.AppendLine($"Candies: {_candy.GetCandiesAsync(Context.User.Id)}{EmotesHelper.Emotes["rarecandy"]}");
             sb.AppendLine("");
 
             foreach(var item in Items)
@@ -118,16 +118,16 @@ namespace Umbreon.Callbacks
             var item = shopItems.FirstOrDefault(x => x.Emote.Equals(emote));
 
             if (item is null) return false;
-            if (_candy.GetCandies(Context.User.Id) < item.Price)
+            if (await _candy.GetCandiesAsync(Context.User.Id) < item.Price)
             {
                 await _messageService.NewMessageAsync(Context, "You don't have enough candies to afford this");
                 await _message.RemoveReactionAsync(item.Emote, Context.Client.CurrentUser);
                 return false;
             }
 
-            _candy.UpdateCandies(Context.User.Id, false, -item.Price);
+            await _candy.UpdateCandiesAsync(Context.User.Id, false, -item.Price);
 
-            _player.AddItem(Context.User.Id, item);
+            await _player.AddItemAsync(Context.User.Id, item);
 
             await _message.ModifyAsync(x => x.Embed = BuildEmbed());
 

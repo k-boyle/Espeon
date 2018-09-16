@@ -12,52 +12,46 @@ namespace Umbreon.Services
     [Service]
     public class TimerService
     {
-        private readonly IServiceProvider _services;
-
         private readonly Timer _timer;
+
         private ConcurrentQueue<IRemoveable> _queue = new ConcurrentQueue<IRemoveable>();
-
-        public TimerService(IServiceProvider services)
+        
+        public TimerService()
         {
-            _services = services;
-
-            _timer = new Timer(_ =>
-            {
-                if (!_queue.TryDequeue(out var removeable)) return;
-                HandleRemoveableAsync(removeable);
-                SetTimer();
-            }, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+            _timer = new Timer(async _ =>
+                {
+                    if (!_queue.TryDequeue(out var removeable)) return;
+                    await HandleRemoveableAsync(removeable);
+                    await SetTimerAsync();
+                }, null,
+                TimeSpan.FromMilliseconds(-1),
+                TimeSpan.FromMilliseconds(-1));
         }
 
-        public void Enqueue(IRemoveable removeable)
+        public async Task EnqueueAsync(IRemoveable removeable)
         {
             _queue.Enqueue(removeable);
-            _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
-            SetTimer();
+            await SetTimerAsync();
         }
 
-        private void SetTimer()
+        private async Task SetTimerAsync()
         {
+            _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
+
             IRemoveable removeable;
-            while (_queue.TryPeek(out removeable) && removeable.When - DateTime.UtcNow < TimeSpan.Zero)
+            while (_queue.TryPeek(out removeable))
             {
-                if(_queue.TryDequeue(out removeable))
-                    HandleRemoveableAsync(removeable);
+                if (!(removeable.When.ToUniversalTime() - DateTime.UtcNow < TimeSpan.Zero)) break;
+                await HandleRemoveableAsync(removeable);
             }
 
-            _timer.Change(removeable.When - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
+            _timer.Change(removeable.When.ToUniversalTime() - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
         }
 
-        private void HandleRemoveableAsync(IRemoveable removeable)
-            => _ = Task.Run(async () =>
-             {
-                 //anti-pattern, needs changing
-                 var service = _services.GetService(removeable.Service.GetType());
-                 if (service is IRemoveableService removeableService)
-                     await removeableService.RemoveAsync(removeable);
-             });
+        private static Task HandleRemoveableAsync(IRemoveable removeable)
+            => removeable.RemoveAsync();
 
-        private void Remove(IRemoveable obj)
+        private Task RemoveAsync(IRemoveable obj)
         {
             var newQueue = new ConcurrentQueue<IRemoveable>();
             foreach (var item in _queue)
@@ -67,18 +61,21 @@ namespace Umbreon.Services
             }
 
             _queue = newQueue;
+            return Task.CompletedTask;
         }
 
-        public void RemoveRange(IEnumerable<IRemoveable> objs)
+        public async Task RemoveRangeAsync(IEnumerable<IRemoveable> objs)
         {
             var newCol = _queue.Except(objs);
             _queue = new ConcurrentQueue<IRemoveable>(newCol);
+            await SetTimerAsync();
         }
 
-        public void Update(IRemoveable removeable)
+        public async Task UpdateAsync(IRemoveable removeable)
         {
-            Remove(removeable);
-            Enqueue(removeable);
+            await RemoveAsync(removeable);
+            await EnqueueAsync(removeable);
+            await SetTimerAsync();
         }
     }
 }

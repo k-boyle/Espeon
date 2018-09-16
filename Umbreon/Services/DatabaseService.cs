@@ -43,7 +43,7 @@ namespace Umbreon.Services
             return Task.CompletedTask;
         }
 
-        private T LoadObject<T>(string name, ulong id) where T : BaseObject, new()
+        private async Task<T> LoadObject<T>(string name, ulong id) where T : BaseObject, new()
         {
             using (var db = new LiteDatabase(DatabaseDir))
             {
@@ -51,7 +51,7 @@ namespace Umbreon.Services
                 var found = collection.FindOne(x => x.Id == id) ?? NewObject<T>(id);
                 found.When = DateTime.UtcNow.AddDays(1);
                 collection.Upsert(found);
-                _timer.Update(found);
+                await _timer.UpdateAsync(found);
                 _cache.TryAdd(found.Id, found);
                 _log.NewLogEvent(LogSeverity.Info, LogSource.Database, $"{found.Id}:{found.GetType()} has been loaded into the cache");
                 return found;
@@ -59,19 +59,28 @@ namespace Umbreon.Services
         }
 
         private T NewObject<T>(ulong id) where T : BaseObject, new()
-            => new T { Id = id, Identifier = _random.Next(), Service = this };
+        {
+            var newObj = new T
+            {
+                Id = id,
+                Identifier = _random.Next()
+            };
+
+            var returnObj = (T)Activator.CreateInstance(typeof(T), newObj);
+            return returnObj;
+        }
 
         public T TempLoad<T>(string name, ulong id) where T : BaseObject, new()
         {
             if (_cache.TryGetValue(id, out var found))
-                return (T) found;
+                return (T)found;
 
             using (var db = new LiteDatabase(DatabaseDir))
             {
                 var collection = db.GetCollection<T>(name);
                 found = collection.FindOne(x => x.Id == id) ?? NewObject<T>(id);
-                collection.Upsert((T) found);
-                return (T) found;
+                collection.Upsert((T)found);
+                return (T)found;
             }
         }
 
@@ -84,8 +93,8 @@ namespace Umbreon.Services
             }
         }
 
-        public T GetObject<T>(string name, ulong id) where T : BaseObject, new() 
-            => _cache.TryGetValue(id, out var found) ? (T) found : LoadObject<T>(name, id);
+        public async Task<T> GetObjectAsync<T>(string name, ulong id) where T : BaseObject, new()
+            => _cache.TryGetValue(id, out var found) ? (T)found : await LoadObject<T>(name, id);
 
         public static IEnumerable<T> GrabAllData<T>(string name) where T : BaseObject
         {

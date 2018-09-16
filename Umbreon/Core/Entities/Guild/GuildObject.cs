@@ -1,9 +1,16 @@
 ﻿using System.Collections.Generic;
+using Umbreon.Interfaces;
 
 namespace Umbreon.Core.Entities.Guild
 {
     public class GuildObject : BaseObject
     {
+        public GuildObject(IRemoveableService service) : base(service)
+        {
+        }
+
+        public GuildObject() { }
+
         public ulong AdminRole { get; set; }
         public ulong ModRole { get; set; }
         public ulong WelcomeChannel { get; set; } = 0; // TODO

@@ -8,28 +8,23 @@ namespace Umbreon.Commands.TypeReaders
 {
     public class CandyTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
+        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, CommandInfo command, string input, IServiceProvider services)
         {
             var candy = services.GetService<CandyService>();
-            var user = candy.GetCandies(context.User.Id);
+            var user = await candy.GetCandiesAsync(context.User.Id);
 
             if (string.Equals(input, "NaN")) //JS meme
-                return Task.FromResult(TypeReaderResult.FromSuccess(command, 0));
+                return TypeReaderResult.FromSuccess(command, 0);
 
             if (string.Equals(input, "all", StringComparison.CurrentCultureIgnoreCase))
-                return Task.FromResult(TypeReaderResult.FromSuccess(command, user));
+                return TypeReaderResult.FromSuccess(command, user);
 
             if (!int.TryParse(input, out var amount))
-                return Task.FromResult(
-                    TypeReaderResult.FromError(command, CommandError.ParseFailed, "Failed to parse amount"));
+                return TypeReaderResult.FromError(command, CommandError.ParseFailed, "Failed to parse amount");
             if (amount < 0)
-                return Task.FromResult(TypeReaderResult.FromError(command, CommandError.ParseFailed, "Amount must be a positive integer"));
+                return TypeReaderResult.FromError(command, CommandError.ParseFailed, "Amount must be a positive integer");
 
-            if (amount > user)
-                return Task.FromResult(TypeReaderResult.FromError(command, CommandError.Unsuccessful, "You don't have enough candies"));
-
-            return Task.FromResult(TypeReaderResult.FromSuccess(command, amount));
-
+            return amount > user ? TypeReaderResult.FromError(command, CommandError.Unsuccessful, "You don't have enough candies") : TypeReaderResult.FromSuccess(command, amount);
         }
     }
 }

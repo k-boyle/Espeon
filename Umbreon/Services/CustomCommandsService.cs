@@ -69,7 +69,7 @@ namespace Umbreon.Services
 
         private async Task CommandCallbackAsync(ICommandContext context, object[] _, IServiceProvider __, CommandInfo info)
         {
-            await _message.SendMessageAsync(context, GetCmds(context).FirstOrDefault(x =>
+            await _message.SendMessageAsync(context, (await GetCmdsAsync(context)).FirstOrDefault(x =>
                 string.Equals(x.CommandName, info.Name, StringComparison.CurrentCultureIgnoreCase))?.CommandValue);
         }
 
@@ -80,15 +80,15 @@ namespace Umbreon.Services
                 CommandName = cmdName,
                 CommandValue = cmdValue
             };
-            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", context.Guild.Id);
             guild.CustomCommands.Add(newCmd);
             _database.UpdateObject("guilds", guild);
             await NewCmdsAsync(context.Guild);
         }
 
-        public void UpdateCommand(ICommandContext context, string cmdName, string newValue)
+        public async Task UpdateCommandAsync(ICommandContext context, string cmdName, string newValue)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", context.Guild.Id);
             guild.CustomCommands
                 .Find(x => string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase))
                 .CommandValue = newValue;
@@ -97,7 +97,7 @@ namespace Umbreon.Services
 
         public async Task RemoveCmdAsync(ICommandContext context, string cmdName)
         {
-            var guild = _database.GetObject<GuildObject>("guilds", context.Guild.Id);
+            var guild = await _database.GetObjectAsync<GuildObject>("guilds", context.Guild.Id);
             var targetCmd = guild.CustomCommands.Find(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase));
             guild.CustomCommands.Remove(targetCmd);
@@ -137,10 +137,10 @@ namespace Umbreon.Services
             return !(cmd is null);
         }
 
-        public IEnumerable<CustomCommand> GetCmds(ICommandContext context)
-            => GetCmds(context.Guild.Id);
+        public Task<IEnumerable<CustomCommand>> GetCmdsAsync(ICommandContext context)
+            => GetCmdsAsync(context.Guild.Id);
 
-        private IEnumerable<CustomCommand> GetCmds(ulong guildId)
-            => _database.GetObject<GuildObject>("guilds", guildId).CustomCommands;
+        private async Task<IEnumerable<CustomCommand>> GetCmdsAsync(ulong guildId)
+            => (await _database.GetObjectAsync<GuildObject>("guilds", guildId)).CustomCommands;
     }
 }

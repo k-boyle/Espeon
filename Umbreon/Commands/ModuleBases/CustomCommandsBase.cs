@@ -13,7 +13,8 @@ namespace Umbreon.Commands.ModuleBases
 
         protected override void BeforeExecute(CommandInfo command)
         {
-            CurrentCmds = Commands.GetCmds(Context);
+            // TODO FIX THIS PLZ
+            CurrentCmds = Commands.GetCmdsAsync(Context).Result;
         }
     }
 }

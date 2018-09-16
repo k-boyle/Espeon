@@ -13,7 +13,8 @@ namespace Umbreon.Commands.ModuleBases
 
         protected override void BeforeExecute(CommandInfo command)
         {
-            CurrentGuild = Database.GetObject<GuildObject>("guilds", Context.Guild.Id);
+            //TODO YUCK PLZ FIX
+            CurrentGuild = Database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id).Result;
         }
 
         protected override void AfterExecute(CommandInfo command)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Umbreon.Attributes;
 using Umbreon.Core.Entities.User;
 
@@ -14,29 +15,29 @@ namespace Umbreon.Services
             _database = database;
         }
 
-        public void UpdateCandies(ulong id, bool isClaim, int amount)
+        public async Task UpdateCandiesAsync(ulong id, bool isClaim, int amount)
         {
-            var user = _database.GetObject<UserObject>("users", id);
+            var user = await _database.GetObjectAsync<UserObject>("users", id);
             user.RareCandies += amount;
             if (isClaim)
                 user.LastClaimed = DateTime.UtcNow;
             _database.UpdateObject("users", user);
         }
 
-        public void SetCandies(ulong id, int amount)
+        public async Task SetCandiesAsync(ulong id, int amount)
         {
-            var user = _database.GetObject<UserObject>("users", id);
+            var user = await _database.GetObjectAsync<UserObject>("users", id);
             user.RareCandies = amount;
             _database.UpdateObject("users", user);
         }
 
-        public bool CanClaim(ulong id)
+        public async Task<bool> CanClaimAsync(ulong id)
         {
-            var user = _database.GetObject<UserObject>("users", id);
+            var user = await _database.GetObjectAsync<UserObject>("users", id);
             return DateTime.UtcNow - user.LastClaimed > TimeSpan.FromHours(8);
         }
 
-        public int GetCandies(ulong id)
-            => _database.GetObject<UserObject>("users", id).RareCandies;
+        public async Task<int> GetCandiesAsync(ulong id)
+            => (await _database.GetObjectAsync<UserObject>("users", id)).RareCandies;
     }
 }
