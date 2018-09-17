@@ -94,9 +94,14 @@ namespace Umbreon.Commands.Modules
         {
             var guild = await CurrentGuild;
             var modRole = Context.Guild.GetRole(guild.ModRole);
-            await user.AddRoleAsync(modRole);
-            await SendMessageAsync("User has been made a moderator");
-            Database.UpdateObject("guilds", guild);
+            if (modRole is null)
+                await SendMessageAsync("You haven't assigned a Mod role");
+            else
+            {
+                await user.AddRoleAsync(modRole);
+                await SendMessageAsync("User has been made a moderator");
+                Database.UpdateObject("guilds", guild);
+            }
         }
 
         [Command("admin")]
@@ -112,9 +117,14 @@ namespace Umbreon.Commands.Modules
         {
             var guild = await CurrentGuild;
             var adminRole = Context.Guild.GetRole(guild.AdminRole);
-            await user.AddRoleAsync(adminRole);
-            await SendMessageAsync("User has been made an admin");
-            Database.UpdateObject("guilds", guild);
+            if (adminRole is null)
+                await SendMessageAsync("You haven't assigned an Admin role");
+            else
+            {
+                await user.AddRoleAsync(adminRole);
+                await SendMessageAsync("User has been made an admin");
+                Database.UpdateObject("guilds", guild);
+            }
         }
 
         [Command("demod")]
@@ -128,9 +138,14 @@ namespace Umbreon.Commands.Modules
         {
             var guild = await CurrentGuild;
             var modRole = Context.Guild.GetRole(guild.ModRole);
-            await user.RemoveRoleAsync(modRole);
-            await SendMessageAsync("User has been demoted");
-            Database.UpdateObject("guilds", guild);
+            if (modRole is null)
+                await SendMessageAsync("You haven't assigned a Mod role");
+            else
+            {
+                await user.RemoveRoleAsync(modRole);
+                await SendMessageAsync("User has been demoted");
+                Database.UpdateObject("guilds", guild);
+            }
         }
 
         [Command("deadmin")]
@@ -146,9 +161,14 @@ namespace Umbreon.Commands.Modules
         {
             var guild = await CurrentGuild;
             var adminRole = Context.Guild.GetRole(guild.AdminRole);
-            await user.RemoveRoleAsync(adminRole);
-            await SendMessageAsync("User has been demoted");
-            Database.UpdateObject("guilds", guild);
+            if (adminRole is null)
+                await SendMessageAsync("You haven't assigned an Admin role");
+            else
+            {
+                await user.RemoveRoleAsync(adminRole);
+                await SendMessageAsync("User has been demoted");
+                Database.UpdateObject("guilds", guild);
+            }
         }
     }
 }
