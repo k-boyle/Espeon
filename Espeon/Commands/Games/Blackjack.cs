@@ -112,7 +112,7 @@ namespace Espeon.Commands.Games
                         x.Content = string.Empty;
                         x.Embed = TimeoutEmbed();
                     });
-                    await Candy.SetCandiesAsync(Context.User.Id, await Candy.GetCandiesAsync(Context.User.Id) - _bet);
+                    await Candy.UpdateCandiesAsync(Context.User.Id, false, -_bet);
                     _inGame = false;
                 }
                 Games.LeaveGame(Context.User.Id);
@@ -209,7 +209,7 @@ namespace Espeon.Commands.Games
                     if (playerTotal > 21)
                     {
                         await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                        await Candy.SetCandiesAsync(Context.User.Id, await Candy.GetCandiesAsync(Context.User.Id) - _bet);
+                        await Candy.UpdateCandiesAsync(Context.User.Id, false, -_bet);
                         Games.LeaveGame(Context.User.Id);
                         _inGame = false;
                         return;
@@ -239,17 +239,17 @@ namespace Espeon.Commands.Games
                     if (dealerTotal > 21)
                     {
                         await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                        await Candy.SetCandiesAsync(Context.User.Id, await Candy.GetCandiesAsync(Context.User.Id) + (int) (Payout * _bet));
+                        await Candy.UpdateCandiesAsync(Context.User.Id, false, (int)(Payout * _bet));
                     }
                     else if (dealerTotal > playerTotal)
                     {
                         await Message.ModifyAsync(x => x.Embed = LoseEmbed());
-                        await Candy.SetCandiesAsync(Context.User.Id, await Candy.GetCandiesAsync(Context.User.Id) - _bet);
+                        await Candy.UpdateCandiesAsync(Context.User.Id, false, -_bet);
                     }
                     else if (dealerTotal < playerTotal)
                     {
                         await Message.ModifyAsync(x => x.Embed = WinEmbed());
-                        await Candy.SetCandiesAsync(Context.User.Id, await Candy.GetCandiesAsync(Context.User.Id) + (int) (Payout * _bet));
+                        await Candy.UpdateCandiesAsync(Context.User.Id, false, (int)(Payout * _bet));
                     }
                     else if (dealerTotal == playerTotal)
                         await Message.ModifyAsync(x => x.Embed = DrawEmbed());
