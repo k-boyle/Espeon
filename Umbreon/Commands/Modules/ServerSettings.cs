@@ -95,7 +95,7 @@ namespace Umbreon.Commands.Modules
             var guild = await CurrentGuild;
             if (Context.Guild.GetRole(guild.ModRole) is SocketRole modRole)
             {
-                await user.RemoveRoleAsync(modRole);
+                await user.AddRoleAsync(modRole);
                 await SendMessageAsync("User has been made a moderator");
                 Database.UpdateObject("guilds", guild);
                 return;
@@ -118,7 +118,7 @@ namespace Umbreon.Commands.Modules
             var guild = await CurrentGuild;
             if (Context.Guild.GetRole(guild.AdminRole) is SocketRole adminRole)
             {
-                await user.RemoveRoleAsync(adminRole);
+                await user.AddRoleAsync(adminRole);
                 await SendMessageAsync("User has been made an administrator");
                 Database.UpdateObject("guilds", guild);
                 return;
