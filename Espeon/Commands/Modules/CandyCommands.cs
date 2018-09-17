@@ -1,10 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Humanizer;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Espeon.Attributes;
 using Espeon.Commands.ModuleBases;
 using Espeon.Commands.TypeReaders;
@@ -12,6 +8,10 @@ using Espeon.Core.Entities.User;
 using Espeon.Extensions;
 using Espeon.Helpers;
 using Espeon.Services;
+using Humanizer;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Colour = Discord.Color;
 
 namespace Espeon.Commands.Modules
@@ -60,6 +60,13 @@ namespace Espeon.Commands.Modules
             await _candy.UpdateCandiesAsync(Context.User.Id, true, amount);
             await SendMessageAsync($"You have received {amount}{EmotesHelper.Emotes["rarecandy"]} rare cand{(amount > 1 ? "ies" : "y")}!");
         }
+
+        [Command("house")]
+        [Name("House Balance")]
+        [Summary("View how many candies the house has won vs suckers who gambled")]
+        [Usage("house")]
+        public async Task SeeHouse()
+            => await SendMessageAsync($"The house currently has {await _candy.GetCandiesAsync(Context.Guild.CurrentUser.Id)}{EmotesHelper.Emotes["rarecandy"]} rare candies");
 
         [Command("treat")]
         [Name("Send Treats")]

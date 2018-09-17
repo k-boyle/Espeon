@@ -9,6 +9,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Discord.WebSocket;
+using Espeon.Core.Entities.User;
 
 namespace Espeon.Services
 {
@@ -21,14 +23,16 @@ namespace Espeon.Services
 
         private readonly Random _random;
         private readonly TimerService _timer;
+        private readonly DiscordSocketClient _client;
+        
+        public DatabaseService() { }
 
-        public DatabaseService(Random random, TimerService timer)
+        public DatabaseService(Random random, TimerService timer, DiscordSocketClient client)
         {
             _random = random;
             _timer = timer;
+            _client = client;
         }
-
-        public DatabaseService() { }
 
         public static Task InitialiseAsync()
         {
@@ -90,6 +94,9 @@ namespace Espeon.Services
 
         public async Task<T> GetObjectAsync<T>(string name, ulong id) where T : BaseObject, new()
             => _cache.TryGetValue(id, out var found) ? (T) found : await AddToCacheAsync<T>(name, id);
+
+        public Task<UserObject> GetBotUserAsync()
+            => GetObjectAsync<UserObject>("users", _client.CurrentUser.Id);
 
         public static IEnumerable<T> GrabAllData<T>(string name) where T : BaseObject
         {
