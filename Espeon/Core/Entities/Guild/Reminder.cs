@@ -8,6 +8,17 @@ namespace Espeon.Core.Entities.Guild
     {
         private readonly IRemoveableService _service;
 
+        public Reminder(Reminder reminder, IRemoveableService service)
+        {
+            TheReminder = reminder.TheReminder;
+            GuildId = reminder.GuildId;
+            ChannelId = reminder.ChannelId;
+            UserId = reminder.UserId;
+            Identifier = reminder.Identifier;
+            When = reminder.When;
+            _service = service;
+        }
+
         public Reminder(IRemoveableService service)
         {
             _service = service;

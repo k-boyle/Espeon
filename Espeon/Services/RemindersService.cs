@@ -40,13 +40,14 @@ namespace Espeon.Services
                 var reminders = _database.TempLoad<GuildObject>("guilds", guild.Id).Reminders;
                 foreach (var reminder in reminders)
                 {
-                    if (reminder.When.ToUniversalTime() < DateTime.UtcNow)
+                    var initializedReminder = new Reminder(reminder, this);
+                    if (initializedReminder.When.ToUniversalTime() < DateTime.UtcNow)
                     {
-                        toRemove.Add(reminder);
+                        toRemove.Add(initializedReminder);
                         continue;
                     }
 
-                    await _timer.EnqueueAsync(reminder);
+                    await _timer.EnqueueAsync(initializedReminder);
                 }
             }
 
