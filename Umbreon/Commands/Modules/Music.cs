@@ -128,8 +128,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The user you want to approve")]
             [Remainder] SocketGuildUser user)
         {
-            CurrentGuild.MusicUsers.Add(user.Id);
+            var guild = await CurrentGuild;
+            guild.MusicUsers.Add(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been approved");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("unapprove")]
@@ -142,8 +144,10 @@ namespace Umbreon.Commands.Modules
             [Summary("The user you want to unapprove")]
             [Remainder] SocketGuildUser user)
         {
-            CurrentGuild.MusicUsers.Remove(user.Id);
+            var guild = await CurrentGuild;
+            guild.MusicUsers.Remove(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been unapproved");
+            Database.UpdateObject("guilds", guild);
         }
 
         [Command("queue")]
