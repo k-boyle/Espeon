@@ -93,15 +93,15 @@ namespace Umbreon.Commands.Modules
             [Remainder] SocketGuildUser user)
         {
             var guild = await CurrentGuild;
-            var modRole = Context.Guild.GetRole(guild.ModRole);
-            if (modRole is null)
-                await SendMessageAsync("You haven't assigned a Mod role");
-            else
+            if (Context.Guild.GetRole(guild.ModRole) is SocketRole modRole)
             {
-                await user.AddRoleAsync(modRole);
+                await user.RemoveRoleAsync(modRole);
                 await SendMessageAsync("User has been made a moderator");
                 Database.UpdateObject("guilds", guild);
+                return;
             }
+
+            await SendMessageAsync("You haven't assigned a Mod role");
         }
 
         [Command("admin")]
@@ -116,15 +116,15 @@ namespace Umbreon.Commands.Modules
             [Remainder] SocketGuildUser user)
         {
             var guild = await CurrentGuild;
-            var adminRole = Context.Guild.GetRole(guild.AdminRole);
-            if (adminRole is null)
-                await SendMessageAsync("You haven't assigned an Admin role");
-            else
+            if (Context.Guild.GetRole(guild.AdminRole) is SocketRole adminRole)
             {
-                await user.AddRoleAsync(adminRole);
-                await SendMessageAsync("User has been made an admin");
+                await user.RemoveRoleAsync(adminRole);
+                await SendMessageAsync("User has been made an administrator");
                 Database.UpdateObject("guilds", guild);
+                return;
             }
+
+            await SendMessageAsync("You haven't assigned an Admin role");
         }
 
         [Command("demod")]
@@ -137,15 +137,15 @@ namespace Umbreon.Commands.Modules
             [Remainder] SocketGuildUser user)
         {
             var guild = await CurrentGuild;
-            var modRole = Context.Guild.GetRole(guild.ModRole);
-            if (modRole is null)
-                await SendMessageAsync("You haven't assigned a Mod role");
-            else
+            if (Context.Guild.GetRole(guild.ModRole) is SocketRole modRole)
             {
                 await user.RemoveRoleAsync(modRole);
                 await SendMessageAsync("User has been demoted");
                 Database.UpdateObject("guilds", guild);
+                return;
             }
+
+            await SendMessageAsync("You haven't assigned a Mod role");
         }
 
         [Command("deadmin")]
@@ -160,15 +160,15 @@ namespace Umbreon.Commands.Modules
             [Remainder] SocketGuildUser user)
         {
             var guild = await CurrentGuild;
-            var adminRole = Context.Guild.GetRole(guild.AdminRole);
-            if (adminRole is null)
-                await SendMessageAsync("You haven't assigned an Admin role");
-            else
+            if (Context.Guild.GetRole(guild.AdminRole) is SocketRole adminRole)
             {
                 await user.RemoveRoleAsync(adminRole);
                 await SendMessageAsync("User has been demoted");
                 Database.UpdateObject("guilds", guild);
+                return;
             }
+
+            await SendMessageAsync("You haven't assigned an Admin role");
         }
     }
 }
