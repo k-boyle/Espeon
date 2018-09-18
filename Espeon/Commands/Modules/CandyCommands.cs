@@ -119,5 +119,30 @@ namespace Espeon.Commands.Modules
             await _candy.UpdateCandiesAsync(user.Id, false, amount);
             await SendMessageAsync("Your gift basket has been made and sent");
         }
+
+        [Command("steal")]
+        [Name("Steal Candies")]
+        [Summary("Attempt to steal candies from the house. You have a (bet/house) * 0.2 % chance of succeeding")]
+        [Usage("steal 100")]
+        public async Task TrySteal(
+            [Name("Amount")]
+            [Summary("The amount you want to bet")]
+            [OverrideTypeReader(typeof(CandyTypeReader))] int amount)
+        {
+            if (await _candy.TryStealAsync(Context.User.Id, amount))
+            {
+                await SendMessageAsync("Well done! You win!");
+                return;
+            }
+
+            await SendMessageAsync("Thanks for the candies, chump");
+        }
+
+        [Command("history")]
+        [Name("Transaction History")]
+        [Summary("View the last 5 transactions")]
+        [Usage("history")]
+        public Task ViewHistory()
+            => SendMessageAsync(string.IsNullOrEmpty(_candy.GetLogs()) ? "None" : _candy.GetLogs());
     }
 }

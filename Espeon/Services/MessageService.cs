@@ -81,7 +81,7 @@ namespace Espeon.Services
 
                 if (_random.Next(100) < 10)
                 {
-                    await _candy.UpdateCandiesAsync(message.Author.Id, false, 1);
+                    await _candy.UpdateCandiesAsync(message.Author.Id, false, 1, true);
                 }
 
                 var guild = _database.TempLoad<GuildObject>("guilds", channel.Guild.Id);
