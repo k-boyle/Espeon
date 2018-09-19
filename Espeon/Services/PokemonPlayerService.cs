@@ -89,7 +89,7 @@ namespace Espeon.Services
         public string GetImageUrl(int id)
             => _habitatImages[id];
 
-        public Task<UserObject> GetCurrentPlayer(ulong id)
+        public Task<UserObject> GetCurrentPlayerAsync(ulong id)
             => _database.GetObjectAsync<UserObject>("users", id);
 
         public void UseBall(UserObject user, BaseBall ball)
@@ -100,7 +100,7 @@ namespace Espeon.Services
 
         public async Task AddItemAsync(ulong userId, ShopItemAttribute item)
         {
-            var user = await GetCurrentPlayer(userId);
+            var user = await GetCurrentPlayerAsync(userId);
             switch (item.ItemName)
             {
                 case "Pokeball":

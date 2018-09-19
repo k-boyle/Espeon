@@ -20,7 +20,7 @@ namespace Espeon.Commands.Modules
         public async Task GetCatfact()
         {
             var msg = await SendMessageAsync("Fetching...");
-            var fact = (await SendRequest("https://catfact.ninja/fact"))["fact"];
+            var fact = (await SendRequestAsync("https://catfact.ninja/fact"))["fact"];
             await msg.ModifyAsync(x => x.Content = $"{fact}");
         }
 
@@ -32,7 +32,7 @@ namespace Espeon.Commands.Modules
         public async Task GetJoke()
         {
             var msg = await SendMessageAsync("Fetching...");
-            var joke = (await SendRequest("https://icanhazdadjoke.com/"))["joke"];
+            var joke = (await SendRequestAsync("https://icanhazdadjoke.com/"))["joke"];
             await msg.ModifyAsync(x => x.Content = $"{joke}");
         }
 
@@ -44,7 +44,7 @@ namespace Espeon.Commands.Modules
         public async Task GetChuck()
         {
             var msg = await SendMessageAsync("Fetching...");
-            var joke = (await SendRequest("http://api.icndb.com/jokes/random"))["value"]["joke"];
+            var joke = (await SendRequestAsync("http://api.icndb.com/jokes/random"))["value"]["joke"];
             await msg.ModifyAsync(x => x.Content = $"{joke}");
         }
 
@@ -59,7 +59,7 @@ namespace Espeon.Commands.Modules
             [Remainder] string search)
         {
             var msg = await SendMessageAsync("Fetching...");
-            var req = await SendRequest($"https://api.giphy.com/v1/gifs/random?api_key={ConstantsHelper.GiphyToken}&rating=r&tag={search.Replace(" ", " + ")}");
+            var req = await SendRequestAsync($"https://api.giphy.com/v1/gifs/random?api_key={ConstantsHelper.GiphyToken}&rating=r&tag={search.Replace(" ", " + ")}");
             if (!req["data"].Any())
             {
                 await msg.ModifyAsync(x => x.Content = "No gif found");
@@ -67,7 +67,7 @@ namespace Espeon.Commands.Modules
             }
 
             var gif = req["data"]["image_original_url"];
-            using (var stream = await GetStream($"{gif}"))
+            using (var stream = await GetStreamAsync($"{gif}"))
             {
                 await msg.DeleteAsync();
                 await Context.Channel.SendFileAsync(stream, "gif.gif", string.Empty);

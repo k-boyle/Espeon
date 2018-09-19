@@ -46,7 +46,7 @@ namespace Espeon.Commands.Modules
         public async Task Clear(int amount = 5)
         {
             var m = await SendMessageAsync("Clearing messages");
-            await ClearMessages(amount);
+            await ClearMessagesAsync(amount);
             await Task.Delay(1000);
             await DeleteMessageAsync(m);
         }

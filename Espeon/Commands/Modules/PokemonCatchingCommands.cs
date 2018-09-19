@@ -21,7 +21,7 @@ namespace Espeon.Commands.Modules
         [RequireEncounter]
         public async Task Search()
         {
-            var player = await _player.GetCurrentPlayer(Context.User.Id);
+            var player = await _player.GetCurrentPlayerAsync(Context.User.Id);
             if (player.Bag.PokeBalls.Count == 0)
             {
                 await SendMessageAsync("You don't have any pokeballs! Visit the shop");

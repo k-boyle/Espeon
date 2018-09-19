@@ -14,7 +14,7 @@ namespace Espeon.Services
     {
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public async Task LogEvent(LogMessage log)
+        public async Task LogEventAsync(LogMessage log)
         {
             await _semaphore.WaitAsync();
 
@@ -75,6 +75,6 @@ namespace Espeon.Services
         }
 
         public void NewLogEvent(LogSeverity serverity, LogSource source, string message)
-            => _ = LogEvent(new LogMessage(serverity, source.ToString(), message));
+            => _ = LogEventAsync(new LogMessage(serverity, source.ToString(), message));
     }
 }

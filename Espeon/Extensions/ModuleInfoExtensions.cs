@@ -10,7 +10,7 @@ namespace Espeon.Extensions
     {
         public static async Task<PreconditionResult> CheckPermissionsAsync(this ModuleInfo module, ICommandContext context, IServiceProvider services)
         {
-            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
+            async Task<PreconditionResult> CheckGroupsAsync(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
                 foreach (var preconditionGroup in preconditions.GroupBy(x => x.Group, StringComparer.Ordinal))
                 {
@@ -37,7 +37,7 @@ namespace Espeon.Extensions
                 return PreconditionResult.FromSuccess(null); //having null is hacky but better than selecting a random command
             }
 
-            var moduleResult = await CheckGroups(module.Preconditions, "Module");
+            var moduleResult = await CheckGroupsAsync(module.Preconditions, "Module");
             return !moduleResult.IsSuccess ? moduleResult : PreconditionResult.FromSuccess(null);
         }
     }

@@ -17,7 +17,7 @@ namespace Espeon.Commands.ModuleBases
     {
         protected Stream Stream = null;
 
-        protected async Task<JObject> SendRequest(string url)
+        protected async Task<JObject> SendRequestAsync(string url)
         {
             var client = Context.HttpClient;
             client.DefaultRequestHeaders.Accept.Clear();
@@ -28,7 +28,7 @@ namespace Espeon.Commands.ModuleBases
             }
         }
 
-        protected async Task<Stream> GetStream(string url)
+        protected async Task<Stream> GetStreamAsync(string url)
         {
             var client = Context.HttpClient;
             client.DefaultRequestHeaders.Accept.Clear();
@@ -58,7 +58,7 @@ namespace Espeon.Commands.ModuleBases
             Embed embed = null)
             => Message.SendFileAsync(Context, stream, content, isTTS, embed);
 
-        protected Task<int> ClearMessages(int amount)
+        protected Task<int> ClearMessagesAsync(int amount)
             => Message.ClearMessagesAsync(Context, amount);
 
         protected Task DeleteMessageAsync(IUserMessage message)

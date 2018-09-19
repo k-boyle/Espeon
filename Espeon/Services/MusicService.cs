@@ -40,7 +40,7 @@ namespace Espeon.Services
                 TotalShards = 1,
                 LogSeverity = LogSeverity.Verbose
             });
-            _lavalinkManager.Log += _log.LogEvent;
+            _lavalinkManager.Log += _log.LogEventAsync;
             await _lavalinkManager.StartAsync();
             _lavalinkManager.TrackEnd += TrackFinishedAsync;
         }

@@ -39,7 +39,7 @@ namespace Espeon.Commands.Modules
                 if ((await module.CheckPermissionsAsync(Context, Services)).IsSuccess)
                     canExecute.Add(module);
 
-            var builder = await Embed();
+            var builder = await EmbedAsync();
             builder.WithFooter($"You can view help on a specific module by doing {await GetPrefixAsync()}help module");
             builder.AddField("Modules", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
 
@@ -63,7 +63,7 @@ namespace Espeon.Commands.Modules
             }
 
             var remarks = module.Attributes.OfType<Remarks>().FirstOrDefault();
-            var builder = await Embed();
+            var builder = await EmbedAsync();
             builder.WithFooter($"You can view help on a specific command by doing {await GetPrefixAsync()}help command");
             builder.AddField($"{module.Name} Information", $"**Summary**: {module.Summary}" +
                                                            $"{(remarks is null ? "" : $"\n**Remarks**: {string.Join(", ", remarks.RemarkStrings)}")}");
@@ -76,7 +76,7 @@ namespace Espeon.Commands.Modules
         [Priority(2)]
         public async Task Help([Remainder] IEnumerable<CommandInfo> commands)
         {
-            var builder = await Embed();
+            var builder = await EmbedAsync();
             builder.WithFooter($"We must go deeper! {await GetPrefixAsync()}deeper command");
 
             foreach (var command in commands)
@@ -96,7 +96,7 @@ namespace Espeon.Commands.Modules
         [Command("deeper")]
         public async Task Deeper([Remainder] IEnumerable<CommandInfo> commands)
         {
-            var builder = await Embed();
+            var builder = await EmbedAsync();
             builder.WithFooter("You're at the core... Going deeper would just be going back");
 
             foreach (var command in commands)
@@ -109,7 +109,7 @@ namespace Espeon.Commands.Modules
             await (await SendMessageAsync(string.Empty, embed: builder.Build())).AddDeleteCallbackAsync(Context, Interactive);
         }
 
-        private async Task<EmbedBuilder> Embed()
+        private async Task<EmbedBuilder> EmbedAsync()
             => new EmbedBuilder
             {
                 Color = new Colour(255, 255, 39),

@@ -28,7 +28,7 @@ namespace Espeon.Callbacks
 
         private readonly PokemonData _encounter;
         private readonly ulong _playerId;
-        private Task<UserObject> GetUserAsync() => _player.GetCurrentPlayer(_playerId);
+        private Task<UserObject> GetUserAsync() => _player.GetCurrentPlayerAsync(_playerId);
         private async Task<int> GetPokeBallsAsync() => (await GetUserAsync()).Bag.PokeBalls.Count(x => x is NormalBall);
         private async Task<int> GetGreatballsAsync() => (await GetUserAsync()).Bag.PokeBalls.Count(x => x is GreatBall);
         private async Task<int> GetUltraballsAsync() => (await GetUserAsync()).Bag.PokeBalls.Count(x => x is UltraBall);
@@ -65,7 +65,7 @@ namespace Espeon.Callbacks
         public async Task SetupAsync()
         {
             _message = await _messageService.SendFileAsync(Context, PokemonDataService.GetImage(_encounter),
-                embed: await BuildEmbed());
+                embed: await BuildEmbedAsync());
 
             _ = Task.Run(async () =>
             {
@@ -108,14 +108,14 @@ namespace Espeon.Callbacks
                 if (!_caught)
                 {
                     _battleLog.Add($"The wild {_encounter.Name.FirstLetterToUpper()} has fled!");
-                    await _message.ModifyAsync(async x => x.Embed = await BuildEmbed());
+                    await _message.ModifyAsync(async x => x.Embed = await BuildEmbedAsync());
                 }
                 _player.SetEncounter(Context.User.Id, false);
             });
 
         }
 
-        private async Task<Embed> BuildEmbed()
+        private async Task<Embed> BuildEmbedAsync()
         {
             var builder = new EmbedBuilder
             {
@@ -194,11 +194,11 @@ namespace Espeon.Callbacks
 
             if (emote.Equals(new Emoji("❌")))
             {
-                await EndEncounter("You have fled");
+                await EndEncounterAsync("You have fled");
                 return true;
             }
 
-            await UseBall(ball);
+            await UseBallAsync(ball);
             _attemps++;
 
             if (IsCaptured(ball))
@@ -209,39 +209,39 @@ namespace Espeon.Callbacks
 
             if (_attemps == _fleeCount)
             {
-                await EndEncounter($"The wild {_encounter.Name.FirstLetterToUpper()} has fled!");
+                await EndEncounterAsync($"The wild {_encounter.Name.FirstLetterToUpper()} has fled!");
                 return true;
             }
 
             if (await GetPokeBallsAsync() == await GetGreatballsAsync() && await GetGreatballsAsync() == await GetUltraballsAsync() && await GetUltraballsAsync() == await GetMasterballsAsync() && await GetMasterballsAsync() == 0)
             {
-                await EndEncounter("You are out of balls");
+                await EndEncounterAsync("You are out of balls");
                 return true;
             }
 
             _battleLog.Add($"{_encounter.Name.FirstLetterToUpper()} escaped the ball!");
-            await _message.ModifyAsync(async x => x.Embed = await BuildEmbed());
+            await _message.ModifyAsync(async x => x.Embed = await BuildEmbedAsync());
             _ = _message.RemoveReactionAsync(emote, Context.User);
 
             return false;
         }
 
-        private async Task EndEncounter(string logMessage)
+        private async Task EndEncounterAsync(string logMessage)
         {
             _caught = true;
             _player.SetEncounter(Context.User.Id, false);
             _ = _message.RemoveAllReactionsAsync();
             _battleLog.Add(logMessage);
-            await _message.ModifyAsync(async x => x.Embed = await BuildEmbed());
+            await _message.ModifyAsync(async x => x.Embed = await BuildEmbedAsync());
         }
 
         private async Task CapturePokemonAsync()
         {
             _player.UpdateDexEntry(await GetUserAsync(), _encounter);
-            await EndEncounter($"{_encounter.Name.FirstLetterToUpper()} has been captured!");
+            await EndEncounterAsync($"{_encounter.Name.FirstLetterToUpper()} has been captured!");
         }
 
-        private async Task UseBall(BaseBall ball)
+        private async Task UseBallAsync(BaseBall ball)
             => _player.UseBall(await GetUserAsync(), ball);
 
         private bool IsCaptured(BaseBall ball)

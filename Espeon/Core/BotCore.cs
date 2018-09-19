@@ -48,7 +48,7 @@ namespace Espeon.Core
             var logs = _services.GetService<LogService>();
             var message = _services.GetService<MessageService>();
             var commands = _services.GetService<CommandService>();
-            client.Log += logs.LogEvent;
+            client.Log += logs.LogEventAsync;
             client.Ready += async () =>
             {
                 await _services.GetService<CustomCommandsService>().LoadCmdsAsync(client);
@@ -76,7 +76,7 @@ namespace Espeon.Core
                     }.Build());
                 }
             };
-            commands.Log += logs.LogEvent;
+            commands.Log += logs.LogEventAsync;
         }
 
         private async Task SetupCommandsAsync()
