@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Espeon.Attributes;
@@ -77,7 +77,7 @@ namespace Espeon.Commands.Modules
         {
             user = user ?? Context.User;
 
-            await _candy.UpdateCandiesAsync(user.Id, false, amount);
+            await _candy.UpdateCandiesAsync(user.Id, false, amount, isGift: true);
             await SendMessageAsync($"{user.GetDisplayName()} has been sent {amount}{EmotesHelper.Emotes["rarecandy"]} rare cand{(amount > 1 ? "ies" : "y")}");
         }
 

@@ -28,11 +28,11 @@ namespace Espeon.Services
             _client = client;
         }
 
-        public async Task UpdateCandiesAsync(ulong id, bool isClaim, int amount, bool fromMessage = false)
+        public async Task UpdateCandiesAsync(ulong id, bool isClaim, int amount, bool fromMessage = false, bool isGift = false)
         {
             var bot = await _database.GetBotUserAsync();
             if (id == bot.Id) return;
-            if (amount < 0)
+            if (amount < 0 && !isGift)
             {
                 bot.RareCandies -= amount;
                 _database.UpdateObject("users", bot);
