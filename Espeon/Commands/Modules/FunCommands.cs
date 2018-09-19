@@ -67,10 +67,11 @@ namespace Espeon.Commands.Modules
             }
 
             var gif = req["data"]["image_original_url"];
-            var stream = await GetStream($"{gif}");
-            await msg.DeleteAsync();
-            await Context.Channel.SendFileAsync(stream, "gif.gif", string.Empty);
-            Stream.Dispose();
+            using (var stream = await GetStream($"{gif}"))
+            {
+                await msg.DeleteAsync();
+                await Context.Channel.SendFileAsync(stream, "gif.gif", string.Empty);
+            }
         }
     }
 }
