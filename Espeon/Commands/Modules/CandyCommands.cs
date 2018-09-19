@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Espeon.Attributes;
@@ -109,13 +109,7 @@ namespace Espeon.Commands.Modules
             [Summary("The amount you want to gift")]
             [OverrideTypeReader(typeof(CandyTypeReader))] int amount)
         {
-            if (amount > await _candy.GetCandiesAsync(Context.User.Id))
-            {
-                await SendMessageAsync("You don't have enough rare candies");
-                return;
-            }
-
-            await _candy.UpdateCandiesAsync(Context.User.Id, false, -amount);
+            await _candy.UpdateCandiesAsync(Context.User.Id, false, -amount, isGift: true);
             await _candy.UpdateCandiesAsync(user.Id, false, amount);
             await SendMessageAsync("Your gift basket has been made and sent");
         }
