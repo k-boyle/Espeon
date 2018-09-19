@@ -18,4 +18,12 @@
         Heads,
         Tails
     }
+
+    //future proofing
+    public enum ServiceType
+    {
+        Singleton,
+        Transient,
+        Scoped
+    }
 }
