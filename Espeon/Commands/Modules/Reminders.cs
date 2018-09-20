@@ -36,7 +36,7 @@ namespace Espeon.Commands.Modules
             [Summary("What you want to be reminded about")]
             [Remainder] string content)
         {
-            await _reminders.CreateReminderAsync($"{content}\n\n{Context.Message.GetJumpUrl()}", Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
+            await _reminders.CreateReminderAsync(content, Context.Message.GetJumpUrl(), Context.Guild.Id, Context.Channel.Id, Context.User.Id, when);
             await SendMessageAsync("Reminder has been created");
         }
 

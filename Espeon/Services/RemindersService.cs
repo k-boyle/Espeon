@@ -67,20 +67,21 @@ namespace Espeon.Services
                     Name = user.GetDisplayName()
                 },
                 Color = Colour.DarkBlue,
-                Description = reminder.TheReminder
+                Description = $"{reminder.TheReminder}\n\n{reminder.JumpLink}"
             }.Build());
             var guild = await _database.GetObjectAsync<GuildObject>("guilds", reminder.GuildId);
             guild.Reminders.Remove(guild.Reminders.Find(x => x.Identifier == reminder.Identifier));
             _database.UpdateObject("guilds", guild);
         }
 
-        public async Task CreateReminderAsync(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
+        public async Task CreateReminderAsync(string content, string jumpLink, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
         {
-            var reminder = new Reminder
+            var reminder = new Reminder(this)
             {
                 ChannelId = channelId,
                 GuildId = guildId,
                 TheReminder = content,
+                JumpLink = jumpLink,
                 UserId = userId,
                 When = DateTime.UtcNow + toExecute,
                 Identifier = _random.Next()

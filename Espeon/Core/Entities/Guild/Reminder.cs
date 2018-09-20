@@ -11,6 +11,7 @@ namespace Espeon.Core.Entities.Guild
         public Reminder(Reminder reminder, IRemoveableService service)
         {
             TheReminder = reminder.TheReminder;
+            JumpLink = reminder.JumpLink;
             GuildId = reminder.GuildId;
             ChannelId = reminder.ChannelId;
             UserId = reminder.UserId;
@@ -19,9 +20,15 @@ namespace Espeon.Core.Entities.Guild
             _service = service;
         }
 
+        public Reminder(IRemoveableService service)
+        {
+            _service = service;
+        }
+
         public Reminder() { }
 
         public string TheReminder { get; set; }
+        public string JumpLink { get; set; }
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
         public ulong UserId { get; set; }
