@@ -19,11 +19,6 @@ namespace Espeon.Core.Entities.Guild
             _service = service;
         }
 
-        public Reminder(IRemoveableService service)
-        {
-            _service = service;
-        }
-
         public Reminder() { }
 
         public string TheReminder { get; set; }

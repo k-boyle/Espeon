@@ -76,7 +76,7 @@ namespace Espeon.Services
 
         public async Task CreateReminderAsync(string content, ulong guildId, ulong channelId, ulong userId, TimeSpan toExecute)
         {
-            var reminder = new Reminder(this)
+            var reminder = new Reminder
             {
                 ChannelId = channelId,
                 GuildId = guildId,
