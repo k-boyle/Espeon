@@ -75,8 +75,9 @@ namespace Espeon.Services
         {
             try
             {
-                if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) ||
-                    !(msg.Channel is SocketGuildChannel channel) ||
+                if (msg is null) return;
+
+                if (msg.Author.IsBot || string.IsNullOrEmpty(msg.Content) || !(msg.Channel is SocketGuildChannel channel) ||
                     !(msg is SocketUserMessage message)) return;
 
                 if (_random.Next(100) < 10)
