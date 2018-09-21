@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -17,10 +18,14 @@ namespace Espeon.Core
     public class BotCore
     {
         private readonly IServiceProvider _services;
+        private readonly IList<Type> _reflectedServices;
+        private readonly TaskCompletionSource<Task> _completionSource;
 
-        public BotCore(IServiceProvider services)
+        public BotCore(IServiceProvider services, IEnumerable<Type> reflectedServices)
         {
             _services = services;
+            _reflectedServices = reflectedServices.ToList();
+            _completionSource = new TaskCompletionSource<Task>();
         }
 
         public async Task RunBotAsync()
@@ -35,7 +40,9 @@ namespace Espeon.Core
             var client = _services.GetService<DiscordSocketClient>();
             await client.LoginAsync(TokenType.Bot, ConstantsHelper.BotToken);
             await client.StartAsync();
-            
+
+            await _completionSource.Task;
+            RunInitialisers();
             await Task.Delay(-1);
         }
 
@@ -46,32 +53,31 @@ namespace Espeon.Core
             var message = _services.GetService<MessageService>();
             var commands = _services.GetService<CommandService>();
             client.Log += logs.LogEventAsync;
-            client.Ready += async () =>
+            client.Ready += () =>
             {
-                await _services.GetService<CustomCommandsService>().LoadCmdsAsync(client);
-                //await _musicService.InitialiseAsync();
-                await _services.GetService<RemindersService>().LoadRemindersAsync();
+                _completionSource.SetResult(Task.CompletedTask);
+                return Task.CompletedTask;
             };
             client.MessageReceived += message.HandleMessageAsync;
             client.MessageUpdated += (_, msg, __) => message.HandleMessageUpdateAsync(msg);
             client.JoinedGuild += async guild =>
             {
                 var channel = guild.GetDefaultChannel();
-                if (!(channel is null))
+                if (channel is null) return;
+
+                await channel.SendMessageAsync(string.Empty, embed: new EmbedBuilder
                 {
-                    await channel.SendMessageAsync(string.Empty, embed: new EmbedBuilder
+                    Author = new EmbedAuthorBuilder
                     {
-                        Author = new EmbedAuthorBuilder
-                        {
-                            IconUrl = client.CurrentUser.GetAvatarOrDefaultUrl(),
-                            Name = guild.CurrentUser.GetDisplayName()
-                        },
-                        Color = new Color(0, 0, 0),
-                        ThumbnailUrl = client.CurrentUser.GetDefaultAvatarUrl(),
-                        Description = $"Hello! I am Espeon{EmotesHelper.Emotes["Espeon"]} and I have just been added to your guild!\n" +
-                                      $"Type {(await _services.GetService<DatabaseService>().GetObjectAsync<GuildObject>("guilds", guild.Id)).Prefixes.First()}help to see all my available commands!"
-                    }.Build());
-                }
+                        IconUrl = client.CurrentUser.GetAvatarOrDefaultUrl(),
+                        Name = guild.CurrentUser.GetDisplayName()
+                    },
+                    Color = new Color(0, 0, 0),
+                    ThumbnailUrl = client.CurrentUser.GetDefaultAvatarUrl(),
+                    Description =
+                        $"Hello! I am Espeon{EmotesHelper.Emotes["Espeon"]} and I have just been added to your guild!\n" +
+                        $"Type {(await _services.GetService<DatabaseService>().GetObjectAsync<GuildObject>("guilds", guild.Id)).Prefixes.First()}help to see all my available commands!"
+                }.Build());
             };
             commands.Log += logs.LogEventAsync;
         }
@@ -84,11 +90,27 @@ namespace Espeon.Core
 
             foreach (var typereader in typereaders)
             {
-                var attribute = typereader.GetCustomAttributes().OfType<TypeReaderAttribute>().FirstOrDefault();
+                var attribute = typereader.GetCustomAttribute<TypeReaderAttribute>();
                 commands.AddTypeReader(attribute?.TargetType, (TypeReader)Activator.CreateInstance(typereader));
             }
-            
+
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+        }
+
+        private void RunInitialisers()
+        {
+            foreach (var type in _reflectedServices)
+            {
+                var service = _services.GetService(type);
+
+                foreach (var method in service.GetType().GetMethods())
+                {
+                    if (!(method.GetCustomAttribute<InitAttribute>() is InitAttribute attribute)) continue;
+                    var argTypes = attribute.Arguments;
+                    var args = argTypes.Select(x => _services.GetService(x)).ToArray();
+                    method.Invoke(service, args);
+                }
+            }
         }
     }
 }

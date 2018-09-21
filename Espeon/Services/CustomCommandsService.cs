@@ -30,6 +30,7 @@ namespace Espeon.Services
             _logs = logs;
         }
 
+        [Init(typeof(DiscordSocketClient))]
         public async Task LoadCmdsAsync(DiscordSocketClient client)
         {
             foreach (var guild in client.Guilds)

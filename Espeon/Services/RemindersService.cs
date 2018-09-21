@@ -12,6 +12,7 @@ using Colour = Discord.Color;
 namespace Espeon.Services
 {
     [Service]
+    
     public class RemindersService : IRemoveableService
     {
         private readonly DatabaseService _database;
@@ -30,7 +31,8 @@ namespace Espeon.Services
             _message = message;
             _random = random;
         }
-
+        
+        [Init]
         public async Task LoadRemindersAsync()
         {
             var toRemove = new List<Reminder>();

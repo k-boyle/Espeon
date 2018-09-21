@@ -56,7 +56,7 @@ namespace Espeon.Core
 
             var builtProvider = serviceCollection.BuildServiceProvider();
 
-            var startup = new BotCore(builtProvider);
+            var startup = new BotCore(builtProvider, services);
             await startup.RunBotAsync();
         }
     }
