@@ -41,16 +41,16 @@ namespace Espeon.Services
         private readonly ConcurrentDictionary<ulong, ConcurrentQueue<Message>> _messageCache =
             new ConcurrentDictionary<ulong, ConcurrentQueue<Message>>();
 
-        public MessageService(DiscordSocketClient client, DatabaseService database, CommandService commands, InteractiveService interactive, TimerService timer, CandyService candy, IServiceProvider services, Random random)
+        public MessageService(IServiceProvider services)
         {
-            _client = client;
-            _database = database;
-            _commands = commands;
-            _interactive = interactive;
-            _timer = timer;
-            _candy = candy;
             _services = services;
-            _random = random;
+            _client = services.GetService<DiscordSocketClient>();
+            _database = services.GetService<DatabaseService>();
+            _commands = services.GetService<CommandService>();
+            _interactive = services.GetService<InteractiveService>();
+            _timer = services.GetService<TimerService>();
+            _candy = services.GetService<CandyService>();
+            _random = services.GetService<Random>();
         }
 
         public Task RemoveAsync(IRemoveable obj)

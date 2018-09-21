@@ -31,9 +31,10 @@ namespace Espeon.Services
             _message = message;
         }
 
-        public async Task EvaluateAsync(EspeonContext context, string code, bool isEval, IServiceProvider services)
+        public async Task EvaluateAsync(EspeonContext context, string code, IServiceProvider services)
         {
-            var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(GetNamespaces());
+            var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies()
+                .Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(GetNamespaces());
             var globals = new Globals
             {
                 Context = context,
@@ -41,9 +42,7 @@ namespace Espeon.Services
                 Services = services,
                 HttpClient = context.HttpClient
             };
-            IUserMessage message = null;
-            if (isEval)
-                message = await _message.SendMessageAsync(context, "Debugging...");
+            var message = await _message.SendMessageAsync(context, "Debugging...");
             var sw = new Stopwatch();
             sw.Start();
             try
@@ -52,23 +51,13 @@ namespace Espeon.Services
                     $"{string.Join("", _usings.Select(x => $"using {x};"))} {code}", scriptOptions, globals,
                     typeof(Globals));
                 sw.Stop();
-                if (isEval)
-                {
-                    await message.ModifyAsync(x => x.Content = $"Completed! Time taken: {sw.ElapsedMilliseconds}ms\n" +
-                                                               $"Returned Results: {eval ?? "none"}");
-                }
+                await message.ModifyAsync(x => x.Content = $"Completed! Time taken: {sw.ElapsedMilliseconds}ms\n" +
+                                                           $"Returned Results: {eval ?? "none"}");
             }
             catch (Exception ex)
             {
-                if (isEval)
-                {
-                    await message.ModifyAsync(x => x.Content = "Completed! There was an error though:\n" +
-                                                               $"{Format.Sanitize(ex.ToString().Substring(0, 500))}");
-                    return;
-                }
-
-                await _message.SendMessageAsync(context,
-                    $"There was an error. Please report this!\n```{Format.Sanitize(ex.ToString().Substring(0, 500))}```");
+                await message.ModifyAsync(x => x.Content = "Completed! There was an error though:\n" +
+                                                           $"{Format.Sanitize(ex.ToString().Substring(0, 500))}");
             }
         }
 

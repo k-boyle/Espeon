@@ -76,7 +76,7 @@ namespace Espeon.Commands.Modules
             [Remainder]
             [OverrideTypeReader(typeof(CodeTypeReader))]
             string code)
-            => _eval.EvaluateAsync(Context, code, true, Services);
+            => _eval.EvaluateAsync(Context, code, Services);
 
         [Command("flush")]
         [Name("Flush Reactions")]
