@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Espeon.Core
                 .AddSingleton(new HttpClient())
                 .AddSingleton(new Random());
 
-            var services = AssemblyHelper.GetAllTypesWithAttribute<ServiceAttribute>();
+            var services = AssemblyHelper.GetAllTypesWithAttribute<ServiceAttribute>().ToArray();
 
             foreach (var service in services)
             {
