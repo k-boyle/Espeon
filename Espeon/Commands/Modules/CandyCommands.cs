@@ -89,7 +89,9 @@ namespace Espeon.Commands.Modules
         public async Task Leaderboard()
         {
             var count = 1;
-            var users = DatabaseService.GrabAllData<UserObject>("users").OrderByDescending(x => x.RareCandies).Select(x => $"{count++} - {Context.Client.GetUser(x.Id)?.Username ?? "-User not found-"} : {x.RareCandies}").ToArray();
+            var users = DatabaseService.GrabAllData<UserObject>("users")
+                .OrderByDescending(x => x.RareCandies)
+                .Select(x => $"{count++} - {(Context.Guild.GetUser(x.Id)?.GetDisplayName() ?? Context.Client.GetUser(x.Id)?.Username ?? "-User not found-")} : {x.RareCandies}").ToArray();
             await SendMessageAsync(string.Empty, embed: new EmbedBuilder
             {
                 Title = "Leaderboard",
