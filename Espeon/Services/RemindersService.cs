@@ -47,7 +47,7 @@ namespace Espeon.Services
                         continue;
                     }
 
-                    await _timer.EnqueueAsync(initializedReminder);
+                    await _timer.UpdateAsync(initializedReminder);
                 }
             }
 
