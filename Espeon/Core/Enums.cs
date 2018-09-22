@@ -1,8 +1,7 @@
-﻿namespace Espeon.Core
+namespace Espeon.Core
 {
     public enum LogSource
     {
-        Database,
         CustomCmds,
         Pokemon
     }
