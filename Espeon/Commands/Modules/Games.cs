@@ -56,7 +56,7 @@ namespace Espeon.Commands.Modules
         {
             var flip = _random.Next(100) > 50 ? Face.Heads : Face.Tails;
 
-            await _candy.UpdateCandiesAsync(Context.User.Id, false, flip == choice ? (int)(0.5 * amount) : -(int)amount);
+            await _candy.UpdateCandiesAsync(Context.User.Id, false, flip == choice ? (int)(0.5 * amount) : -amount);
             await SendMessageAsync($"It was {flip}! {(flip == choice ? "You win!" : "You lose!")}");
         }
 
@@ -71,6 +71,6 @@ namespace Espeon.Commands.Modules
             [Name("Amount")]
             [Summary("The amount you want to wager")]
             [OverrideTypeReader(typeof(CandyTypeReader))] int amount = 0)
-            => _games.StartGameAsync(Context.User.Id, new Duel(Context, user, (int)amount, Services));
+            => _games.StartGameAsync(Context.User.Id, new Duel(Context, user, amount, Services));
     }
 }
