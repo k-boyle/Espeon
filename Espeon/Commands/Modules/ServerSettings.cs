@@ -27,7 +27,7 @@ namespace Espeon.Commands.Modules
             [Summary("The new prefix that you want to add")]
             [Remainder] string newPrefix)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             guild.Prefixes.Add(newPrefix);
             await SendMessageAsync("Prefix has been added");
             Database.UpdateObject("guilds", guild);
@@ -42,7 +42,7 @@ namespace Espeon.Commands.Modules
             [Summary("The prefix that you want to remove")]
             [Remainder] string newPrefix)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             if (guild.Prefixes.Count == 1)
             {
                 await SendMessageAsync("This is the last prefix for the server you cannot remove it");
@@ -62,7 +62,7 @@ namespace Espeon.Commands.Modules
             [Summary("The role you want to make the admin role")]
             [Remainder] SocketRole adminRole)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             guild.AdminRole = adminRole.Id;
             await SendMessageAsync("Admin role has been set");
             Database.UpdateObject("guilds", guild);
@@ -77,7 +77,7 @@ namespace Espeon.Commands.Modules
             [Summary("The role you want to make the mod role")]
             [Remainder] SocketRole modRole)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             guild.ModRole = modRole.Id;
             await SendMessageAsync("Mod role has been set");
             Database.UpdateObject("guilds", guild);
@@ -92,7 +92,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to promote")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             if (Context.Guild.GetRole(guild.ModRole) is SocketRole modRole)
             {
                 await user.AddRoleAsync(modRole);
@@ -114,7 +114,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to promote")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             if (Context.Guild.GetRole(guild.AdminRole) is SocketRole adminRole)
             {
                 await user.AddRoleAsync(adminRole);
@@ -134,7 +134,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to demote")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             if (Context.Guild.GetRole(guild.ModRole) is SocketRole modRole)
             {
                 await user.RemoveRoleAsync(modRole);
@@ -156,7 +156,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to demote")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             if (Context.Guild.GetRole(guild.AdminRole) is SocketRole adminRole)
             {
                 await user.RemoveRoleAsync(adminRole);

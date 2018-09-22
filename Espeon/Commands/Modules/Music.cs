@@ -128,7 +128,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to approve")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             guild.MusicUsers.Add(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been approved");
             Database.UpdateObject("guilds", guild);
@@ -144,7 +144,7 @@ namespace Espeon.Commands.Modules
             [Summary("The user you want to unapprove")]
             [Remainder] SocketGuildUser user)
         {
-            var guild = await CurrentGuild;
+            var guild = await CurrentGuildAsync;
             guild.MusicUsers.Remove(user.Id);
             await SendMessageAsync($"{user.GetDisplayName()} has been unapproved");
             Database.UpdateObject("guilds", guild);

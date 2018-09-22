@@ -9,6 +9,6 @@ namespace Espeon.Commands.ModuleBases
     {
         public DatabaseService Database { get; set; }
 
-        public Task<GuildObject> CurrentGuild => Database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
+        public Task<GuildObject> CurrentGuildAsync => Database.GetObjectAsync<GuildObject>("guilds", Context.Guild.Id);
     }
 }

@@ -31,7 +31,7 @@ namespace Espeon.Commands.Modules
         [Usage("cmd list")]
         public async Task ListCmds()
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             if (currentCmds.Count == 0)
             {
                 await SendMessageAsync("No custom commands currently for this server");
@@ -63,7 +63,7 @@ namespace Espeon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Create()
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             await SendMessageAsync("What do you want the command to be called? [reply with `cancel` to cancel creation]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
@@ -100,7 +100,7 @@ namespace Espeon.Commands.Modules
             [Name("Command Name")]
             [Summary("The name of the command that you want to create")] string cmdName)
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             if (currentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
@@ -136,7 +136,7 @@ namespace Espeon.Commands.Modules
             [Summary("The response you want from the command")]
             [Remainder] string cmdValue)
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             if (currentCmds.Any(x =>
                 string.Equals(x.CommandName, cmdName, StringComparison.CurrentCultureIgnoreCase)))
             {
@@ -163,7 +163,7 @@ namespace Espeon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Modify()
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             await SendMessageAsync("Which Command do you want to edit? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
@@ -228,7 +228,7 @@ namespace Espeon.Commands.Modules
         [RequireOwner(Group = "admin")]
         public async Task Remove()
         {
-            var currentCmds = (await CurrentCmds).ToImmutableList();
+            var currentCmds = (await CurrentCmdsAsync).ToImmutableList();
             await SendMessageAsync("Which Command do you want to remove? [reply with `cancel` to cancel modification]");
             var reply = await NextMessageAsync(timeout: TimeSpan.FromSeconds(30));
             if (string.Equals(reply.Content, "cancel", StringComparison.CurrentCultureIgnoreCase)) return;
