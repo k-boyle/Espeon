@@ -45,6 +45,7 @@ namespace Espeon.Services
         {
             try
             {
+                if (_queue.IsEmpty) return;
                 _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
 
                 IRemoveable removeable;
