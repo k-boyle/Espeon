@@ -4,6 +4,8 @@
 *.dll
 *.pdb
 *.xml
+*.vscode
+config.json
 
 # User-specific files
 *.suo
@@ -279,3 +281,5 @@ Umbreon/config\.json
 Umbreon/\.vscode/launch\.json
 
 Umbreon/\.vscode/tasks\.json
+
+Espeon/Properties/PublishProfiles/FolderProfile\.pubxml
