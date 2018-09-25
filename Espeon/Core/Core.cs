@@ -35,8 +35,8 @@ namespace Espeon.Core
 
             foreach (var service in services)
             {
-                var attribubte = service.GetCustomAttribute<ServiceAttribute>();
-                switch (attribubte.Type)
+                var attribute = service.GetCustomAttribute<ServiceAttribute>();
+                switch (attribute.Type)
                 {
                     case ServiceType.Singleton:
                         serviceCollection.AddSingleton(service);
