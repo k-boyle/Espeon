@@ -5,7 +5,7 @@ namespace Espeon.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class InitAttribute : Attribute
     {
-        public readonly Type[] Arguments;
+        public Type[] Arguments { get; }
 
         public InitAttribute(params Type[] args)
         {
