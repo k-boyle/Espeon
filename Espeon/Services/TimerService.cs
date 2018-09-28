@@ -46,17 +46,22 @@ namespace Espeon.Services
             try
             {
                 if (_queue.IsEmpty) return;
-                _queue = new ConcurrentQueue<IRemoveable>(_queue.OrderBy(x => x.When));
 
-                IRemoveable removeable;
-                while (_queue.TryPeek(out removeable))
+                var toRemove = _queue.Where(x => x.When.ToUniversalTime() < DateTime.UtcNow).ToArray();
+                _queue = new ConcurrentQueue<IRemoveable>(_queue.Where(x => x.When.ToUniversalTime() > DateTime.UtcNow).OrderBy(x => x.When));
+
+                if (toRemove.Any())
                 {
-                    if (!(removeable.When.ToUniversalTime() - DateTime.UtcNow < TimeSpan.Zero)) break;
-                    if (!_queue.TryDequeue(out removeable)) continue;
-                    await HandleRemoveableAsync(removeable);
+                    //stop potential race condition
+                    _ = Task.Run(async () =>
+                    {
+                        foreach (var item in toRemove)
+                            await item.RemoveAsync();
+                    });
                 }
 
-                _timer.Change(removeable.When.ToUniversalTime() - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
+                if(_queue.TryPeek(out var removeable))
+                    _timer.Change(removeable.When.ToUniversalTime() - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
             }
             catch (Exception e)
             {
