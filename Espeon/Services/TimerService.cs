@@ -24,7 +24,7 @@ namespace Espeon.Services
                     {
                         if (!_queue.TryDequeue(out var removeable)) return;
                         await HandleRemoveableAsync(removeable);
-                        await SetTimerAsync();
+                        SetTimer();
                     }
                     catch (Exception e)
                     {
@@ -35,13 +35,13 @@ namespace Espeon.Services
                 TimeSpan.FromMilliseconds(-1));
         }
 
-        public async Task EnqueueAsync(IRemoveable removeable)
+        public void Enqueue(IRemoveable removeable)
         {
             _queue.Enqueue(removeable);
-            await SetTimerAsync();
+            SetTimer();
         }
 
-        private async Task SetTimerAsync()
+        private void SetTimer()
         {
             try
             {
@@ -60,7 +60,7 @@ namespace Espeon.Services
                     });
                 }
 
-                if(_queue.TryPeek(out var removeable))
+                if (_queue.TryPeek(out var removeable))
                     _timer.Change(removeable.When.ToUniversalTime() - DateTime.UtcNow, TimeSpan.FromMilliseconds(-1));
             }
             catch (Exception e)
@@ -85,18 +85,18 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        public async Task RemoveRangeAsync(IEnumerable<IRemoveable> objs)
+        public void RemoveRange(IEnumerable<IRemoveable> objs)
         {
             var newCol = _queue.Except(objs);
             _queue = new ConcurrentQueue<IRemoveable>(newCol);
-            await SetTimerAsync();
+            SetTimer();
         }
 
         public async Task UpdateAsync(IRemoveable removeable)
         {
             await RemoveAsync(removeable);
-            await EnqueueAsync(removeable);
-            await SetTimerAsync();
+            Enqueue(removeable);
+            SetTimer();
         }
     }
 }

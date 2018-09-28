@@ -196,7 +196,7 @@ namespace Espeon.Services
         {
             if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
             var response = await channel.SendMessageAsync(content, isTTS, embed);
-            await NewItemAsync(userId, channelId, response.CreatedAt, executingId, response.Id, false);
+            NewItem(userId, channelId, response.CreatedAt, executingId, response.Id, false);
 
             return response;
         }
@@ -211,7 +211,7 @@ namespace Espeon.Services
         {
             if (!(_client.GetChannel(channelId) is SocketTextChannel channel)) return null;
             var response = await channel.SendFileAsync(stream, "image.png", content, isTTS, embed);
-            await NewItemAsync(userId, channelId, response.CreatedAt, executingId, response.Id, true);
+            NewItem(userId, channelId, response.CreatedAt, executingId, response.Id, true);
             return response;
         }
 
@@ -240,7 +240,7 @@ namespace Espeon.Services
             if (callback == null) return null;
             await callback.DisplayAsync().ConfigureAwait(false);
 
-            await NewItemAsync(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
+            NewItem(context.User.Id, context.Channel.Id, callback.Message.CreatedAt, context.Message.Id,
                 callback.Message.Id, false);
 
             return callback.Message;
@@ -284,7 +284,7 @@ namespace Espeon.Services
                 newQueue.Enqueue(item);
             }
 
-            await _timer.RemoveRangeAsync(newQueue);
+            _timer.RemoveRange(newQueue);
 
             if (newQueue.IsEmpty)
                 _messageCache.TryRemove(context.User.Id, out _);
@@ -312,7 +312,7 @@ namespace Espeon.Services
             }
         }
 
-        private async Task NewItemAsync(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId, bool attachedFile)
+        private void NewItem(ulong userId, ulong channelId, DateTimeOffset createdAt, ulong executingId, ulong responseId, bool attachedFile)
         {
             _messageCache.TryAdd(userId, new ConcurrentQueue<Message>());
             if (!_messageCache.TryGetValue(userId, out var found)) return;
@@ -332,7 +332,7 @@ namespace Espeon.Services
 
             found.Enqueue(newMessage);
 
-            await _timer.EnqueueAsync(newMessage);
+            _timer.Enqueue(newMessage);
             _messageCache[userId] = found;
         }
 

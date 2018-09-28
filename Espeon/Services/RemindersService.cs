@@ -89,7 +89,7 @@ namespace Espeon.Services
                 Identifier = _random.Next()
             };
 
-            await _timer.EnqueueAsync(reminder);
+            _timer.Enqueue(reminder);
 
             var guild = await _database.GetObjectAsync<GuildObject>("guilds", guildId);
             guild.Reminders.Add(reminder);
