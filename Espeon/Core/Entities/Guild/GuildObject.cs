@@ -26,9 +26,9 @@ namespace Espeon.Core.Entities.Guild
 
         public ulong AdminRole { get; set; }
         public ulong ModRole { get; set; }
-        public ulong WelcomeChannel { get; set; } = 0; // TODO
+        public ulong WelcomeChannel { get; set; } // TODO
         public string WelcomeMessage { get; set; } // TODO
-        public bool UseWhiteList { get; set; } = false; // TODO
+        public bool UseWhiteList { get; set; } // TODO
         public List<ulong> SelfAssigningRoles { get; set; } = new List<ulong>();
         public List<string> Prefixes { get; set; } = new List<string>
         {
