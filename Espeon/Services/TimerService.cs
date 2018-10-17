@@ -50,7 +50,7 @@ namespace Espeon.Services
                 var toRemove = _queue.Where(x => x.When.ToUniversalTime() < DateTime.UtcNow).ToArray();
                 _queue = new ConcurrentQueue<IRemoveable>(_queue.Where(x => x.When.ToUniversalTime() > DateTime.UtcNow).OrderBy(x => x.When));
 
-                if (toRemove.Any())
+                if (toRemove.Length > 0)
                 {
                     //stop potential race condition
                     _ = Task.Run(async () =>

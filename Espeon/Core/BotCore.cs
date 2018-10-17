@@ -31,8 +31,6 @@ namespace Espeon.Core
         public async Task RunBotAsync()
         {
             await DatabaseService.InitialiseAsync();
-            _services.GetService<PokemonDataService>().Initialise();
-            _services.GetService<PokemonPlayerService>().Initialise();
 
             HookEvents();
             await SetupCommandsAsync();
@@ -69,9 +67,11 @@ namespace Espeon.Core
                 {
                     Author = new EmbedAuthorBuilder
                     {
+                        //TODO doesn't work?
                         IconUrl = client.CurrentUser.GetAvatarOrDefaultUrl(),
                         Name = guild.CurrentUser.GetDisplayName()
                     },
+                    //TODO better colour
                     Color = new Color(0, 0, 0),
                     ThumbnailUrl = client.CurrentUser.GetDefaultAvatarUrl(),
                     Description =

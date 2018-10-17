@@ -1,10 +1,5 @@
-﻿using Discord.Commands;
+using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Espeon.Attributes;
 using Espeon.Commands.ModuleBases;
 using Espeon.Core;
@@ -12,6 +7,11 @@ using Espeon.Core.Entities.Guild;
 using Espeon.Extensions;
 using Espeon.Paginators.CommandMenu;
 using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
 {
