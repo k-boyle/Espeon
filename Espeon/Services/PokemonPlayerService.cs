@@ -55,6 +55,7 @@ namespace Espeon.Services
             _log = log;
         }
 
+        [Init]
         public void Initialise()
         {
             foreach (var user in DatabaseService.GrabAllData<UserObject>("users"))

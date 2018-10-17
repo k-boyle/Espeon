@@ -1,4 +1,4 @@
-﻿using Discord.Commands;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
@@ -39,7 +39,7 @@ namespace Espeon.Commands.Modules
             [Summary("The amount of rare candies you want to bet.")]
             [Remarks("Don't specify for no bet")]
             [OverrideTypeReader(typeof(CandyTypeReader))] int amount = 0)
-            => _games.StartGameAsync(Context.User.Id, new Blackjack(Context, amount, Services));
+            => _games.StartGameAsync(Context.User.Id, new Blackjack(Context, Services, amount));
 
         [Command("coinflip")]
         [Alias("cf")]

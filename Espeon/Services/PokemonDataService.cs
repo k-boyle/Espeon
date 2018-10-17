@@ -43,6 +43,7 @@ namespace Espeon.Services
             _log = log;
         }
 
+        [Init]
         public void Initialise()
         {
             _data = PokemonData.FromJson(File.ReadAllText(DataDir)).Where(x => x.Id <= ConstantsHelper.PokemonLimit).ToArray();
