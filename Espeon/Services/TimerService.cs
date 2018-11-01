@@ -27,7 +27,7 @@ namespace Espeon.Services
                     {
                         if (!_queue.TryDequeue(out var removeable)) return;
                         await HandleRemoveableAsync(removeable);
-                        SetTimer();
+                        await SetTimerAsync();
                     }
                     catch (Exception e)
                     {
@@ -38,7 +38,7 @@ namespace Espeon.Services
                 TimeSpan.FromMilliseconds(-1));
         }
 
-        public void Enqueue(IRemoveable removeable)
+        public async Task EnqueueAsync(IRemoveable removeable)
         {
             if (removeable is DelayedRemovable delayed)
                 removeable = delayed.Removeable;
@@ -48,14 +48,14 @@ namespace Espeon.Services
                 removeable = new DelayedRemovable(removeable);
 
             _queue.Enqueue(removeable);
-            SetTimer();
+            await SetTimerAsync();
         }
 
-        private void SetTimer()
+        private Task SetTimerAsync()
         {
             try
             {
-                if (_queue.IsEmpty) return;
+                if (_queue.IsEmpty) return Task.CompletedTask;
 
                 //Added some overhead to try avoid the very small chance of a race condition
                 var toRemove = _queue.Where(x =>
@@ -69,7 +69,7 @@ namespace Espeon.Services
                 if (toRemove.Length > 0)
                 {
                     //Stops potential race condition
-                    _ = Task.Run(async () =>
+                    Task.Run(async () =>
                     {
                         foreach (var item in toRemove)
                             await item.RemoveAsync();
@@ -83,6 +83,8 @@ namespace Espeon.Services
             {
                 Console.WriteLine(e);
             }
+
+            return Task.CompletedTask;
         }
 
         private static Task HandleRemoveableAsync(IRemoveable removeable)
@@ -105,14 +107,14 @@ namespace Espeon.Services
         {
             var newCol = _queue.Except(objs);
             _queue = new ConcurrentQueue<IRemoveable>(newCol);
-            SetTimer();
+            SetTimerAsync();
         }
 
         public async Task UpdateAsync(IRemoveable removeable)
         {
             await RemoveAsync(removeable);
-            Enqueue(removeable);
-            SetTimer();
+            await EnqueueAsync(removeable);
+            await SetTimerAsync();
         }
 
         private class DelayedRemovable : IRemoveable
