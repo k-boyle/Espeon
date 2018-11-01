@@ -14,8 +14,11 @@ namespace Espeon.Services
     {
         private readonly Timer _timer;
 
+        private static TimeSpan MaxTime =>
+            TimeSpan.FromMilliseconds(Math.Pow(2, 32) - 2);
+
         private ConcurrentQueue<IRemoveable> _queue = new ConcurrentQueue<IRemoveable>();
-        
+
         public TimerService()
         {
             _timer = new Timer(async _ =>
@@ -37,6 +40,13 @@ namespace Espeon.Services
 
         public void Enqueue(IRemoveable removeable)
         {
+            if (removeable is DelayedRemovable delayed)
+                removeable = delayed.Removeable;
+
+            //Timer can't have has a value greater than TimeSpan.FromMilliseconds(Math.Pow(2,32) - 2)
+            if (removeable.When - DateTime.UtcNow > MaxTime)
+                removeable = new DelayedRemovable(removeable);
+
             _queue.Enqueue(removeable);
             SetTimer();
         }
@@ -47,12 +57,18 @@ namespace Espeon.Services
             {
                 if (_queue.IsEmpty) return;
 
-                var toRemove = _queue.Where(x => x.When.ToUniversalTime() < DateTime.UtcNow).ToArray();
-                _queue = new ConcurrentQueue<IRemoveable>(_queue.Where(x => x.When.ToUniversalTime() > DateTime.UtcNow).OrderBy(x => x.When));
+                //Added some overhead to try avoid the very small chance of a race condition
+                var toRemove = _queue.Where(x =>
+                    x.When.ToUniversalTime() - DateTime.UtcNow <
+                    TimeSpan.FromSeconds(10)).ToArray();
+
+                _queue = new ConcurrentQueue<IRemoveable>(_queue
+                    .Where(x => x.When.ToUniversalTime() - DateTime.UtcNow > TimeSpan.FromSeconds(10))
+                    .OrderBy(x => x.When));
 
                 if (toRemove.Length > 0)
                 {
-                    //stop potential race condition
+                    //Stops potential race condition
                     _ = Task.Run(async () =>
                     {
                         foreach (var item in toRemove)
@@ -97,6 +113,25 @@ namespace Espeon.Services
             await RemoveAsync(removeable);
             Enqueue(removeable);
             SetTimer();
+        }
+
+        private class DelayedRemovable : IRemoveable
+        {
+            public IRemoveable Removeable { get; }
+
+            public int Identifier => throw new NotImplementedException();
+            public DateTime When { get; }
+
+            public DelayedRemovable(IRemoveable removeable)
+            {
+                Removeable = removeable;
+                When = DateTime.UtcNow.Add(MaxTime);
+            }
+
+            public Task RemoveAsync()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
