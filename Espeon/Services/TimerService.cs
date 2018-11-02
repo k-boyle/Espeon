@@ -44,7 +44,7 @@ namespace Espeon.Services
                 removeable = delayed.Removeable;
 
             //Timer can't have has a value greater than TimeSpan.FromMilliseconds(Math.Pow(2,32) - 2)
-            if (removeable.When - DateTime.UtcNow > MaxTime)
+            if (removeable.When.ToUniversalTime() - DateTime.UtcNow > MaxTime)
                 removeable = new DelayedRemovable(removeable);
 
             _queue.Enqueue(removeable);
@@ -121,7 +121,7 @@ namespace Espeon.Services
         {
             public IRemoveable Removeable { get; }
 
-            public int Identifier => throw new NotImplementedException();
+            public int Identifier => Removeable.Identifier;
             public DateTime When { get; }
 
             public DelayedRemovable(IRemoveable removeable)
