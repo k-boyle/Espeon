@@ -16,18 +16,18 @@ namespace Espeon.Callbacks
         public ICriterion<SocketReaction> Criterion => new EnsureReactionFromSourceUserCriterion();
         public TimeSpan? Timeout => TimeSpan.FromMinutes(2);
         public ICommandContext Context { get; }
-        public InteractiveService Interatice { get; }
+        public InteractiveService Interative { get; }
         public IEmote Reaction { get; }
         public IUserMessage Message { get; }
 
         public DeleteCallback(ICommandContext context, InteractiveService interactive, IUserMessage message, IEmote reaction)
         {
             Context = context;
-            Interatice = interactive;
+            Interative = interactive;
             Message = message;
             Reaction = reaction;
 
-            Interatice.AddReactionCallback(Message, this);
+            Interative.AddReactionCallback(Message, this);
         }
 
         public void StartDelayAsync()
@@ -35,7 +35,7 @@ namespace Espeon.Callbacks
             _ = Task.Delay(Timeout.GetValueOrDefault()).ContinueWith(_ =>
             {
                 _ = Message.DeleteAsync();
-                Interatice.RemoveReactionCallback(Message);
+                Interative.RemoveReactionCallback(Message);
             });
         }
 
@@ -43,7 +43,7 @@ namespace Espeon.Callbacks
         {
             if (!reaction.Emote.Equals(Reaction)) return false;
             await Message.DeleteAsync();
-            Interatice.RemoveReactionCallback(Message);
+            Interative.RemoveReactionCallback(Message);
             return true;
         }
     }
