@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -27,12 +28,17 @@ namespace Espeon
             EventHooks();
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Testeon"));
             await _client.StartAsync();
+
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
-        public void EventHooks()
+        private void EventHooks()
         {
             var logger = _services.GetService<ILogService>();
             _client.Log += logger.LogAsync;
+
+            var message = _services.GetService<IMessageService>();
+            _client.MessageReceived += message.HandleReceivedMessageAsync;
         }
     }
 }
