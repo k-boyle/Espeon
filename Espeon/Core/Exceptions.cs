@@ -8,4 +8,11 @@ namespace Espeon.Core
         {
         }
     }
+
+    public class QuahuRenamedException : Exception
+    {
+        public QuahuRenamedException(string message) : base($"Quahu renamed {message} REEEEEEEEEEEEEEEEEEEEEEEEE")
+        {
+        }
+    }
 }
