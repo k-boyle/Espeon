@@ -18,7 +18,7 @@ namespace Espeon
             var types = assembly.FindTypesWithAttribute<ServiceAttribute>().ToImmutableArray();
 
             var services = new ServiceCollection()
-                .AddServices(assembly, types)
+                .AddServices(types)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     LogLevel = LogSeverity.Verbose,
@@ -30,8 +30,8 @@ namespace Espeon
                     CaseSensitive = false
                 }))
                 .BuildServiceProvider()
-                .Inject(assembly, types)
-                .RunInitialisers(assembly, types);
+                .Inject(types)
+                .RunInitialisers(types);
 
             var espeon = new EspeonStartup(services);
             services.Inject(espeon);

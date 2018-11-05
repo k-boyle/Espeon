@@ -10,10 +10,11 @@ namespace Espeon.Core
 {
     public static class Extensions
     {
-        public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly, IEnumerable<Type> services = null)
-        {
-            services = services ?? assembly.FindTypesWithAttribute<ServiceAttribute>();
+        public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly)
+            => AddServices(collection, assembly.FindTypesWithAttribute<ServiceAttribute>());
 
+        public static IServiceCollection AddServices(this IServiceCollection collection, IEnumerable<Type> services)
+        {
             foreach (var service in services)
             {
                 var attribute = service.GetCustomAttribute<ServiceAttribute>();
@@ -23,10 +24,11 @@ namespace Espeon.Core
             return collection;
         }
 
-        public static IServiceProvider Inject(this IServiceProvider services, Assembly assembly, IEnumerable<Type> types = null)
-        {
-            types = types ?? assembly.FindTypesWithAttribute<ServiceAttribute>();
+        public static IServiceProvider Inject(this IServiceProvider services, Assembly assembly)
+            => Inject(services, assembly.FindTypesWithAttribute<ServiceAttribute>());
 
+        public static IServiceProvider Inject(this IServiceProvider services, IEnumerable<Type> types)
+        {
             foreach (var type in types)
             {
                 var attribute = type.GetCustomAttribute<ServiceAttribute>();
@@ -76,10 +78,11 @@ namespace Espeon.Core
             }
         }
 
-        public static IServiceProvider RunInitialisers(this IServiceProvider services, Assembly assembly, IEnumerable<Type> types = null)
-        {
-            types = types ?? FindTypesWithAttribute<ServiceAttribute>(assembly);
+        public static IServiceProvider RunInitialisers(this IServiceProvider services, Assembly assembly)
+            => RunInitialisers(services, FindTypesWithAttribute<ServiceAttribute>(assembly));
 
+        public static IServiceProvider RunInitialisers(this IServiceProvider services, IEnumerable<Type> types)
+        {
             foreach (var type in types)
             {
                 var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
