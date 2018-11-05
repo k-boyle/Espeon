@@ -10,9 +10,9 @@ namespace Espeon.Core
 {
     public static class Extensions
     {
-        public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly)
+        public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly, IEnumerable<Type> services = null)
         {
-            var services = assembly.FindTypesWithAttribute<ServiceAttribute>();
+            services = services ?? assembly.FindTypesWithAttribute<ServiceAttribute>();
 
             foreach (var service in services)
             {
@@ -23,9 +23,9 @@ namespace Espeon.Core
             return collection;
         }
 
-        public static IServiceProvider Inject(this IServiceProvider services, Assembly assembly)
+        public static IServiceProvider Inject(this IServiceProvider services, Assembly assembly, IEnumerable<Type> types = null)
         {
-            var types = assembly.FindTypesWithAttribute<ServiceAttribute>();
+            types = types ?? assembly.FindTypesWithAttribute<ServiceAttribute>();
 
             foreach (var type in types)
             {
@@ -40,42 +40,45 @@ namespace Espeon.Core
 
         public static void Inject(this IServiceProvider services, object obj)
         {
-            var fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            var members = obj.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
                 .ToArray();
 
-            foreach (var field in fields)
+            foreach (var member in members)
             {
-                var type = field.FieldType;
+                Type type;
+                object value;
 
-                var value = services.GetService(type);
+                switch (member)
+                {
+                    case FieldInfo fieldInfo:
+                        type = fieldInfo.FieldType;
 
-                if (value is null)
-                    continue;
+                        value = services.GetService(type);
 
-                field.SetValue(obj, value);
-            }
+                        if (value is null)
+                            continue;
 
-            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
-                .ToArray();
+                        fieldInfo.SetValue(obj, value);
+                        break;
 
-            foreach (var property in properties)
-            {
-                var type = property.PropertyType;
+                    case PropertyInfo propertyInfo:
+                        type = propertyInfo.PropertyType;
 
-                var value = services.GetService(type);
+                        value = services.GetService(type);
 
-                if (value is null)
-                    continue;
+                        if (value is null)
+                            continue;
 
-                property.SetValue(obj, value);
+                        propertyInfo.SetValue(obj, value);
+                        break;
+                }
             }
         }
 
-        public static IServiceProvider RunInitialisers(this IServiceProvider services, Assembly assembly)
+        public static IServiceProvider RunInitialisers(this IServiceProvider services, Assembly assembly, IEnumerable<Type> types = null)
         {
-            var types = FindTypesWithAttribute<ServiceAttribute>(assembly);
+            types = types ?? FindTypesWithAttribute<ServiceAttribute>(assembly);
 
             foreach (var type in types)
             {
@@ -97,7 +100,7 @@ namespace Espeon.Core
             return services;
         }
 
-        private static IEnumerable<Type> FindTypesWithAttribute<T>(this Assembly assembly)
+        public static IEnumerable<Type> FindTypesWithAttribute<T>(this Assembly assembly)
         {
             return assembly.GetTypes().Where(x => x.GetCustomAttributes(typeof(T), true).Length > 0);
         }

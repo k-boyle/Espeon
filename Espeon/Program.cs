@@ -1,10 +1,12 @@
-﻿using Discord;
+﻿using System.Collections.Immutable;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System.Reflection;
 using System.Threading.Tasks;
+using Espeon.Core.Attributes;
 
 namespace Espeon
 {
@@ -13,8 +15,10 @@ namespace Espeon
         private static async Task Main()
         {
             var assembly = Assembly.GetEntryAssembly();
+            var types = assembly.FindTypesWithAttribute<ServiceAttribute>().ToImmutableArray();
+
             var services = new ServiceCollection()
-                .AddServices(assembly)
+                .AddServices(assembly, types)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
                     LogLevel = LogSeverity.Verbose,
@@ -26,8 +30,8 @@ namespace Espeon
                     CaseSensitive = false
                 }))
                 .BuildServiceProvider()
-                .Inject(assembly)
-                .RunInitialisers(assembly);
+                .Inject(assembly, types)
+                .RunInitialisers(assembly, types);
 
             var espeon = new EspeonStartup(services);
             services.Inject(espeon);
