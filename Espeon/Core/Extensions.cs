@@ -17,7 +17,7 @@ namespace Espeon.Core
             foreach (var service in services)
             {
                 var attribute = service.GetCustomAttribute<ServiceAttribute>();
-                collection.AddSingleton(service, attribute.Target);
+                collection.AddSingleton(attribute.Target, service);
             }
 
             return collection;
@@ -29,7 +29,8 @@ namespace Espeon.Core
 
             foreach (var type in types)
             {
-                var service = services.GetService(type);
+                var attribute = type.GetCustomAttribute<ServiceAttribute>();
+                var service = services.GetService(attribute.Target);
 
                 Inject(services, service);
             }
@@ -39,7 +40,7 @@ namespace Espeon.Core
 
         public static void Inject(this IServiceProvider services, object obj)
         {
-            var fields = obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public)
+            var fields = obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
                 .ToArray();
 
@@ -55,7 +56,7 @@ namespace Espeon.Core
                 field.SetValue(obj, value);
             }
 
-            var properties = obj.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public)
+            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
                 .ToArray();
 
@@ -78,14 +79,16 @@ namespace Espeon.Core
 
             foreach (var type in types)
             {
-                var service = services.GetService(type);
+                var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
+
+                var service = services.GetService(serviceAtt.Target);
 
                 foreach (var method in service.GetType().GetMethods())
                 {
-                    if (!(method.GetCustomAttribute<InitialiserAttribute>() is InitialiserAttribute attribute))
+                    if (!(method.GetCustomAttribute<InitialiserAttribute>() is InitialiserAttribute initAtt))
                         continue;
 
-                    var argTypes = attribute.Arguments;
+                    var argTypes = initAtt.Arguments;
                     var args = argTypes.Select(services.GetService).ToArray();
                     method.Invoke(service, args);
                 }
@@ -99,7 +102,7 @@ namespace Espeon.Core
             return assembly.GetTypes().Where(x => x.GetCustomAttributes(typeof(T), true).Length > 0);
         }
 
-        public static CommandService AddTypeParsers(this CommandService commands)
+        public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
             var typeParserInterface = commands.GetType().Assembly.GetTypes()
                 .FirstOrDefault(x => x.Name == "ITypeParser").GetTypeInfo();
@@ -107,8 +110,7 @@ namespace Espeon.Core
             if (typeParserInterface is null)
                 throw new QuahuRenamedException("ITypeParser");
 
-            var parsers = Assembly.GetEntryAssembly().GetTypes()
-                .Where(x => typeParserInterface.IsAssignableFrom(x));
+            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x));
 
             var internalAddParser = commands.GetType().GetMethod("AddParserInternal",
                 BindingFlags.NonPublic | BindingFlags.Instance);
