@@ -13,12 +13,12 @@ namespace Espeon.Core
         public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly)
             => AddServices(collection, assembly.FindTypesWithAttribute<ServiceAttribute>());
 
-        public static IServiceCollection AddServices(this IServiceCollection collection, IEnumerable<Type> services)
+        public static IServiceCollection AddServices(this IServiceCollection collection, IEnumerable<Type> types)
         {
-            foreach (var service in services)
+            foreach (var type in types)
             {
-                var attribute = service.GetCustomAttribute<ServiceAttribute>();
-                collection.AddSingleton(attribute.Target, service);
+                var attribute = type.GetCustomAttribute<ServiceAttribute>();
+                collection.AddSingleton(attribute.Target, type);
             }
 
             return collection;
