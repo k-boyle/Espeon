@@ -40,7 +40,7 @@ namespace Espeon.Core
 
         public static void Inject(this IServiceProvider services, object obj)
         {
-            var fields = obj.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+            var fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
                 .ToArray();
 
@@ -56,7 +56,7 @@ namespace Espeon.Core
                 field.SetValue(obj, value);
             }
 
-            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => x.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0)
                 .ToArray();
 
