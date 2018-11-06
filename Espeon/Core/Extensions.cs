@@ -111,7 +111,7 @@ namespace Espeon.Core
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
             var typeParserInterface = commands.GetType().Assembly.GetTypes()
-                .FirstOrDefault(x => x.Name == "ITypeParse")?.GetTypeInfo();
+                .FirstOrDefault(x => x.Name == "ITypeParser")?.GetTypeInfo();
 
             if (typeParserInterface is null)
                 throw new QuahuRenamedException("ITypeParser");
