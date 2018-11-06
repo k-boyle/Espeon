@@ -6,7 +6,7 @@ using Espeon.Core.Services;
 
 namespace Espeon.Implementation.Services
 {
-    [Service(typeof(ILogService))]
+    [Service(typeof(ILogService), true)]
     public class LogService : ILogService
     {
         public Task LogAsync(LogMessage message)

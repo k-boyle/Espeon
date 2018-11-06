@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
@@ -15,7 +16,8 @@ namespace Espeon
         private static async Task Main()
         {
             var assembly = Assembly.GetEntryAssembly();
-            var types = assembly.FindTypesWithAttribute<ServiceAttribute>().ToImmutableArray();
+            var types = assembly.FindTypesWithAttribute<ServiceAttribute>()
+                .Where(x => x.GetCustomAttribute<ServiceAttribute>().Implement).ToImmutableArray();
 
             var services = new ServiceCollection()
                 .AddServices(types)
@@ -28,7 +30,8 @@ namespace Espeon
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
                 {
                     CaseSensitive = false
-                }))
+                })
+                    .AddTypeParsers(assembly))
                 .BuildServiceProvider()
                 .Inject(types)
                 .RunInitialisers(types);

@@ -8,7 +8,7 @@ using Espeon.Implementation.Entities;
 
 namespace Espeon.Implementation.Services
 {
-    [Service(typeof(IMessageService))]
+    [Service(typeof(IMessageService), true)]
     public class MessageService : IMessageService
     {
         [Inject] private readonly ITimerService _timer;
