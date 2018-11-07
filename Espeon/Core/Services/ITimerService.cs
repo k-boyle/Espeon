@@ -6,7 +6,7 @@ namespace Espeon.Core.Services
 {
     public interface ITimerService
     {
-        Task EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeAsync);
-        Task RemoveAsync(IRemovable removeable);
+        Task<int> EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeAsync);
+        Task RemoveAsync(int key);
     }
 }

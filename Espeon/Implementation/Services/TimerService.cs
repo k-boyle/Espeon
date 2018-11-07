@@ -13,6 +13,10 @@ namespace Espeon.Implementation.Services
     [Service(typeof(ITimerService), true)]
     public class TimerService : ITimerService
     {
+        [Inject] private Random _random;
+
+        private Random Random => _random ?? (_random = new Random());
+
         private readonly Timer _timer;
         private ConcurrentQueue<TaskObject> _taskQueue;
 
@@ -30,15 +34,17 @@ namespace Espeon.Implementation.Services
             }, null, -1, -1);
         }
 
-        Task ITimerService.EnqueueAsync(IRemovable removable, Func<IRemovable, Task> removeTask)
+        Task<int> ITimerService.EnqueueAsync(IRemovable removable, Func<IRemovable, Task> removeTask)
             => EnqueueAsync(removable, removeTask, true);
 
-        private Task EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeTask, bool setTimer)
+        private async Task<int> EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeTask, bool setTimer)
         {
+            var key = Random.Next();
             var task = new TaskObject
             {
                 Removeable = removeable,
-                RemoveTask = removeTask
+                RemoveTask = removeTask,
+                TaskKey = key
             };
 
             if (removeable.WhenToRemove > MaxTime)
@@ -51,12 +57,15 @@ namespace Espeon.Implementation.Services
 
             _taskQueue.Enqueue(task);
 
-            return setTimer ? SetTimerAsync() : Task.CompletedTask;
+            if (setTimer)
+                await SetTimerAsync();
+
+            return key;
         }
 
-        public Task RemoveAsync(IRemovable removable)
+        public Task RemoveAsync(int key)
         {
-            var removed = _taskQueue.Where(x => x.Removeable.TaskKey != removable.TaskKey);
+            var removed = _taskQueue.Where(x => x.TaskKey != key);
             _taskQueue = new ConcurrentQueue<TaskObject>(removed);
 
             return SetTimerAsync();
@@ -102,6 +111,7 @@ namespace Espeon.Implementation.Services
         {
             public IRemovable Removeable { get; set; }
             public Func<IRemovable, Task> RemoveTask { get; set; }
+            public int TaskKey { get; set; }
         }
 
         private class DelayedTask : TaskObject
