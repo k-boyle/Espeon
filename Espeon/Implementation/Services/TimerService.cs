@@ -75,7 +75,7 @@ namespace Espeon.Implementation.Services
 
                 if (DateTimeOffset.UtcNow - whenToRemove < TimeSpan.FromSeconds(10))
                 {
-                    Task.Run(async () => await HandleTaskAsync(item));
+                    Task.Run(() => HandleTaskAsync(item));
                     continue;
                 }
 
@@ -94,8 +94,8 @@ namespace Espeon.Implementation.Services
         {
             if (!(task is DelayedTask delayed)) return task.RemoveTask(task.Removeable);
             task = delayed.Task;
-            return EnqueueAsync(task.Removeable, task.RemoveTask, false);
 
+            return EnqueueAsync(task.Removeable, task.RemoveTask, false);
         }
 
         private class TaskObject
