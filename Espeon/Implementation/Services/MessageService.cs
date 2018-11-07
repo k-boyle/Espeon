@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Espeon.Core;
 using Espeon.Core.Attributes;
 using Espeon.Core.Commands;
 using Espeon.Core.Services;

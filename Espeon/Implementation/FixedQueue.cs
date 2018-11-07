@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Espeon.Core;
 
 namespace Espeon.Implementation
 {
-    public interface IFixedQueue<T>
-    {
-        bool TryEnqueue(T item);
-        bool TryDequeue(out T item);
-    }
-
     public class FixedQueue<T> : ConcurrentQueue<T>, IFixedQueue<T>
     {
         private readonly int _size;
