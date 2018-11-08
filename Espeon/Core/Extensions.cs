@@ -1,11 +1,11 @@
-﻿using Espeon.Core.Attributes;
+﻿using Discord;
+using Espeon.Core.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Discord;
 
 namespace Espeon.Core
 {
@@ -19,7 +19,8 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var attribute = type.GetCustomAttribute<ServiceAttribute>();
-                collection.AddSingleton(attribute.Target, type);
+                var target = attribute.Generic is null ? attribute.Target : attribute.Target.MakeGenericType(attribute.Generic);
+                collection.AddSingleton(target, type);
             }
 
             return collection;
@@ -33,7 +34,8 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var attribute = type.GetCustomAttribute<ServiceAttribute>();
-                var service = services.GetService(attribute.Target);
+                var target = attribute.Generic is null ? attribute.Target : attribute.Target.MakeGenericType(attribute.Generic);
+                var service = services.GetService(target);
 
                 Inject(services, service);
             }
@@ -87,8 +89,8 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
-
-                var service = services.GetService(serviceAtt.Target);
+                var target = serviceAtt.Generic is null ? serviceAtt.Target : serviceAtt.Target.MakeGenericType(serviceAtt.Generic);
+                var service = services.GetService(target);
 
                 foreach (var method in service.GetType().GetMethods())
                 {

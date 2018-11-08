@@ -1,13 +1,14 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
+using Espeon.Core.Attributes;
+using Espeon.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Espeon.Core.Attributes;
 
 namespace Espeon
 {
@@ -36,7 +37,7 @@ namespace Espeon
                 .Inject(types)
                 .RunInitialisers(types);
 
-            var espeon = new EspeonStartup(services);
+            var espeon = new EspeonStartup<EspeonContext>(services);
             services.Inject(espeon);
             await espeon.StartBotAsync();
 

@@ -24,7 +24,10 @@ namespace Espeon.Implementation.Entities
         public ulong WelcomeChannelId { get; set; }
         public ulong DefaultRoleId { get; set; }
 
-        public IList<string> Prefixes { get; set; } = new List<string>();
+        public IList<string> Prefixes { get; set; } = new List<string>
+        {
+            "es/"
+        };
         public IList<ulong> RestrictedChannels { get; set; } = new List<ulong>();
         public IList<ulong> RestrictedUsers { get; set; } = new List<ulong>();
     }

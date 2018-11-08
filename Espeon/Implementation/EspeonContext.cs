@@ -12,12 +12,16 @@ namespace Espeon.Implementation
         public SocketGuild Guild => User.Guild;
         public SocketTextChannel Channel { get; }
 
-        public EspeonContext(DiscordSocketClient client, IUserMessage message)
+        public bool IsEdit { get; }
+
+        public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit)
         {
             Client = client;
             Message = message;
             User = message.Author as SocketGuildUser;
             Channel = message.Channel as SocketTextChannel;
+
+            IsEdit = isEdit;
         }
     }
 }

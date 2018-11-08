@@ -43,12 +43,18 @@ namespace Espeon.Implementation.Services
 
         public async Task<T> GetAndCacheEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
-            if (_cache.TryGetValue(id, out var cached)) return (T) cached;
+            if (_cache.TryGetValue(id, out var cached))
+                return (T) cached;
+
             cached = await GetEntityAsync<T>(collection, id);
+
+            if (cached is null)
+                return null;
+
             cached.WhenToRemove = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds();
             await WriteAsync(collection, (T) cached);
-            _cache[id] = cached;
 
+            _cache[id] = cached;
             await _timer.EnqueueAsync(cached, RemoveAsync);
 
             return (T) cached;
