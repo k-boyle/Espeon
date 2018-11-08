@@ -29,7 +29,7 @@ namespace Espeon.Implementation.Services
             _timer = new Timer(async _ =>
             {
                 if (!_taskQueue.TryDequeue(out var task)) return;
-                await HandleTaskAsync(task);
+                await HandleTaskAsync(task, false);
                 await SetTimerAsync();
             }, null, -1, -1);
         }
@@ -47,7 +47,14 @@ namespace Espeon.Implementation.Services
                 TaskKey = key
             };
 
-            if (removeable.WhenToRemove > MaxTime)
+            await EnqueueAsync(task, setTimer);
+
+            return key;
+        }
+
+        private Task EnqueueAsync(TaskObject task, bool setTimer)
+        {
+            if (task.Removeable.WhenToRemove > MaxTime)
             {
                 task = new DelayedTask
                 {
@@ -57,10 +64,7 @@ namespace Espeon.Implementation.Services
 
             _taskQueue.Enqueue(task);
 
-            if (setTimer)
-                await SetTimerAsync();
-
-            return key;
+            return setTimer ? SetTimerAsync() : Task.CompletedTask;
         }
 
         public Task RemoveAsync(int key)
@@ -84,7 +88,7 @@ namespace Espeon.Implementation.Services
 
                 if (DateTimeOffset.UtcNow - whenToRemove < TimeSpan.FromSeconds(10))
                 {
-                    Task.Run(() => HandleTaskAsync(item));
+                    Task.Run(() => HandleTaskAsync(item, true));
                     continue;
                 }
 
@@ -99,12 +103,14 @@ namespace Espeon.Implementation.Services
             return Task.CompletedTask;
         }
 
-        private Task HandleTaskAsync(TaskObject task)
+        private Task HandleTaskAsync(TaskObject task, bool setTimer)
         {
-            if (!(task is DelayedTask delayed)) return task.RemoveTask(task.Removeable);
+            if (!(task is DelayedTask delayed))
+                return task.RemoveTask(task.Removeable);
+
             task = delayed.Task;
 
-            return EnqueueAsync(task.Removeable, task.RemoveTask, false);
+            return EnqueueAsync(task, setTimer);
         }
 
         private class TaskObject
