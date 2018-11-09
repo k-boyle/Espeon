@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Espeon.Core;
 
 namespace Espeon.Implementation.Services
 {
@@ -34,12 +35,12 @@ namespace Espeon.Implementation.Services
             }, null, -1, -1);
         }
 
-        Task<int> ITimerService.EnqueueAsync(IRemovable removable, Func<IRemovable, Task> removeTask)
+        Task<string> ITimerService.EnqueueAsync(IRemovable removable, Func<IRemovable, Task> removeTask)
             => EnqueueAsync(removable, removeTask, true);
 
-        private async Task<int> EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeTask, bool setTimer)
+        private async Task<string> EnqueueAsync(IRemovable removeable, Func<IRemovable, Task> removeTask, bool setTimer)
         {
-            var key = Random.Next();
+            var key = Random.GenerateKey();
             var task = new TaskObject
             {
                 Removeable = removeable,
@@ -67,7 +68,7 @@ namespace Espeon.Implementation.Services
             return setTimer ? SetTimerAsync() : Task.CompletedTask;
         }
 
-        public Task RemoveAsync(int key)
+        public Task RemoveAsync(string key)
         {
             var removed = _taskQueue.Where(x => x.TaskKey != key);
             _taskQueue = new ConcurrentQueue<TaskObject>(removed);
@@ -117,7 +118,7 @@ namespace Espeon.Implementation.Services
         {
             public IRemovable Removeable { get; set; }
             public Func<IRemovable, Task> RemoveTask { get; set; }
-            public int TaskKey { get; set; }
+            public string TaskKey { get; set; }
         }
 
         private class DelayedTask : TaskObject

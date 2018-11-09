@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Espeon.Core
 {
@@ -156,7 +157,16 @@ namespace Espeon.Core
             if (userId != user.Id) return false;
             parsed = content.Substring(endPos + 2);
             return true;
+        }
 
+        public static string GenerateKey(this Random random)
+        {
+            var builder = new StringBuilder();
+
+            for (var i = 0; i < 10; i++)
+                builder.Append((char) random.Next(127));
+
+            return builder.ToString();
         }
     }
 }

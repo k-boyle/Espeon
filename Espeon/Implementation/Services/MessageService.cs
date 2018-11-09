@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
@@ -22,15 +22,18 @@ namespace Espeon.Implementation.Services
         [Inject] private readonly IDatabaseService _database;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly ITimerService _timer;
+        [Inject] private Random _random;
 
-        private readonly ConcurrentDictionary<ulong, IFixedQueue<(Message Message, int Key)>> _messageCache;
+        private Random Random => _random ?? (_random = new Random());
+
+        private readonly ConcurrentDictionary<ulong, IFixedQueue<(Message Message, string Key)>> _messageCache;
 
         private const int CacheSize = 20;
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
 
         public MessageService()
         {
-            _messageCache = new ConcurrentDictionary<ulong, IFixedQueue<(Message message, int key)>>();
+            _messageCache = new ConcurrentDictionary<ulong, IFixedQueue<(Message message, string key)>>();
         }
 
         [Initialiser]
@@ -81,7 +84,7 @@ namespace Espeon.Implementation.Services
         {
             var foundItem = _messageCache[context.User.Id].FirstOrDefault(x => x.Message.ExecutingId == context.Message.Id);
 
-            if (context.IsEdit && !(foundItem.Message is null || foundItem.Key == 0))
+            if (context.IsEdit && !(foundItem.Message is null || string.IsNullOrWhiteSpace(foundItem.Key)))
             {
                 //TODO figure out how I'm gonna handle message edits... Probably gonna need to rewrite this... RIP
             }
@@ -89,7 +92,7 @@ namespace Espeon.Implementation.Services
             var message = await context.Channel.SendMessageAsync(content, embed: embed);
 
             //stupid c#
-            if (foundItem.Message is null || foundItem.Key == 0)
+            if (foundItem.Message is null || string.IsNullOrWhiteSpace(foundItem.Key))
             {
                 var item = new Message
                 {
@@ -102,7 +105,7 @@ namespace Espeon.Implementation.Services
 
                 var key = await _timer.EnqueueAsync(item, RemoveAsync);
 
-                var queue = new FixedQueue<(Message message, int key)>(CacheSize);
+                var queue = new FixedQueue<(Message message, string key)>(CacheSize);
                 queue.TryEnqueue((item, key));
 
                 _messageCache[context.User.Id] = queue;
@@ -135,7 +138,7 @@ namespace Espeon.Implementation.Services
 
             var filtered = queue.Where(item => item.Message.ExecutingId != message.ExecutingId).ToList();
 
-            _messageCache[message.UserId] = new FixedQueue<(Message, int)>(CacheSize, filtered);
+            _messageCache[message.UserId] = new FixedQueue<(Message, string)>(CacheSize, filtered);
 
             return Task.CompletedTask;
         }

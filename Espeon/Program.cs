@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
@@ -33,6 +34,7 @@ namespace Espeon
                     CaseSensitive = false
                 })
                     .AddTypeParsers(assembly))
+                .AddSingleton<Random>()
                 .BuildServiceProvider()
                 .Inject(types)
                 .RunInitialisers(types);
