@@ -1,8 +1,8 @@
-﻿using System;
-using Espeon.Core.Attributes;
+﻿using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using LiteDB;
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -60,7 +60,7 @@ namespace Espeon.Implementation.Services
             return (T) cached;
         }
 
-        private Task RemoveAsync(IRemovable removable)
+        private Task RemoveAsync(string __, IRemovable removable)
         {
             var entity = removable as DatabaseEntity;
             //shouldn't nullref
