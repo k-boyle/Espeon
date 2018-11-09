@@ -1,7 +1,8 @@
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
+using Espeon.Core.Commands;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using Espeon.Implementation.Entities;
@@ -9,6 +10,7 @@ using Qmmands;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,14 +28,13 @@ namespace Espeon.Implementation.Services
 
         private Random Random => _random ?? (_random = new Random());
 
-        private readonly ConcurrentDictionary<ulong, IFixedQueue<(Message Message, string Key)>> _messageCache;
+        private readonly ConcurrentDictionary<ulong, Dictionary<ulong, Dictionary<string, CachedMessage>>> _messageCache;
 
-        private const int CacheSize = 20;
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
 
         public MessageService()
         {
-            _messageCache = new ConcurrentDictionary<ulong, IFixedQueue<(Message message, string key)>>();
+            _messageCache = new ConcurrentDictionary<ulong, Dictionary<ulong, Dictionary<string, CachedMessage>>>();
         }
 
         [Initialiser]
@@ -76,48 +77,49 @@ namespace Espeon.Implementation.Services
 
         private Task CommandErroredAsync(ExecutionFailedResult result, ICommandContext context, IServiceProvider services)
         {
+            //TODO error handling
             return Task.CompletedTask;
-
         }
 
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
-            var foundItem = _messageCache[context.User.Id].FirstOrDefault(x => x.Message.ExecutingId == context.Message.Id);
+            var foundCache = _messageCache[context.Channel.Id][context.User.Id] ??
+                             (_messageCache[context.Channel.Id][context.User.Id] =
+                                 new Dictionary<string, CachedMessage>());
 
-            if (context.IsEdit && !(foundItem.Message is null || string.IsNullOrWhiteSpace(foundItem.Key)))
+            var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
+
+            if (context.IsEdit && !foundMessage.Equals(default(KeyValuePair<string, CachedMessage>)))
             {
-                //TODO figure out how I'm gonna handle message edits... Probably gonna need to rewrite this... RIP
-            }
-
-            var message = await context.Channel.SendMessageAsync(content, embed: embed);
-
-            //stupid c#
-            if (foundItem.Message is null || string.IsNullOrWhiteSpace(foundItem.Key))
-            {
-                var item = new Message
+                if (await GetOrDownloadMessageAsync(foundMessage.Value.ChannelId, foundMessage.Value.ResponseId) is
+                    IUserMessage fetchedMessage)
                 {
-                    ChannelId = context.Channel.Id,
-                    ExecutingId = context.Message.Id,
-                    UserId = context.User.Id,
-                    ResponseIds = new[] { message.Id },
-                    WhenToRemove = DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds()
-                };
+                    await fetchedMessage.ModifyAsync(x =>
+                    {
+                        x.Content = content;
+                        x.Embed = embed;
+                    });
 
-                var key = await _timer.EnqueueAsync(item, RemoveAsync);
-
-                var queue = new FixedQueue<(Message message, string key)>(CacheSize);
-                queue.TryEnqueue((item, key));
-
-                _messageCache[context.User.Id] = queue;
-
-                return message;
+                    return fetchedMessage;
+                }
             }
 
-            //TODO check this does what I hope it does even though it's ugly
-            _messageCache[context.User.Id].FirstOrDefault(x => x.Message.ExecutingId == context.Message.Id).Message
-                .ResponseIds.Add(message.Id);
+            var sentMessage = await context.Channel.SendMessageAsync(content, embed: embed);
 
-            return message;
+            var message = new CachedMessage
+            {
+                ChannelId = context.Channel.Id,
+                ExecutingId = context.Message.Id,
+                UserId = context.User.Id,
+                ResponseId = sentMessage.Id,
+                WhenToRemove = DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds()
+            };
+
+            var key = await _timer.EnqueueAsync(message, RemoveAsync);
+
+            _messageCache[context.Channel.Id][context.User.Id][key] = message;
+
+            return sentMessage;
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
@@ -130,17 +132,79 @@ namespace Espeon.Implementation.Services
                 : Task.FromResult(message);
         }
 
-        private Task RemoveAsync(IRemovable removeable)
+        private Task RemoveAsync(string key, IRemovable removable)
         {
-            var message = removeable as Message;
+            var message = removable as CachedMessage;
+            _messageCache[message.ChannelId][message.UserId].Remove(key);
 
-            var queue = _messageCache[message.UserId];
+            if (_messageCache[message.ChannelId][message.UserId].Count == 0)
+                _messageCache.Remove(message.UserId, out _);
 
-            var filtered = queue.Where(item => item.Message.ExecutingId != message.ExecutingId).ToList();
-
-            _messageCache[message.UserId] = new FixedQueue<(Message, string)>(CacheSize, filtered);
+            if (_messageCache[message.ChannelId].Count == 0)
+                _messageCache.Remove(message.ChannelId, out _);
 
             return Task.CompletedTask;
+        }
+
+        public async Task DeleteMessagesAsync(EspeonContext context, int amount)
+        {
+            var perms = context.Guild.CurrentUser.GetPermissions(context.Channel);
+            var manageMessages = perms.ManageMessages;
+
+            var deleted = 0;
+
+            do
+            {
+                var found = _messageCache[context.Channel.Id][context.User.Id];
+
+                if (found is null)
+                {
+                    _messageCache[context.Channel.Id].Remove(context.User.Id, out _);
+
+                    if (_messageCache[context.Channel.Id].Count == 0)
+                        _messageCache.Remove(context.Channel.Id, out _);
+
+                    return;
+                }
+
+                var ordered = found.OrderByDescending(x => x.Value.WhenToRemove).ToImmutableArray();
+                amount = amount > ordered.Length ? ordered.Length : amount;
+
+                var toDelete = new List<(string, CachedMessage)>();
+
+                for (var i = 0; i < amount; i++)
+                    toDelete.Add((ordered[i].Key, ordered[i].Value));
+
+                var res = await DeleteMessagesAsync(context, manageMessages, toDelete);
+                deleted += res;
+
+            } while (deleted < amount);
+        }
+
+        private async Task<int> DeleteMessagesAsync(IEspeonContext context, bool manageMessages, IEnumerable<(string Key, CachedMessage Cached)> messages)
+        {
+            var fetchedMessages = new List<IMessage>();
+
+            foreach (var (key, cached) in messages)
+            {
+                await RemoveAsync(key, cached);
+                await _timer.RemoveAsync(key);
+
+                if (await GetOrDownloadMessageAsync(cached.ChannelId, cached.ResponseId) is IMessage fetchedMessage)
+                    fetchedMessages.Add(fetchedMessage);
+            }
+
+            if (manageMessages)
+            {
+                await context.Channel.DeleteMessagesAsync(fetchedMessages);
+            }
+            else
+            {
+                foreach (var message in fetchedMessages)
+                    await context.Channel.DeleteMessageAsync(message);
+            }
+
+            return fetchedMessages.Count;
         }
     }
 }

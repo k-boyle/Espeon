@@ -9,5 +9,6 @@ namespace Espeon.Core.Services
     {
         Task HandleReceivedMessageAsync(SocketMessage message);
         Task<IUserMessage> SendMessageAsync(T context, string message, Embed embed);
+        Task DeleteMessagesAsync(T context, int amount);
     }
 }
