@@ -1,4 +1,5 @@
-﻿using Espeon.Core.Attributes;
+﻿using Espeon.Core;
+using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using System;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Espeon.Core;
 
 namespace Espeon.Implementation.Services
 {

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Espeon.Core.Entities;
+﻿using Espeon.Core.Entities;
 using LiteDB;
+using System.Collections.Generic;
 
 namespace Espeon.Implementation.Entities
 {

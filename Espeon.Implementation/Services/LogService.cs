@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Espeon.Core.Attributes;
 using Espeon.Core.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace Espeon.Implementation.Services
 {
