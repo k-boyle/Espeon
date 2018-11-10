@@ -1,14 +1,14 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Espeon.Core.Commands;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Espeon.Core.Services
 {
-    public interface IMessageService<in T> where T : IEspeonContext
+    public interface IMessageService
     {
         Task HandleReceivedMessageAsync(SocketMessage message);
-        Task<IUserMessage> SendMessageAsync(T context, string message, Embed embed);
-        Task DeleteMessagesAsync(T context, int amount);
+        Task<IUserMessage> SendMessageAsync(IEspeonContext context, string message, Embed embed);
+        Task DeleteMessagesAsync(IEspeonContext context, int amount);
     }
 }

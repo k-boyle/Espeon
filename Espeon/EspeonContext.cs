@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Espeon.Core.Commands;
 
-namespace Espeon.Implementation
+namespace Espeon
 {
     public class EspeonContext : IEspeonContext
     {

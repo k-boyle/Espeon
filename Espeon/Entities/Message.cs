@@ -1,6 +1,6 @@
 ﻿using Espeon.Core.Entities;
 
-namespace Espeon.Implementation.Entities
+namespace Espeon.Entities
 {
     public class CachedMessage : IRemovable
     {

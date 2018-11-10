@@ -1,23 +1,23 @@
-﻿using Discord;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
 using Espeon.Core.Commands;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
-using Espeon.Implementation.Entities;
+using Espeon.Entities;
 using Qmmands;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Espeon.Implementation.Services
+namespace Espeon.Services
 {
-    [Service(typeof(IMessageService<>), typeof(EspeonContext), true)]
-    public class MessageService : IMessageService<EspeonContext>
+    [Service(typeof(IMessageService), true)]
+    public class MessageService : IMessageService
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
@@ -45,7 +45,7 @@ namespace Espeon.Implementation.Services
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
         }
 
-        Task IMessageService<EspeonContext>.HandleReceivedMessageAsync(SocketMessage msg)
+        Task IMessageService.HandleReceivedMessageAsync(SocketMessage msg)
             => msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
@@ -80,6 +80,9 @@ namespace Espeon.Implementation.Services
             //TODO error handling
             return Task.CompletedTask;
         }
+
+        Task<IUserMessage> IMessageService.SendMessageAsync(IEspeonContext context, string content, Embed embed)
+            => SendMessageAsync(context as EspeonContext, content, embed);
 
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
@@ -146,7 +149,7 @@ namespace Espeon.Implementation.Services
             return Task.CompletedTask;
         }
 
-        public async Task DeleteMessagesAsync(EspeonContext context, int amount)
+        public async Task DeleteMessagesAsync(IEspeonContext context, int amount)
         {
             var perms = context.Guild.CurrentUser.GetPermissions(context.Channel);
             var manageMessages = perms.ManageMessages;

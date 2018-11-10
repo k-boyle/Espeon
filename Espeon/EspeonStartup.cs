@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core.Attributes;
-using Espeon.Core.Commands;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -11,17 +10,19 @@ using System.Threading.Tasks;
 
 namespace Espeon
 {
-    public class EspeonStartup<T> where T : IEspeonContext
+    public class EspeonStartup
     {
         private readonly IServiceProvider _services;
+        private readonly Assembly _assembly;
 
         [Inject] private readonly DiscordSocketClient _client;
 
         [Inject] private readonly CommandService _commands;
 
-        public EspeonStartup(IServiceProvider services)
+        public EspeonStartup(IServiceProvider services, Assembly assembly)
         {
             _services = services;
+            _assembly = assembly;
         }
 
         public async Task StartBotAsync()
@@ -30,7 +31,7 @@ namespace Espeon
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Testeon"));
             await _client.StartAsync();
 
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await _commands.AddModulesAsync(_assembly);
         }
 
         private void EventHooks()
@@ -38,7 +39,7 @@ namespace Espeon
             var logger = _services.GetService<ILogService>();
             _client.Log += logger.LogAsync;
 
-            var message = _services.GetService<IMessageService<T>>();
+            var message = _services.GetService<IMessageService>();
             _client.MessageReceived += message.HandleReceivedMessageAsync;
         }
     }

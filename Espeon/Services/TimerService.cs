@@ -1,15 +1,15 @@
-﻿using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Espeon.Core;
+using Espeon.Core.Attributes;
+using Espeon.Core.Entities;
+using Espeon.Core.Services;
 
-namespace Espeon.Implementation.Services
+namespace Espeon.Services
 {
     [Service(typeof(ITimerService), true)]
     public class TimerService : ITimerService

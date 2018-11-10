@@ -1,12 +1,12 @@
-﻿using Espeon.Core.Attributes;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using LiteDB;
-using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
-namespace Espeon.Implementation.Services
+namespace Espeon.Services
 {
     [Service(typeof(IDatabaseService), true)]
     public class DatabaseService : IDatabaseService

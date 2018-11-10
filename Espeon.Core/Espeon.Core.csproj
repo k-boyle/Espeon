@@ -11,4 +11,8 @@
     <PackageReference Include="Qmmands" Version="1.0.3-nightly-00067" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\" />
+  </ItemGroup>
+
 </Project>
