@@ -168,5 +168,15 @@ namespace Espeon.Core
 
             return builder.ToString();
         }
+
+        public static string GetAvatarOrDefaultUrl(this IGuildUser user)
+        {
+            return user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
+        }
+
+        public static string GetDisplayName(this IGuildUser user)
+        {
+            return user.Nickname ?? user.Username;
+        }
     }
 }

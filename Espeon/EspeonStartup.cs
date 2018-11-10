@@ -5,7 +5,7 @@ using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon
@@ -13,16 +13,14 @@ namespace Espeon
     public class EspeonStartup
     {
         private readonly IServiceProvider _services;
-        private readonly Assembly _assembly;
 
         [Inject] private readonly DiscordSocketClient _client;
 
         [Inject] private readonly CommandService _commands;
 
-        public EspeonStartup(IServiceProvider services, Assembly assembly)
+        public EspeonStartup(IServiceProvider services)
         {
             _services = services;
-            _assembly = assembly;
         }
 
         public async Task StartBotAsync()
@@ -31,11 +29,15 @@ namespace Espeon
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Testeon"));
             await _client.StartAsync();
 
-            await _commands.AddModulesAsync(_assembly);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name == "Espeon.Core");
+            await _commands.AddModulesAsync(assembly);
         }
 
         private void EventHooks()
         {
+            var module = _services.GetService<IModuleManager>();
+            _commands.ModuleBuilding += module.OnBuildingAsync;
+
             var logger = _services.GetService<ILogService>();
             _client.Log += logger.LogAsync;
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
@@ -13,6 +7,12 @@ using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using Espeon.Entities;
 using Qmmands;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
@@ -22,6 +22,7 @@ namespace Espeon.Services
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IDatabaseService _database;
+        [Inject] private readonly ILogService _logger;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly ITimerService _timer;
         [Inject] private Random _random;
@@ -41,9 +42,12 @@ namespace Espeon.Services
         public void Initialise()
         {
             _commands.CommandErrored += CommandErroredAsync;
+            _commands.CommandExecuted += CommandExecutedAsync;
             _client.MessageUpdated += (_, msg, __) =>
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
         }
+
+        
 
         Task IMessageService.HandleReceivedMessageAsync(SocketMessage msg)
             => msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
@@ -75,20 +79,70 @@ namespace Espeon.Services
             }
         }
 
-        private Task CommandErroredAsync(ExecutionFailedResult result, ICommandContext context, IServiceProvider services)
+        private async Task CommandErroredAsync(ExecutionFailedResult result, ICommandContext originalContext, IServiceProvider services)
         {
-            //TODO error handling
-            return Task.CompletedTask;
+            if (!(originalContext is EspeonContext context))
+                return;
+
+            switch (result.CommandExecutionStep)
+            {
+                case CommandExecutionStep.Checks:
+                    break;
+
+                case CommandExecutionStep.ArgumentParsing:
+                    break;
+
+                case CommandExecutionStep.TypeParsing:
+                    break;
+
+                case CommandExecutionStep.BeforeExecuted:
+                    break;
+
+                case CommandExecutionStep.Command:
+                    
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.Exception.ToString()))
+                await _logger.LogAsync(new LogMessage(LogSeverity.Error, "Commands", string.Empty, result.Exception));
+        }
+
+        private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
+            ICommandContext originalContext, IServiceProvider services)
+        {
+            if (!(originalResult is EspeonResult result))
+                return;
+
+            if (!(originalContext is EspeonContext context))
+                return;
+
+            var embed = new EmbedBuilder
+            {
+                Author = new EmbedAuthorBuilder
+                {
+                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
+                    Name = context.User.GetDisplayName()
+                },
+                Color = new Color(result.IsSuccessful ? (uint)0xd1a9dd : 0xf31126),
+                Description = result.Message
+            };
+
+            await SendMessageAsync(context, string.Empty, embed.Build());
+            await _logger.LogAsync(new LogMessage(LogSeverity.Verbose, "Commands",
+                $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}"));
         }
 
         Task<IUserMessage> IMessageService.SendMessageAsync(IEspeonContext context, string content, Embed embed)
             => SendMessageAsync(context as EspeonContext, content, embed);
 
-        public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
+        private async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
-            var foundCache = _messageCache[context.Channel.Id][context.User.Id] ??
-                             (_messageCache[context.Channel.Id][context.User.Id] =
-                                 new Dictionary<string, CachedMessage>());
+            if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
+                foundChannel = (_messageCache[context.Channel.Id] =
+                    new Dictionary<ulong, Dictionary<string, CachedMessage>>());
+
+            if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
+                foundCache = (foundChannel[context.User.Id] = new Dictionary<string, CachedMessage>());
 
             var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
 

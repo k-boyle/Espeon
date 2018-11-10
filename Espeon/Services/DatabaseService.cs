@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
@@ -67,6 +70,14 @@ namespace Espeon.Services
             _cache.TryRemove(entity.Id, out _);
 
             return Task.CompletedTask;
+        }
+
+        public Task<ImmutableArray<T>> GetCollectionAsync<T>(string collection) where T : DatabaseEntity
+        {
+            using (var db = new LiteDatabase(Dir))
+            {
+                return Task.FromResult(db.GetCollection<T>(collection).FindAll().ToImmutableArray());
+            }
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Espeon.Services
             var key = Random.GenerateKey();
             var task = new TaskObject
             {
-                removable = removable,
+                Removable = removable,
                 RemoveTask = removeTask,
                 TaskKey = key
             };
@@ -55,7 +55,7 @@ namespace Espeon.Services
 
         private Task EnqueueAsync(TaskObject task, bool setTimer)
         {
-            if (task.removable.WhenToRemove > MaxTime)
+            if (task.Removable.WhenToRemove > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + MaxTime)
             {
                 task = new DelayedTask
                 {
@@ -85,9 +85,9 @@ namespace Espeon.Services
 
             foreach (var item in _taskQueue)
             {
-                var whenToRemove = DateTimeOffset.FromUnixTimeMilliseconds(item.removable.WhenToRemove);
+                var whenToRemove = DateTimeOffset.FromUnixTimeMilliseconds(item is DelayedTask ? MaxTime : item.Removable.WhenToRemove);
 
-                if (DateTimeOffset.UtcNow - whenToRemove < TimeSpan.FromSeconds(10))
+                if (whenToRemove - DateTimeOffset.UtcNow < TimeSpan.FromSeconds(10))
                 {
                     Task.Run(() => HandleTaskAsync(item, true));
                     continue;
@@ -96,10 +96,13 @@ namespace Espeon.Services
                 keepList.Add(item);
             }
 
-            _taskQueue = new ConcurrentQueue<TaskObject>(keepList.OrderBy(x => x.removable.WhenToRemove));
+            _taskQueue = new ConcurrentQueue<TaskObject>(keepList.OrderBy(x => x.Removable.WhenToRemove));
+
+            if(_taskQueue.IsEmpty)
+                return Task.CompletedTask;
 
             var nextTask = _taskQueue.First();
-            _timer.Change(nextTask.removable.WhenToRemove, -1);
+            _timer.Change(nextTask.Removable.WhenToRemove - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), -1);
 
             return Task.CompletedTask;
         }
@@ -107,7 +110,7 @@ namespace Espeon.Services
         private Task HandleTaskAsync(TaskObject task, bool setTimer)
         {
             if (!(task is DelayedTask delayed))
-                return task.RemoveTask(task.TaskKey, task.removable);
+                return task.RemoveTask(task.TaskKey, task.Removable);
 
             task = delayed.Task;
 
@@ -116,7 +119,7 @@ namespace Espeon.Services
 
         private class TaskObject
         {
-            public IRemovable removable { get; set; }
+            public IRemovable Removable { get; set; }
             public Func<string, IRemovable, Task> RemoveTask { get; set; }
             public string TaskKey { get; set; }
         }
