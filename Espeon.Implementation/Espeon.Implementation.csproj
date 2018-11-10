@@ -1,21 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net.Core" Version="2.0.0-beta2-01023" />
-    <PackageReference Include="Discord.Net.Rest" Version="2.0.0-beta2-01023" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.0-beta2-01023" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0-preview3-35497" />
@@ -23,12 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Espeon.Core\Espeon.Core.csproj" />
-    <ProjectReference Include="..\Espeon.Implementation\Espeon.Implementation.csproj" />
   </ItemGroup>
 
 </Project>

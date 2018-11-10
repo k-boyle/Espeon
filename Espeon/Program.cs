@@ -1,11 +1,11 @@
-﻿using System;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
 using Espeon.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +17,9 @@ namespace Espeon
     {
         private static async Task Main()
         {
-            var assembly = Assembly.GetEntryAssembly();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assembly = assemblies.SingleOrDefault(x => x.GetName().Name == "Espeon.Implementation");
+
             var types = assembly.FindTypesWithAttribute<ServiceAttribute>()
                 .Where(x => x.GetCustomAttribute<ServiceAttribute>().Implement).ToImmutableArray();
 

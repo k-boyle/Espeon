@@ -1,12 +1,12 @@
-﻿using Discord;
-using Espeon.Core.Attributes;
-using Microsoft.Extensions.DependencyInjection;
-using Qmmands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Discord;
+using Espeon.Core.Attributes;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 
 namespace Espeon.Core
 {
@@ -111,7 +111,7 @@ namespace Espeon.Core
         {
             return assembly.GetTypes().Where(x => x.GetCustomAttributes(typeof(T), true).Length > 0);
         }
-
+        
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
             var typeParserInterface = commands.GetType().Assembly.GetTypes()
