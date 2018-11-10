@@ -158,6 +158,9 @@ namespace Espeon.Implementation.Services
                 var found = _messageCache[context.Channel.Id][context.User.Id];
 
                 if (found is null)
+                    return;
+
+                if (found.Count == 0)
                 {
                     _messageCache[context.Channel.Id].Remove(context.User.Id, out _);
 
@@ -181,7 +184,8 @@ namespace Espeon.Implementation.Services
             } while (deleted < amount);
         }
 
-        private async Task<int> DeleteMessagesAsync(IEspeonContext context, bool manageMessages, IEnumerable<(string Key, CachedMessage Cached)> messages)
+        private async Task<int> DeleteMessagesAsync(IEspeonContext context, bool manageMessages,
+            IEnumerable<(string Key, CachedMessage Cached)> messages)
         {
             var fetchedMessages = new List<IMessage>();
 
