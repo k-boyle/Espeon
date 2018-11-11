@@ -47,8 +47,6 @@ namespace Espeon.Services
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
         }
 
-        
-
         Task IMessageService.HandleReceivedMessageAsync(SocketMessage msg)
             => msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
 
@@ -116,18 +114,9 @@ namespace Espeon.Services
             if (!(originalContext is EspeonContext context))
                 return;
 
-            var embed = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = new Color(result.IsSuccessful ? (uint)0xd1a9dd : 0xf31126),
-                Description = result.Message
-            };
+            var respone = ResponseBuilder.EspeonResult(context, result);
 
-            await SendMessageAsync(context, string.Empty, embed.Build());
+            await SendMessageAsync(context, string.Empty, respone);
             await _logger.LogAsync(new LogMessage(LogSeverity.Verbose, "Commands",
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}"));
         }

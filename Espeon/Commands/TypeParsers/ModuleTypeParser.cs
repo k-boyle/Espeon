@@ -12,7 +12,8 @@ namespace Espeon.Commands.TypeParsers
         {
             var commands = provider.GetService<CommandService>();
 
-            var module = commands.GetAllModules().FirstOrDefault(x => x.Name == value);
+            var module = commands.GetAllModules().SingleOrDefault(x =>
+                string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
             return Task.FromResult(module is null
                 ? new TypeParserResult<Module>($"Failed to find module: {value}")

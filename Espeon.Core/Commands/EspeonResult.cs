@@ -13,4 +13,12 @@ namespace Espeon.Core.Commands
             Message = message;
         }
     }
+
+    public class ContextResult
+    {
+        public static implicit operator CheckResult(ContextResult _)
+        {
+            return new CheckResult("Expect EspeonContext");
+        }
+    }
 }

@@ -18,14 +18,16 @@ namespace Espeon.Entities
         public CandyData Candies { get; set; }
     }
 
-    public class Reminder : IRemovable
+    public class Reminder : BaseReminder, IRemovable
     {
-        public string TheReminder { get; set; }
-        public string JumpUrl { get; set; }
-        public ulong ChannelId { get; set; }
-        public ulong UserId { get; set; }
+        public override string TheReminder { get; set; }
+        public override string JumpUrl { get; set; }
+        public override ulong GuildId { get; set; }
+        public override ulong ChannelId { get; set; }
+        public override ulong UserId { get; set; }
+        public override int Id { get; set; }
 
-        public int TaskKey { get; set; }
+        public string TaskKey { get; set; }
         public long WhenToRemove { get; set; }
     }
 

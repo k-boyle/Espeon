@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Core.Attributes;
+using Espeon.Core.Commands;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon
@@ -29,7 +29,7 @@ namespace Espeon
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Testeon"));
             await _client.StartAsync();
 
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().Single(x => x.GetName().Name == "Espeon.Core");
+            var assembly = typeof(IEspeonContext).Assembly;
             await _commands.AddModulesAsync(assembly);
         }
 

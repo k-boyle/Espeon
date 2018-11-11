@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using LiteDB;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
@@ -20,23 +18,30 @@ namespace Espeon.Services
         [Inject] private readonly ITimerService _timer;
 
         private readonly ConcurrentDictionary<ulong, DatabaseEntity> _cache;
-        private readonly SemaphoreSlim _semaphore;
+
+        private readonly SemaphoreSlim _getEntitySemaphore;
+        private readonly SemaphoreSlim _writeEntitySemaphore;
+        private readonly SemaphoreSlim _getAndCacheSemaphore;
+        private readonly SemaphoreSlim _getCollectionSemaphore;
 
         public DatabaseService()
         {
-           _cache = new ConcurrentDictionary<ulong, DatabaseEntity>(); 
-           _semaphore = new SemaphoreSlim(1, 1);
+            _cache = new ConcurrentDictionary<ulong, DatabaseEntity>();
+            _getEntitySemaphore = new SemaphoreSlim(1, 1);
+            _writeEntitySemaphore = new SemaphoreSlim(1, 1);
+            _getAndCacheSemaphore = new SemaphoreSlim(1, 1);
+            _getCollectionSemaphore = new SemaphoreSlim(1, 1);
         }
 
         public async Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
-            await _semaphore.WaitAsync();
+            await _getEntitySemaphore.WaitAsync();
 
             using (var db = new LiteDatabase(Dir))
             {
                 var dbCollection = db.GetCollection<T>(collection);
 
-                _semaphore.Release();
+                _getEntitySemaphore.Release();
 
                 return dbCollection.FindOne(x => x.Id == id);
             }
@@ -44,28 +49,34 @@ namespace Espeon.Services
 
         public async Task WriteAsync<T>(string collection, T entity) where T : DatabaseEntity
         {
-            await _semaphore.WaitAsync();
+            await _writeEntitySemaphore.WaitAsync();
 
             using (var db = new LiteDatabase(Dir))
             {
                 var dbCollection = db.GetCollection<T>(collection);
                 dbCollection.Upsert(entity);
 
-                _semaphore.Release();
-            }            
+                _writeEntitySemaphore.Release();
+            }
         }
 
         public async Task<T> GetAndCacheEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
-            await _semaphore.WaitAsync();
+            await _getAndCacheSemaphore.WaitAsync();
 
             if (_cache.TryGetValue(id, out var cached))
+            {
+                _getAndCacheSemaphore.Release();
                 return (T) cached;
+            }
 
             cached = await GetEntityAsync<T>(collection, id);
 
             if (cached is null)
+            {
+                _getAndCacheSemaphore.Release();
                 return null;
+            }
 
             cached.WhenToRemove = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds();
             await WriteAsync(collection, (T) cached);
@@ -73,7 +84,7 @@ namespace Espeon.Services
             _cache[id] = cached;
             await _timer.EnqueueAsync(cached, RemoveAsync);
 
-            _semaphore.Release();
+            _getAndCacheSemaphore.Release();
             return (T) cached;
         }
 
@@ -88,11 +99,11 @@ namespace Espeon.Services
 
         public async Task<ImmutableArray<T>> GetCollectionAsync<T>(string collection) where T : DatabaseEntity
         {
-            await _semaphore.WaitAsync();
+            await _getCollectionSemaphore.WaitAsync();
 
             using (var db = new LiteDatabase(Dir))
             {
-                _semaphore.Release();
+                _getCollectionSemaphore.Release();
                 return db.GetCollection<T>(collection).FindAll().ToImmutableArray();
             }
         }
