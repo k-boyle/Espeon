@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
@@ -19,33 +20,45 @@ namespace Espeon.Services
         [Inject] private readonly ITimerService _timer;
 
         private readonly ConcurrentDictionary<ulong, DatabaseEntity> _cache;
+        private readonly SemaphoreSlim _semaphore;
 
         public DatabaseService()
         {
            _cache = new ConcurrentDictionary<ulong, DatabaseEntity>(); 
+           _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
+        public async Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
+            await _semaphore.WaitAsync();
+
             using (var db = new LiteDatabase(Dir))
             {
                 var dbCollection = db.GetCollection<T>(collection);
-                return Task.FromResult(dbCollection.FindOne(x => x.Id == id));
+
+                _semaphore.Release();
+
+                return dbCollection.FindOne(x => x.Id == id);
             }
         }
 
-        public Task WriteAsync<T>(string collection, T entity) where T : DatabaseEntity
+        public async Task WriteAsync<T>(string collection, T entity) where T : DatabaseEntity
         {
+            await _semaphore.WaitAsync();
+
             using (var db = new LiteDatabase(Dir))
             {
                 var dbCollection = db.GetCollection<T>(collection);
                 dbCollection.Upsert(entity);
-                return Task.CompletedTask;
-            }
+
+                _semaphore.Release();
+            }            
         }
 
         public async Task<T> GetAndCacheEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
+            await _semaphore.WaitAsync();
+
             if (_cache.TryGetValue(id, out var cached))
                 return (T) cached;
 
@@ -60,6 +73,7 @@ namespace Espeon.Services
             _cache[id] = cached;
             await _timer.EnqueueAsync(cached, RemoveAsync);
 
+            _semaphore.Release();
             return (T) cached;
         }
 
@@ -72,11 +86,14 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        public Task<ImmutableArray<T>> GetCollectionAsync<T>(string collection) where T : DatabaseEntity
+        public async Task<ImmutableArray<T>> GetCollectionAsync<T>(string collection) where T : DatabaseEntity
         {
+            await _semaphore.WaitAsync();
+
             using (var db = new LiteDatabase(Dir))
             {
-                return Task.FromResult(db.GetCollection<T>(collection).FindAll().ToImmutableArray());
+                _semaphore.Release();
+                return db.GetCollection<T>(collection).FindAll().ToImmutableArray();
             }
         }
     }
