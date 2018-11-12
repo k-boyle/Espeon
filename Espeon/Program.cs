@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using Pusharp;
 using Qmmands;
 using System;
 using System.Collections.Immutable;
@@ -16,6 +17,8 @@ namespace Espeon
     {
         private static async Task Main()
         {
+            var config = Config.Create("./config.json");
+
             var assembly = Assembly.GetEntryAssembly();
             var types = assembly.FindTypesWithAttribute<ServiceAttribute>()
                 .Where(x => x.GetCustomAttribute<ServiceAttribute>().Implement).ToImmutableArray();
@@ -33,6 +36,12 @@ namespace Espeon
                     CaseSensitive = false
                 })
                     .AddTypeParsers(assembly))
+                .AddSingleton(new PushBulletClient(new PushBulletClientConfig
+                {
+                    LogLevel = LogLevel.Debug,
+                    UseCache = true,
+                    Token = config.PushbulletToken
+                }))
                 .AddSingleton<Random>()
                 .BuildServiceProvider()
                 .Inject(types)

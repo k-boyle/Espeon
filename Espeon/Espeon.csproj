@@ -17,10 +17,12 @@
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.0-beta2-01023" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0-preview3-35497" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1-beta1" />
     <PackageReference Include="Qmmands" Version="1.0.3-nightly-00071" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Pusharp\Pusharp\Pusharp.csproj" />
     <ProjectReference Include="..\Espeon.Core\Espeon.Core.csproj" />
   </ItemGroup>
 
