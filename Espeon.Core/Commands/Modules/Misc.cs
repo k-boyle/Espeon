@@ -9,6 +9,7 @@ namespace Espeon.Core.Commands.Modules
     public class Misc : EspeonBase
     {
         [Command("Ping")]
+        [Name("Ping")]
         public async Task PingAsync()
         {
             var latency = Context.Client.Latency;

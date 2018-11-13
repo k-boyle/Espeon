@@ -1,4 +1,6 @@
-﻿using Espeon.Core.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using Espeon.Core.Attributes;
 using Espeon.Core.Services;
 using Espeon.Entities;
 using Qmmands;
@@ -12,9 +14,15 @@ namespace Espeon.Services
     {
         [Inject] private readonly IDatabaseService _database;
         [Inject] private readonly CommandService _commands;
+        [Inject] private Random _random;
+
+        private Random Random => _random ?? (_random = new Random());
 
         public async Task OnBuildingAsync(ModuleBuilder moduleBuilder)
         {
+            if(string.IsNullOrWhiteSpace(moduleBuilder.Name))
+                throw new ArgumentNullException(nameof(moduleBuilder.Name));
+
             var modules = await _database.GetCollectionAsync<ModuleInfo>("modules");
             var foundModule = modules.FirstOrDefault(x => x.Name == moduleBuilder.Name);
 
@@ -22,12 +30,22 @@ namespace Espeon.Services
             {
                 foundModule = new ModuleInfo
                 {
-                    Name = moduleBuilder.Name,
-                    Commands = moduleBuilder.Commands.Select(x => new CommandInfo
-                    {
-                        Name = x.Name
-                    }).ToArray()
+                    Id = (ulong) Random.Next(),
+                    Name = moduleBuilder.Name
                 };
+
+                var list = new List<CommandInfo>();
+
+                foreach (var commandBuilder in moduleBuilder.Commands)
+                {
+                    if(string.IsNullOrWhiteSpace(commandBuilder.Name))
+                        throw new ArgumentNullException(nameof(commandBuilder.Name));
+
+                    list.Add(new CommandInfo
+                    {
+                        Name = commandBuilder.Name
+                    });
+                }
 
                 await _database.WriteAsync("modules", foundModule);
                 return;
@@ -37,6 +55,9 @@ namespace Espeon.Services
 
             foreach (var commandBuilder in moduleBuilder.Commands)
             {
+                if (string.IsNullOrWhiteSpace(commandBuilder.Name))
+                    throw new ArgumentNullException(nameof(commandBuilder.Name));
+
                 var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandBuilder.Name);
 
                 if (foundCommand is null)

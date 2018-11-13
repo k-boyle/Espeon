@@ -15,7 +15,6 @@ namespace Espeon
             { Discord.LogSeverity.Error, Severity.Error },
             { Discord.LogSeverity.Info, Severity.Info },
             { Discord.LogSeverity.Warning, Severity.Verbose },
-            { Discord.LogSeverity.Critical, Severity.Critical }
         };
 
         private static readonly IReadOnlyDictionary<Pusharp.LogLevel, Severity> PusharpSeverity =

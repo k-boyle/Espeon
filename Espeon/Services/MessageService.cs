@@ -102,9 +102,10 @@ namespace Espeon.Services
             }
 
             if (!string.IsNullOrWhiteSpace(result.Exception.ToString()))
-                await _logger.LogAsync(new LogMessage(LogSeverity.Error, "Commands", string.Empty, result.Exception));
+                await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, result.Exception);
         }
 
+        //TODO log non-EspeonResult
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
             ICommandContext originalContext, IServiceProvider services)
         {
@@ -117,8 +118,8 @@ namespace Espeon.Services
             var respone = ResponseBuilder.EspeonResult(context, result);
 
             await SendMessageAsync(context, string.Empty, respone);
-            await _logger.LogAsync(new LogMessage(LogSeverity.Verbose, "Commands",
-                $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}"));
+            await _logger.LogAsync(Source.Commands, Severity.Verbose,
+                $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
 
         Task<IUserMessage> IMessageService.SendMessageAsync(IEspeonContext context, string content, Embed embed)

@@ -6,6 +6,8 @@ using Espeon.Core.Commands;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using Espeon.Entities;
+using Pusharp;
+using Pusharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -22,9 +24,13 @@ namespace Espeon.Services
         [Inject] private readonly ITimerService _timer;
 
         [Inject] private readonly DiscordSocketClient _client;
+        [Inject] private readonly PushBulletClient _push;
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
+
+        private Device _phone;
+        private Device Phone => _phone ?? (_phone = _push.Devices.First());
 
         [Initialiser]
         public async Task LoadRemindersAsync()
@@ -45,8 +51,7 @@ namespace Espeon.Services
 
                     var newKey = await _timer.EnqueueAsync(reminder, RemoveAsync);
                     reminder.TaskKey = newKey;
-
-                    //TODO check this
+                    
                     await _database.WriteAsync("users", user);
                 }
             }
@@ -74,8 +79,11 @@ namespace Espeon.Services
 
             reminder.TaskKey = key;
 
-            var user = await _database.GetAndCacheEntityAsync<User>("users", context.User.Id);
-            
+            var user = await _database.GetAndCacheEntityAsync<User>("users", context.User.Id) ?? new User
+            {
+                Id = context.User.Id
+            };
+
             user.Reminders.Add(reminder);
             await _database.WriteAsync("users", user);
 
@@ -109,6 +117,17 @@ namespace Espeon.Services
         {
             var reminder = removable as Reminder;
 
+            var appInfo = await _client.GetApplicationInfoAsync();
+
+            if (reminder.UserId == appInfo.Owner.Id)
+            {
+                await Phone.SendNoteAsync(x =>
+                {
+                    x.Title = "Reminder!";
+                    x.Body = reminder.TheReminder;
+                });
+            }
+
             if (!(_client.GetGuild(reminder.GuildId) is SocketGuild guild))
                 return;
 
@@ -127,8 +146,8 @@ namespace Espeon.Services
 
             await _database.WriteAsync("users", dUser);
 
-            await _logger.LogAsync(new LogMessage(LogSeverity.Verbose, "Reminders",
-                $"Executed reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}"));
+            await _logger.LogAsync(Source.Reminders, Severity.Verbose,
+                $"Executed reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");
         }
 
         private static string ReminderString(string reminder, string jumpUrl)

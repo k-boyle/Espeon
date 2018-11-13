@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using Espeon.Core.Entities;
+﻿using Espeon.Core.Entities;
 using LiteDB;
+using System.Collections.Generic;
 
 namespace Espeon.Entities
 {
     public class ModuleInfo : DatabaseEntity
     {
-        [BsonId]
+        [BsonId(false)]
         public override ulong Id { get; set; }
 
         public string Name { get; set; }

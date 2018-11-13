@@ -14,6 +14,7 @@ namespace Espeon.Core.Commands.Modules
         public IReminderService ReminderService { get; set; }
 
         [Command]
+        [Name("Reminder")]
         public async Task<EspeonResult> CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
         {
             await ReminderService.CreateReminderAsync(Context, reminder, when);
@@ -23,6 +24,7 @@ namespace Espeon.Core.Commands.Modules
 
         //TODO Make better
         [Command("List")]
+        [Name("List Reminders")]
         public async Task<EspeonResult> ListRemindersAsync()
         {
             var reminders = await ReminderService.GetRemindersAsync(Context);

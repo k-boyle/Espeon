@@ -14,6 +14,7 @@ namespace Espeon.Core.Commands.Modules
         public IModuleManager Manager { get; set; }
 
         [Command("Add")]
+        [Name("Module Add Alias")]
         public override async Task<EspeonResult> AddAsync(Module target, string value)
         {
             var result = await Manager.AddAliasAsync(target, value);
@@ -21,6 +22,7 @@ namespace Espeon.Core.Commands.Modules
         }
 
         [Command("Remove")]
+        [Name("Module Remove Alias")]
         public override async Task<EspeonResult> RemoveAsync(Module target, string value)
         {
             var result = await Manager.RemoveAliasAsync(target, value);
@@ -36,6 +38,7 @@ namespace Espeon.Core.Commands.Modules
         public IModuleManager Manager { get; set; }
 
         [Command("Add")]
+        [Name("Command Add Alias")]
         public override async Task<EspeonResult> AddAsync(Command target, string value)
         {
             var result = await Manager.AddAliasAsync(target.Module, target.Name, value);
@@ -43,6 +46,7 @@ namespace Espeon.Core.Commands.Modules
         }
 
         [Command("Remove")]
+        [Name("Command Add Alias")]
         public override async Task<EspeonResult> RemoveAsync(Command target, string value)
         {
             var result = await Manager.RemoveAliasAsync(target.Module, target.Name, value);

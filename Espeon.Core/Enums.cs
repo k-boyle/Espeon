@@ -4,7 +4,8 @@
     {
         Commands,
         Discord,
-        Pusharp
+        Pusharp,
+        Reminders
     }
 
     public enum Severity

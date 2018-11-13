@@ -44,8 +44,7 @@ namespace Espeon
                 }))
                 .AddSingleton<Random>()
                 .BuildServiceProvider()
-                .Inject(types)
-                .RunInitialisers(types);
+                .Inject(types);
 
             var espeon = new EspeonStartup(services);
             services.Inject(espeon);
