@@ -1,30 +1,54 @@
-﻿using System.Threading.Tasks;
-using Espeon.Core.Attributes;
+﻿using Espeon.Core.Attributes;
 using Espeon.Core.Services;
+using Espeon.Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
     [Service(typeof(ICandyService), true)]
     public class CandyService : ICandyService
     {
-        public Task AddCandiesAsync(ulong id, int amount)
+        [Inject] private readonly IDatabaseService _database;
+        [Inject] private Random _random;
+
+        private Random Random => _random ?? (_random = new Random());
+
+        Task ICandyService.AddCandiesAsync(ulong id, int amount)
+            => UpdateCandiesAsync(id, amount);
+
+        Task ICandyService.RemoveCandiesAsync(ulong id, int amount)
+            => UpdateCandiesAsync(id, amount);
+
+        private async Task UpdateCandiesAsync(ulong id, int amount)
         {
-            throw new System.NotImplementedException();
+            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            user.Candies.Amount += amount;
+
+            await _database.WriteAsync("users", user);
         }
 
-        public Task RemoveCandiesAsync(ulong id, int amount)
+        public async Task ClaimCandiesAsync(ulong id)
         {
-            throw new System.NotImplementedException();
+            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            user.Candies.Amount += Random.Next(1, 11);
+            user.Candies.LastClaimed = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            await _database.WriteAsync("users", user);
         }
 
-        public Task ClaimCandiesAsync(ulong id)
+        public async Task<int> GetCandiesAsync(ulong id)
         {
-            throw new System.NotImplementedException();
+            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            return user.Candies.Amount;
         }
 
-        public Task<bool> CanClaimCandiesAsync(ulong id)
+        public async Task<bool> CanClaimCandiesAsync(ulong id)
         {
-            throw new System.NotImplementedException();
+            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            var lastClaimed = DateTimeOffset.FromUnixTimeMilliseconds(user.Candies.LastClaimed);
+
+            return DateTimeOffset.UtcNow - lastClaimed > TimeSpan.FromHours(8);
         }
     }
 }

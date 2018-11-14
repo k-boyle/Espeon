@@ -44,10 +44,10 @@ namespace Espeon.Entities
         public IList<CustomCommand> Commands { get; set; } = new List<CustomCommand>();
     }
 
-    public class CustomCommand
+    public class CustomCommand : BaseCustomCommand
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
+        public override string Name { get; set; }
+        public override string Value { get; set; }
     }
 
     public class Starboard

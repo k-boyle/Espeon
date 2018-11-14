@@ -7,6 +7,7 @@ namespace Espeon.Core.Services
         Task AddCandiesAsync(ulong id, int amount);
         Task RemoveCandiesAsync(ulong id, int amount);
         Task ClaimCandiesAsync(ulong id);
+        Task<int> GetCandiesAsync(ulong id);
         Task<bool> CanClaimCandiesAsync(ulong id);
     }
 }
