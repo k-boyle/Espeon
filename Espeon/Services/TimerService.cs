@@ -1,23 +1,18 @@
-﻿using System;
+﻿using Espeon.Core.Attributes;
+using Espeon.Core.Entities;
+using Espeon.Core.Services;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
 
 namespace Espeon.Services
 {
     [Service(typeof(ITimerService), true)]
     public class TimerService : ITimerService
     {
-        [Inject] private Random _random;
-
-        private Random Random => _random ?? (_random = new Random());
-
         private readonly Timer _timer;
         private ConcurrentQueue<TaskObject> _taskQueue;
 
@@ -40,7 +35,7 @@ namespace Espeon.Services
 
         private async Task<string> EnqueueAsync(IRemovable removable, Func<string, IRemovable, Task> removeTask, bool setTimer)
         {
-            var key = Random.GenerateKey();
+            var key = Guid.NewGuid().ToString();
             var task = new TaskObject
             {
                 Removable = removable,

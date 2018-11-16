@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
 using Espeon.Core.Attributes;
@@ -29,13 +29,17 @@ namespace Espeon.Services
 
         private Random Random => _random ?? (_random = new Random());
 
-        private readonly ConcurrentDictionary<ulong, Dictionary<ulong, Dictionary<string, CachedMessage>>> _messageCache;
+        private readonly
+            ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>>
+            _messageCache;
 
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
 
         public MessageService()
         {
-            _messageCache = new ConcurrentDictionary<ulong, Dictionary<ulong, Dictionary<string, CachedMessage>>>();
+            _messageCache =
+                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, 
+                    CachedMessage>>>();
         }
 
         [Initialiser]
@@ -129,10 +133,10 @@ namespace Espeon.Services
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
                 foundChannel = (_messageCache[context.Channel.Id] =
-                    new Dictionary<ulong, Dictionary<string, CachedMessage>>());
+                    new ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>());
 
             if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
-                foundCache = (foundChannel[context.User.Id] = new Dictionary<string, CachedMessage>());
+                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<string, CachedMessage>());
 
             var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
 
@@ -182,7 +186,7 @@ namespace Espeon.Services
         private Task RemoveAsync(string key, IRemovable removable)
         {
             var message = removable as CachedMessage;
-            _messageCache[message.ChannelId][message.UserId].Remove(key);
+            _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
 
             if (_messageCache[message.ChannelId][message.UserId].Count == 0)
                 _messageCache.Remove(message.UserId, out _);

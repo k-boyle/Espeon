@@ -34,6 +34,7 @@ namespace Espeon.Entities
     public class CandyData
     {
         public int Amount { get; set; }
+        public int Highest { get; set;  }
         public long LastClaimed { get; set; }
     }
 }

@@ -25,6 +25,9 @@ namespace Espeon.Services
             var user = await _database.GetAndCacheEntityAsync<User>("users", id);
             user.Candies.Amount += amount;
 
+            if (user.Candies.Highest < user.Candies.Amount)
+                user.Candies.Highest = user.Candies.Amount;
+
             await _database.WriteAsync("users", user);
         }
 
@@ -32,6 +35,10 @@ namespace Espeon.Services
         {
             var user = await _database.GetAndCacheEntityAsync<User>("users", id);
             user.Candies.Amount += Random.Next(1, 11);
+
+            if (user.Candies.Highest < user.Candies.Amount)
+                user.Candies.Highest = user.Candies.Amount;
+
             user.Candies.LastClaimed = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             await _database.WriteAsync("users", user);
