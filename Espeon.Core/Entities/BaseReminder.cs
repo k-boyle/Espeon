@@ -9,6 +9,6 @@
         public abstract ulong UserId { get; set; }
         public abstract int Id { get; set; }
 
-        public long WhenToRemove { get; }
+        public long WhenToRemove { get; set; }
     }
 }

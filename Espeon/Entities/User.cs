@@ -28,7 +28,6 @@ namespace Espeon.Entities
         public override int Id { get; set; }
 
         public string TaskKey { get; set; }
-        public long WhenToRemove { get; set; }
     }
 
     public class CandyData
