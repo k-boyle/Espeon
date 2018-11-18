@@ -1,6 +1,10 @@
 using System.Threading.Tasks;
 using Qmmands;
-public interface IResponseService
+
+namespace Espeon.Core.Services
 {
-    Task<string> GetResponseAsync(Module module, Command command);
+    public interface IResponseService
+    {
+        Task<string> GetResponseAsync(Module module, Command command);
+    }
 }

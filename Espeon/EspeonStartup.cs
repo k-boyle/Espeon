@@ -58,10 +58,7 @@ namespace Espeon
                 _completionSource.SetResult(Task.CompletedTask);
                 return Task.CompletedTask;
             };
-
-            var module = _services.GetService<IModuleManager>();
-            _commands.ModuleBuilding += module.OnBuildingAsync;
-
+            
             var logger = _services.GetService<ILogService>();
             _client.Log += async log =>
             {

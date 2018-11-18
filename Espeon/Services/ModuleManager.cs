@@ -18,7 +18,12 @@ namespace Espeon.Services
 
         private Random Random => _random ?? (_random = new Random());
 
-        public async Task OnBuildingAsync(ModuleBuilder moduleBuilder)
+        public ModuleManager()
+        {
+            _commands.ModuleBuilding += OnBuildingAsync;
+        }
+
+        private async Task OnBuildingAsync(ModuleBuilder moduleBuilder)
         {
             if(string.IsNullOrWhiteSpace(moduleBuilder.Name))
                 throw new ArgumentNullException(nameof(moduleBuilder.Name));
