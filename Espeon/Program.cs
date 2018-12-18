@@ -46,7 +46,7 @@ namespace Espeon
                 .BuildServiceProvider()
                 .Inject(types);
 
-            var espeon = new EspeonStartup(services);
+            var espeon = new EspeonStartup(services, config);
             services.Inject(espeon);
             await espeon.StartBotAsync();
 

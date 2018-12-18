@@ -15,4 +15,11 @@ namespace Espeon.Core
         {
         }
     }
+
+    public class QuahuLiedException : Exception
+    {
+        public QuahuLiedException(string message) : base($"QUAHU CANNOT BE TRUSTED: {message}")
+        {
+        }
+    }
 }

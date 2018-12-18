@@ -79,7 +79,7 @@ namespace Espeon.Services
 
             reminder.TaskKey = key;
 
-            var user = await _database.GetAndCacheEntityAsync<User>("users", context.User.Id) ?? new User
+            var user = await _database.GetEntityAsync<User>("users", context.User.Id) ?? new User
             {
                 Id = context.User.Id
             };
@@ -97,7 +97,7 @@ namespace Espeon.Services
         {
             await _timer.RemoveAsync(reminder.TaskKey);
 
-            var user = await _database.GetAndCacheEntityAsync<User>("users", reminder.UserId);
+            var user = await _database.GetEntityAsync<User>("users", reminder.UserId);
             user.Reminders = user.Reminders.Where(x => x.TaskKey != reminder.TaskKey).ToList();
 
             await _database.WriteAsync("users", user);
@@ -108,7 +108,7 @@ namespace Espeon.Services
 
         private async Task<IReadOnlyCollection<Reminder>> GetRemindersAsync(IEspeonContext context)
         {
-            var user = await _database.GetAndCacheEntityAsync<User>("users", context.User.Id);
+            var user = await _database.GetEntityAsync<User>("users", context.User.Id);
 
             return user.Reminders.ToImmutableList();
         }
@@ -141,7 +141,7 @@ namespace Espeon.Services
 
             await channel.SendMessageAsync(user.Mention, embed: embed);
 
-            var dUser = await _database.GetAndCacheEntityAsync<User>("users", user.Id);
+            var dUser = await _database.GetEntityAsync<User>("users", user.Id);
             dUser.Reminders = dUser.Reminders.Where(x => x.TaskKey != taskKey).ToList();
 
             await _database.WriteAsync("users", dUser);

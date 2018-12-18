@@ -159,16 +159,6 @@ namespace Espeon.Core
             return true;
         }
 
-        public static string GenerateKey(this Random random)
-        {
-            var builder = new StringBuilder();
-
-            for (var i = 0; i < 10; i++)
-                builder.Append((char) random.Next(127));
-
-            return builder.ToString();
-        }
-
         public static string GetAvatarOrDefaultUrl(this IGuildUser user)
         {
             return user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();

@@ -25,9 +25,6 @@ namespace Espeon.Services
         [Inject] private readonly ILogService _logger;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly ITimerService _timer;
-        [Inject] private Random _random;
-
-        private Random Random => _random ?? (_random = new Random());
 
         private readonly
             ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>>
@@ -60,7 +57,7 @@ namespace Espeon.Services
                 message.Channel is IPrivateChannel) return;
 
             var context = new EspeonContext(_client, message, isEdit);
-            var guild = await _database.GetAndCacheEntityAsync<Guild>("guilds", context.Guild.Id);
+            var guild = await _database.GetEntityAsync<Guild>("guilds", context.Guild.Id);
 
             if (guild is null)
             {
@@ -77,51 +74,63 @@ namespace Espeon.Services
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                     out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
             {
-                await _commands.ExecuteAsync(output, context, _services);
+                var result = await _commands.ExecuteAsync(output, context, _services);
+
+                if (!result.IsSuccessful)
+                    await CommandErroredAsync(result as FailedResult, context, _services);
             }
         }
 
-        private async Task CommandErroredAsync(ExecutionFailedResult result, ICommandContext originalContext, IServiceProvider services)
+        private async Task CommandErroredAsync(FailedResult result, ICommandContext originalContext, IServiceProvider services)
         {
             if (!(originalContext is EspeonContext context))
                 return;
 
-            switch (result.CommandExecutionStep)
+            Embed response = null;
+
+            switch (result)
             {
-                case CommandExecutionStep.Checks:
+                case ArgumentParseFailedResult argumentParseFailedResult:
+                    response = argumentParseFailedResult.GenerateResponse(context);
                     break;
 
-                case CommandExecutionStep.ArgumentParsing:
+                case ChecksFailedResult checksFailedResult:
+                    response = checksFailedResult.GenerateResponse(context);
                     break;
 
-                case CommandExecutionStep.TypeParsing:
+                //TODO
+                case CommandOnCooldownResult commandOnCooldownResult:
                     break;
 
-                case CommandExecutionStep.BeforeExecuted:
+                case ExecutionFailedResult executionFailedResult:
+                    response = executionFailedResult.GenerateResponse(context);
+
+                    await _logger.LogAsync(Source.Commands, Severity.Critical, executionFailedResult.Reason,
+                        executionFailedResult.Exception);
                     break;
 
-                case CommandExecutionStep.Command:
-                    
+                case OverloadsFailedResult overloadsFailedResult:
+                    response = overloadsFailedResult.GenerateResponse(context);
+                    break;
+
+                case ParameterChecksFailedResult parameterChecksFailedResult:
+                    response = parameterChecksFailedResult.GenerateResponse(context);
+                    break;
+
+                case TypeParseFailedResult typeParseFailedResult:
+                    response = typeParseFailedResult.GenerateResponse(context);
                     break;
             }
 
-            if (!string.IsNullOrWhiteSpace(result.Exception.ToString()))
-                await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, result.Exception);
+            await SendMessageAsync(context, string.Empty, response);
         }
 
-        //TODO log non-EspeonResult
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
             ICommandContext originalContext, IServiceProvider services)
         {
-            if (!(originalResult is EspeonResult result))
-                return;
-
             if (!(originalContext is EspeonContext context))
                 return;
-
-            var respone = ResponseBuilder.EspeonResult(context, result);
-
-            await SendMessageAsync(context, string.Empty, respone);
+            
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Espeon.Core.Attributes;
+﻿using Espeon.Core.Attributes;
 using Espeon.Core.Services;
 using Espeon.Entities;
 using Qmmands;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,8 +17,9 @@ namespace Espeon.Services
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
-
-        public ModuleManager()
+        
+        [Initialiser]
+        public void Initialiser()
         {
             _commands.ModuleBuilding += OnBuildingAsync;
         }
@@ -56,7 +57,7 @@ namespace Espeon.Services
                 return;
             }
 
-            moduleBuilder.AddAliases(foundModule.Aliases);
+            moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
 
             foreach (var commandBuilder in moduleBuilder.Commands)
             {
@@ -77,7 +78,7 @@ namespace Espeon.Services
                     continue;
                 }
 
-                commandBuilder.AddAliases(foundCommand.Aliases);
+                commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
             }
         }
 

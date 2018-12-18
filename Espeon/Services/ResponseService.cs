@@ -1,14 +1,15 @@
 using Espeon.Core.Attributes;
 using Espeon.Core.Services;
+using Newtonsoft.Json;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Espeon.Services
 {
+    //TODO ALL OF THIS
     [Service(typeof(IResponseService), true)]
     public class ResponseService : IResponseService
     {
@@ -17,7 +18,7 @@ namespace Espeon.Services
         private readonly IDictionary<string, Dictionary<string, Dictionary<string, string>>> _responseMap;
 
         public ResponseService()
-        {            
+        {
             _responseMap = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
         }
 
@@ -30,28 +31,29 @@ namespace Espeon.Services
 
         public Task OnCommandsRegisteredAsync(IEnumerable<Module> modules)
         {
+            /*
             var loadedMap = JsonConvert
                 .DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, string>>>>
                 (File.ReadAllText(MapDir));
 
-            foreach(var module in modules)
+            foreach (var module in modules)
             {
-                if(string.IsNullOrWhiteSpace(module.Name))
+                if (string.IsNullOrWhiteSpace(module.Name))
                     throw new ArgumentNullException(nameof(module.Name));
 
-                if(!loadedMap.ContainsKey(module.Name))
+                if (!loadedMap.ContainsKey(module.Name))
                     loadedMap[module.Name] = new Dictionary<string, Dictionary<string, string>>();
 
                 _responseMap.Add(module.Name, new Dictionary<string, Dictionary<string, string>>());
 
                 var commands = module.Commands;
 
-                foreach(var command in commands)
+                foreach (var command in commands)
                 {
-                    if(string.IsNullOrWhiteSpace(command.Name))
-                        throw new ArgumentNullException(nameof(command.Name));                    
+                    if (string.IsNullOrWhiteSpace(command.Name))
+                        throw new ArgumentNullException(nameof(command.Name));
 
-                    if(!loadedMap[module.Name].ContainsKey(command.Name))
+                    if (!loadedMap[module.Name].ContainsKey(command.Name))
                         loadedMap[module.Name][command.Name] = new Dictionary<string, string>();
 
                     _responseMap[module.Name][command.Name] = loadedMap[module.Name][command.Name];
@@ -59,6 +61,7 @@ namespace Espeon.Services
             }
 
             File.WriteAllText(MapDir, JsonConvert.SerializeObject(loadedMap));
+            */
 
             return Task.CompletedTask;
         }

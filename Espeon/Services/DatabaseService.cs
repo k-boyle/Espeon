@@ -33,7 +33,7 @@ namespace Espeon.Services
             _getCollectionSemaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
+        private async Task<T> LoadEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
             await _getEntitySemaphore.WaitAsync();
 
@@ -60,7 +60,7 @@ namespace Espeon.Services
             }
         }
 
-        public async Task<T> GetAndCacheEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
+        public async Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
             await _getAndCacheSemaphore.WaitAsync();
 
@@ -70,7 +70,7 @@ namespace Espeon.Services
                 return (T) cached;
             }
 
-            cached = await GetEntityAsync<T>(collection, id);
+            cached = await LoadEntityAsync<T>(collection, id);
 
             if (cached is null)
             {

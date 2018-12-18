@@ -2,35 +2,16 @@
 using Espeon.Core.Services;
 using Qmmands;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Commands.Modules
 {
-    [Name("Reminder")]
-    [Group("Reminder")]
-    public class Reminder : EspeonBase
+    public abstract class Reminder : EspeonBase
     {
-        public IReminderService ReminderService { get; set; }
+        public abstract IReminderService ReminderService { get; set; }
 
-        [Command]
-        [Name("Reminder")]
-        public async Task<EspeonResult> CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
-        {
-            await ReminderService.CreateReminderAsync(Context, reminder, when);
+        public abstract Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder);
 
-            return new EspeonResult(true, "Reminder has been created!");
-        }
-
-        //TODO Make better
-        [Command("List")]
-        [Name("List Reminders")]
-        public async Task<EspeonResult> ListRemindersAsync()
-        {
-            var reminders = await ReminderService.GetRemindersAsync(Context);
-            var ordered = reminders.OrderBy(x => x.WhenToRemove);
-            
-            return new EspeonResult(true, string.Join('\n', ordered.Select(x => $"{x.Id}: {x.TheReminder}")));
-        }
+        public abstract Task ListRemindersAsync();
     }
 }

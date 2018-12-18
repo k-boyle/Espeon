@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Core;
 using Espeon.Core.Attributes;
-using Espeon.Core.Commands;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
@@ -11,7 +11,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Espeon.Core;
 
 namespace Espeon
 {
@@ -23,14 +22,17 @@ namespace Espeon
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly PushBulletClient _push;
 
+        private readonly Config _config;
+
         private Device _phone;
         private Device Phone => _phone ?? (_phone = _push.Devices.First());
 
         private readonly TaskCompletionSource<Task> _completionSource;
 
-        public EspeonStartup(IServiceProvider services)
+        public EspeonStartup(IServiceProvider services, Config config)
         {
             _services = services;
+            _config = config;
             _completionSource = new TaskCompletionSource<Task>();
         }
 
@@ -38,12 +40,14 @@ namespace Espeon
         {
             EventHooks();
 
-            var assembly = typeof(IEspeonContext).Assembly;
-            await _commands.AddModulesAsync(assembly);
+            var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+
+            var response = _services.GetService<IResponseService>();
+            await response.OnCommandsRegisteredAsync(modules);
 
             await _push.ConnectAsync();
 
-            await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("Testeon"));
+            await _client.LoginAsync(TokenType.Bot, _config.DiscordToken);
             await _client.StartAsync();
 
             await _completionSource.Task;

@@ -22,7 +22,7 @@ namespace Espeon.Services
 
         private async Task UpdateCandiesAsync(ulong id, int amount)
         {
-            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            var user = await _database.GetEntityAsync<User>("users", id);
             user.Candies.Amount += amount;
 
             if (user.Candies.Highest < user.Candies.Amount)
@@ -33,7 +33,7 @@ namespace Espeon.Services
 
         public async Task ClaimCandiesAsync(ulong id)
         {
-            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            var user = await _database.GetEntityAsync<User>("users", id);
             user.Candies.Amount += Random.Next(1, 11);
 
             if (user.Candies.Highest < user.Candies.Amount)
@@ -46,13 +46,13 @@ namespace Espeon.Services
 
         public async Task<int> GetCandiesAsync(ulong id)
         {
-            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            var user = await _database.GetEntityAsync<User>("users", id);
             return user.Candies.Amount;
         }
 
         public async Task<bool> CanClaimCandiesAsync(ulong id)
         {
-            var user = await _database.GetAndCacheEntityAsync<User>("users", id);
+            var user = await _database.GetEntityAsync<User>("users", id);
             var lastClaimed = DateTimeOffset.FromUnixTimeMilliseconds(user.Candies.LastClaimed);
 
             return DateTimeOffset.UtcNow - lastClaimed > TimeSpan.FromHours(8);

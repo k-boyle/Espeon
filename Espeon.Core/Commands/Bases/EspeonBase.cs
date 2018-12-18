@@ -9,6 +9,11 @@ namespace Espeon.Core.Commands.Bases
     {
         public IMessageService Message { get; set; }
 
+        protected Task<IUserMessage> SendMessageAsync(Embed embed)
+        {
+            return SendMessageAsync(string.Empty, embed);
+        }
+
         protected Task<IUserMessage> SendMessageAsync(string content, Embed embed = null)
         {
             return Message.SendMessageAsync(Context, content, embed);
