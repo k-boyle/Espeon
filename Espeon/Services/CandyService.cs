@@ -3,10 +3,11 @@ using Espeon.Core.Services;
 using Espeon.Entities;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ICandyService), true)]
+    [Service(typeof(ICandyService), ServiceLifetime.Singleton, true)]
     public class CandyService : ICandyService
     {
         [Inject] private readonly IDatabaseService _database;
@@ -28,7 +29,7 @@ namespace Espeon.Services
             if (user.Candies.Highest < user.Candies.Amount)
                 user.Candies.Highest = user.Candies.Amount;
 
-            await _database.WriteAsync("users", user);
+            await _database.WriteEntityAsync("users", user);
         }
 
         public async Task ClaimCandiesAsync(ulong id)
@@ -41,7 +42,7 @@ namespace Espeon.Services
 
             user.Candies.LastClaimed = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            await _database.WriteAsync("users", user);
+            await _database.WriteEntityAsync("users", user);
         }
 
         public async Task<int> GetCandiesAsync(ulong id)

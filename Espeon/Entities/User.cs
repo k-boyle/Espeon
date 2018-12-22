@@ -13,6 +13,8 @@ namespace Espeon.Entities
         
         public override long WhenToRemove { get; set; }
 
+        public string ResponsePack { get; set; } = "default";
+
         public IList<Reminder> Reminders { get; set; } = new List<Reminder>();
 
         public CandyData Candies { get; set; }

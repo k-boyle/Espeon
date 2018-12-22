@@ -24,11 +24,6 @@ namespace Espeon.Core
             return builder.Build();
         }
 
-        public static Embed EspeonResult(IEspeonContext context, EspeonResult result)
-        {
-            return Embed(context.User, result.Message, result.IsSuccessful);
-        }
-
         public static Embed Message(IEspeonContext context, string message, bool isGood = true)
         {
             return Embed(context.User, message, isGood);

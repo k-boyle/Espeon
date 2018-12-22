@@ -1,19 +1,24 @@
 using Espeon.Core.Attributes;
 using Espeon.Core.Services;
+using Espeon.Entities;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    //TODO ALL OF THIS
-    [Service(typeof(IResponseService), true)]
+    [Service(typeof(IResponseService), ServiceLifetime.Singleton, true)]
     public class ResponseService : IResponseService
     {
         private const string MapDir = "./commands.json";
+
+        [Inject] private readonly IDatabaseService _database;
 
         private readonly IDictionary<string, Dictionary<string, Dictionary<string, string>>> _responseMap;
 
@@ -22,19 +27,23 @@ namespace Espeon.Services
             _responseMap = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
         }
 
-        public async Task<string> GetResponseAsync(Module module, Command command, string pack = "default", params string[] @params)
+        public Task<string> GetResponseAsync(Module module, Command command, string pack = "default", params object[] @params)
         {
             var response = _responseMap[module.Name][command.Name][pack];
-            //TODO interpolation
-            return response ?? "No response found";
+
+            if (@params.Length > 0)
+            {
+                response = string.Format(response, @params);
+            }
+
+            return Task.FromResult(response ?? "No response found");
         }
 
         public Task OnCommandsRegisteredAsync(IEnumerable<Module> modules)
         {
-            /*
             var loadedMap = JsonConvert
                 .DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, string>>>>
-                (File.ReadAllText(MapDir));
+                (File.ReadAllText(MapDir)) ?? new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
 
             foreach (var module in modules)
             {
@@ -60,10 +69,24 @@ namespace Espeon.Services
                 }
             }
 
-            File.WriteAllText(MapDir, JsonConvert.SerializeObject(loadedMap));
-            */
+            File.WriteAllText(MapDir, JsonConvert.SerializeObject(loadedMap, Formatting.Indented));
 
             return Task.CompletedTask;
+        }
+
+        public async Task<string> GetUsersPackAsync(ulong id)
+        {
+            var user = await _database.GetEntityAsync<User>("users", id);
+            return user.ResponsePack;
+        }
+
+        public Task<ImmutableArray<string>> GetResponsesPacksAsync()
+        {
+            var commandMaps = _responseMap.Values;
+            var responseMaps = commandMaps.SelectMany(x => x.Values);
+            var responsePacks = responseMaps.SelectMany(x => x.Keys);
+
+            return Task.FromResult(responsePacks.ToImmutableArray());
         }
     }
 }

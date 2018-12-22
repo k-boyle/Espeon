@@ -19,9 +19,10 @@ namespace Espeon.Commands.Modules
         {
             await ReminderService.CreateReminderAsync(Context, reminder, when);
 
-            var response = ResponseBuilder.Message(Context, "Reminder has been set");
+            var response = await Response.GetResponseAsync(Module, Command, ResponsePack);
+            var embed = ResponseBuilder.Message(Context, response);
 
-            await SendMessageAsync(response);
+            await SendMessageAsync(embed);
         }
 
         //TODO Make better

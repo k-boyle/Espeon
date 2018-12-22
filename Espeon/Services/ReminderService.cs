@@ -13,10 +13,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IReminderService), true)]
+    [Service(typeof(IReminderService), ServiceLifetime.Singleton, true)]
     public class ReminderService : IReminderService
     {
         [Inject] private readonly IDatabaseService _database;
@@ -52,7 +53,7 @@ namespace Espeon.Services
                     var newKey = await _timer.EnqueueAsync(reminder, RemoveAsync);
                     reminder.TaskKey = newKey;
                     
-                    await _database.WriteAsync("users", user);
+                    await _database.WriteEntityAsync("users", user);
                 }
             }
 
@@ -85,7 +86,7 @@ namespace Espeon.Services
             };
 
             user.Reminders.Add(reminder);
-            await _database.WriteAsync("users", user);
+            await _database.WriteEntityAsync("users", user);
 
             return reminder;
         }
@@ -100,17 +101,14 @@ namespace Espeon.Services
             var user = await _database.GetEntityAsync<User>("users", reminder.UserId);
             user.Reminders = user.Reminders.Where(x => x.TaskKey != reminder.TaskKey).ToList();
 
-            await _database.WriteAsync("users", user);
+            await _database.WriteEntityAsync("users", user);
         }
-
-        async Task<IReadOnlyCollection<BaseReminder>> IReminderService.GetRemindersAsync(IEspeonContext context)
-            => await GetRemindersAsync(context);
-
-        private async Task<IReadOnlyCollection<Reminder>> GetRemindersAsync(IEspeonContext context)
+        
+        public async Task<ImmutableArray<BaseReminder>> GetRemindersAsync(IEspeonContext context)
         {
             var user = await _database.GetEntityAsync<User>("users", context.User.Id);
 
-            return user.Reminders.ToImmutableList();
+            return user.Reminders.Cast<BaseReminder>().ToImmutableArray();
         }
 
         private async Task RemoveAsync(string taskKey, IRemovable removable)
@@ -144,7 +142,7 @@ namespace Espeon.Services
             var dUser = await _database.GetEntityAsync<User>("users", user.Id);
             dUser.Reminders = dUser.Reminders.Where(x => x.TaskKey != taskKey).ToList();
 
-            await _database.WriteAsync("users", dUser);
+            await _database.WriteEntityAsync("users", dUser);
 
             await _logger.LogAsync(Source.Reminders, Severity.Verbose,
                 $"Executed reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");

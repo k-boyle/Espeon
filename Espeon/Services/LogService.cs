@@ -1,16 +1,17 @@
 ﻿using Espeon.Core;
 using Espeon.Core.Attributes;
 using Espeon.Core.Services;
+using Pusharp;
+using Pusharp.Entities;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Pusharp;
-using Pusharp.Entities;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ILogService), true)]
+    [Service(typeof(ILogService), ServiceLifetime.Singleton, true)]
     public class LogService : ILogService
     {
         [Inject] private readonly PushBulletClient _push;
@@ -37,11 +38,6 @@ namespace Espeon.Services
             {
                 case Severity.Critical:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    await Phone.SendNoteAsync(x =>
-                    {
-                        x.Title = "Critical Error";
-                        x.Body = $"{message}\n{ex}";
-                    });
                     break;
                 case Severity.Error:
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -79,6 +75,17 @@ namespace Espeon.Services
 
             Console.WriteLine();
             _semaphore.Release();
+
+#if !DEBUG
+            if (severity == Severity.Critical)
+            {
+                await Phone.SendNoteAsync(x =>
+                {
+                    x.Title = "Critical Error";
+                    x.Body = $"{message}\n{ex}";
+                });
+            }
+#endif
         }
     }
 }

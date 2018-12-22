@@ -1,111 +1,63 @@
-using Espeon.Core.Attributes;
+﻿using Espeon.Core.Attributes;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using LiteDB;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IDatabaseService), true)]
-    public class DatabaseService : IDatabaseService
+    [Service(typeof(IDatabaseService), ServiceLifetime.Transient, true)]
+    public class DatabaseService : IDatabaseService, IDisposable
     {
         private const string Dir = "./Database.db";
+        private readonly LiteDatabase _database;
+        private readonly SemaphoreSlim _semaphore;
 
-        [Inject] private readonly ITimerService _timer;
-
-        private readonly ConcurrentDictionary<ulong, DatabaseEntity> _cache;
-
-        private readonly SemaphoreSlim _getEntitySemaphore;
-        private readonly SemaphoreSlim _writeEntitySemaphore;
-        private readonly SemaphoreSlim _getAndCacheSemaphore;
-        private readonly SemaphoreSlim _getCollectionSemaphore;
-
-        public DatabaseService()
+        public DatabaseService(LiteDatabase database)
         {
-            _cache = new ConcurrentDictionary<ulong, DatabaseEntity>();
-            _getEntitySemaphore = new SemaphoreSlim(1, 1);
-            _writeEntitySemaphore = new SemaphoreSlim(1, 1);
-            _getAndCacheSemaphore = new SemaphoreSlim(1, 1);
-            _getCollectionSemaphore = new SemaphoreSlim(1, 1);
-        }
-
-        private async Task<T> LoadEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
-        {
-            await _getEntitySemaphore.WaitAsync();
-
-            using (var db = new LiteDatabase(Dir))
-            {
-                var dbCollection = db.GetCollection<T>(collection);
-
-                _getEntitySemaphore.Release();
-
-                return dbCollection.FindOne(x => x.Id == id);
-            }
-        }
-
-        public async Task WriteAsync<T>(string collection, T entity) where T : DatabaseEntity
-        {
-            await _writeEntitySemaphore.WaitAsync();
-
-            using (var db = new LiteDatabase(Dir))
-            {
-                var dbCollection = db.GetCollection<T>(collection);
-                dbCollection.Upsert(entity);
-
-                _writeEntitySemaphore.Release();
-            }
+            _database = database;
+            _semaphore = new SemaphoreSlim(1);
         }
 
         public async Task<T> GetEntityAsync<T>(string collection, ulong id) where T : DatabaseEntity
         {
-            await _getAndCacheSemaphore.WaitAsync();
+            await _semaphore.WaitAsync();
 
-            if (_cache.TryGetValue(id, out var cached))
-            {
-                _getAndCacheSemaphore.Release();
-                return (T) cached;
-            }
+            var dbCollection = _database.GetCollection<T>(collection);
 
-            cached = await LoadEntityAsync<T>(collection, id);
+            _semaphore.Release();
 
-            if (cached is null)
-            {
-                _getAndCacheSemaphore.Release();
-                return null;
-            }
-
-            cached.WhenToRemove = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeMilliseconds();
-            await WriteAsync(collection, (T) cached);
-
-            _cache[id] = cached;
-            await _timer.EnqueueAsync(cached, RemoveAsync);
-
-            _getAndCacheSemaphore.Release();
-            return (T) cached;
+            return dbCollection.FindOne(x => x.Id == id);
         }
 
-        private Task RemoveAsync(string __, IRemovable removable)
+        public async Task WriteEntityAsync<T>(string collection, T entity) where T : DatabaseEntity
         {
-            var entity = removable as DatabaseEntity;
-            //shouldn't nullref
-            _cache.TryRemove(entity.Id, out _);
+            await _semaphore.WaitAsync();
 
-            return Task.CompletedTask;
+            var dbCollection = _database.GetCollection<T>(collection);
+            dbCollection.Upsert(entity);
+
+            _semaphore.Release();
         }
 
         public async Task<ImmutableArray<T>> GetCollectionAsync<T>(string collection) where T : DatabaseEntity
         {
-            await _getCollectionSemaphore.WaitAsync();
+            await _semaphore.WaitAsync();
 
-            using (var db = new LiteDatabase(Dir))
-            {
-                _getCollectionSemaphore.Release();
-                return db.GetCollection<T>(collection).FindAll().ToImmutableArray();
-            }
+            var dbCollection = _database.GetCollection<T>(collection);
+
+            _semaphore.Release();
+
+            return dbCollection.FindAll().ToImmutableArray();
+        }
+
+        public void Dispose()
+        {
+            _database?.Dispose();
         }
     }
 }

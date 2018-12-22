@@ -1,5 +1,4 @@
-﻿using Espeon.Core.Commands.Checks;
-using Espeon.Core.Services;
+﻿using Espeon.Core.Services;
 using Qmmands;
 using System.Threading.Tasks;
 using Base = Espeon.Core.Commands.Modules;
@@ -8,7 +7,7 @@ namespace Espeon.Commands.Modules
 {
     [Name("Module Management")]
     [Group("Module")]
-    [RequireOwner]
+    [Checks.RequireOwner]
     public class ModuleManagement : Base.ModuleManagement
     {
         public override IModuleManager Manager { get; set; }
@@ -40,7 +39,7 @@ namespace Espeon.Commands.Modules
 
     [Name("Command Management")]
     [Group("Command")]
-    [RequireOwner]
+    [Checks.RequireOwner]
     public class CommandManagement : Base.CommandManagement
     {
         public override IModuleManager Manager { get; set; }
@@ -58,7 +57,7 @@ namespace Espeon.Commands.Modules
         }
 
         [Command("Remove")]
-        [Name("Command Add Alias")]
+        [Name("Command Remove Alias")]
         public override async Task RemoveAsync(Command target, string value)
         {
             var result = await Manager.RemoveAliasAsync(target.Module, target.Name, value);

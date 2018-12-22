@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Espeon.Core.Commands;
+﻿using Espeon.Core.Commands;
 using Espeon.Core.Entities;
+using System;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace Espeon.Core.Services
 {
@@ -11,6 +10,6 @@ namespace Espeon.Core.Services
     {
         Task<BaseReminder> CreateReminderAsync(IEspeonContext context, string content, TimeSpan when);
         Task CancelReminderAsync (IEspeonContext context, BaseReminder removable);
-        Task<IReadOnlyCollection<BaseReminder>> GetRemindersAsync(IEspeonContext context);
+        Task<ImmutableArray<BaseReminder>> GetRemindersAsync(IEspeonContext context);
     }
 }

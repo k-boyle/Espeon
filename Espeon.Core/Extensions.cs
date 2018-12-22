@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Discord;
+﻿using Discord;
 using Espeon.Core.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Espeon.Core
 {
@@ -20,8 +19,16 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var attribute = type.GetCustomAttribute<ServiceAttribute>();
-                var target = attribute.Generic is null ? attribute.Target : attribute.Target.MakeGenericType(attribute.Generic);
-                collection.AddSingleton(target, type);
+
+                switch (attribute.Lifetime)
+                {
+                    case ServiceLifetime.Singleton:
+                        collection.AddSingleton(attribute.Target, type);
+                        break;
+                    case ServiceLifetime.Transient:
+                        collection.AddTransient(attribute.Target, type);
+                        break;
+                }
             }
 
             return collection;
@@ -35,8 +42,7 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var attribute = type.GetCustomAttribute<ServiceAttribute>();
-                var target = attribute.Generic is null ? attribute.Target : attribute.Target.MakeGenericType(attribute.Generic);
-                var service = services.GetService(target);
+                var service = services.GetService(attribute.Target);
 
                 Inject(services, service);
             }
@@ -90,8 +96,7 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
-                var target = serviceAtt.Generic is null ? serviceAtt.Target : serviceAtt.Target.MakeGenericType(serviceAtt.Generic);
-                var service = services.GetService(target);
+                var service = services.GetService(serviceAtt.Target);
 
                 foreach (var method in service.GetType().GetMethods())
                 {

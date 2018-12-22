@@ -1,6 +1,7 @@
 ﻿using Espeon.Core.Attributes;
 using Espeon.Core.Services;
 using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IModuleManager), true)]
+    [Service(typeof(IModuleManager), ServiceLifetime.Singleton, true)]
     public class ModuleManager : IModuleManager
     {
         [Inject] private readonly IDatabaseService _database;
@@ -53,7 +54,7 @@ namespace Espeon.Services
                     });
                 }
 
-                await _database.WriteAsync("modules", foundModule);
+                await _database.WriteEntityAsync("modules", foundModule);
                 return;
             }
 
@@ -92,7 +93,7 @@ namespace Espeon.Services
 
             foundModule.Aliases.Add(alias);
 
-            await _database.WriteAsync("modules", foundModule);
+            await _database.WriteEntityAsync("modules", foundModule);
             await UpdateAsync(module);
             return true;
         }
@@ -109,7 +110,7 @@ namespace Espeon.Services
 
             foundCommand.Aliases.Add(alias);
 
-            await _database.WriteAsync("modules", foundModule);
+            await _database.WriteEntityAsync("modules", foundModule);
             await UpdateAsync(module);
             return true;
         }
@@ -124,7 +125,7 @@ namespace Espeon.Services
 
             foundModule.Aliases.Remove(alias);
 
-            await _database.WriteAsync("modules", foundModule);
+            await _database.WriteEntityAsync("modules", foundModule);
             await UpdateAsync(module);
             return true;
         }
@@ -141,7 +142,7 @@ namespace Espeon.Services
 
             foundCommand.Aliases.Remove(alias);
 
-            await _database.WriteAsync("modules", foundModule);
+            await _database.WriteEntityAsync("modules", foundModule);
             await UpdateAsync(module);
             return true;
         }

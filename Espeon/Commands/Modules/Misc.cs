@@ -13,7 +13,7 @@ namespace Espeon.Commands.Modules
         public override async Task PingAsync()
         {
             var latency = Context.Client.Latency;
-            var str = $"Latency: {latency}ms\nPing: ";
+            var str = await Response.GetResponseAsync(Module, Command, ResponsePack, latency, "");
             var response = ResponseBuilder.Message(Context, str);
 
             var sw = new Stopwatch();
@@ -23,7 +23,8 @@ namespace Espeon.Commands.Modules
 
             sw.Stop();
 
-            response = ResponseBuilder.Message(Context, $"{str}{sw.ElapsedMilliseconds}ms");
+            str = await Response.GetResponseAsync(Module, Command, ResponsePack, latency, sw.ElapsedMilliseconds);
+            response = ResponseBuilder.Message(Context, str);
 
             await message.ModifyAsync(x => x.Embed = response);
         }

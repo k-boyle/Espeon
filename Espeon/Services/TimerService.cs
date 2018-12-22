@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ITimerService), true)]
+    [Service(typeof(ITimerService), ServiceLifetime.Singleton, true)]
     public class TimerService : ITimerService
     {
         private readonly Timer _timer;

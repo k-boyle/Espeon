@@ -13,10 +13,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IMessageService), true)]
+    [Service(typeof(IMessageService), ServiceLifetime.Singleton, true)]
     public class MessageService : IMessageService
     {
         [Inject] private readonly CommandService _commands;
@@ -35,7 +36,7 @@ namespace Espeon.Services
         public MessageService()
         {
             _messageCache =
-                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, 
+                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string,
                     CachedMessage>>>();
         }
 
@@ -66,7 +67,7 @@ namespace Espeon.Services
                     Id = context.Guild.Id
                 };
 
-                await _database.WriteAsync("guilds", guild);
+                await _database.WriteEntityAsync("guilds", guild);
             }
 
             var prefixes = guild.Config.Prefixes;
@@ -75,8 +76,8 @@ namespace Espeon.Services
                     out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
             {
                 var result = await _commands.ExecuteAsync(output, context, _services);
-
-                if (!result.IsSuccessful)
+                
+                if (!result.IsSuccessful && !(result is ExecutionFailedResult))
                     await CommandErroredAsync(result as FailedResult, context, _services);
             }
         }
@@ -130,7 +131,7 @@ namespace Espeon.Services
         {
             if (!(originalContext is EspeonContext context))
                 return;
-            
+
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
