@@ -1,18 +1,16 @@
-﻿using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Services;
+﻿using Espeon.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ILogService), ServiceLifetime.Singleton, true)]
-    public class LogService : ILogService
+    [Service(ServiceLifetime.Singleton)]
+    public class LogService
     {
         [Inject] private readonly PushBulletClient _push;
 

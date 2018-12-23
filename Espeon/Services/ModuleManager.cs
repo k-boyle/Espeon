@@ -1,5 +1,4 @@
-﻿using Espeon.Core.Attributes;
-using Espeon.Core.Services;
+﻿using Espeon.Attributes;
 using Espeon.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -10,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IModuleManager), ServiceLifetime.Singleton, true)]
-    public class ModuleManager : IModuleManager
+    [Service(ServiceLifetime.Singleton)]
+    public class ModuleManager
     {
-        [Inject] private readonly IDatabaseService _database;
+        [Inject] private readonly DatabaseService _database;
         [Inject] private readonly CommandService _commands;
         [Inject] private Random _random;
 

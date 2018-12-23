@@ -1,16 +1,15 @@
 ﻿using Qmmands;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Base = Espeon.Core.Commands.Modules;
 
 namespace Espeon.Commands.Modules
 {
     [Name("Misc")]
-    public class Misc : Base.Misc
+    public class Misc : EspeonBase
     {
         [Command("Ping")]
         [Name("Ping")]
-        public override async Task PingAsync()
+        public async Task PingAsync()
         {
             var latency = Context.Client.Latency;
             var str = await Response.GetResponseAsync(Module, Command, ResponsePack, latency, "");

@@ -1,17 +1,15 @@
 ﻿using Discord;
-using Espeon.Core;
-using Espeon.Core.Commands;
 using Qmmands;
 using System.Linq;
 
-namespace Espeon
+namespace Espeon.Commands
 {
     //TODO make responses look a bit nicer
     public static class ErrorHandling
     {
         private static Color Bad => new Color(0xf31126);
 
-        public static Embed GenerateResponse(this ArgumentParseFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this ArgumentParseFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -60,7 +58,7 @@ namespace Espeon
             return builder.Build();
         }
 
-        public static Embed GenerateResponse(this ChecksFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this ChecksFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -82,7 +80,7 @@ namespace Espeon
             return builder.Build();
         }
 
-        public static Embed GenerateResponse(this ExecutionFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this ExecutionFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -99,7 +97,7 @@ namespace Espeon
             return builder.Build();
         }
 
-        public static Embed GenerateResponse(this OverloadsFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this OverloadsFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -121,7 +119,7 @@ namespace Espeon
             return builder.Build();
         }
 
-        public static Embed GenerateResponse(this ParameterChecksFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this ParameterChecksFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -143,7 +141,7 @@ namespace Espeon
             return builder.Build();
         }
 
-        public static Embed GenerateResponse(this TypeParseFailedResult result, IEspeonContext context)
+        public static Embed GenerateResponse(this TypeParseFailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {

@@ -1,6 +1,6 @@
-using Espeon.Core.Attributes;
-using Espeon.Core.Services;
+using Espeon.Attributes;
 using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
@@ -9,16 +9,15 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IResponseService), ServiceLifetime.Singleton, true)]
-    public class ResponseService : IResponseService
+    [Service(ServiceLifetime.Singleton)]
+    public class ResponseService
     {
         private const string MapDir = "./commands.json";
 
-        [Inject] private readonly IDatabaseService _database;
+        [Inject] private readonly DatabaseService _database;
 
         private readonly IDictionary<string, Dictionary<string, Dictionary<string, string>>> _responseMap;
 

@@ -1,5 +1,4 @@
-﻿using Espeon.Core.Entities;
-using LiteDB;
+﻿using LiteDB;
 using System.Collections.Generic;
 
 namespace Espeon.Entities

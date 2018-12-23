@@ -1,11 +1,9 @@
 using Discord;
 using Discord.WebSocket;
-using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Commands;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
+using Espeon.Attributes;
+using Espeon.Commands;
 using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -13,19 +11,18 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IMessageService), ServiceLifetime.Singleton, true)]
-    public class MessageService : IMessageService
+    [Service(ServiceLifetime.Singleton)]
+    public class MessageService
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly IDatabaseService _database;
-        [Inject] private readonly ILogService _logger;
+        [Inject] private readonly DatabaseService _database;
+        [Inject] private readonly LogService _logger;
         [Inject] private readonly IServiceProvider _services;
-        [Inject] private readonly ITimerService _timer;
+        [Inject] private readonly TimerService _timer;
 
         private readonly
             ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>>
@@ -45,12 +42,11 @@ namespace Espeon.Services
         {
             _commands.CommandErrored += CommandErroredAsync;
             _commands.CommandExecuted += CommandExecutedAsync;
+            _client.MessageReceived += msg =>
+                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
             _client.MessageUpdated += (_, msg, __) =>
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
         }
-
-        Task IMessageService.HandleReceivedMessageAsync(SocketMessage msg)
-            => msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
@@ -135,11 +131,8 @@ namespace Espeon.Services
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
-
-        Task<IUserMessage> IMessageService.SendMessageAsync(IEspeonContext context, string content, Embed embed)
-            => SendMessageAsync(context as EspeonContext, content, embed);
-
-        private async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
+        
+        public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
                 foundChannel = (_messageCache[context.Channel.Id] =
@@ -207,7 +200,7 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        public async Task DeleteMessagesAsync(IEspeonContext context, int amount)
+        public async Task DeleteMessagesAsync(EspeonContext context, int amount)
         {
             var perms = context.Guild.CurrentUser.GetPermissions(context.Channel);
             var manageMessages = perms.ManageMessages;
@@ -245,7 +238,7 @@ namespace Espeon.Services
             } while (deleted < amount);
         }
 
-        private async Task<int> DeleteMessagesAsync(IEspeonContext context, bool manageMessages,
+        private async Task<int> DeleteMessagesAsync(EspeonContext context, bool manageMessages,
             IEnumerable<(string Key, CachedMessage Cached)> messages)
         {
             var fetchedMessages = new List<IMessage>();

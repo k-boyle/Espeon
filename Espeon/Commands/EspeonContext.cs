@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Core.Commands;
+using Qmmands;
 
-namespace Espeon
+namespace Espeon.Commands
 {
-    public class EspeonContext : IEspeonContext
+    public class EspeonContext : ICommandContext
     {
         public DiscordSocketClient Client { get; }
         public IUserMessage Message { get; }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Qmmands;
 
 namespace Espeon.Commands.TypeParsers
 {

@@ -1,25 +1,18 @@
-﻿using Espeon.Core.Attributes;
-using Espeon.Core.Services;
+﻿using Espeon.Attributes;
 using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ICandyService), ServiceLifetime.Singleton, true)]
-    public class CandyService : ICandyService
+    [Service(ServiceLifetime.Singleton)]
+    public class CandyService
     {
-        [Inject] private readonly IDatabaseService _database;
+        [Inject] private readonly DatabaseService _database;
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
-
-        Task ICandyService.AddCandiesAsync(ulong id, int amount)
-            => UpdateCandiesAsync(id, amount);
-
-        Task ICandyService.RemoveCandiesAsync(ulong id, int amount)
-            => UpdateCandiesAsync(id, amount);
 
         private async Task UpdateCandiesAsync(ulong id, int amount)
         {

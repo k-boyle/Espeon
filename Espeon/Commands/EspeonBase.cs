@@ -1,15 +1,15 @@
 ﻿using Discord;
-using Espeon.Core.Services;
+using Espeon.Services;
 using Qmmands;
 using System.Threading.Tasks;
 
-namespace Espeon.Core.Commands.Bases
+namespace Espeon.Commands
 {
-    public abstract class EspeonBase : ModuleBase<IEspeonContext>
+    public abstract class EspeonBase : ModuleBase<EspeonContext>
     {
-        public IMessageService Message { get; set; }
-        public IResponseService Response { get; set; }
-        public IDatabaseService Database { get; set; }
+        public MessageService Message { get; set; }
+        public ResponseService Response { get; set; }
+        public DatabaseService Database { get; set; }
 
         public Module Module { get; private set; }
         public Command Command { get; private set; }

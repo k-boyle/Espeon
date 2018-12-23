@@ -1,7 +1,6 @@
 ﻿using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Espeon.Core;
 
 namespace Espeon.Commands.Checks
 {

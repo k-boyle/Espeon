@@ -1,9 +1,6 @@
-﻿using Espeon.Commands.Checks;
-using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Commands;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
+﻿using Espeon.Attributes;
+using Espeon.Commands;
+using Espeon.Commands.Checks;
 using Espeon.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -15,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ICustomCommandsService), ServiceLifetime.Singleton, true)]
-    public class CustomCommandsService : ICustomCommandsService
+    [Service(ServiceLifetime.Singleton)]
+    public class CustomCommandsService
     {
-        [Inject] private readonly IDatabaseService _database;
-        [Inject] private readonly ILogService _log;
-        [Inject] private readonly IMessageService _massage;
+        [Inject] private readonly DatabaseService _database;
+        [Inject] private readonly LogService _log;
+        [Inject] private readonly MessageService _massage;
         [Inject] private readonly CommandService _commands;
 
         private readonly ConcurrentDictionary<ulong, Module> _moduleCache;
@@ -70,7 +67,7 @@ namespace Espeon.Services
         private async Task<IResult> CommandCallbackAsync(Command command, object[] parameters,
             ICommandContext originaContext, IServiceProvider services)
         {
-            if (!(originaContext is IEspeonContext context))
+            if (!(originaContext is EspeonContext context))
                 throw new ExpectedContextException("IEspeonContext");
 
 
@@ -78,12 +75,12 @@ namespace Espeon.Services
             var commands = guild.Data.Commands;
             var found = commands.First(x => string.Equals(x.Name, command.Name));
 
-            await _massage.SendMessageAsync(context, found.Value, null);
+            await _massage.SendMessageAsync(context, found.Value);
 
             return new SuccessfulResult();
         }
 
-        public async Task<bool> TryCreateCommandAsync(IEspeonContext context, string name, string value)
+        public async Task<bool> TryCreateCommandAsync(EspeonContext context, string name, string value)
         {
             if (_moduleCache.TryGetValue(context.Guild.Id, out var found))
             {
@@ -97,17 +94,17 @@ namespace Espeon.Services
             return true;
         }
 
-        public Task<bool> TryDeleteCommandAsync(IEspeonContext context, BaseCustomCommand command)
+        public Task<bool> TryDeleteCommandAsync(EspeonContext context, CustomCommand command)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<bool> TryModifyCommandAsync(IEspeonContext context, BaseCustomCommand command, string newValue)
+        public Task<bool> TryModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<ImmutableArray<BaseCustomCommand>> GetCommandsAsync(ulong id)
+        public Task<ImmutableArray<CustomCommand>> GetCommandsAsync(ulong id)
         {
             throw new System.NotImplementedException();
         }

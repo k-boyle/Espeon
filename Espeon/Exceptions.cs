@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon.Core
+namespace Espeon
 {
     public class NotInterfaceException : Exception
     {

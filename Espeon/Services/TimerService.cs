@@ -1,18 +1,17 @@
-﻿using Espeon.Core.Attributes;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
+﻿using Espeon.Attributes;
+using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(ITimerService), ServiceLifetime.Singleton, true)]
-    public class TimerService : ITimerService
+    [Service(ServiceLifetime.Singleton)]
+    public class TimerService
     {
         private readonly Timer _timer;
         private ConcurrentQueue<TaskObject> _taskQueue;
@@ -31,7 +30,7 @@ namespace Espeon.Services
             }, null, -1, -1);
         }
 
-        Task<string> ITimerService.EnqueueAsync(IRemovable removable, Func<string, IRemovable, Task> removeTask)
+        public Task<string> EnqueueAsync(IRemovable removable, Func<string, IRemovable, Task> removeTask)
             => EnqueueAsync(removable, removeTask, true);
 
         private async Task<string> EnqueueAsync(IRemovable removable, Func<string, IRemovable, Task> removeTask, bool setTimer)

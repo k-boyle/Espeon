@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Espeon.Core.Entities;
-using LiteDB;
+﻿using LiteDB;
+using System.Collections.Generic;
 
 namespace Espeon.Entities
 {
@@ -44,10 +43,10 @@ namespace Espeon.Entities
         public IList<CustomCommand> Commands { get; set; } = new List<CustomCommand>();
     }
 
-    public class CustomCommand : BaseCustomCommand
+    public class CustomCommand
     {
-        public override string Name { get; set; }
-        public override string Value { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 
     public class Starboard

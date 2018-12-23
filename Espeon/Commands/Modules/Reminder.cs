@@ -1,21 +1,20 @@
-﻿using Espeon.Core.Services;
+﻿using Espeon.Services;
 using Qmmands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Base = Espeon.Core.Commands.Modules;
 
 namespace Espeon.Commands.Modules
 {
     [Name("Reminder")]
     [Group("Reminder")]
-    public class Reminder : Base.Reminder
+    public class Reminder : EspeonBase
     {
-        public override IReminderService ReminderService { get; set; }
+        public ReminderService ReminderService { get; set; }
 
         [Command]
         [Name("Reminder")]
-        public override async Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
+        public async Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
         {
             await ReminderService.CreateReminderAsync(Context, reminder, when);
 
@@ -28,7 +27,7 @@ namespace Espeon.Commands.Modules
         //TODO Make better
         [Command("List")]
         [Name("List Reminders")]
-        public override async Task ListRemindersAsync()
+        public async Task ListRemindersAsync()
         {
             var reminders = await ReminderService.GetRemindersAsync(Context);
             var ordered = reminders.OrderBy(x => x.WhenToRemove);

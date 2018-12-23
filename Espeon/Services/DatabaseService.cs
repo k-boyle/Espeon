@@ -1,6 +1,5 @@
-using Espeon.Core.Attributes;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
+using Espeon.Attributes;
+using Espeon.Entities;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IDatabaseService), ServiceLifetime.Singleton, true)]
-    public class DatabaseService : IDatabaseService
+    [Service(ServiceLifetime.Singleton)]
+    public class DatabaseService
     {
         private const string Dir = "./Database.db";
 
-        [Inject] private readonly ITimerService _timer;
+        [Inject] private readonly TimerService _timer;
 
         private readonly ConcurrentDictionary<ulong, DatabaseEntity> _cache;
 

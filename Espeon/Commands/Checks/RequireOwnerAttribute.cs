@@ -1,6 +1,4 @@
-﻿using Espeon.Core;
-using Espeon.Core.Commands;
-using Qmmands;
+﻿using Qmmands;
 using System;
 using System.Threading.Tasks;
 
@@ -10,8 +8,8 @@ namespace Espeon.Commands.Checks
     {
         public override async Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
         {
-            if(!(originalContext is IEspeonContext context))
-                throw new ExpectedContextException("IEspeonContext");
+            if(!(originalContext is EspeonContext context))
+                throw new ExpectedContextException("EspeonContext");
 
             var app = await context.Client.GetApplicationInfoAsync();
 

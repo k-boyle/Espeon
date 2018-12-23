@@ -1,5 +1,4 @@
-﻿using Espeon.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Espeon

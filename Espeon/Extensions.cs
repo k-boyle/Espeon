@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Espeon.Core.Attributes;
+using Espeon.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Espeon.Core
+namespace Espeon
 {
     public static class Extensions
     {
@@ -23,10 +23,10 @@ namespace Espeon.Core
                 switch (attribute.Lifetime)
                 {
                     case ServiceLifetime.Singleton:
-                        collection.AddSingleton(attribute.Target, type);
+                        collection.AddSingleton(type);
                         break;
                     case ServiceLifetime.Transient:
-                        collection.AddTransient(attribute.Target, type);
+                        collection.AddTransient(type);
                         break;
                 }
             }
@@ -41,8 +41,7 @@ namespace Espeon.Core
         {
             foreach (var type in types)
             {
-                var attribute = type.GetCustomAttribute<ServiceAttribute>();
-                var service = services.GetService(attribute.Target);
+                var service = services.GetService(type);
 
                 Inject(services, service);
             }
@@ -96,7 +95,7 @@ namespace Espeon.Core
             foreach (var type in types)
             {
                 var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
-                var service = services.GetService(serviceAtt.Target);
+                var service = services.GetService(type);
 
                 foreach (var method in service.GetType().GetMethods())
                 {

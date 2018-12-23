@@ -1,11 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Commands;
-using Espeon.Core.Entities;
-using Espeon.Core.Services;
+using Espeon.Attributes;
+using Espeon.Commands;
 using Espeon.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
 using System;
@@ -13,16 +11,15 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Services
 {
-    [Service(typeof(IReminderService), ServiceLifetime.Singleton, true)]
-    public class ReminderService : IReminderService
+    [Service(ServiceLifetime.Singleton)]
+    public class ReminderService
     {
-        [Inject] private readonly IDatabaseService _database;
-        [Inject] private readonly ILogService _logger;
-        [Inject] private readonly ITimerService _timer;
+        [Inject] private readonly DatabaseService _database;
+        [Inject] private readonly LogService _logger;
+        [Inject] private readonly TimerService _timer;
 
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly PushBulletClient _push;
@@ -60,10 +57,7 @@ namespace Espeon.Services
             await Task.WhenAll(toRemove.Select(x => RemoveAsync(x.TaskKey, x)));
         }
 
-        async Task<BaseReminder> IReminderService.CreateReminderAsync(IEspeonContext context, string content, TimeSpan when)
-            => await CreateReminderAsync(context, content, when);
-
-        private async Task<Reminder> CreateReminderAsync(IEspeonContext context, string content, TimeSpan when)
+        public async Task<Reminder> CreateReminderAsync(EspeonContext context, string content, TimeSpan when)
         {
             var reminder = new Reminder
             {
@@ -90,11 +84,8 @@ namespace Espeon.Services
 
             return reminder;
         }
-
-        Task IReminderService.CancelReminderAsync(IEspeonContext context, BaseReminder reminder)
-            => CancelReminderAsync(context, reminder as Reminder);
-
-        private async Task CancelReminderAsync(IEspeonContext context, Reminder reminder)
+        
+        private async Task CancelReminderAsync(EspeonContext context, Reminder reminder)
         {
             await _timer.RemoveAsync(reminder.TaskKey);
 
@@ -104,11 +95,11 @@ namespace Espeon.Services
             await _database.WriteEntityAsync("users", user);
         }
         
-        public async Task<ImmutableArray<BaseReminder>> GetRemindersAsync(IEspeonContext context)
+        public async Task<ImmutableArray<Reminder>> GetRemindersAsync(EspeonContext context)
         {
             var user = await _database.GetEntityAsync<User>("users", context.User.Id);
 
-            return user.Reminders.Cast<BaseReminder>().ToImmutableArray();
+            return user.Reminders.Cast<Reminder>().ToImmutableArray();
         }
 
         private async Task RemoveAsync(string taskKey, IRemovable removable)

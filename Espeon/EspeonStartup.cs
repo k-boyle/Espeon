@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Core;
-using Espeon.Core.Attributes;
-using Espeon.Core.Services;
+using Espeon.Attributes;
+using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
@@ -42,7 +41,7 @@ namespace Espeon
 
             var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
 
-            var response = _services.GetService<IResponseService>();
+            var response = _services.GetService<ResponseService>();
             await response.OnCommandsRegisteredAsync(modules);
 
             await _push.ConnectAsync();
@@ -63,7 +62,7 @@ namespace Espeon
                 return Task.CompletedTask;
             };
             
-            var logger = _services.GetService<ILogService>();
+            var logger = _services.GetService<LogService>();
             _client.Log += async log =>
             {
                 var (source, severity, lMessage, exception) = LogFactory.FromDiscord(log);
@@ -76,10 +75,6 @@ namespace Espeon
                 await logger.LogAsync(source, severity, lMessage);
             };
 
-            var message = _services.GetService<IMessageService>();
-            _client.MessageReceived += message.HandleReceivedMessageAsync;
-
-            
 #if !DEBUG //Don't want to waste my pushes
             _client.Connected += async () => 
             {

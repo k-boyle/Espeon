@@ -1,7 +1,6 @@
 ﻿using Discord;
-using Espeon.Core.Commands;
 
-namespace Espeon.Core
+namespace Espeon.Commands
 {
     public static class ResponseBuilder
     {
@@ -24,7 +23,7 @@ namespace Espeon.Core
             return builder.Build();
         }
 
-        public static Embed Message(IEspeonContext context, string message, bool isGood = true)
+        public static Embed Message(EspeonContext context, string message, bool isGood = true)
         {
             return Embed(context.User, message, isGood);
         }
