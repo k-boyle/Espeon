@@ -15,7 +15,7 @@ namespace Espeon.Commands.Modules
         [Name("Module Add Alias")]
         public async Task AddAsync(Module target, string value)
         {
-            var result = await Manager.AddAliasAsync(target, value);
+            var result = await Manager.AddAliasAsync(Context, target, value);
             var response = ResponseBuilder.Message(Context,
                 result ? $"{value} has been added to {target.Name}!" : $"{value} already exists for {target.Name}!",
                 result);
@@ -27,7 +27,7 @@ namespace Espeon.Commands.Modules
         [Name("Module Remove Alias")]
         public async Task RemoveAsync(Module target, string value)
         {
-            var result = await Manager.RemoveAliasAsync(target, value);
+            var result = await Manager.RemoveAliasAsync(Context, target, value);
             var response = ResponseBuilder.Message(Context,
                 result ? $"{value} has been removed from {target.Name}!" : $"{value} doesn't exist for {target.Name}!",
                 result);
@@ -47,7 +47,7 @@ namespace Espeon.Commands.Modules
         [Name("Command Add Alias")]
         public async Task AddAsync(Command target, string value)
         {
-            var result = await Manager.AddAliasAsync(target.Module, target.Name, value);
+            var result = await Manager.AddAliasAsync(Context, target.Module, target.Name, value);
             var response = ResponseBuilder.Message(Context,
                 result ? $"{value} has been added to {target.Name}!" : $"{value} already exists for {target.Name}!",
                 result);
@@ -59,7 +59,7 @@ namespace Espeon.Commands.Modules
         [Name("Command Remove Alias")]
         public async Task RemoveAsync(Command target, string value)
         {
-            var result = await Manager.RemoveAliasAsync(target.Module, target.Name, value);
+            var result = await Manager.RemoveAliasAsync(Context, target.Module, target.Name, value);
             var response = ResponseBuilder.Message(Context,
                 result ? $"{value} has been removed from {target.Name}!" : $"{value} doesn't exist for {target.Name}!",
                 result);

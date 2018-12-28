@@ -1,5 +1,5 @@
 ﻿using Espeon.Attributes;
-using Microsoft.Extensions.DependencyInjection;
+using Espeon.Database;
 using Pusharp;
 using Pusharp.Entities;
 using System;
@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(ServiceLifetime.Singleton)]
-    public class LogService
+    public class LogService : IService
     {
         [Inject] private readonly PushBulletClient _push;
 
@@ -23,6 +22,10 @@ namespace Espeon.Services
         {
             _semaphore = new SemaphoreSlim(1, 1);
         }
+
+
+        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+            => Task.CompletedTask;
 
         public async Task LogAsync(Source source, Severity severity, string message, Exception ex = null)
         {

@@ -1,6 +1,6 @@
-using Espeon.Attributes;
-using Espeon.Entities;
-using Microsoft.Extensions.DependencyInjection;
+using Espeon.Commands;
+using Espeon.Database;
+using Espeon.Database.Entities;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
@@ -12,19 +12,19 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(ServiceLifetime.Singleton)]
-    public class ResponseService
+    public class ResponseService : IService
     {
         private const string MapDir = "./commands.json";
-
-        [Inject] private readonly DatabaseService _database;
-
+        
         private readonly IDictionary<string, Dictionary<string, Dictionary<string, string>>> _responseMap;
 
         public ResponseService()
         {
             _responseMap = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
         }
+
+        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+         => Task.CompletedTask;
 
         public Task<string> GetResponseAsync(Module module, Command command, string pack = "default", params object[] @params)
         {
@@ -73,9 +73,19 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        public async Task<string> GetUsersPackAsync(ulong id)
+        public async Task<string> GetUsersPackAsync(EspeonContext context, ulong id)
         {
-            var user = await _database.GetEntityAsync<User>("users", id);
+            var user = await context.Database.Users.FindAsync(id);
+
+            if (!(user is null)) return user.ResponsePack;
+
+            user = new User
+            {
+                Id = id
+            };
+
+            await context.Database.Users.UpsertAsync(user);
+
             return user.ResponsePack;
         }
 

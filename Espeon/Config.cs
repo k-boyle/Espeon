@@ -7,6 +7,8 @@ namespace Espeon
     {
         public string DiscordToken { get; set; }
         public string PushbulletToken { get; set; }
+        public string DbPassword { get; set; }
+        public int DbPort { get; set; }
 
         private Config()
         {

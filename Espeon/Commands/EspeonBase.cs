@@ -9,7 +9,6 @@ namespace Espeon.Commands
     {
         public MessageService Message { get; set; }
         public ResponseService Response { get; set; }
-        public DatabaseService Database { get; set; }
 
         public Module Module { get; private set; }
         public Command Command { get; private set; }
@@ -31,7 +30,7 @@ namespace Espeon.Commands
             Module = command.Module;
             Command = command;
 
-            var pack = await Response.GetUsersPackAsync(Context.User.Id);
+            var pack = await Response.GetUsersPackAsync(Context, Context.User.Id);
             ResponsePack = pack;
         }
     }

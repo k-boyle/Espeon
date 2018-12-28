@@ -1,32 +1,32 @@
-﻿using LiteDB;
+﻿using Espeon.Entities;
 using System.Collections.Generic;
 
-namespace Espeon.Entities
+namespace Espeon.Database.Entities
 {
     public class User : DatabaseEntity
     {
-        public User() { }
-
-        [BsonId(false)]
         public override ulong Id { get; set; }
-        
+
         public override long WhenToRemove { get; set; }
 
         public string ResponsePack { get; set; } = "default";
 
-        public IList<Reminder> Reminders { get; set; } = new List<Reminder>();
+        public List<Reminder> Reminders { get; set; } = new List<Reminder>();
 
-        public CandyData Candies { get; set; }
+        public CandyData Candies { get; set; } = new CandyData();
     }
 
     public class Reminder : IRemovable
     {
+        public string Id { get; set; }
+
         public string TheReminder { get; set; }
         public string JumpUrl { get; set; }
+        
+        public ulong UserId { get; set; }
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
-        public ulong UserId { get; set; }
-        public int Id { get; set; }
+        public int ReminderId { get; set; }
 
         public string TaskKey { get; set; }
         public long WhenToRemove { get; set; }
@@ -34,6 +34,9 @@ namespace Espeon.Entities
 
     public class CandyData
     {
+        public User User { get; set; }
+        public ulong UserId { get; set; }
+
         public int Amount { get; set; }
         public int Highest { get; set;  }
         public long LastClaimed { get; set; }

@@ -1,8 +1,8 @@
 ﻿using Espeon.Attributes;
 using Espeon.Commands;
 using Espeon.Commands.Checks;
-using Espeon.Entities;
-using Microsoft.Extensions.DependencyInjection;
+using Espeon.Database;
+using Espeon.Database.Entities;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -12,10 +12,8 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(ServiceLifetime.Singleton)]
-    public class CustomCommandsService
+    public class CustomCommandsService : IService
     {
-        [Inject] private readonly DatabaseService _database;
         [Inject] private readonly LogService _log;
         [Inject] private readonly MessageService _massage;
         [Inject] private readonly CommandService _commands;
@@ -27,10 +25,9 @@ namespace Espeon.Services
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
 
-        [Initialiser]
-        private async Task InitialiseAsync()
+        public async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
-            var guilds = await _database.GetCollectionAsync<Guild>("guilds");
+            var guilds = context.Guilds;
 
             var createCommands = guilds.Select(CreateCommandsAsync);
 
@@ -71,7 +68,7 @@ namespace Espeon.Services
                 throw new ExpectedContextException("IEspeonContext");
 
 
-            var guild = await _database.GetEntityAsync<Guild>("guilds", context.Guild.Id);
+            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
             var commands = guild.Data.Commands;
             var found = commands.First(x => string.Equals(x.Name, command.Name));
 

@@ -2,6 +2,8 @@ using Discord;
 using Discord.WebSocket;
 using Espeon.Attributes;
 using Espeon.Commands;
+using Espeon.Database;
+using Espeon.Database.Entities;
 using Espeon.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -14,12 +16,10 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(ServiceLifetime.Singleton)]
-    public class MessageService
+    public class MessageService : IService
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly DatabaseService _database;
         [Inject] private readonly LogService _logger;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly TimerService _timer;
@@ -37,44 +37,55 @@ namespace Espeon.Services
                     CachedMessage>>>();
         }
 
-        [Initialiser]
-        public void Initialise()
+        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
-            _commands.CommandErrored += CommandErroredAsync;
-            _commands.CommandExecuted += CommandExecutedAsync;
-            _client.MessageReceived += msg =>
-                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
-            _client.MessageUpdated += (_, msg, __) =>
-                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
-        }
+            var commands = services.GetService<CommandService>();
+            var client = services.GetService<DiscordSocketClient>();
 
+            commands.CommandErrored += CommandErroredAsync;
+            commands.CommandExecuted += CommandExecutedAsync;
+
+            client.MessageReceived += msg =>
+                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
+            client.MessageUpdated += (_, msg, __) =>
+                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
+
+            return Task.CompletedTask;
+        }
+        
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
             if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id ||
                 message.Channel is IPrivateChannel) return;
 
-            var context = new EspeonContext(_client, message, isEdit);
-            var guild = await _database.GetEntityAsync<Guild>("guilds", context.Guild.Id);
-
-            if (guild is null)
+            using (var scope = _services.CreateScope())
             {
-                guild = new Guild
+                var databaseContext = scope.ServiceProvider.GetService<DatabaseContext>();
+
+                var commandContext = new EspeonContext(databaseContext, _client, message, isEdit);
+                var guild = await databaseContext.Guilds.FindAsync(commandContext.Guild.Id);
+
+                if (guild is null)
                 {
-                    Id = context.Guild.Id
-                };
+                    guild = new Guild
+                    {
+                        Id = commandContext.Guild.Id
+                    };
 
-                await _database.WriteEntityAsync("guilds", guild);
-            }
+                    await databaseContext.Guilds.AddAsync(guild);
+                }
 
-            var prefixes = guild.Config.Prefixes;
+                var prefixes = guild.Config.Prefixes;
 
-            if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
-                    out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
-            {
-                var result = await _commands.ExecuteAsync(output, context, _services);
-                
-                if (!result.IsSuccessful && !(result is ExecutionFailedResult))
-                    await CommandErroredAsync(result as FailedResult, context, _services);
+                if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
+                        out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
+                {
+                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
+                    await commandContext.Database.SaveChangesAsync();
+
+                    if (!result.IsSuccessful && !(result is ExecutionFailedResult))
+                        await CommandErroredAsync(result as FailedResult, commandContext, _services);
+                }
             }
         }
 
@@ -131,7 +142,7 @@ namespace Espeon.Services
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
-        
+
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))

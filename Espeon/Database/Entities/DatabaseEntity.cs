@@ -1,4 +1,6 @@
-﻿namespace Espeon.Entities
+﻿using Espeon.Entities;
+
+namespace Espeon.Database.Entities
 {
     public abstract class DatabaseEntity : IRemovable
     {

@@ -1,42 +1,31 @@
 ﻿using Discord;
 using Espeon.Attributes;
+using Espeon.Database;
+using Espeon.Database.Entities;
+using Espeon.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Espeon
 {
     public static class Extensions
     {
-        public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly)
-            => AddServices(collection, assembly.FindTypesWithAttribute<ServiceAttribute>());
-
         public static IServiceCollection AddServices(this IServiceCollection collection, IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
-                var attribute = type.GetCustomAttribute<ServiceAttribute>();
-
-                switch (attribute.Lifetime)
-                {
-                    case ServiceLifetime.Singleton:
-                        collection.AddSingleton(type);
-                        break;
-                    case ServiceLifetime.Transient:
-                        collection.AddTransient(type);
-                        break;
-                }
+                collection.AddSingleton(type);
             }
 
             return collection;
         }
-
-        public static IServiceProvider Inject(this IServiceProvider services, Assembly assembly)
-            => Inject(services, assembly.FindTypesWithAttribute<ServiceAttribute>());
-
+        
         public static IServiceProvider Inject(this IServiceProvider services, IEnumerable<Type> types)
         {
             foreach (var type in types)
@@ -86,34 +75,18 @@ namespace Espeon
                 }
             }
         }
-
-        public static IServiceProvider RunInitialisers(this IServiceProvider services, Assembly assembly)
-            => RunInitialisers(services, FindTypesWithAttribute<ServiceAttribute>(assembly));
-
-        public static IServiceProvider RunInitialisers(this IServiceProvider services, IEnumerable<Type> types)
+        
+        public static async Task RunInitialisersAsync(this IServiceProvider services, DatabaseContext context, IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
-                var serviceAtt = type.GetCustomAttribute<ServiceAttribute>();
                 var service = services.GetService(type);
 
-                foreach (var method in service.GetType().GetMethods())
-                {
-                    if (!(method.GetCustomAttribute<InitialiserAttribute>() is InitialiserAttribute initAtt))
-                        continue;
+                if(!(service is IService validService))
+                    throw new InvalidServiceException($"{type}");
 
-                    var argTypes = initAtt.Arguments;
-                    var args = argTypes.Select(services.GetService).ToArray();
-                    method.Invoke(service, args);
-                }
+                await validService.InitialiseAsync(context, services);
             }
-
-            return services;
-        }
-
-        public static IEnumerable<Type> FindTypesWithAttribute<T>(this Assembly assembly)
-        {
-            return assembly.GetTypes().Where(x => x.GetCustomAttributes(typeof(T), true).Length > 0);
         }
         
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
@@ -171,6 +144,19 @@ namespace Espeon
         public static string GetDisplayName(this IGuildUser user)
         {
             return user.Nickname ?? user.Username;
+        }
+
+        public static async Task UpsertAsync<T>(this DbSet<T> set, T entity) where T : DatabaseEntity
+        {
+            var found = await set.FindAsync(entity.Id);
+
+            if (found is null)
+            {
+                await set.AddAsync(entity);
+                return;
+            }
+
+            set.Update(entity);
         }
     }
 }

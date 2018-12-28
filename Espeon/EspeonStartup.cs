@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Espeon.Database;
 
 namespace Espeon
 {
@@ -35,7 +36,7 @@ namespace Espeon
             _completionSource = new TaskCompletionSource<Task>();
         }
 
-        public async Task StartBotAsync()
+        public async Task StartBotAsync(DatabaseContext context)
         {
             EventHooks();
 
@@ -49,9 +50,10 @@ namespace Espeon
             await _client.LoginAsync(TokenType.Bot, _config.DiscordToken);
             await _client.StartAsync();
 
+            //'Ready event' that only fires at startup
             await _completionSource.Task;
 
-            _services.RunInitialisers(Assembly.GetEntryAssembly());
+            await _services.GetService<ReminderService>().LoadRemindersAsync(context);
         }
 
         private void EventHooks()
@@ -63,16 +65,16 @@ namespace Espeon
             };
             
             var logger = _services.GetService<LogService>();
-            _client.Log += async log =>
+            _client.Log += log =>
             {
                 var (source, severity, lMessage, exception) = LogFactory.FromDiscord(log);
-                await logger.LogAsync(source, severity, lMessage, exception);
+                return logger.LogAsync(source, severity, lMessage, exception);
             };
 
-            _push.Log += async log =>
+            _push.Log += log =>
             {
                 var (source, severity, lMessage) = LogFactory.FromPusharp(log);
-                await logger.LogAsync(source, severity, lMessage);
+                return logger.LogAsync(source, severity, lMessage);
             };
 
 #if !DEBUG //Don't want to waste my pushes

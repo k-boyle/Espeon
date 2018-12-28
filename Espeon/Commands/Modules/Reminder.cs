@@ -32,7 +32,7 @@ namespace Espeon.Commands.Modules
             var reminders = await ReminderService.GetRemindersAsync(Context);
             var ordered = reminders.OrderBy(x => x.WhenToRemove);
 
-            var message = string.Join('\n', ordered.Select(x => $"{x.Id}: {x.TheReminder}"));
+            var message = string.Join('\n', ordered.Select(x => $"{x.ReminderId}: {x.TheReminder}"));
             var response = ResponseBuilder.Message(Context, message);
             
             await SendMessageAsync(response);

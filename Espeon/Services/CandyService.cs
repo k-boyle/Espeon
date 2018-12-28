@@ -1,33 +1,43 @@
 ﻿using Espeon.Attributes;
-using Espeon.Entities;
-using Microsoft.Extensions.DependencyInjection;
+using Espeon.Commands;
+using Espeon.Database;
+using Espeon.Database.Entities;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    [Service(ServiceLifetime.Singleton)]
-    public class CandyService
+    public class CandyService : IService
     {
-        [Inject] private readonly DatabaseService _database;
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
 
-        private async Task UpdateCandiesAsync(ulong id, int amount)
+        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+            => Task.CompletedTask;
+
+        private async Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
         {
-            var user = await _database.GetEntityAsync<User>("users", id);
+            var user = await context.Database.Users.FindAsync(id) ?? new User
+            {
+                Id = id
+            };
+
             user.Candies.Amount += amount;
 
             if (user.Candies.Highest < user.Candies.Amount)
                 user.Candies.Highest = user.Candies.Amount;
 
-            await _database.WriteEntityAsync("users", user);
+            await context.Database.Users.UpsertAsync(user);
         }
 
-        public async Task ClaimCandiesAsync(ulong id)
+        public async Task ClaimCandiesAsync(EspeonContext context, ulong id)
         {
-            var user = await _database.GetEntityAsync<User>("users", id);
+            var user = await context.Database.Users.FindAsync(id) ?? new User
+            {
+                Id = id
+            };
+
             user.Candies.Amount += Random.Next(1, 11);
 
             if (user.Candies.Highest < user.Candies.Amount)
@@ -35,18 +45,39 @@ namespace Espeon.Services
 
             user.Candies.LastClaimed = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            await _database.WriteEntityAsync("users", user);
+            await context.Database.Users.UpsertAsync(user);
         }
 
-        public async Task<int> GetCandiesAsync(ulong id)
+        public async Task<int> GetCandiesAsync(EspeonContext context, ulong id)
         {
-            var user = await _database.GetEntityAsync<User>("users", id);
+            var user = await context.Database.Users.FindAsync(id);
+
+            if (!(user is null)) return user.Candies.Amount;
+
+            user = new User
+            {
+                Id = id
+            };
+
+            await context.Database.Users.AddAsync(user);
+
             return user.Candies.Amount;
         }
 
-        public async Task<bool> CanClaimCandiesAsync(ulong id)
+        public async Task<bool> CanClaimCandiesAsync(EspeonContext context, ulong id)
         {
-            var user = await _database.GetEntityAsync<User>("users", id);
+            var user = await context.Database.Users.FindAsync(id);
+
+            if (user is null)
+            {
+                user = new User
+                {
+                    Id = id
+                };
+
+                await context.Database.AddAsync(user);
+            }
+
             var lastClaimed = DateTimeOffset.FromUnixTimeMilliseconds(user.Candies.LastClaimed);
 
             return DateTimeOffset.UtcNow - lastClaimed > TimeSpan.FromHours(8);
