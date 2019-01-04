@@ -199,7 +199,7 @@ namespace Espeon.Services
 
         private Task RemoveAsync(string key, IRemovable removable)
         {
-            var message = removable as CachedMessage;
+            var message = (CachedMessage) removable;
             _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
 
             if (_messageCache[message.ChannelId][message.UserId].Count == 0)

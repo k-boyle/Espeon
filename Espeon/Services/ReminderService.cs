@@ -119,7 +119,7 @@ namespace Espeon.Services
 
         private async Task RemoveAsync(string taskKey, IRemovable removable)
         {
-            var reminder = removable as Reminder;
+            var reminder = (Reminder) removable;
 
             var appInfo = await _client.GetApplicationInfoAsync();
 

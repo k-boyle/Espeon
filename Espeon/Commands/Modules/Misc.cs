@@ -1,4 +1,7 @@
-﻿using Qmmands;
+﻿using Discord;
+using Espeon.Interactive.Callbacks;
+using Espeon.Interactive.Criteria;
+using Qmmands;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -26,6 +29,11 @@ namespace Espeon.Commands.Modules
             response = ResponseBuilder.Message(Context, str);
 
             await message.ModifyAsync(x => x.Embed = response);
+
+            var deleteCallback = new DeleteCallback(Context, message, new Emoji("🚮"),
+                new ReactionFromSourceUser(Context.User.Id));
+
+            await TryAddCallbackAsync(deleteCallback);
         }
     }
 }
