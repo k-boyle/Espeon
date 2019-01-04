@@ -13,7 +13,7 @@ namespace Espeon.Interactive.Criteria
             _userId = userId;
         }
 
-        public Task<bool> JudgeCriterionAsync(EspeonContext context, SocketReaction reaction)
+        public Task<bool> JudgeAsync(EspeonContext context, SocketReaction reaction)
             => Task.FromResult(reaction.UserId == _userId);
     }
 }

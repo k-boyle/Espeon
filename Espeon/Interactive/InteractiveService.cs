@@ -40,7 +40,7 @@ namespace Espeon.Interactive
 
             async Task MessageReceivedAsync(SocketUserMessage message)
             {
-                var result = await criterion.JudgeCriterionAsync(context, message);
+                var result = await criterion.JudgeAsync(context, message);
 
                 if(result)
                     taskCompletionSource.SetResult(message);
@@ -101,7 +101,7 @@ namespace Espeon.Interactive
 
             var callback = callbackData.Callback;
             var criterion = callback.Criterion;
-            var result = await criterion.JudgeCriterionAsync(callback.Context, reaction);
+            var result = await criterion.JudgeAsync(callback.Context, reaction);
 
             if (!result)
                 return;
