@@ -1,6 +1,10 @@
 ﻿using Discord;
+using Discord.WebSocket;
+using Espeon.Interactive;
+using Espeon.Interactive.Criteria;
 using Espeon.Services;
 using Qmmands;
+using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -9,6 +13,7 @@ namespace Espeon.Commands
     {
         public MessageService Message { get; set; }
         public ResponseService Response { get; set; }
+        public InteractiveService Interactive { get; set; }
 
         public Module Module { get; private set; }
         public Command Command { get; private set; }
@@ -23,6 +28,17 @@ namespace Espeon.Commands
         protected Task<IUserMessage> SendMessageAsync(string content, Embed embed = null)
         {
             return Message.SendMessageAsync(Context, content, embed);
+        }
+
+        protected Task<SocketUserMessage> NextMessageAsync(ICriterion<SocketUserMessage> criterion,
+            TimeSpan? timeout = null)
+        {
+            return Interactive.NextMessageAsync(Context, criterion, timeout);
+        }
+
+        protected Task<bool> TryAddCallbackAsync(IReactionCallback callback, TimeSpan? timeout = null)
+        {
+            return Interactive.TryAddCallbackAsync(callback, timeout);
         }
 
         protected override async Task BeforeExecutedAsync(Command command)
