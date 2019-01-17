@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Espeon.Interactive;
 using Espeon.Interactive.Criteria;
+using Espeon.Interactive.Paginator;
 using Espeon.Services;
 using Qmmands;
 using System;
@@ -39,6 +40,11 @@ namespace Espeon.Commands
         protected Task<bool> TryAddCallbackAsync(IReactionCallback callback, TimeSpan? timeout = null)
         {
             return Interactive.TryAddCallbackAsync(callback, timeout);
+        }
+
+        protected Task SendPaginatedMessageAsync(PaginatorBase paginator, TimeSpan? timeout = null)
+        {
+            return Interactive.SendPaginatedMessageAsync(Context, paginator, timeout);
         }
 
         protected override async Task BeforeExecutedAsync(Command command)

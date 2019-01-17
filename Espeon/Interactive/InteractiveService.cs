@@ -5,6 +5,7 @@ using Espeon.Commands;
 using Espeon.Database;
 using Espeon.Entities;
 using Espeon.Interactive.Criteria;
+using Espeon.Interactive.Paginator;
 using Espeon.Services;
 using System;
 using System.Collections.Concurrent;
@@ -32,7 +33,8 @@ namespace Espeon.Interactive
             return Task.CompletedTask;
         }
 
-        public async Task<SocketUserMessage> NextMessageAsync(EspeonContext context, ICriterion<SocketUserMessage> criterion, TimeSpan? timeout = null)
+        public async Task<SocketUserMessage> NextMessageAsync(EspeonContext context,
+            ICriterion<SocketUserMessage> criterion, TimeSpan? timeout = null)
         {
             timeout = timeout ?? DefaultTimeout;
 
@@ -63,8 +65,20 @@ namespace Espeon.Interactive
             return taskResult == resultTask ? await resultTask : null;
         }
 
+        public async Task SendPaginatedMessageAsync(EspeonContext context, PaginatorBase paginator, TimeSpan? timeout = null)
+        {
+            timeout = timeout ?? DefaultTimeout;
+
+            await paginator.InitialiseAsync();
+
+            await InternalAddCallbackAsync(paginator, timeout.Value);
+        }
+
         public async Task<bool> TryAddCallbackAsync(IReactionCallback callback, TimeSpan? timeout = null)
         {
+            if (callback is PaginatorBase)
+                return false;
+
             var message = callback.Message;
 
             if (_reactionCallbacks.ContainsKey(message.Id))
@@ -74,12 +88,19 @@ namespace Espeon.Interactive
 
             await callback.InitialiseAsync();
 
+            return await InternalAddCallbackAsync(callback, timeout.Value);
+        }
+
+        private async Task<bool> InternalAddCallbackAsync(IReactionCallback callback, TimeSpan timeout)
+        {
+            var message = callback.Message;
+
             foreach (var emote in callback.Reactions)
                 await message.AddReactionAsync(emote);
 
-            var callbackData = new CallbackData(callback, timeout.Value)
+            var callbackData = new CallbackData(callback, timeout)
             {
-                WhenToRemove = DateTimeOffset.UtcNow.Add(timeout.Value).ToUnixTimeMilliseconds()
+                WhenToRemove = DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds()
             };
 
             var key = await _timer.EnqueueAsync(callbackData, RemoveAsync);
@@ -89,7 +110,8 @@ namespace Espeon.Interactive
             return _reactionCallbacks.TryAdd(message.Id, callbackData);
         }
 
-        private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> cachedMessage,
+            ISocketMessageChannel channel, SocketReaction reaction)
         {
             var message = await cachedMessage.GetOrDownloadAsync();
 

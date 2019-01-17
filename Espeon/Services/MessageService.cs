@@ -220,7 +220,11 @@ namespace Espeon.Services
 
             do
             {
-                var found = _messageCache[context.Channel.Id][context.User.Id];
+                if (!_messageCache.TryGetValue(context.Channel.Id, out var foundCache))
+                    return;
+
+                if (!foundCache.TryGetValue(context.User.Id, out var found))
+                    return;
 
                 if (found is null)
                     return;
