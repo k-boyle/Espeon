@@ -10,7 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace Espeon
 {
@@ -25,7 +28,7 @@ namespace Espeon
 
             return collection;
         }
-        
+
         public static IServiceProvider Inject(this IServiceProvider services, IEnumerable<Type> types)
         {
             foreach (var type in types)
@@ -75,20 +78,21 @@ namespace Espeon
                 }
             }
         }
-        
-        public static async Task RunInitialisersAsync(this IServiceProvider services, DatabaseContext context, IEnumerable<Type> types)
+
+        public static async Task RunInitialisersAsync(this IServiceProvider services, DatabaseContext context,
+            IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
                 var service = services.GetService(type);
 
-                if(!(service is IService validService))
+                if (!(service is IService validService))
                     throw new InvalidServiceException($"{type}");
 
                 await validService.InitialiseAsync(context, services);
             }
         }
-        
+
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
             var typeParserInterface = commands.GetType().Assembly.GetTypes()
@@ -157,6 +161,13 @@ namespace Espeon
             }
 
             set.Update(entity);
+        }
+
+        public static string[] FindCommands(this string str)
+        {
+            var split = str.Split(new[] {"::"}, StringSplitOptions.RemoveEmptyEntries);
+
+            return split.Select(x => x.Trim()).ToArray();
         }
     }
 }

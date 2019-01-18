@@ -80,11 +80,16 @@ namespace Espeon.Services
                 if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
                 {
-                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
-                    await commandContext.Database.SaveChangesAsync();
+                    var foundCommands = output.FindCommands();
 
-                    if (!result.IsSuccessful && !(result is ExecutionFailedResult))
-                        await CommandErroredAsync(result as FailedResult, commandContext, _services);
+                    foreach(var command in foundCommands)
+                    {
+                        var result = await _commands.ExecuteAsync(command, commandContext, _services);
+                        await commandContext.Database.SaveChangesAsync();
+
+                        if (!result.IsSuccessful && !(result is ExecutionFailedResult))
+                            await CommandErroredAsync(result as FailedResult, commandContext, _services);
+                    }
                 }
             }
         }
