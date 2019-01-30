@@ -32,9 +32,9 @@ namespace Espeon
                     MessageCacheSize = 100
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
-                    {
-                        CaseSensitive = false
-                    })
+                {
+                    CaseSensitive = false
+                })
                     .AddTypeParsers(assembly))
                 .AddSingleton(new PushBulletClient(new PushBulletClientConfig
                 {
@@ -45,24 +45,21 @@ namespace Espeon
                 .AddSingleton(config)
                 .AddSingleton<Random>()
                 .AddEntityFrameworkNpgsql()
-                .AddDbContext<DatabaseContext>()
+                .AddDbContext<DatabaseContext>(ServiceLifetime.Transient)
                 .BuildServiceProvider()
                 .Inject(types);
 
-            using (var scope = services.CreateScope())
-            {
-                var ctx = scope.ServiceProvider.GetService<DatabaseContext>();
+            var ctx = services.GetService<DatabaseContext>();
 
-                await ctx.Database.MigrateAsync();
+            await ctx.Database.MigrateAsync();
 
-                await services.RunInitialisersAsync(ctx, types);
+            await services.RunInitialisersAsync(ctx, types);
 
-                var espeon = new EspeonStartup(services, config);
-                services.Inject(espeon);
-                await espeon.StartBotAsync(ctx);
+            await ctx.SaveChangesAsync();
 
-                await ctx.SaveChangesAsync();
-            }
+            var espeon = new EspeonStartup(services, config);
+            services.Inject(espeon);
+            await espeon.StartBotAsync(ctx);
 
             await Task.Delay(-1);
         }

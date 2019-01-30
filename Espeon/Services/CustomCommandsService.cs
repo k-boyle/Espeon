@@ -3,6 +3,7 @@ using Espeon.Commands;
 using Espeon.Commands.Checks;
 using Espeon.Database;
 using Espeon.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -15,7 +16,7 @@ namespace Espeon.Services
     public class CustomCommandsService : IService
     {
         [Inject] private readonly LogService _log;
-        [Inject] private readonly MessageService _massage;
+        [Inject] private readonly MessageService _message;
         [Inject] private readonly CommandService _commands;
 
         private readonly ConcurrentDictionary<ulong, Module> _moduleCache;
@@ -27,7 +28,7 @@ namespace Espeon.Services
 
         public async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
-            var guilds = context.Guilds;
+            var guilds = context.Guilds.Include(x => x.Commands);
 
             var createCommands = guilds.Select(CreateCommandsAsync);
 
@@ -37,9 +38,9 @@ namespace Espeon.Services
 
         private async Task CreateCommandsAsync(Guild guild)
         {
-            var commands = guild.Data.Commands;
+            var commands = guild.Commands;
 
-            if (commands.Count == 0)
+            if (commands is null || commands.Count == 0)
                 return;
 
             var module = await _commands.AddModuleAsync(moduleBuilder =>
@@ -65,14 +66,16 @@ namespace Espeon.Services
             ICommandContext originaContext, IServiceProvider services)
         {
             if (!(originaContext is EspeonContext context))
-                throw new ExpectedContextException("IEspeonContext");
+                throw new ExpectedContextException("EspeonContext");
 
+            var guild = context.Database.Guilds.Include(x => x.Commands)
+                .FirstOrDefault(x => x.Id == context.Guild.Id);
+            var commands = guild?.Commands;
 
-            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
-            var commands = guild.Data.Commands;
-            var found = commands.First(x => string.Equals(x.Name, command.Name));
+            var found = commands?.FirstOrDefault(x =>
+                string.Equals(x.Name, command.Name, StringComparison.InvariantCultureIgnoreCase));
 
-            await _massage.SendMessageAsync(context, found.Value);
+            await _message.SendMessageAsync(context, found?.Value ?? "Something went wrong");
 
             return new SuccessfulResult();
         }
@@ -83,27 +86,65 @@ namespace Espeon.Services
             {
                 var commands = found.Commands;
 
-                if (commands.Any(x => x.FullAliases
-                    .Any(y => string.Equals(y, name, StringComparison.InvariantCultureIgnoreCase))))
+                if (!Utilities.AvailableName(commands, name))
                     return false;
             }
+
+            var loadedCommands = _commands.GetAllCommands();
+            var filtered = loadedCommands.Where(x => !ulong.TryParse(x.Module.Name, out _));
+
+            if (Utilities.AvailableName(filtered, name))
+                return false;
+
+            var newCmd = new CustomCommand
+            {
+                Name = name,
+                Value = value,
+                GuildId = context.Guild.Id
+            };
+
+            await context.Database.CustomCommands.AddAsync(newCmd);
+            await context.Database.SaveChangesAsync();
+
+            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
+
+            await UpdateCommandsAsync(guild);
 
             return true;
         }
 
-        public Task<bool> TryDeleteCommandAsync(EspeonContext context, CustomCommand command)
+        public async Task DeleteCommandAsync(EspeonContext context, CustomCommand command)
         {
-            throw new System.NotImplementedException();
+            context.Database.CustomCommands.Remove(command);
+            await context.Database.SaveChangesAsync();
+
+            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
+
+            await UpdateCommandsAsync(guild);
         }
 
-        public Task<bool> TryModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue)
+        public Task ModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue)
         {
-            throw new System.NotImplementedException();
+            command.Value = newValue;
+
+            context.Database.CustomCommands.Update(command);
+
+            return context.Database.SaveChangesAsync();
         }
 
-        public Task<ImmutableArray<CustomCommand>> GetCommandsAsync(ulong id)
+        public ImmutableArray<CustomCommand> GetCommands(EspeonContext context)
         {
-            throw new System.NotImplementedException();
+            var guilds = context.Database.Guilds.Include(x => x.Commands);
+            var guild = guilds.First(x => x.Id == context.Guild.Id);
+            return guild.Commands.ToImmutableArray();
+        }
+
+        private async Task UpdateCommandsAsync(Guild guild)
+        {
+            if(_moduleCache.ContainsKey(guild.Id))
+                await _commands.RemoveModuleAsync(_moduleCache[guild.Id]);
+
+            await CreateCommandsAsync(guild);
         }
     }
 }

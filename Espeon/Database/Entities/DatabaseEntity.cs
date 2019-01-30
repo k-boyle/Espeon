@@ -1,12 +1,7 @@
-﻿using Espeon.Entities;
-
-namespace Espeon.Database.Entities
+﻿namespace Espeon.Database.Entities
 {
-    public abstract class DatabaseEntity : IRemovable
+    public abstract class DatabaseEntity
     {
         public abstract ulong Id { get; set; }
-        
-        //unix milliseconds to account for LiteDb being stupid with handling datetimes
-        public abstract long WhenToRemove { get; set; }
     }
 }

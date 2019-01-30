@@ -1,4 +1,5 @@
-﻿using Espeon.Services;
+﻿using Espeon.Commands.Checks;
+using Espeon.Services;
 using Qmmands;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace Espeon.Commands.Modules
 {
     [Name("Module Management")]
     [Group("Module")]
-    [Checks.RequireOwner]
+    [RequireOwner]
     public class ModuleManagement : EspeonBase
     {
         public ModuleManager Manager { get; set; }
@@ -38,7 +39,7 @@ namespace Espeon.Commands.Modules
 
     [Name("Command Management")]
     [Group("Command")]
-    [Checks.RequireOwner]
+    [RequireOwner]
     public class CommandManagement : EspeonBase
     {
         public ModuleManager Manager { get; set; }

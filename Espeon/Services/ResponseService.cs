@@ -1,6 +1,5 @@
 using Espeon.Commands;
 using Espeon.Database;
-using Espeon.Database.Entities;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
@@ -76,16 +75,6 @@ namespace Espeon.Services
         public async Task<string> GetUsersPackAsync(EspeonContext context, ulong id)
         {
             var user = await context.Database.Users.FindAsync(id);
-
-            if (!(user is null)) return user.ResponsePack;
-
-            user = new User
-            {
-                Id = id
-            };
-
-            await context.Database.Users.UpsertAsync(user);
-
             return user.ResponsePack;
         }
 

@@ -2,18 +2,21 @@
 using Espeon.Commands;
 using Espeon.Database;
 using Espeon.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
+    //TODO add shit like custom summaries
     public class ModuleManager : IService
     {
         [Inject] private readonly CommandService _commands;
+        [Inject] private readonly CustomCommandsService _customCommands;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private Random _random;
 
@@ -27,131 +30,144 @@ namespace Espeon.Services
         
         private async Task OnBuildingAsync(ModuleBuilder moduleBuilder)
         {
-            if (string.IsNullOrWhiteSpace(moduleBuilder.Name))
-                throw new ArgumentNullException(nameof(moduleBuilder.Name));
+            if(string.IsNullOrEmpty(moduleBuilder.Name))
+                throw new NoNullAllowedException(nameof(moduleBuilder));
 
-            ModuleInfo foundModule;
-
-            using (var scope = _services.CreateScope())
+            using (var ctx = _services.GetService<DatabaseContext>())
             {
-                var ctx = scope.ServiceProvider.GetService<DatabaseContext>();
+                var modules = ctx.Modules.Include(x => x.Commands);
+                var foundModule = await modules.FirstOrDefaultAsync(x => x.Name == moduleBuilder.Name);
 
-                var modules = ctx.Modules;
-                foundModule = modules.FirstOrDefault(x => x.Name == moduleBuilder.Name);
+                var commandBuilders = moduleBuilder.Commands;
 
                 if (foundModule is null)
                 {
                     foundModule = new ModuleInfo
                     {
-                        Id = (ulong)Random.Next(),
                         Name = moduleBuilder.Name
                     };
 
-                    var list = new List<CommandInfo>();
+                    if(commandBuilders.Any(x => string.IsNullOrEmpty(x.Name)))
+                        throw new NoNullAllowedException(nameof(commandBuilders));
 
-                    foreach (var commandBuilder in moduleBuilder.Commands)
+                    foundModule.Commands = commandBuilders.Select(x => new CommandInfo
                     {
-                        if (string.IsNullOrWhiteSpace(commandBuilder.Name))
-                            throw new ArgumentNullException(nameof(commandBuilder.Name));
+                        Name = $"{moduleBuilder.Name}{x.Name}"
+                    }).ToList();
 
-                        list.Add(new CommandInfo
-                        {
-                            Name = commandBuilder.Name
-                        });
-                    }
-
-                    foundModule.Commands = list;
-
-                    await ctx.Modules.UpsertAsync(foundModule);
-                    await ctx.SaveChangesAsync();
+                    await ctx.Modules.AddAsync(foundModule);
                 }
-            }
-
-            moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
-
-            foreach (var commandBuilder in moduleBuilder.Commands)
-            {
-                if (string.IsNullOrWhiteSpace(commandBuilder.Name))
-                    throw new ArgumentNullException(nameof(commandBuilder.Name));
-
-                var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandBuilder.Name);
-
-                if (foundCommand is null)
+                else
                 {
-                    foundCommand = new CommandInfo
+                    if(!(foundModule.Aliases is null) && foundModule.Aliases.Count > 0)
+                        moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
+
+                    foreach (var commandBuilder in commandBuilders)
                     {
-                        Name = commandBuilder.Name
-                    };
+                        if(string.IsNullOrWhiteSpace(commandBuilder.Name))
+                            throw new NoNullAllowedException(nameof(commandBuilder));
 
-                    foundModule.Commands.Add(foundCommand);
+                        var commandKey = $"{moduleBuilder.Name}{commandBuilder.Name}";
 
-                    continue;
+                        var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandKey);
+
+                        if (foundCommand is null)
+                        {
+                            foundCommand = new CommandInfo
+                            {
+                                Name = commandKey,
+                            };
+
+                            foundModule.Commands.Add(foundCommand);
+                            ctx.Modules.Update(foundModule);
+                        }
+                        else
+                        {
+                            if(!(foundCommand.Aliases is null) && foundCommand.Aliases.Count > 0)
+                                commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
+                        }
+                    }
                 }
 
-                commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
+                await ctx.SaveChangesAsync();
             }
         }
 
+        //TODO doesn't work
         public async Task<bool> AddAliasAsync(EspeonContext context, Module module, string alias)
         {
-            var modules = context.Database.Modules;
-            var foundModule = modules.FirstOrDefault(x => x.Name == module.Name);
+            var commands = _commands.GetAllCommands();
 
-            if (foundModule.Aliases.Contains(alias))
+            if (!Utilities.AvailableName(commands, alias))
+                return false;
+
+            var foundModule = await context.Database.Modules.FindAsync(module.Name);
+
+            if (foundModule is null)
                 return false;
 
             foundModule.Aliases.Add(alias);
-
-            await context.Database.Modules.UpsertAsync(foundModule);
+            context.Database.Modules.Update(foundModule);
+            await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
+
             return true;
         }
 
         public async Task<bool> AddAliasAsync(EspeonContext context, Module module, string command, string alias)
         {
-            var modules = context.Database.Modules;
-            var foundModule = modules.FirstOrDefault(x => x.Name == module.Name);
+            var commands = _commands.GetAllCommands();
 
-            var foundCommand = foundModule.Commands.Single(x => x.Name == command);
+            if (!Utilities.AvailableName(commands, alias))
+                return false;
 
-            if (foundCommand.Aliases.Contains(alias))
+            var foundModule = await context.Database.Modules.Include(x => x.Commands)
+                .FirstOrDefaultAsync(x => x.Name == module.Name);
+
+            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == $"{module.Name}{command}");
+
+            if (foundCommand is null || foundCommand.Aliases.Contains(alias))
                 return false;
 
             foundCommand.Aliases.Add(alias);
 
             context.Database.Commands.Update(foundCommand);
+            await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
+
             return true;
         }
 
         public async Task<bool> RemoveAliasAsync(EspeonContext context, Module module, string alias)
         {
-            var modules = context.Database.Modules;
-            var foundModule = modules.FirstOrDefault(x => x.Name == module.Name);
+            var foundModule = await context.Database.Modules.FindAsync(module.Name);
 
-            if (!foundModule.Aliases.Contains(alias))
+            if (foundModule is null || !foundModule.Aliases.Contains(alias))
                 return false;
 
             foundModule.Aliases.Remove(alias);
 
-            await context.Database.Modules.UpsertAsync(foundModule);
+            context.Database.Modules.Update(foundModule);
+            await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
+
             return true;
         }
 
         public async Task<bool> RemoveAliasAsync(EspeonContext context, Module module, string command, string alias)
         {
-            var modules = context.Database.Modules;
-            var foundModule = modules.FirstOrDefault(x => x.Name == module.Name);
+            var foundModule = await context.Database.Modules.Include(x => x.Commands)
+                .FirstOrDefaultAsync(x => x.Name == module.Name);
 
-            var foundCommand = foundModule.Commands.Single(x => x.Name == command);
+            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == $"{module.Name}{command}");
 
-            if (!foundCommand.Aliases.Contains(alias))
+            if (foundCommand is null || !foundCommand.Aliases.Contains(alias))
                 return false;
 
             foundCommand.Aliases.Remove(alias);
 
             context.Database.Commands.Update(foundCommand);
+            await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
             return true;
         }

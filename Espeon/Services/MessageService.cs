@@ -10,7 +10,6 @@ using Qmmands;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,43 +51,54 @@ namespace Espeon.Services
 
             return Task.CompletedTask;
         }
-        
+
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
             if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id ||
-                message.Channel is IPrivateChannel) return;
+                !(message.Channel is ITextChannel textChannel)) return;
 
-            using (var scope = _services.CreateScope())
+            List<string> prefixes;
+
+            using (var databaseContext = _services.GetService<DatabaseContext>())
             {
-                var databaseContext = scope.ServiceProvider.GetService<DatabaseContext>();
+                var guild = await databaseContext.Guilds.FindAsync(textChannel.GuildId);
 
-                var commandContext = new EspeonContext(databaseContext, _client, message, isEdit);
-                var guild = await databaseContext.Guilds.FindAsync(commandContext.Guild.Id);
+                prefixes = guild.Prefixes;
 
-                if (guild is null)
+                var user = await databaseContext.Users.FindAsync(message.Author.Id);
+
+                if (user is null)
                 {
-                    guild = new Guild
+                    var newUser = new User
                     {
-                        Id = commandContext.Guild.Id
+                        Id = message.Author.Id,
                     };
 
-                    await databaseContext.Guilds.AddAsync(guild);
+                    await databaseContext.Users.AddAsync(newUser);
+
+                    await databaseContext.SaveChangesAsync();
                 }
+            }
 
-                var prefixes = guild.Config.Prefixes;
-
-                if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
+            if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
+            {
+                var commandContext = new EspeonContext(_client, message, isEdit);
+                var foundCommands = output.FindCommands();
+
+                foreach (var command in foundCommands)
                 {
-                    var foundCommands = output.FindCommands();
+                    var result = await _commands.ExecuteAsync(command, commandContext, _services);
 
-                    foreach(var command in foundCommands)
+                    if (result is CommandNotFoundResult)
                     {
-                        var result = await _commands.ExecuteAsync(command, commandContext, _services);
-                        await commandContext.Database.SaveChangesAsync();
-
-                        if (!result.IsSuccessful && !(result is ExecutionFailedResult))
-                            await CommandErroredAsync(result as FailedResult, commandContext, _services);
+                        //TODO put this in a config file or something
+                        var emote = Emote.Parse("<:blobcatgooglythink:537228289631322112>");
+                        await message.AddReactionAsync(emote);
+                    }
+                    else if (!result.IsSuccessful && !(result is ExecutionFailedResult))
+                    {
+                        await CommandErroredAsync(result as FailedResult, commandContext, _services);
                     }
                 }
             }
@@ -98,44 +108,11 @@ namespace Espeon.Services
         {
             if (!(originalContext is EspeonContext context))
                 return;
+            
+            if (result is ExecutionFailedResult failed)
+                await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
-            Embed response = null;
-
-            switch (result)
-            {
-                case ArgumentParseFailedResult argumentParseFailedResult:
-                    response = argumentParseFailedResult.GenerateResponse(context);
-                    break;
-
-                case ChecksFailedResult checksFailedResult:
-                    response = checksFailedResult.GenerateResponse(context);
-                    break;
-
-                //TODO
-                case CommandOnCooldownResult commandOnCooldownResult:
-                    break;
-
-                case ExecutionFailedResult executionFailedResult:
-                    response = executionFailedResult.GenerateResponse(context);
-
-                    await _logger.LogAsync(Source.Commands, Severity.Critical, executionFailedResult.Reason,
-                        executionFailedResult.Exception);
-                    break;
-
-                case OverloadsFailedResult overloadsFailedResult:
-                    response = overloadsFailedResult.GenerateResponse(context);
-                    break;
-
-                case ParameterChecksFailedResult parameterChecksFailedResult:
-                    response = parameterChecksFailedResult.GenerateResponse(context);
-                    break;
-
-                case TypeParseFailedResult typeParseFailedResult:
-                    response = typeParseFailedResult.GenerateResponse(context);
-                    break;
-            }
-
-            await SendMessageAsync(context, string.Empty, response);
+            await SendMessageAsync(context, string.Empty, result.GenerateResponse(context));
         }
 
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
@@ -204,7 +181,7 @@ namespace Espeon.Services
 
         private Task RemoveAsync(string key, IRemovable removable)
         {
-            var message = (CachedMessage) removable;
+            var message = (CachedMessage)removable;
             _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
 
             if (_messageCache[message.ChannelId][message.UserId].Count == 0)
@@ -244,7 +221,7 @@ namespace Espeon.Services
                     return;
                 }
 
-                var ordered = found.OrderByDescending(x => x.Value.WhenToRemove).ToImmutableArray();
+                var ordered = found.OrderByDescending(x => x.Value.WhenToRemove).ToArray();
                 amount = amount > ordered.Length ? ordered.Length : amount;
 
                 var toDelete = new List<(string, CachedMessage)>();

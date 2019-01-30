@@ -29,7 +29,7 @@ namespace Espeon.Commands.Modules
         [Name("List Reminders")]
         public async Task ListRemindersAsync()
         {
-            var reminders = await ReminderService.GetRemindersAsync(Context);
+            var reminders = ReminderService.GetReminders(Context);
             var ordered = reminders.OrderBy(x => x.WhenToRemove);
 
             var message = string.Join('\n', ordered.Select(x => $"{x.ReminderId}: {x.TheReminder}"));

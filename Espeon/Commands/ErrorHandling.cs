@@ -9,7 +9,7 @@ namespace Espeon.Commands
     {
         private static Color Bad => new Color(0xf31126);
 
-        public static Embed GenerateResponse(this ArgumentParseFailedResult result, EspeonContext context)
+        public static Embed GenerateResponse(this FailedResult result, EspeonContext context)
         {
             var builder = new EmbedBuilder
             {
@@ -21,138 +21,87 @@ namespace Espeon.Commands
                 Color = Bad
             };
 
-            switch (result.ArgumentParserFailure)
+            string message;
+
+            switch (result)
             {
-                case ArgumentParserFailure.UnclosedQuote:
-                case ArgumentParserFailure.UnexpectedQuote:
-                case ArgumentParserFailure.NoWhitespaceBetweenArguments:
-                case ArgumentParserFailure.TooManyArguments:
+                case ArgumentParseFailedResult argumentParseFailedResult:
+                    switch (argumentParseFailedResult.ArgumentParserFailure)
+                    {
+                        case ArgumentParserFailure.UnclosedQuote:
+                        case ArgumentParserFailure.UnexpectedQuote:
+                        case ArgumentParserFailure.NoWhitespaceBetweenArguments:
+                        case ArgumentParserFailure.TooManyArguments:
 
-                    var position = result.Position ?? throw new QuahuLiedException("Result.Position");
+                            var position = argumentParseFailedResult.Position ??
+                                           throw new QuahuLiedException("Result.Position");
 
-                    var message = string.Concat(
+                            message = string.Concat(
+                                result.Reason,
+                                "\n```",
+                                $"{"^".PadLeft(position, ' ')}",
+                                "\n```");
+
+                            builder.WithDescription(message);
+                            break;
+
+                        case ArgumentParserFailure.TooFewArguments:
+
+                            var cmd = argumentParseFailedResult.Command;
+                            var parameters = cmd.Parameters;
+
+                            var response = string.Concat(
+                                result.Reason,
+                                "\n",
+                                cmd.FullAliases.First(),
+                                " ",
+                                string.Join(' ', parameters.Select(x => x.Name)));
+
+                            builder.WithDescription(response);
+                            break;
+                    }
+                    break;
+
+                case ChecksFailedResult checksFailedResult:
+                    message = string.Concat(
                         result.Reason,
-                        "\n```",
-                        $"{"^".PadLeft(position, ' ')}",
-                        "\n```");
+                        "\n",
+                        string.Join('\n', checksFailedResult.FailedChecks.Select(x => x.Error)));
 
                     builder.WithDescription(message);
                     break;
 
-                case ArgumentParserFailure.TooFewArguments:
+                //TODO
+                case CommandOnCooldownResult commandOnCooldownResult:
+                    break;
 
-                    var cmd = result.Command;
-                    var parameters = cmd.Parameters;
+                case ExecutionFailedResult _:
+                    builder.WithDescription("Something went horribly wrong... " +
+                                            "The problem has been forwarded to the appropiate authorities");
+                    break;
 
-                    var response = string.Concat(
+                case OverloadsFailedResult overloadsFailedResult:
+                    message = string.Concat(
                         result.Reason,
                         "\n",
-                        cmd.FullAliases.First(),
-                        " ",
-                        string.Join(' ', parameters.Select(x => x.Name)));
+                        string.Join('\n', overloadsFailedResult.FailedOverloads.Select(x => x.Value.Reason)));
 
-                    builder.WithDescription(response);
+                    builder.WithDescription(message);
+                    break;
+
+                case ParameterChecksFailedResult parameterChecksFailedResult:
+                    message = string.Concat(
+                        result.Reason,
+                        "\n",
+                        string.Join('\n', parameterChecksFailedResult.FailedChecks.Select(x => x.Error)));
+
+                    builder.WithDescription(message);
+                    break;
+
+                case TypeParseFailedResult typeParseFailedResult:
+                    builder.WithDescription(typeParseFailedResult.Reason);
                     break;
             }
-
-            return builder.Build();
-        }
-
-        public static Embed GenerateResponse(this ChecksFailedResult result, EspeonContext context)
-        {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = Bad
-            };
-
-            var message = string.Concat(
-                result.Reason,
-                "\n",
-                string.Join('\n', result.FailedChecks.Select(x => x.Error)));
-
-            builder.WithDescription(message);
-
-            return builder.Build();
-        }
-
-        public static Embed GenerateResponse(this ExecutionFailedResult result, EspeonContext context)
-        {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = Bad,
-                Description = "Something went horribly wrong... " +
-                              "The problem has been forwarded to the appropiate authorities"
-            };
-
-            return builder.Build();
-        }
-
-        public static Embed GenerateResponse(this OverloadsFailedResult result, EspeonContext context)
-        {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = Bad
-            };
-
-            var message = string.Concat(
-                result.Reason,
-                "\n",
-                string.Join('\n', result.FailedOverloads.Select(x => x.Value.Reason)));
-
-            builder.WithDescription(message);
-
-            return builder.Build();
-        }
-
-        public static Embed GenerateResponse(this ParameterChecksFailedResult result, EspeonContext context)
-        {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = Bad
-            };
-
-            var message = string.Concat(
-                result.Reason,
-                "\n",
-                string.Join('\n', result.FailedChecks.Select(x => x.Error)));
-
-            builder.WithDescription(message);
-
-            return builder.Build();
-        }
-
-        public static Embed GenerateResponse(this TypeParseFailedResult result, EspeonContext context)
-        {
-            var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
-                {
-                    IconUrl = context.User.GetAvatarOrDefaultUrl(),
-                    Name = context.User.GetDisplayName()
-                },
-                Color = Bad,
-                Description = result.Reason
-            };
 
             return builder.Build();
         }

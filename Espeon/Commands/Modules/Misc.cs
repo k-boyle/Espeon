@@ -7,6 +7,16 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
 {
+    /*
+     * Cat Fact
+     * Joke
+     * Chuck
+     * Gif
+     * Clear Responses
+     * Admins
+     * Mods
+     * Help
+     */
     [Name("Misc")]
     public class Misc : EspeonBase
     {

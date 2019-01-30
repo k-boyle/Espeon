@@ -1,16 +1,19 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Attributes;
+using Espeon.Database;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
 using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Espeon.Database;
+using Espeon.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Espeon
 {
@@ -38,7 +41,7 @@ namespace Espeon
 
         public async Task StartBotAsync(DatabaseContext context)
         {
-            EventHooks();
+            EventHooks(context);
 
             var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
 
@@ -56,7 +59,8 @@ namespace Espeon
             await _services.GetService<ReminderService>().LoadRemindersAsync(context);
         }
 
-        private void EventHooks()
+        //TODO clean this up
+        private void EventHooks(DatabaseContext context)
         {
             _client.Ready += () =>
             {
@@ -69,6 +73,27 @@ namespace Espeon
             {
                 var (source, severity, lMessage, exception) = LogFactory.FromDiscord(log);
                 return logger.LogAsync(source, severity, lMessage, exception);
+            };
+
+            _client.GuildAvailable += async guild =>
+            {
+                if (await context.Guilds.AnyAsync(x => x.Id == guild.Id))
+                    return;
+
+                await context.Guilds.AddAsync(new Guild
+                {
+                    Id = guild.Id,
+                    Prefixes = new List<string>
+                    {
+                        "es/"
+                    },
+                    Admins = new List<ulong>
+                    {
+                        guild.OwnerId
+                    }
+                });
+
+                await context.SaveChangesAsync();
             };
 
             _push.Log += log =>

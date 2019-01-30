@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20190129140631_ModuleManagar-1.0.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Discord.Net.Core" Version="2.0.2-dev-01059" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.2-dev-01059" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview.18572.1">
@@ -15,7 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview.18572.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview1" />
-    <PackageReference Include="Qmmands" Version="2.0.1-nightly-00098" />
+    <PackageReference Include="Qmmands" Version="2.0.1-nightly-00103" />
   </ItemGroup>
 
   <ItemGroup>

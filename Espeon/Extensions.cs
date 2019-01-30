@@ -10,10 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace Espeon
 {
@@ -149,23 +146,10 @@ namespace Espeon
         {
             return user.Nickname ?? user.Username;
         }
-
-        public static async Task UpsertAsync<T>(this DbSet<T> set, T entity) where T : DatabaseEntity
-        {
-            var found = await set.FindAsync(entity.Id);
-
-            if (found is null)
-            {
-                await set.AddAsync(entity);
-                return;
-            }
-
-            set.Update(entity);
-        }
-
+        
         public static string[] FindCommands(this string str)
         {
-            var split = str.Split(new[] {"::"}, StringSplitOptions.RemoveEmptyEntries);
+            var split = str.Split("::", StringSplitOptions.RemoveEmptyEntries);
 
             return split.Select(x => x.Trim()).ToArray();
         }

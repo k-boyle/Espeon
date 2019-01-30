@@ -6,14 +6,14 @@ namespace Espeon.Database.Entities
     public class User : DatabaseEntity
     {
         public override ulong Id { get; set; }
+        
+        public string ResponsePack { get; set; }
 
-        public override long WhenToRemove { get; set; }
+        public List<Reminder> Reminders { get; set; }
 
-        public string ResponsePack { get; set; } = "default";
-
-        public List<Reminder> Reminders { get; set; } = new List<Reminder>();
-
-        public CandyData Candies { get; set; } = new CandyData();
+        public int CandyAmount { get; set; }
+        public int HighestCandies { get; set; }
+        public long LastClaimedCandies { get; set; }
     }
 
     public class Reminder : IRemovable
@@ -30,15 +30,5 @@ namespace Espeon.Database.Entities
 
         public string TaskKey { get; set; }
         public long WhenToRemove { get; set; }
-    }
-
-    public class CandyData
-    {
-        public User User { get; set; }
-        public ulong UserId { get; set; }
-
-        public int Amount { get; set; }
-        public int Highest { get; set;  }
-        public long LastClaimed { get; set; }
     }
 }

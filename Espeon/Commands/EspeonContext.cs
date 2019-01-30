@@ -7,7 +7,8 @@ namespace Espeon.Commands
 {
     public class EspeonContext : ICommandContext
     {
-        public DatabaseContext Database { get; set; }
+        private DatabaseContext _database;
+        public DatabaseContext Database => _database ?? (_database = new DatabaseContext());
 
         public DiscordSocketClient Client { get; }
         public IUserMessage Message { get; }
@@ -17,10 +18,8 @@ namespace Espeon.Commands
 
         public bool IsEdit { get; }
 
-        public EspeonContext(DatabaseContext database, DiscordSocketClient client, IUserMessage message, bool isEdit)
+        public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit)
         {
-            Database = database;
-
             Client = client;
             Message = message;
             User = message.Author as SocketGuildUser;
