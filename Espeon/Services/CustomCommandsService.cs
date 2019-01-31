@@ -68,8 +68,7 @@ namespace Espeon.Services
             if (!(originaContext is EspeonContext context))
                 throw new ExpectedContextException("EspeonContext");
 
-            var guild = context.Database.Guilds.Include(x => x.Commands)
-                .FirstOrDefault(x => x.Id == context.Guild.Id);
+            var guild = await context.GetCurrentGuildAsync(x => x.Commands);
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
@@ -132,10 +131,9 @@ namespace Espeon.Services
             return context.Database.SaveChangesAsync();
         }
 
-        public ImmutableArray<CustomCommand> GetCommands(EspeonContext context)
+        public async Task<ImmutableArray<CustomCommand>> GetCommandsAsync(EspeonContext context)
         {
-            var guilds = context.Database.Guilds.Include(x => x.Commands);
-            var guild = guilds.First(x => x.Id == context.Guild.Id);
+            var guild = await context.GetCurrentGuildAsync(x => x.Commands);
             return guild.Commands.ToImmutableArray();
         }
 

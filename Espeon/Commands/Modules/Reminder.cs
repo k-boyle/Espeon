@@ -17,11 +17,7 @@ namespace Espeon.Commands.Modules
         public async Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
         {
             await ReminderService.CreateReminderAsync(Context, reminder, when);
-
-            var response = await Response.GetResponseAsync(Module, Command, ResponsePack);
-            var embed = ResponseBuilder.Message(Context, response);
-
-            await SendMessageAsync(embed);
+            await SendOkAsync(await Response.GetResponseAsync(Module, Command, ResponsePack));
         }
 
         //TODO Make better

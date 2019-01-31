@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using Espeon.Database.Entities;
 using Espeon.Interactive.Criteria;
 using Espeon.Services;
@@ -53,30 +52,22 @@ namespace Espeon.Commands.Modules
 
             var result = await Commands.TryCreateCommandAsync(Context, name, value);
 
-            Embed response;
-
             if (result)
             {
-                response = ResponseBuilder.Message(Context, $"{name} has been successfully created");
-
-                await SendMessageAsync(response);
+                await SendOkAsync($"{name} has been successfully created");
                 return;
             }
 
-            response = ResponseBuilder.Message(Context, "Command already exists", false);
-
-            await SendMessageAsync(response);
+            await SendNotOkAsync("Command already exists");
         }
 
         [Command("delete")]
         [Name("Delete Command")]
         [RunMode(RunMode.Parallel)]
-        public async Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
+        public Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
         {
-            await Commands.DeleteCommandAsync(Context, command);
-            var response = ResponseBuilder.Message(Context, $"{command.Name} has been deleted");
-
-            await SendMessageAsync(response);
+            return Task.WhenAll(Commands.DeleteCommandAsync(Context, command),
+                SendOkAsync($"{command.Name} has been deleted"));
         }
 
         [Command("modify")]
@@ -101,9 +92,7 @@ namespace Espeon.Commands.Modules
             
             await Commands.ModifyCommandAsync(Context, command, newValue);
 
-            var response = ResponseBuilder.Message(Context, $"{command.Name} has been updated");
-
-            await SendMessageAsync(response);
+            await SendOkAsync($"{command.Name} has been updated");
         }
     }
 }

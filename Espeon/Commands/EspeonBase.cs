@@ -31,6 +31,18 @@ namespace Espeon.Commands
             return Message.SendMessageAsync(Context, content, embed);
         }
 
+        protected Task<IUserMessage> SendOkAsync(string content)
+        {
+            var response = ResponseBuilder.Message(Context, content);
+            return SendMessageAsync(response);
+        }
+
+        protected Task<IUserMessage> SendNotOkAsync(string content)
+        {
+            var response = ResponseBuilder.Message(Context, content, false);
+            return SendMessageAsync(response);
+        }
+
         protected Task<SocketUserMessage> NextMessageAsync(ICriterion<SocketUserMessage> criterion,
             TimeSpan? timeout = null)
         {

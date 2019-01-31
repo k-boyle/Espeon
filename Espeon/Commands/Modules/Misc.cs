@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
 {
+    //TODO rewrite ping
     /*
      * Cat Fact
      * Joke

@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
 {
+    //TODO renamed this stuff
+    /*
+     * Summaries
+     * Checks?
+     */
     [Name("Module Management")]
     [Group("Module")]
     [RequireOwner]
@@ -17,11 +22,14 @@ namespace Espeon.Commands.Modules
         public async Task AddAsync(Module target, string value)
         {
             var result = await Manager.AddAliasAsync(Context, target, value);
-            var response = ResponseBuilder.Message(Context,
-                result ? $"{value} has been added to {target.Name}!" : $"{value} already exists for {target.Name}!",
-                result);
 
-            await SendMessageAsync(response);
+            if (result)
+            {
+                await SendOkAsync($"{value} has been added to {target.Name}!");
+                return;
+            }
+
+            await SendNotOkAsync($"{value} already exists for {target.Name}!");
         }
 
         [Command("Remove")]
@@ -29,11 +37,14 @@ namespace Espeon.Commands.Modules
         public async Task RemoveAsync(Module target, string value)
         {
             var result = await Manager.RemoveAliasAsync(Context, target, value);
-            var response = ResponseBuilder.Message(Context,
-                result ? $"{value} has been removed from {target.Name}!" : $"{value} doesn't exist for {target.Name}!",
-                result);
 
-            await SendMessageAsync(response);
+            if (result)
+            {
+                await SendOkAsync($"{value} has been removed from {target.Name}!");
+                return;
+            }
+
+            await SendNotOkAsync($"{value} doesn't exist for {target.Name}!");
         }
     }
 
@@ -49,11 +60,14 @@ namespace Espeon.Commands.Modules
         public async Task AddAsync(Command target, string value)
         {
             var result = await Manager.AddAliasAsync(Context, target.Module, target.Name, value);
-            var response = ResponseBuilder.Message(Context,
-                result ? $"{value} has been added to {target.Name}!" : $"{value} already exists for {target.Name}!",
-                result);
 
-            await SendMessageAsync(response);
+            if (result)
+            {
+                await SendOkAsync($"{value} has been added to {target.Name}!");
+                return;
+            }
+
+            await SendNotOkAsync($"{value} already exists for {target.Name}!");
         }
 
         [Command("Remove")]
@@ -61,11 +75,14 @@ namespace Espeon.Commands.Modules
         public async Task RemoveAsync(Command target, string value)
         {
             var result = await Manager.RemoveAliasAsync(Context, target.Module, target.Name, value);
-            var response = ResponseBuilder.Message(Context,
-                result ? $"{value} has been removed from {target.Name}!" : $"{value} doesn't exist for {target.Name}!",
-                result);
 
-            await SendMessageAsync(response);
+            if (result)
+            {
+                await SendOkAsync($"{value} has been removed from {target.Name}!");
+                return;
+            }
+
+            await SendNotOkAsync($"{value} doesn't exist for {target.Name}!");
         }
     }
 }

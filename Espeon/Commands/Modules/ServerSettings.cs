@@ -1,6 +1,5 @@
 ﻿using Qmmands;
 using System.Threading.Tasks;
-using Espeon.Database.Entities;
 
 namespace Espeon.Commands.Modules
 {
@@ -19,39 +18,39 @@ namespace Espeon.Commands.Modules
     [Name("Settings")]
     public class ServerSettings : EspeonBase
     {
-        private Guild CurrentGuild { get; set; }
-
         [Command("addprefix")]
         [Name("Add Prefix")]
-        public Task AddPrefixAsync([Remainder] string prefix)
+        public async Task AddPrefixAsync([Remainder] string prefix)
         {
-            if (CurrentGuild.Prefixes.Contains(prefix))
+            var currentGuild = await Context.GetCurrentGuildAsync();
+            if (currentGuild.Prefixes.Contains(prefix))
             {
-                return SendMessageAsync("This prefix already exists for this guild");
+                await SendMessageAsync("This prefix already exists for this guild");
+                return;
             }
 
-            CurrentGuild.Prefixes.Add(prefix);
+            currentGuild.Prefixes.Add(prefix);
 
-            return Task.WhenAll(Context.Database.SaveChangesAsync(), SendMessageAsync("Prefix has been added"));
+            await Context.Database.SaveChangesAsync();
+            await SendMessageAsync("Prefix has been added");
         }
 
         [Command("removeprefix")]
         [Name("Remove Prefix")]
-        public Task RemovePrefixAsync([Remainder] string prefix)
+        public async Task RemovePrefixAsync([Remainder] string prefix)
         {
-            if (!CurrentGuild.Prefixes.Contains(prefix))
+            var currentGuild = await Context.GetCurrentGuildAsync();
+
+            if (!currentGuild.Prefixes.Contains(prefix))
             {
-                return SendMessageAsync("This prefix doesn't exist for this guild");
+                await SendMessageAsync("This prefix doesn't exist for this guild");
+                return;
             }
 
-            CurrentGuild.Prefixes.Remove(prefix);
+            currentGuild.Prefixes.Remove(prefix);
 
-            return Task.WhenAll(Context.Database.SaveChangesAsync(), SendMessageAsync("Prefix has been removed"));
-        }
-
-        protected override async Task BeforeExecutedAsync(Command command)
-        {
-            CurrentGuild = await Context.Database.GetCurrentGuildAsync(Context);
+            await Context.Database.SaveChangesAsync();
+            await SendMessageAsync("Prefix has been removed");
         }
     }
 }
