@@ -1,10 +1,12 @@
-﻿using Espeon.Database.Entities;
+﻿using Espeon.Commands;
+using Espeon.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Espeon.Database
 {
@@ -101,5 +103,8 @@ namespace Espeon.Database
                     ? str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(ulong.Parse).ToList()
                     : new List<ulong>();
         }
+
+        public Task<Guild> GetCurrentGuildAsync(EspeonContext context)
+            => Guilds.FindAsync(context.Guild.Id);
     }
 }

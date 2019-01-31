@@ -124,7 +124,8 @@ namespace Espeon.Services
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
-
+        
+        //TODO response builder in here
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
