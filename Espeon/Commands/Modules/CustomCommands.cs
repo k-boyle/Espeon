@@ -5,12 +5,13 @@ using Espeon.Services;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
+using Espeon.Commands.Checks;
 
 namespace Espeon.Commands.Modules
 {
     [Name("Custom Commands")]
     [Group("cmd")]
-    //TODO elavated user
+    [RequireElevation(ElevationLevel.Mod)]
     public class CustomCommands : EspeonBase
     {
         public CustomCommandsService Commands { get; set; }
