@@ -19,9 +19,10 @@ namespace Espeon.Services
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
+        [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
-        [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly TimerService _timer;
+        [Inject] private readonly IServiceProvider _services;
 
         private readonly
             ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>>
@@ -64,7 +65,7 @@ namespace Espeon.Services
                 var guild = await databaseContext.Guilds.FindAsync(textChannel.GuildId);
 
                 prefixes = guild.Prefixes;
-
+                
                 var user = await databaseContext.Users.FindAsync(message.Author.Id);
 
                 if (user is null)
@@ -92,9 +93,7 @@ namespace Espeon.Services
 
                     if (result is CommandNotFoundResult)
                     {
-                        //TODO put this in a config file or something
-                        var emote = Emote.Parse("<:blobcatgooglythink:537228289631322112>");
-                        await message.AddReactionAsync(emote);
+                        await message.AddReactionAsync(_emotes.Collection["BlobCat"]);
                     }
                     else if (!result.IsSuccessful && !(result is ExecutionFailedResult))
                     {
@@ -106,9 +105,8 @@ namespace Espeon.Services
 
         private async Task CommandErroredAsync(FailedResult result, ICommandContext originalContext, IServiceProvider services)
         {
-            if (!(originalContext is EspeonContext context))
-                return;
-            
+            var context = originalContext as EspeonContext;
+
             if (result is ExecutionFailedResult failed)
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
@@ -118,8 +116,7 @@ namespace Espeon.Services
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
             ICommandContext originalContext, IServiceProvider services)
         {
-            if (!(originalContext is EspeonContext context))
-                return;
+            var context = originalContext as EspeonContext;
 
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");

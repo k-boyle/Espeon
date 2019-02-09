@@ -8,10 +8,9 @@ namespace Espeon.Commands.Checks
     {
         public override async Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
         {
-            if(!(originalContext is EspeonContext context))
-                throw new ExpectedContextException("EspeonContext");
+            var context = originalContext as EspeonContext;
 
-            var app = await context.Client.GetApplicationInfoAsync();
+            var app = await context!.Client.GetApplicationInfoAsync();
 
             return app.Owner.Id == context.User.Id
                 ? new CheckResult()

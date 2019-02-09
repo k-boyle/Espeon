@@ -61,7 +61,7 @@ namespace Espeon.Commands.Modules
         public async Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
-            channel = channel ?? Context.Channel;
+            channel ??= Context.Channel;
 
             if (currentGuild.RestrictedChannels.Contains(channel.Id))
             {
@@ -80,7 +80,7 @@ namespace Espeon.Commands.Modules
         public async Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
-            channel = channel ?? Context.Channel;
+            channel ??= Context.Channel;
 
             if (!currentGuild.RestrictedChannels.Contains(channel.Id))
             {

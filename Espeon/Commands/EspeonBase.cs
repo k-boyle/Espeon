@@ -57,7 +57,7 @@ namespace Espeon.Commands
 
         protected Task SendPaginatedMessageAsync(PaginatorBase paginator, TimeSpan? timeout = null)
         {
-            return Interactive.SendPaginatedMessageAsync(Context, paginator, timeout);
+            return Interactive.SendPaginatedMessageAsync(paginator, timeout);
         }
 
         protected override async Task BeforeExecutedAsync(Command command)

@@ -27,7 +27,7 @@ namespace Espeon.Interactive
             _reactionCallbacks = new ConcurrentDictionary<ulong, CallbackData>();
         }
 
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
             _client.ReactionAdded += HandleReactionAsync;
             return Task.CompletedTask;
@@ -36,7 +36,7 @@ namespace Espeon.Interactive
         public async Task<SocketUserMessage> NextMessageAsync(EspeonContext context,
             ICriterion<SocketUserMessage> criterion, TimeSpan? timeout = null)
         {
-            timeout = timeout ?? DefaultTimeout;
+            timeout ??= DefaultTimeout;
 
             var taskCompletionSource = new TaskCompletionSource<SocketUserMessage>();
 
@@ -65,9 +65,9 @@ namespace Espeon.Interactive
             return taskResult == resultTask ? await resultTask : null;
         }
 
-        public async Task SendPaginatedMessageAsync(EspeonContext context, PaginatorBase paginator, TimeSpan? timeout = null)
+        public async Task SendPaginatedMessageAsync(PaginatorBase paginator, TimeSpan? timeout = null)
         {
-            timeout = timeout ?? DefaultTimeout;
+            timeout ??= DefaultTimeout;
 
             await paginator.InitialiseAsync();
 
@@ -85,7 +85,7 @@ namespace Espeon.Interactive
             if (!(message is null) && _reactionCallbacks.ContainsKey(message.Id))
                 return false;
 
-            timeout = timeout ?? DefaultTimeout;
+            timeout ??= DefaultTimeout;
 
             await callback.InitialiseAsync();
 

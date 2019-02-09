@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Espeon.Attributes;
+using Espeon.Commands.TypeParsers;
 using Espeon.Database;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -106,6 +107,9 @@ namespace Espeon
 
             foreach (var parser in parsers)
             {
+                if(!(parser.GetCustomAttribute<DontAddAttribute>() is null))
+                    continue;
+
                 var targetType = parser.BaseType.GetGenericArguments().First();
 
                 internalAddParser.Invoke(commands, new[] {targetType, Activator.CreateInstance(parser), true});
@@ -114,6 +118,7 @@ namespace Espeon
             return commands;
         }
 
+        //Based on https://github.com/discord-net/Discord.Net/blob/dev/src/Discord.Net.Commands/Extensions/MessageExtensions.cs#L45-L62
         public static bool HasMentionPrefix(this IMessage message, IUser user, out string parsed)
         {
             var content = message.Content;

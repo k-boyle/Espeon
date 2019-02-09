@@ -36,14 +36,14 @@ namespace Espeon.Services
             await _log.LogAsync(Source.Commands, Severity.Verbose, "All custom commands loaded");
         }
 
-        private async Task CreateCommandsAsync(Guild guild)
+        private Task CreateCommandsAsync(Guild guild)
         {
             var commands = guild.Commands;
 
             if (commands is null || commands.Count == 0)
-                return;
+                return Task.CompletedTask;
 
-            var module = await _commands.AddModuleAsync(moduleBuilder =>
+            var module = _commands.AddModule(moduleBuilder =>
             {
                 moduleBuilder.Name = guild.Id.ToString();
                 moduleBuilder.AddCheck(new RequireGuildAttribute(guild.Id));
@@ -60,21 +60,22 @@ namespace Espeon.Services
             });
 
             _moduleCache[guild.Id] = module;
+
+            return Task.CompletedTask;
         }
 
         private async Task<IResult> CommandCallbackAsync(Command command, object[] parameters,
-            ICommandContext originaContext, IServiceProvider services)
+            ICommandContext originalContext, IServiceProvider services)
         {
-            if (!(originaContext is EspeonContext context))
-                throw new ExpectedContextException("EspeonContext");
+            var context = originalContext as EspeonContext;
 
-            var guild = await context.GetCurrentGuildAsync(x => x.Commands);
+            var guild = await context!.GetCurrentGuildAsync(x => x.Commands);
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
                 string.Equals(x.Name, command.Name, StringComparison.InvariantCultureIgnoreCase));
 
-            await _message.SendMessageAsync(context, found?.Value ?? "Something went wrong");
+            await _message.SendMessageAsync(context, found!.Value);
 
             return new SuccessfulResult();
         }
@@ -140,7 +141,7 @@ namespace Espeon.Services
         private async Task UpdateCommandsAsync(Guild guild)
         {
             if(_moduleCache.ContainsKey(guild.Id))
-                await _commands.RemoveModuleAsync(_moduleCache[guild.Id]);
+                _commands.RemoveModule(_moduleCache[guild.Id]);
 
             await CreateCommandsAsync(guild);
         }

@@ -15,10 +15,9 @@ namespace Espeon.Commands.Checks
 
         public override Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
         {
-            if (!(originalContext is EspeonContext context))
-                throw new ExpectedContextException("IEspeonContext");
+            var context = originalContext as EspeonContext;
 
-            return Task.FromResult(context.Guild.Id == _id
+            return Task.FromResult(context!.Guild.Id == _id
                 ? CheckResult.Successful
                 : CheckResult.Unsuccessful("Command cannot be run in this guild"));
         }

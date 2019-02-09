@@ -13,10 +13,9 @@ namespace Espeon.Commands.Checks
             if(result.IsSuccessful)
                 return CheckResult.Successful;
 
-            if(!(originalContext is EspeonContext context))
-                throw new ExpectedContextException("EspeonContext");
+            var context = originalContext as EspeonContext;
 
-            return context.User.Id == context.Guild.OwnerId
+            return context.User.Id == context!.Guild.OwnerId
                 ? CheckResult.Successful
                 : CheckResult.Unsuccessful("This command can only be executed by the guilds owner");
         }

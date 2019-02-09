@@ -42,8 +42,8 @@ namespace Espeon
         public async Task StartBotAsync(DatabaseContext context)
         {
             EventHooks(context);
-
-            var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            
+            var modules = _commands.AddModules(Assembly.GetEntryAssembly());
 
             var response = _services.GetService<ResponseService>();
             await response.OnCommandsRegisteredAsync(modules);

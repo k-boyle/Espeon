@@ -22,9 +22,12 @@ namespace Espeon.Commands.Games
         public IEnumerable<IEmote> Reactions => new[] { _hit, _stop };
         public ICriterion<SocketReaction> Criterion { get; }
 
-        [Inject] private readonly MessageService _message;
         [Inject] private readonly CandyService _candy;
+        [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly GamesService _games;
+        [Inject] private readonly MessageService _message;
+
+        private Emote RareCandy => _emotes.Collection["RareCandy"];
 
         private readonly IReadOnlyDictionary<string, int> _cards = new Dictionary<string, int>
         {
@@ -102,7 +105,7 @@ namespace Espeon.Commands.Games
                 //lose 
 
                 await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                description = $"I win! You lose {_bet}<:rarecandy:487333156329095168> candies!";
+                description = $"I win! You lose {_bet}{RareCandy} candies!";
                 color = Color.Red;
             }
             else
@@ -122,7 +125,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * NormalPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"I struck out! You win {payout}<:rarecandy:487333156329095168> candies!";
+                    description = $"I struck out! You win {payout}{RareCandy} candies!";
                     color = Color.Green;
                 }
                 else if (dealerTotal == playerTotal)
@@ -137,7 +140,7 @@ namespace Espeon.Commands.Games
                     //lose
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                    description = $"I win! You lose {_bet}<:rarecandy:487333156329095168> candies!";
+                    description = $"I win! You lose {_bet}{RareCandy} candies!";
                     color = Color.Red;
                 }
                 else if(playerTotal == 21)
@@ -147,7 +150,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * BlackjackPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, payout);
-                    description = $"BLACKJACK! You win {payout}<:rarecandy:487333156329095168> candies!";
+                    description = $"BLACKJACK! You win {payout}{RareCandy} candies!";
                     color = Color.Gold;
                 }
                 else
@@ -157,7 +160,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * NormalPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"You have the higher score! You win {payout}<:rarecandy:487333156329095168> candies!";
+                    description = $"You have the higher score! You win {payout}{RareCandy} candies!";
                     color = Color.Green;
                 }
             }
@@ -218,7 +221,7 @@ namespace Espeon.Commands.Games
             var builder = new EmbedBuilder
             {
                 Title = "Blackjack",
-                Description = $"You have bet {_bet}<:rarecandy:487333156329095168> candies\n" + //TODO config file or some shit
+                Description = $"You have bet {_bet}{RareCandy} candies\n" + 
                               $"A game of blackjack. Click {_hit} to hit or {_stop} to stay\n",
                 Color = Color.Default,
                 Fields = GetEmbedFields()

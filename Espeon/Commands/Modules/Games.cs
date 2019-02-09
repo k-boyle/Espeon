@@ -1,4 +1,5 @@
 ﻿using Espeon.Commands.Games;
+using Espeon.Commands.TypeParsers;
 using Espeon.Services;
 using Qmmands;
 using System;
@@ -17,17 +18,11 @@ namespace Espeon.Commands.Modules
     public class Games : EspeonBase
     {
         public GamesService GameService { get; set; }
-
-        //TODO typereader
+        
         [Command("blackjack")]
-        public async Task StartBlackjackAsync(int bet = 0)
+        [Name("Blackjack")]
+        public async Task StartBlackjackAsync([OverrideTypeParser(typeof(CandyTypeParser))] int bet = 0)
         {
-            if (bet < 0)
-            {
-                await SendNotOkAsync("fuck off");
-                return;
-            }
-
             var bj = new Blackjack(Context, Services, bet);
 
             var result = await GameService.TryStartGameAsync(Context, bj, TimeSpan.FromMinutes(5));

@@ -20,21 +20,7 @@ namespace Espeon.Services
                 user.HighestCandies = user.CandyAmount;
             
             await context.Database.SaveChangesAsync();
-        }
-
-        public async Task ClaimCandiesAsync(EspeonContext context, ulong id)
-        {
-            var user = await context.Database.Users.FindAsync(id);
-
-            user.CandyAmount += Random.Next(1, 21);
-
-            if (user.CandyAmount > user.HighestCandies)
-                user.HighestCandies = user.CandyAmount;
-
-            user.LastClaimedCandies = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            
-            await context.Database.SaveChangesAsync();
-        }
+        }        
 
         public async Task<int> GetCandiesAsync(EspeonContext context, ulong id)
         {
@@ -42,11 +28,27 @@ namespace Espeon.Services
             return user.CandyAmount;
         }
 
-        public async Task<bool> CanClaimCandiesAsync(EspeonContext context, ulong id)
+        public async Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)> TryClaimCandiesAsync(EspeonContext context, ulong id)
         {
             var user = await context.Database.Users.FindAsync(id);
-            return DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(user.LastClaimedCandies) >
-                   TimeSpan.FromHours(8);
+            var difference = DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(user.LastClaimedCandies);
+
+            if (difference < TimeSpan.FromHours(8))
+            {
+                return (false, 0, TimeSpan.FromHours(8) - difference);
+            }
+
+            var amount = Random.Next(1, 21);
+            user.CandyAmount += amount;
+
+            if (user.CandyAmount > user.HighestCandies)
+                user.HighestCandies = user.CandyAmount;
+
+            user.LastClaimedCandies = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            await context.Database.SaveChangesAsync();
+
+            return (true, amount, TimeSpan.FromHours(8));
         }
     }
 }

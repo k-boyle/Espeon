@@ -61,6 +61,9 @@ namespace Espeon.Database
                 user.Property(x => x.CandyAmount)
                     .HasDefaultValue(10);
 
+                user.Property(x => x.HighestCandies)
+                    .HasDefaultValue(10);
+
                 user.Property(x => x.ResponsePack)
                     .HasDefaultValue("default");
 
@@ -103,15 +106,14 @@ namespace Espeon.Database
                     ? str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(ulong.Parse).ToList()
                     : new List<ulong>();
         }
-
-        //TODO short hand rest of entities
+        
         public Task<Guild> GetCurrentGuildAsync(EspeonContext context)
             => Guilds.FindAsync(context.Guild.Id);
 
         public Task<Guild> GetCurrentGuildAsync<TProp>(EspeonContext context,
-            Expression<Func<Guild, TProp>> expression)
+            Expression<Func<Guild, TProp>> expression = null)
             => expression is null
                 ? Guilds.FindAsync(context.Guild.Id)
-                : Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == context.Guild.Id);
+                : Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == context.Guild.Id);        
     }
 }

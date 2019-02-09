@@ -27,8 +27,9 @@ namespace Espeon.Services
             services.GetService<CommandService>().ModuleBuilding += OnBuildingAsync;
             return Task.CompletedTask;
         }
-        
-        private async Task OnBuildingAsync(ModuleBuilder moduleBuilder)
+
+        //REEEEEEEEEEEEEEEEEEEEEE
+        private async void OnBuildingAsync(ModuleBuilder moduleBuilder)
         {
             if(string.IsNullOrEmpty(moduleBuilder.Name))
                 throw new NoNullAllowedException(nameof(moduleBuilder));
@@ -167,10 +168,12 @@ namespace Espeon.Services
             return true;
         }
 
-        private async Task UpdateAsync(Module module)
+        private Task UpdateAsync(Module module)
         {
-            await _commands.RemoveModuleAsync(module);
-            await _commands.AddModuleAsync(module.Type);
+            _commands.RemoveModule(module);
+            _commands.AddModule(module.Type);
+
+            return Task.CompletedTask;
         }
     }
 }
