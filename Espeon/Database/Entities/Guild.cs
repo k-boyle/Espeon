@@ -7,6 +7,8 @@ namespace Espeon.Database.Entities
         public override ulong Id { get; set; }
 
         public ulong WelcomeChannelId { get; set; }
+        public string WelcomeMessage { get; set; }
+
         public ulong DefaultRoleId { get; set; }
 
         public List<string> Prefixes { get; set; }

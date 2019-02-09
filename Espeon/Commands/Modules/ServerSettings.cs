@@ -33,7 +33,6 @@ namespace Espeon.Commands.Modules
             }
 
             currentGuild.Prefixes.Add(prefix);
-            Context.Database.Guilds.Update(currentGuild);
 
             await Context.Database.SaveChangesAsync();
             await SendMessageAsync("Prefix has been added");
@@ -52,7 +51,6 @@ namespace Espeon.Commands.Modules
             }
 
             currentGuild.Prefixes.Remove(prefix);
-            Context.Database.Guilds.Update(currentGuild);
 
             await Context.Database.SaveChangesAsync();
             await SendMessageAsync("Prefix has been removed");
@@ -72,7 +70,6 @@ namespace Espeon.Commands.Modules
             }
 
             currentGuild.RestrictedChannels.Add(channel.Id);
-            Context.Database.Guilds.Update(currentGuild);
 
             await Context.Database.SaveChangesAsync();
             await SendOkAsync("The bot has been restricted from this channel");
@@ -92,7 +89,6 @@ namespace Espeon.Commands.Modules
             }
 
             currentGuild.RestrictedChannels.Remove(channel.Id);
-            Context.Database.Guilds.Update(currentGuild);
 
             await Context.Database.SaveChangesAsync();
             await SendOkAsync("The bot has been unrestricted from this channel");
@@ -113,8 +109,7 @@ namespace Espeon.Commands.Modules
                 {
                     currentGuild.Moderators.Remove(user.Id);
                 }
-
-                Context.Database.Update(currentGuild);
+                
 
                 await Context.Database.SaveChangesAsync();
 
@@ -140,7 +135,6 @@ namespace Espeon.Commands.Modules
                 }
 
                 currentGuild.Moderators.Add(user.Id);
-                Context.Database.Guilds.Update(currentGuild);
 
                 await Context.Database.SaveChangesAsync();
                 await SendOkAsync($"{user.GetDisplayName()} has been promoted to a moderator");
@@ -148,6 +142,82 @@ namespace Espeon.Commands.Modules
             }
 
             await SendOkAsync($"{user.GetDisplayName()} is already a moderator");
+        }
+
+        [Command("deadmin")]
+        [Name("Demote Admin")]
+        [RequireGuildOwner]
+        public async Task DemoteAdminAsync([Remainder] SocketGuildUser user)
+        {
+            var currentGuild = await Context.GetCurrentGuildAsync();
+
+            if (currentGuild.Admins.Contains(user.Id))
+            {
+                currentGuild.Admins.Remove(user.Id);
+
+                await Context.Database.SaveChangesAsync();
+                await SendOkAsync($"{user.GetDisplayName()} has been demoted");
+                return;
+            }
+
+            await SendNotOkAsync($"{user.GetDisplayName()} isn't an admin in this guild");
+        }
+
+        [Command("demod")]
+        [Name("Demote Moderator")]
+        [RequireGuildOwner]
+        public async Task DemoteModeratorAsync([Remainder] SocketGuildUser user)
+        {
+            var currentGuild = await Context.GetCurrentGuildAsync();
+
+            if (currentGuild.Moderators.Contains(user.Id))
+            {
+                currentGuild.Moderators.Remove(user.Id);
+
+                await Context.Database.SaveChangesAsync();
+                await SendOkAsync($"{user.GetDisplayName()} has been demoted");
+                return;
+            }
+
+            await SendNotOkAsync($"{user.GetDisplayName()} isn't a moderator in this guild");
+        }
+
+        [Command("welcomechannel")]
+        [Name("Set Welcome Channel")]
+        public async Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null)
+        {
+            var currentGuild = await Context.GetCurrentGuildAsync();
+            currentGuild.WelcomeChannelId = channel?.Id ?? 0;
+            
+            await Context.Database.SaveChangesAsync();
+
+            await SendOkAsync("Welcome channel has been set");
+        }
+
+        [Command("welcomemessage")]
+        [Name("Set Welcome Message")]
+        public async Task SetWelcomeMessageAsync(
+            [Remainder]
+            [ParameterLength(1900)]
+            string message)
+        {
+            var currentGuild = await Context.GetCurrentGuildAsync();
+            currentGuild.WelcomeMessage = message;
+            
+            await Context.Database.SaveChangesAsync();
+
+            await SendOkAsync("Welcome message has been set");
+        }
+
+        [Command("defaultrole")]
+        [Name("Set Default Role")]
+        public async Task SetDefaultRoleAsync([Remainder] SocketRole role = null)
+        {
+            var currentGuild = await Context.GetCurrentGuildAsync();
+            currentGuild.DefaultRoleId = role?.Id ?? 0;
+            
+            await Context.Database.SaveChangesAsync();
+            await SendOkAsync("Default role has been updated");
         }
     }
 }

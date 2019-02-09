@@ -5,6 +5,7 @@ using Espeon.Commands;
 using Espeon.Database;
 using Espeon.Database.Entities;
 using Espeon.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
@@ -13,11 +14,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace Espeon.Services
 {
-    public class ReminderService : IService
+    public class ReminderService : BaseService
     {
         [Inject] private readonly LogService _logger;
         [Inject] private readonly TimerService _timer;
@@ -31,11 +31,7 @@ namespace Espeon.Services
 
         private Device _phone;
         private Device Phone => _phone ?? (_phone = _push.Devices.First());
-
-
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
-            => Task.CompletedTask;
-
+        
         //requires client to be populated to send reminders
         public async Task LoadRemindersAsync(DatabaseContext ctx)
         {
@@ -52,8 +48,6 @@ namespace Espeon.Services
 
                 var newKey = await _timer.EnqueueAsync(reminder, RemoveAsync);
                 reminder.TaskKey = newKey;
-
-                ctx.Reminders.Update(reminder);
             }
 
             await Task.WhenAll(toRemove.Select(x => RemoveAsync(x.TaskKey, x)));

@@ -15,6 +15,7 @@ namespace Espeon.Commands
         public MessageService Message { get; set; }
         public ResponseService Response { get; set; }
         public InteractiveService Interactive { get; set; }
+        public IServiceProvider Services { get; set; }
 
         public Module Module { get; private set; }
         public Command Command { get; private set; }

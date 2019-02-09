@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    public class CustomCommandsService : IService
+    public class CustomCommandsService : BaseService
     {
         [Inject] private readonly LogService _log;
         [Inject] private readonly MessageService _message;
@@ -26,7 +26,7 @@ namespace Espeon.Services
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
 
-        public async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
             var guilds = context.Guilds.Include(x => x.Commands);
 

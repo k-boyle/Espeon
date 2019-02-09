@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Interactive
 {
-    public class InteractiveService : IService
+    public class InteractiveService : BaseService
     {
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly TimerService _timer;
@@ -81,7 +81,8 @@ namespace Espeon.Interactive
 
             var message = callback.Message;
 
-            if (_reactionCallbacks.ContainsKey(message.Id))
+            //null check for games support... Yeah I should rethink this
+            if (!(message is null) && _reactionCallbacks.ContainsKey(message.Id))
                 return false;
 
             timeout = timeout ?? DefaultTimeout;
@@ -110,6 +111,16 @@ namespace Espeon.Interactive
             return _reactionCallbacks.TryAdd(message.Id, callbackData);
         }
 
+        public async Task<bool> TryRemoveCallbackAsync(IReactionCallback callback)
+        {
+            if (!_reactionCallbacks.TryGetValue(callback.Message.Id, out var callbackData))
+                return false;
+            
+            await _timer.RemoveAsync(callbackData.TaskKey);
+
+            return _reactionCallbacks.TryRemove(callback.Message.Id, out _);
+        }
+             
         private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> cachedMessage,
             ISocketMessageChannel channel, SocketReaction reaction)
         {
@@ -130,7 +141,7 @@ namespace Espeon.Interactive
 
             result = await callback.HandleCallbackAsync(reaction);
 
-            if (result)
+            if (!result)
             {
                 await _timer.RemoveAsync(callbackData.TaskKey);
 

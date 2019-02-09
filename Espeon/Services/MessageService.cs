@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    public class MessageService : IService
+    public class MessageService : BaseService
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly DiscordSocketClient _client;
@@ -36,7 +36,7 @@ namespace Espeon.Services
                     CachedMessage>>>();
         }
 
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
             var commands = services.GetService<CommandService>();
             var client = services.GetService<DiscordSocketClient>();

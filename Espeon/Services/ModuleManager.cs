@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Espeon.Services
 {
     //TODO add shit like custom summaries
-    public class ModuleManager : IService
+    public class ModuleManager : BaseService
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly CustomCommandsService _customCommands;
@@ -22,7 +22,7 @@ namespace Espeon.Services
 
         private Random Random => _random ?? (_random = new Random());
 
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
             services.GetService<CommandService>().ModuleBuilding += OnBuildingAsync;
             return Task.CompletedTask;
@@ -79,7 +79,6 @@ namespace Espeon.Services
                             };
 
                             foundModule.Commands.Add(foundCommand);
-                            ctx.Modules.Update(foundModule);
                         }
                         else
                         {
@@ -107,7 +106,6 @@ namespace Espeon.Services
                 return false;
 
             foundModule.Aliases.Add(alias);
-            context.Database.Modules.Update(foundModule);
             await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
 
@@ -130,8 +128,7 @@ namespace Espeon.Services
                 return false;
 
             foundCommand.Aliases.Add(alias);
-
-            context.Database.Commands.Update(foundCommand);
+            
             await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
 
@@ -146,8 +143,7 @@ namespace Espeon.Services
                 return false;
 
             foundModule.Aliases.Remove(alias);
-
-            context.Database.Modules.Update(foundModule);
+            
             await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
 
@@ -166,7 +162,6 @@ namespace Espeon.Services
 
             foundCommand.Aliases.Remove(alias);
 
-            context.Database.Commands.Update(foundCommand);
             await context.Database.SaveChangesAsync();
             await UpdateAsync(module);
             return true;

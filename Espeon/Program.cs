@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Espeon
 {
-    class Program
+    internal class Program
     {
         private static async Task Main()
         {
@@ -21,7 +21,7 @@ namespace Espeon
 
             var assembly = Assembly.GetEntryAssembly();
             var types = assembly.GetTypes()
-                .Where(x => typeof(IService).IsAssignableFrom(x) && !x.IsInterface).ToArray();
+                .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
             var services = new ServiceCollection()
                 .AddServices(types)

@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Espeon.Attributes;
 using Espeon.Database;
-using Espeon.Database.Entities;
 using Espeon.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
@@ -83,7 +81,7 @@ namespace Espeon
             {
                 var service = services.GetService(type);
 
-                if (!(service is IService validService))
+                if (!(service is BaseService validService))
                     throw new InvalidServiceException($"{type}");
 
                 await validService.InitialiseAsync(context, services);

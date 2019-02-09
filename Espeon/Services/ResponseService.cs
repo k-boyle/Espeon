@@ -1,5 +1,4 @@
 using Espeon.Commands;
-using Espeon.Database;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    public class ResponseService : IService
+    public class ResponseService : BaseService
     {
         private const string MapDir = "./commands.json";
         
@@ -21,10 +20,7 @@ namespace Espeon.Services
         {
             _responseMap = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
         }
-
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
-         => Task.CompletedTask;
-
+        
         public Task<string> GetResponseAsync(Module module, Command command, string pack = "default", params object[] @params)
         {
             var response = _responseMap[module.Name][command.Name][pack];

@@ -1,5 +1,4 @@
-﻿using Espeon.Database;
-using Espeon.Entities;
+﻿using Espeon.Entities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    public class TimerService : IService
+    public class TimerService : BaseService
     {
         private readonly Timer _timer;
         private ConcurrentQueue<TaskObject> _taskQueue;
@@ -27,9 +26,6 @@ namespace Espeon.Services
                 await SetTimerAsync();
             }, null, -1, -1);
         }
-
-        public Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
-            => Task.CompletedTask;
         
         public Task<string> EnqueueAsync(IRemovable removable, Func<string, IRemovable, Task> removeTask)
             => EnqueueAsync(removable, removeTask, true);
