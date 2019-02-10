@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.TypeParsers
 {
-    [DontAdd]
+    [DontOverride]
     public class CandyTypeParser : TypeParser<int>
     {
         public override async Task<TypeParserResult<int>> ParseAsync(string value, ICommandContext originalContext, IServiceProvider services)
@@ -14,7 +14,7 @@ namespace Espeon.Commands.TypeParsers
             var context = originalContext as EspeonContext;
 
             var candy = services.GetService<CandyService>();
-            var userAmount = await candy.GetCandiesAsync(context, context!.User.Id);
+            var userAmount = await candy.GetCandiesAsync(context, context!.User);
 
             if (string.Equals(value, "NaN")) //JS meme
                 return TypeParserResult<int>.Successful(0);

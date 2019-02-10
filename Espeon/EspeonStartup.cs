@@ -8,12 +8,9 @@ using Pusharp;
 using Pusharp.Entities;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Espeon.Database.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Espeon
 {
@@ -73,27 +70,6 @@ namespace Espeon
             {
                 var (source, severity, lMessage, exception) = LogFactory.FromDiscord(log);
                 return logger.LogAsync(source, severity, lMessage, exception);
-            };
-
-            _client.GuildAvailable += async guild =>
-            {
-                if (await context.Guilds.AnyAsync(x => x.Id == guild.Id))
-                    return;
-
-                await context.Guilds.AddAsync(new Guild
-                {
-                    Id = guild.Id,
-                    Prefixes = new List<string>
-                    {
-                        "es/"
-                    },
-                    Admins = new List<ulong>
-                    {
-                        guild.OwnerId
-                    }
-                });
-
-                await context.SaveChangesAsync();
             };
 
             _push.Log += log =>

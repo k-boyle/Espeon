@@ -1,11 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Database;
-using Espeon.Database.Entities;
 using Qmmands;
-using System;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
@@ -31,11 +27,5 @@ namespace Espeon.Commands
 
             IsEdit = isEdit;
         }
-
-        public Task<Guild> GetCurrentGuildAsync()
-            => Database.GetCurrentGuildAsync(this);
-
-        public Task<Guild> GetCurrentGuildAsync<TProp>(Expression<Func<Guild, TProp>> expression)
-            => Database.GetCurrentGuildAsync(this, expression);
     }
 }

@@ -107,12 +107,11 @@ namespace Espeon
 
             foreach (var parser in parsers)
             {
-                if(!(parser.GetCustomAttribute<DontAddAttribute>() is null))
-                    continue;
+                var @override = parser.GetCustomAttribute<DontOverrideAttribute>() is null;
 
                 var targetType = parser.BaseType.GetGenericArguments().First();
 
-                internalAddParser.Invoke(commands, new[] {targetType, Activator.CreateInstance(parser), true});
+                internalAddParser.Invoke(commands, new[] {targetType, Activator.CreateInstance(parser), !@override});
             }
 
             return commands;

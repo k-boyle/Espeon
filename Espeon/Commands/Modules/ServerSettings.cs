@@ -25,7 +25,7 @@ namespace Espeon.Commands.Modules
         [Name("Add Prefix")]
         public async Task AddPrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             if (currentGuild.Prefixes.Contains(prefix))
             {
                 await SendMessageAsync("This prefix already exists for this guild");
@@ -42,7 +42,7 @@ namespace Espeon.Commands.Modules
         [Name("Remove Prefix")]
         public async Task RemovePrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Prefixes.Contains(prefix))
             {
@@ -60,7 +60,7 @@ namespace Espeon.Commands.Modules
         [Name("Restrict Channel")]
         public async Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             channel ??= Context.Channel;
 
             if (currentGuild.RestrictedChannels.Contains(channel.Id))
@@ -79,7 +79,7 @@ namespace Espeon.Commands.Modules
         [Name("Unrestrict Channel")]
         public async Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             channel ??= Context.Channel;
 
             if (!currentGuild.RestrictedChannels.Contains(channel.Id))
@@ -99,7 +99,7 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task AdminUserAsync([Remainder] SocketGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Admins.Contains(user.Id))
             {
@@ -124,7 +124,7 @@ namespace Espeon.Commands.Modules
         [Name("Moderate User")]
         public async Task ModUserAsync([Remainder] SocketGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Moderators.Contains(user.Id))
             {
@@ -149,7 +149,7 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task DemoteAdminAsync([Remainder] SocketGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
             if (currentGuild.Admins.Contains(user.Id))
             {
@@ -168,7 +168,7 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task DemoteModeratorAsync([Remainder] SocketGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
             if (currentGuild.Moderators.Contains(user.Id))
             {
@@ -186,7 +186,7 @@ namespace Espeon.Commands.Modules
         [Name("Set Welcome Channel")]
         public async Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeChannelId = channel?.Id ?? 0;
             
             await Context.Database.SaveChangesAsync();
@@ -201,7 +201,7 @@ namespace Espeon.Commands.Modules
             [ParameterLength(1900)]
             string message)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeMessage = message;
             
             await Context.Database.SaveChangesAsync();
@@ -213,7 +213,7 @@ namespace Espeon.Commands.Modules
         [Name("Set Default Role")]
         public async Task SetDefaultRoleAsync([Remainder] SocketRole role = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.DefaultRoleId = role?.Id ?? 0;
             
             await Context.Database.SaveChangesAsync();

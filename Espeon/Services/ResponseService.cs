@@ -68,9 +68,9 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        public async Task<string> GetUsersPackAsync(EspeonContext context, ulong id)
+        public async Task<string> GetUsersPackAsync(EspeonContext context)
         {
-            var user = await context.Database.Users.FindAsync(id);
+            var user = await context.Database.GetOrCreateUserAsync(context.User);
             return user.ResponsePack;
         }
 

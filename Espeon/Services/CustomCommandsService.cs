@@ -3,7 +3,6 @@ using Espeon.Commands;
 using Espeon.Commands.Checks;
 using Espeon.Database;
 using Espeon.Database.Entities;
-using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -28,7 +27,7 @@ namespace Espeon.Services
 
         public override async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
         {
-            var guilds = context.Guilds.Include(x => x.Commands);
+            var guilds = await context.GetAllGuildsAsync(x => x.Commands);
 
             var createCommands = guilds.Select(CreateCommandsAsync);
 
@@ -69,7 +68,7 @@ namespace Espeon.Services
         {
             var context = originalContext as EspeonContext;
 
-            var guild = await context!.GetCurrentGuildAsync(x => x.Commands);
+            var guild = await context!.Database.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
@@ -106,7 +105,7 @@ namespace Espeon.Services
             await context.Database.CustomCommands.AddAsync(newCmd);
             await context.Database.SaveChangesAsync();
 
-            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
+            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild);
 
             await UpdateCommandsAsync(guild);
 
@@ -118,7 +117,7 @@ namespace Espeon.Services
             context.Database.CustomCommands.Remove(command);
             await context.Database.SaveChangesAsync();
 
-            var guild = await context.Database.Guilds.FindAsync(context.Guild.Id);
+            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild);
 
             await UpdateCommandsAsync(guild);
         }
@@ -134,7 +133,7 @@ namespace Espeon.Services
 
         public async Task<ImmutableArray<CustomCommand>> GetCommandsAsync(EspeonContext context)
         {
-            var guild = await context.GetCurrentGuildAsync(x => x.Commands);
+            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             return guild.Commands.ToImmutableArray();
         }
 

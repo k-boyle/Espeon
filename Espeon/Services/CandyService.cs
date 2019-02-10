@@ -1,4 +1,5 @@
-﻿using Espeon.Attributes;
+﻿using Discord;
+using Espeon.Attributes;
 using Espeon.Commands;
 using System;
 using System.Threading.Tasks;
@@ -13,7 +14,16 @@ namespace Espeon.Services
 
         public async Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
         {
-            var user = await context.Database.Users.FindAsync(id);
+            var bot = context.Client.CurrentUser;
+
+            if(amount < 0 && id != bot.Id)
+            {
+                var espeon = await context.Database.GetOrCreateUserAsync(bot);
+
+                espeon.CandyAmount += Math.Abs(amount);
+            }
+
+            var user = await context.Database.GetOrCreateUserAsync(context.User);
             user.CandyAmount += amount;
 
             if (user.CandyAmount > user.HighestCandies)
@@ -22,15 +32,29 @@ namespace Espeon.Services
             await context.Database.SaveChangesAsync();
         }        
 
-        public async Task<int> GetCandiesAsync(EspeonContext context, ulong id)
+        public async Task TransferCandiesAsync(EspeonContext context, IUser sender, IUser receiver, int amount)
         {
-            var user = await context.Database.Users.FindAsync(id);
-            return user.CandyAmount;
+            var foundSender = await context.Database.GetOrCreateUserAsync(sender);
+            var foundReceiver = await context.Database.GetOrCreateUserAsync(receiver);
+
+            foundSender.CandyAmount -= amount;
+            foundReceiver.CandyAmount += amount;
+
+            if (foundReceiver.CandyAmount > foundReceiver.HighestCandies)
+                foundReceiver.HighestCandies = foundReceiver.CandyAmount;
+
+            await context.Database.SaveChangesAsync();
         }
 
-        public async Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)> TryClaimCandiesAsync(EspeonContext context, ulong id)
+        public async Task<int> GetCandiesAsync(EspeonContext context, IUser user)
         {
-            var user = await context.Database.Users.FindAsync(id);
+            var foundUser = await context.Database.GetOrCreateUserAsync(user);
+            return foundUser.CandyAmount;
+        }
+
+        public async Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)> TryClaimCandiesAsync(EspeonContext context, IUser toClaim)
+        {
+            var user = await context.Database.GetOrCreateUserAsync(toClaim);
             var difference = DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(user.LastClaimedCandies);
 
             if (difference < TimeSpan.FromHours(8))

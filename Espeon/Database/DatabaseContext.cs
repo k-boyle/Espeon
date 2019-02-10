@@ -1,4 +1,4 @@
-﻿using Espeon.Commands;
+﻿using Discord;
 using Espeon.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -12,8 +12,8 @@ namespace Espeon.Database
 {
     public class DatabaseContext : DbContext
     {
-        public DbSet<Guild> Guilds { get; set; }
-        public DbSet<User> Users { get; set; }
+        private DbSet<Guild> Guilds { get; set; }
+        private DbSet<User> Users { get; set; }
         public DbSet<Reminder> Reminders { get; set; }
         public DbSet<ModuleInfo> Modules { get; set; }
         public DbSet<CommandInfo> Commands { get; set; }
@@ -70,7 +70,7 @@ namespace Espeon.Database
                 user.HasMany(x => x.Reminders)
                     .WithOne();
             });
-            
+
             modelBuilder.Entity<Reminder>().HasKey(x => x.Id);
 
             modelBuilder.Entity<Reminder>().Property(x => x.Id)
@@ -106,14 +106,97 @@ namespace Espeon.Database
                     ? str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(ulong.Parse).ToList()
                     : new List<ulong>();
         }
-        
-        public Task<Guild> GetCurrentGuildAsync(EspeonContext context)
-            => Guilds.FindAsync(context.Guild.Id);
 
-        public Task<Guild> GetCurrentGuildAsync<TProp>(EspeonContext context,
-            Expression<Func<Guild, TProp>> expression = null)
-            => expression is null
-                ? Guilds.FindAsync(context.Guild.Id)
-                : Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == context.Guild.Id);        
+        public async Task<Guild> GetOrCreateGuildAsync(IGuild guild)
+        {
+            var foundGuild = await Guilds.FindAsync(guild.Id) 
+                ?? await CreateGuildAsync<ulong>(guild, null); //kinda hacky?
+
+            return foundGuild;
+        }
+
+        public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression)
+        {
+            var foundGuild = await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id) 
+                ?? await CreateGuildAsync(guild, expression);
+
+            return foundGuild;
+        }
+
+        private async Task<Guild> CreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression)
+        {
+            var newGuild = new Guild
+            {
+                Id = guild.Id,
+                Prefixes = new List<string>
+                {
+                    "es/"
+                },
+                Admins = new List<ulong>
+                {
+                    guild.OwnerId
+                }
+            };
+
+            await Guilds.AddAsync(newGuild);
+
+            await SaveChangesAsync();
+
+            if(expression is null)
+                return await Guilds.FindAsync(guild.Id);
+
+            return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id);
+        }
+
+        public Task<IReadOnlyCollection<Guild>> GetAllGuildsAsync()
+            => GetAllGuildsAsync<ulong>(null);
+
+        public async Task<IReadOnlyCollection<Guild>> GetAllGuildsAsync<TProp>(Expression<Func<Guild, TProp>> expression)
+        {
+            if(expression is null)
+            {
+                return await Guilds.ToListAsync();
+            }
+            
+            return await Guilds.Include(expression).ToListAsync();
+        }
+
+        public async Task<User> GetOrCreateUserAsync(IUser user)
+        {
+            var foundUser = await Users.FindAsync(user.Id)
+                ?? await CreateUserAsync<ulong>(user, null);
+
+            return foundUser;
+        }
+
+        public async Task<User> GetOrCreateUserAsync<TProp>(IUser user, Expression<Func<User, TProp>> expression)
+        {
+            var foundUser = await Users.Include(expression).FirstOrDefaultAsync(x => x.Id == user.Id)
+                ?? await CreateUserAsync(user, expression);
+
+            return foundUser;
+        }
+
+        private async Task<User> CreateUserAsync<TProp>(IUser user, Expression<Func<User, TProp>> expression)
+        {
+            var newUser = new User
+            {
+                Id = user.Id
+            };
+
+            await Users.AddAsync(newUser);
+
+            await SaveChangesAsync();
+
+            if(expression is null)
+                return await Users.FindAsync(user.Id);
+
+            return await Users.Include(expression).FirstOrDefaultAsync(x => x.Id == user.Id);
+        }
+
+        //async needed for the cast
+        public async Task<IReadOnlyCollection<User>> GetAllUsersAsync()
+            => await Users.ToListAsync();
+        
     }
 }

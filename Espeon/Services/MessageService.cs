@@ -56,29 +56,15 @@ namespace Espeon.Services
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
             if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id ||
-                !(message.Channel is ITextChannel textChannel)) return;
+                !(message.Channel is SocketTextChannel textChannel)) return;
 
-            List<string> prefixes;
+            IReadOnlyCollection<string> prefixes;
 
             using (var databaseContext = _services.GetService<DatabaseContext>())
             {
-                var guild = await databaseContext.Guilds.FindAsync(textChannel.GuildId);
+                var guild = await databaseContext.GetOrCreateGuildAsync(textChannel.Guild);
 
-                prefixes = guild.Prefixes;
-                
-                var user = await databaseContext.Users.FindAsync(message.Author.Id);
-
-                if (user is null)
-                {
-                    var newUser = new User
-                    {
-                        Id = message.Author.Id,
-                    };
-
-                    await databaseContext.Users.AddAsync(newUser);
-
-                    await databaseContext.SaveChangesAsync();
-                }
+                prefixes = guild.Prefixes;                
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,

@@ -105,7 +105,7 @@ namespace Espeon.Commands.Games
                 //lose 
 
                 await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                description = $"I win! You lose {_bet}{RareCandy} candies!";
+                description = $"I win! You lose {_bet}{RareCandy} cand{(_bet == 1 ? "y" : "ies")}!";
                 color = Color.Red;
             }
             else
@@ -125,7 +125,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * NormalPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"I struck out! You win {payout}{RareCandy} candies!";
+                    description = $"I struck out! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
                 else if (dealerTotal == playerTotal)
@@ -140,7 +140,7 @@ namespace Espeon.Commands.Games
                     //lose
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                    description = $"I win! You lose {_bet}{RareCandy} candies!";
+                    description = $"I win! You lose {_bet}{RareCandy} cand{(_bet == 1 ? "y" : "ies")}!";
                     color = Color.Red;
                 }
                 else if(playerTotal == 21)
@@ -150,7 +150,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * BlackjackPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, payout);
-                    description = $"BLACKJACK! You win {payout}{RareCandy} candies!";
+                    description = $"BLACKJACK! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
                     color = Color.Gold;
                 }
                 else
@@ -160,7 +160,7 @@ namespace Espeon.Commands.Games
                     payout = (int)(_bet * NormalPayout);
 
                     await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"You have the higher score! You win {payout}{RareCandy} candies!";
+                    description = $"You have the higher score! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
             }

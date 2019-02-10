@@ -84,10 +84,9 @@ namespace Espeon.Services
             await context.Database.SaveChangesAsync();
         }
 
-        public ImmutableArray<Reminder> GetReminders(EspeonContext context)
+        public async Task<ImmutableArray<Reminder>> GetRemindersAsync(EspeonContext context)
         {
-            var users = context.Database.Users.Include(x => x.Reminders);
-            var user = users.First(x => x.Id == context.User.Id);
+            var user = await context.Database.GetOrCreateUserAsync(context.User, x => x.Reminders);
             return user.Reminders.ToImmutableArray();
         }
 

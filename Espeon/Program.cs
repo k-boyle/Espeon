@@ -52,7 +52,7 @@ namespace Espeon
             var ctx = services.GetService<DatabaseContext>();
 
             await ctx.Database.MigrateAsync();
-
+            
             await services.RunInitialisersAsync(ctx, types);
 
             await ctx.SaveChangesAsync();

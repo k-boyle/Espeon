@@ -65,7 +65,7 @@ namespace Espeon.Commands
             Module = command.Module;
             Command = command;
 
-            var pack = await Response.GetUsersPackAsync(Context, Context.User.Id);
+            var pack = await Response.GetUsersPackAsync(Context);
             ResponsePack = pack;
         }
     }

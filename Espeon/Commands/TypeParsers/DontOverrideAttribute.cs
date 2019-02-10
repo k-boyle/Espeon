@@ -3,7 +3,7 @@
 namespace Espeon.Commands.TypeParsers
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class DontAddAttribute : Attribute
+    public class DontOverrideAttribute : Attribute
     {
     }
 }

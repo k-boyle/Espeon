@@ -10,6 +10,7 @@ namespace Espeon.Commands.TypeParsers
 {
     public sealed class SocketGuildUserParser : TypeParser<SocketGuildUser>
     {
+        //TODO change to IGuildUser + add (IGuildUser, User)
         public override Task<TypeParserResult<SocketGuildUser>> ParseAsync(string value, ICommandContext ctx,
             IServiceProvider provider)
         {
