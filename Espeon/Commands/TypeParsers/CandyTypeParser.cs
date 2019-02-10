@@ -19,7 +19,7 @@ namespace Espeon.Commands.TypeParsers
             if (string.Equals(value, "NaN")) //JS meme
                 return TypeParserResult<int>.Successful(0);
 
-            if (string.Equals(value, "all", StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals(value, "all", StringComparison.InvariantCultureIgnoreCase))
                 return TypeParserResult<int>.Successful(userAmount);
 
             if (!int.TryParse(value, out var amount))

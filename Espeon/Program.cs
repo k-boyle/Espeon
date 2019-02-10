@@ -8,6 +8,8 @@ using Pusharp;
 using Qmmands;
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -44,11 +46,16 @@ namespace Espeon
                 }))
                 .AddSingleton(config)
                 .AddSingleton<Random>()
+                .AddHttpClient("requests", client =>
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                })
+                    .Services
                 .AddEntityFrameworkNpgsql()
                 .AddDbContext<DatabaseContext>(ServiceLifetime.Transient)
                 .BuildServiceProvider()
                 .Inject(types);
-
+            
             var ctx = services.GetService<DatabaseContext>();
 
             await ctx.Database.MigrateAsync();

@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
+using Espeon.Commands.Checks;
 using Espeon.Database.Entities;
 using Espeon.Interactive.Criteria;
 using Espeon.Services;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Espeon.Commands.Checks;
 
 namespace Espeon.Commands.Modules
 {

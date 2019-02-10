@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Espeon.Commands.Checks;
 using Qmmands;
 using System.Threading.Tasks;
@@ -97,7 +98,7 @@ namespace Espeon.Commands.Modules
         [Command("admin")]
         [Name("Admin User")]
         [RequireGuildOwner]
-        public async Task AdminUserAsync([Remainder] SocketGuildUser user)
+        public async Task AdminUserAsync([Remainder] IGuildUser user)
         {
             var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
@@ -122,7 +123,7 @@ namespace Espeon.Commands.Modules
 
         [Command("mod")]
         [Name("Moderate User")]
-        public async Task ModUserAsync([Remainder] SocketGuildUser user)
+        public async Task ModUserAsync([Remainder] IGuildUser user)
         {
             var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
@@ -147,7 +148,7 @@ namespace Espeon.Commands.Modules
         [Command("deadmin")]
         [Name("Demote Admin")]
         [RequireGuildOwner]
-        public async Task DemoteAdminAsync([Remainder] SocketGuildUser user)
+        public async Task DemoteAdminAsync([Remainder] IGuildUser user)
         {
             var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 
@@ -166,7 +167,7 @@ namespace Espeon.Commands.Modules
         [Command("demod")]
         [Name("Demote Moderator")]
         [RequireGuildOwner]
-        public async Task DemoteModeratorAsync([Remainder] SocketGuildUser user)
+        public async Task DemoteModeratorAsync([Remainder] IGuildUser user)
         {
             var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
 

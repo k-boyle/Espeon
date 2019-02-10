@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
 {
-    [Name("Reminder")]
+    [Name("Reminders")]
     [Group("Reminder")]
     public class Reminder : EspeonBase
     {

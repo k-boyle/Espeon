@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Espeon.Commands.TypeParsers;
 using Espeon.Database.Entities;
 using Espeon.Services;
@@ -23,7 +22,7 @@ namespace Espeon.Commands.Modules
      * Steal
      */
 
-    [Name("Candy Commands")]
+    [Name("Candies")]
     public class Candy : EspeonBase
     {
         public CandyService CandyService { get; set; }
@@ -34,7 +33,7 @@ namespace Espeon.Commands.Modules
 
         [Command("Candies")]
         [Name("View Candies")]
-        public async Task ViewCandiesAsync([Remainder] SocketGuildUser user = null)
+        public async Task ViewCandiesAsync([Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
 
@@ -69,7 +68,7 @@ namespace Espeon.Commands.Modules
 
         [Command("Treat")]
         [Name("Treat")]
-        public async Task TreatUserAsync(int amount, [Remainder] SocketGuildUser user = null)
+        public async Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
 
@@ -119,7 +118,7 @@ namespace Espeon.Commands.Modules
 
         [Command("Gift")]
         [Name("Gift Candies")]
-        public async Task GiftCandiesAsync(SocketGuildUser user, [OverrideTypeParser(typeof(CandyTypeParser))] int amount)
+        public async Task GiftCandiesAsync(IGuildUser user, [OverrideTypeParser(typeof(CandyTypeParser))] int amount)
         {
             await CandyService.TransferCandiesAsync(Context, Context.User, user, amount);
 
