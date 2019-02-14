@@ -33,15 +33,15 @@ namespace Espeon.Commands.Modules
         public EmotesService Emotes { get; set; }
         public IHttpClientFactory ClientFactory { get; set; }
 
-        private Emoji _delete = new Emoji("🚮");
+        private readonly Emoji _delete = new Emoji("🚮");
 
+        //TODO this is a special case
         [Command("Ping")]
         [Name("Ping")]
         public async Task PingAsync()
         {
             var latency = Context.Client.Latency;
-            var str = await Response.GetResponseAsync(Module, Command, ResponsePack, latency, "");
-            var response = ResponseBuilder.Message(Context, str);
+            var response = ResponseBuilder.Message(Context, $"Latency: {latency}ms");
 
             var sw = new Stopwatch();
             sw.Start();
@@ -49,9 +49,8 @@ namespace Espeon.Commands.Modules
             var message = await SendMessageAsync(response);
 
             sw.Stop();
-
-            str = await Response.GetResponseAsync(Module, Command, ResponsePack, latency, sw.ElapsedMilliseconds);
-            response = ResponseBuilder.Message(Context, str);
+            
+            response = ResponseBuilder.Message(Context, $"Latency: {latency}ms\nPing: {sw.ElapsedMilliseconds}ms");
 
             await message.ModifyAsync(x => x.Embed = response);
 
@@ -68,7 +67,7 @@ namespace Espeon.Commands.Modules
         [Name("Get Catfact")]
         public async Task GetCatfactAsync()
         {
-            var client = ClientFactory.CreateClient("requests");
+            var client = ClientFactory.CreateClient();
 
             using (var response = await client.GetAsync("https://catfact.ninja/fact"))
             {
@@ -77,11 +76,11 @@ namespace Espeon.Commands.Modules
                     var content = await response.Content.ReadAsStringAsync();
                     var obj = JObject.Parse(content);
 
-                    await SendOkAsync($"{obj["fact"]}");
+                    await SendOkAsync(0, obj["fact"]);
                 }
                 else
                 {
-                    await SendNotOkAsync("Something went wrong...");
+                    await SendNotOkAsync(1);
                 }
             }
         }
@@ -91,7 +90,7 @@ namespace Espeon.Commands.Modules
         [Name("Get Joke")]
         public async Task GetJokeAsync()
         {
-            var client = ClientFactory.CreateClient("requests");
+            var client = ClientFactory.CreateClient();
 
             using (var response = await client.GetAsync("https://icanhazdadjoke.com/"))
             {
@@ -100,11 +99,11 @@ namespace Espeon.Commands.Modules
                     var content = await response.Content.ReadAsStringAsync();
                     var obj = JObject.Parse(content);
 
-                    await SendOkAsync($"{obj["joke"]}");
+                    await SendOkAsync(0, obj["joke"]);
                 }
                 else
                 {
-                    await SendNotOkAsync("Something went wrong...");
+                    await SendNotOkAsync(1);
                 }
             }
         }
@@ -114,7 +113,7 @@ namespace Espeon.Commands.Modules
         [Name("Get Gif")]
         public async Task GetGifAsync([Remainder] string search)
         {
-            var client = ClientFactory.CreateClient("requests");
+            var client = ClientFactory.CreateClient();
 
             using (var response = await client.GetAsync($"https://api.giphy.com/v1/gifs/random?api_key={Config.GiphyAPIKey}&rating=r&tag={search}"))
             {
@@ -125,7 +124,7 @@ namespace Espeon.Commands.Modules
 
                     if (!obj["data"].Any())
                     {
-                        await SendNotOkAsync("No gif found");
+                        await SendNotOkAsync(0);
                     }
                     else
                     {
@@ -141,14 +140,14 @@ namespace Espeon.Commands.Modules
                             }
                             catch(HttpException ex) when(ex.DiscordCode == 40003)
                             {
-                                await SendNotOkAsync("The found gif was too big to send");
+                                await SendNotOkAsync(1);
                             }
                         }
                     }
                 }
                 else
                 {
-                    await SendNotOkAsync("Something went wrong...");
+                    await SendNotOkAsync(2);
                 }
             }
         }
@@ -183,7 +182,7 @@ namespace Espeon.Commands.Modules
                 }
             }
 
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             var prefix = currentGuild.Prefixes.First();
 
             var builder = GetBuilder(prefix);
@@ -203,7 +202,7 @@ namespace Espeon.Commands.Modules
         [Name("Help Module")]
         public async Task HelpAsync([Remainder] Module module)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             var prefix = currentGuild.Prefixes.First();
 
             var canExecute = new List<Command>();
@@ -233,7 +232,7 @@ namespace Espeon.Commands.Modules
         [Name("Help Commands")]
         public async Task HelpAsync([Remainder] IReadOnlyCollection<Command> commands)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             var prefix = currentGuild.Prefixes.First();
 
             var builder = GetBuilder(prefix);
@@ -271,6 +270,51 @@ namespace Espeon.Commands.Modules
                 Description = $"Hello, my name is Espeon{Emotes.Collection["Espeon"]}! " +
                 $"You can invoke my commands either by mentioning me or using the `{Format.Sanitize(prefix)}` prefix!"
             };
+        }
+
+        [Command("Mods")]
+        [Name("List Mods")]
+        public async Task ListModsAsync()
+        {
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+
+            var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser 
+                ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
+
+            var mods = await Task.WhenAll(modTasks);
+
+            if(mods.Length == 0)
+            {
+                await SendOkAsync(0);
+            }
+            else
+            {
+                await SendOkAsync(1, 
+                    string.Join(", ", mods.Select(x => $"{Format.Sanitize(x.GetDisplayName())}")));
+            }
+        }
+
+        [Command("Admins")]
+        [Name("List Admins")]
+        public async Task ListAdminsAsync()
+        {
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+
+            var adminTasks = currentGuild.Admins.Select(async x => Context.Guild.GetUser(x) as IGuildUser
+                ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
+
+            var admins = await Task.WhenAll(adminTasks);
+
+            if (admins.Length == 0)
+            {
+                //should never happen but sure
+                await SendOkAsync(0);
+            }
+            else
+            {
+                await SendOkAsync(1,
+                    string.Join(", ", admins.Select(x => $"{Format.Sanitize(x.GetDisplayName())}")));
+            }
         }
     }
 }

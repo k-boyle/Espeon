@@ -1,14 +1,22 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Database;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Qmmands;
 
 namespace Espeon.Commands
 {
     public class EspeonContext : ICommandContext
     {
-        private DatabaseContext _database;
-        public DatabaseContext Database => _database ?? (_database = new DatabaseContext());
+        private UserStore _userStore;
+        public UserStore UserStore => _userStore ?? (_userStore = new UserStore());
+
+        private GuildStore _guildStore;
+        public GuildStore GuildStore => _guildStore ?? (_guildStore = new GuildStore());
+
+        private CommandStore _commandStore;
+        public CommandStore CommandStore => _commandStore ?? (_commandStore = new CommandStore());
 
         public DiscordSocketClient Client { get; }
         public IUserMessage Message { get; }

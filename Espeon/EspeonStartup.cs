@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Attributes;
-using Espeon.Database;
+using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
@@ -36,14 +36,11 @@ namespace Espeon
             _completionSource = new TaskCompletionSource<Task>();
         }
 
-        public async Task StartBotAsync(DatabaseContext context)
+        public async Task StartBotAsync(UserStore context)
         {
-            EventHooks(context);
+            EventHooks();
             
-            var modules = _commands.AddModules(Assembly.GetEntryAssembly());
-
-            var response = _services.GetService<ResponseService>();
-            await response.OnCommandsRegisteredAsync(modules);
+            _commands.AddModules(Assembly.GetEntryAssembly());
 
             await _push.ConnectAsync();
 
@@ -57,7 +54,7 @@ namespace Espeon
         }
 
         //TODO clean this up
-        private void EventHooks(DatabaseContext context)
+        private void EventHooks()
         {
             _client.Ready += () =>
             {

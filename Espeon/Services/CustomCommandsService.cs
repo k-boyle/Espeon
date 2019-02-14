@@ -1,8 +1,10 @@
 ﻿using Espeon.Attributes;
 using Espeon.Commands;
 using Espeon.Commands.Checks;
-using Espeon.Database;
-using Espeon.Database.Entities;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.Entities;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -25,9 +27,9 @@ namespace Espeon.Services
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
 
-        public override async Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override async Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
         {
-            var guilds = await context.GetAllGuildsAsync(x => x.Commands);
+            var guilds = await guildStore.GetAllGuildsAsync(x => x.Commands);
 
             var createCommands = guilds.Select(CreateCommandsAsync);
 
@@ -68,7 +70,7 @@ namespace Espeon.Services
         {
             var context = originalContext as EspeonContext;
 
-            var guild = await context!.Database.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
+            var guild = await context!.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
@@ -102,10 +104,10 @@ namespace Espeon.Services
                 GuildId = context.Guild.Id
             };
 
-            await context.Database.CustomCommands.AddAsync(newCmd);
-            await context.Database.SaveChangesAsync();
+            await context.GuildStore.CustomCommands.AddAsync(newCmd);
+            await context.GuildStore.SaveChangesAsync();
 
-            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild);
+            var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild);
 
             await UpdateCommandsAsync(guild);
 
@@ -114,10 +116,10 @@ namespace Espeon.Services
 
         public async Task DeleteCommandAsync(EspeonContext context, CustomCommand command)
         {
-            context.Database.CustomCommands.Remove(command);
-            await context.Database.SaveChangesAsync();
+            context.GuildStore.CustomCommands.Remove(command);
+            await context.GuildStore.SaveChangesAsync();
 
-            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild);
+            var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild);
 
             await UpdateCommandsAsync(guild);
         }
@@ -126,14 +128,14 @@ namespace Espeon.Services
         {
             command.Value = newValue;
 
-            context.Database.CustomCommands.Update(command);
+            context.GuildStore.CustomCommands.Update(command);
 
-            return context.Database.SaveChangesAsync();
+            return context.GuildStore.SaveChangesAsync();
         }
 
         public async Task<ImmutableArray<CustomCommand>> GetCommandsAsync(EspeonContext context)
         {
-            var guild = await context.Database.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
+            var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             return guild.Commands.ToImmutableArray();
         }
 

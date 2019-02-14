@@ -2,7 +2,9 @@ using Discord;
 using Discord.WebSocket;
 using Espeon.Attributes;
 using Espeon.Commands;
-using Espeon.Database;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Espeon.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -36,7 +38,7 @@ namespace Espeon.Services
                     CachedMessage>>>();
         }
 
-        public override Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
         {
             var commands = services.GetService<CommandService>();
             var client = services.GetService<DiscordSocketClient>();
@@ -59,11 +61,11 @@ namespace Espeon.Services
 
             IReadOnlyCollection<string> prefixes;
 
-            using (var databaseContext = _services.GetService<DatabaseContext>())
+            using (var guildStore = _services.GetService<GuildStore>())
             {
-                var guild = await databaseContext.GetOrCreateGuildAsync(textChannel.Guild);
+                var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
 
-                prefixes = guild.Prefixes;                
+                prefixes = guild.Prefixes;
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
@@ -107,7 +109,7 @@ namespace Espeon.Services
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
         
-        //TODO rework to delete all old
+        //TODO redo this
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
@@ -142,10 +144,10 @@ namespace Espeon.Services
                 ExecutingId = context.Message.Id,
                 UserId = context.User.Id,
                 ResponseId = sentMessage.Id,
-                WhenToRemove = DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds()
+                CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
             };
 
-            var key = await _timer.EnqueueAsync(message, RemoveAsync);
+            var key = await _timer.EnqueueAsync(message, DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(), RemoveAsync);
 
             _messageCache[context.Channel.Id][context.User.Id][key] = message;
 
@@ -162,10 +164,10 @@ namespace Espeon.Services
                 : Task.FromResult(message);
         }
 
-        private Task RemoveAsync(string key, IRemovable removable)
+        private Task RemoveAsync(string key, object removable)
         {
             var message = (CachedMessage)removable;
-            _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
+            _messageCache[message!.ChannelId][message.UserId].TryRemove(key, out _);
 
             if (_messageCache[message.ChannelId][message.UserId].Count == 0)
                 _messageCache.Remove(message.UserId, out _);
@@ -204,7 +206,7 @@ namespace Espeon.Services
                     return;
                 }
 
-                var ordered = found.OrderByDescending(x => x.Value.WhenToRemove).ToArray();
+                var ordered = found.OrderByDescending(x => x.Value.CreatedAt).ToArray();
                 amount = amount > ordered.Length ? ordered.Length : amount;
 
                 var toDelete = new List<(string, CachedMessage)>();

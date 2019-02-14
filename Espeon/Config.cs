@@ -8,6 +8,7 @@ namespace Espeon
         public string DiscordToken { get; set; }
         public string PushbulletToken { get; set; }
         public string GiphyAPIKey { get; set; }
+        public ConnectionStrings ConnectionStrings { get; set; }
 
         private Config()
         {
@@ -18,6 +19,13 @@ namespace Espeon
         {
             var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(dir));
             return config;
-        }
+        }        
+    }
+
+    public class ConnectionStrings
+    {
+        public string GuildStore { get; set; }
+        public string UserStore { get; set; }
+        public string CommandStore { get; set; }
     }
 }

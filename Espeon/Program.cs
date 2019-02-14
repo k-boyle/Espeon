@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Database;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +10,6 @@ using Pusharp;
 using Qmmands;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -40,33 +41,42 @@ namespace Espeon
                     .AddTypeParsers(assembly))
                 .AddSingleton(new PushBulletClient(new PushBulletClientConfig
                 {
-                    LogLevel = LogLevel.Debug,
+                    LogLevel = LogLevel.Verbose,
                     UseCache = true,
                     Token = config.PushbulletToken
                 }))
                 .AddSingleton(config)
                 .AddSingleton<Random>()
-                .AddHttpClient("requests", client =>
+                .AddHttpClient("", client =>
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 })
-                    .Services
+                    .Services //annoying
                 .AddEntityFrameworkNpgsql()
-                .AddDbContext<DatabaseContext>(ServiceLifetime.Transient)
+                .AddDbContext<UserStore>(ServiceLifetime.Transient)
+                .AddDbContext<GuildStore>(ServiceLifetime.Transient)     
+                .AddDbContext<CommandStore>(ServiceLifetime.Transient)
                 .BuildServiceProvider()
                 .Inject(types);
-            
-            var ctx = services.GetService<DatabaseContext>();
 
-            await ctx.Database.MigrateAsync();
-            
-            await services.RunInitialisersAsync(ctx, types);
+            using (var userStore = services.GetService<UserStore>())
+            using (var guildStore = services.GetService<GuildStore>())
+            using (var commandStore = services.GetService<CommandStore>())
+            {
+                await userStore.Database.MigrateAsync();
+                await guildStore.Database.MigrateAsync();
+                await commandStore.Database.MigrateAsync();                
 
-            await ctx.SaveChangesAsync();
+                await services.RunInitialisersAsync(userStore, guildStore, commandStore, types);                
 
-            var espeon = new EspeonStartup(services, config);
-            services.Inject(espeon);
-            await espeon.StartBotAsync(ctx);
+                await userStore.SaveChangesAsync();
+                await guildStore.SaveChangesAsync();
+                await commandStore.SaveChangesAsync();
+
+                var espeon = new EspeonStartup(services, config);
+                services.Inject(espeon);
+                await espeon.StartBotAsync(userStore);
+            }            
 
             await Task.Delay(-1);
         }

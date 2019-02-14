@@ -2,10 +2,8 @@
 using Discord.WebSocket;
 using Espeon.Attributes;
 using Espeon.Commands;
-using Espeon.Database;
-using Espeon.Database.Entities;
-using Espeon.Entities;
-using Microsoft.EntityFrameworkCore;
+using Espeon.Databases.Entities;
+using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
 using Pusharp;
 using Pusharp.Entities;
@@ -33,7 +31,7 @@ namespace Espeon.Services
         private Device Phone => _phone ?? (_phone = _push.Devices.First());
         
         //requires client to be populated to send reminders
-        public async Task LoadRemindersAsync(DatabaseContext ctx)
+        public async Task LoadRemindersAsync(UserStore ctx)
         {
             var toRemove = new List<Reminder>();
 
@@ -46,7 +44,7 @@ namespace Espeon.Services
                     continue;
                 }
 
-                var newKey = await _timer.EnqueueAsync(reminder, RemoveAsync);
+                var newKey = await _timer.EnqueueAsync(reminder, reminder.WhenToRemove, RemoveAsync);
                 reminder.TaskKey = newKey;
             }
 
@@ -66,12 +64,12 @@ namespace Espeon.Services
                 ReminderId = Random.Next(999)
             };
 
-            var key = await _timer.EnqueueAsync(reminder, RemoveAsync);
+            var key = await _timer.EnqueueAsync(reminder, reminder.WhenToRemove, RemoveAsync);
 
             reminder.TaskKey = key;
 
-            await context.Database.Reminders.AddAsync(reminder);
-            await context.Database.SaveChangesAsync();
+            await context.UserStore.Reminders.AddAsync(reminder);
+            await context.UserStore.SaveChangesAsync();
 
             return reminder;
         }
@@ -80,17 +78,17 @@ namespace Espeon.Services
         {
             await _timer.RemoveAsync(reminder.TaskKey);
 
-            context.Database.Reminders.Remove(reminder);
-            await context.Database.SaveChangesAsync();
+            context.UserStore.Remove(reminder);
+            await context.UserStore.SaveChangesAsync();
         }
 
         public async Task<ImmutableArray<Reminder>> GetRemindersAsync(EspeonContext context)
         {
-            var user = await context.Database.GetOrCreateUserAsync(context.User, x => x.Reminders);
+            var user = await context.UserStore.GetOrCreateUserAsync(context.User, x => x.Reminders);
             return user.Reminders.ToImmutableArray();
         }
 
-        private async Task RemoveAsync(string taskKey, IRemovable removable)
+        private async Task RemoveAsync(string taskKey, object removable)
         {
             var reminder = (Reminder)removable;
 
@@ -118,7 +116,7 @@ namespace Espeon.Services
 
             await channel.SendMessageAsync(user.Mention, embed: embed);
 
-            var ctx = _services.GetService<DatabaseContext>();
+            var ctx = _services.GetService<UserStore>();
 
             ctx.Reminders.Remove(reminder);
             await ctx.SaveChangesAsync();

@@ -18,6 +18,7 @@ namespace Espeon.Commands.Modules
      * Star Limit
      */
 
+    //TODO force language pack
     [Name("Settings")]
     [RequireElevation(ElevationLevel.Admin)]
     public class ServerSettings : EspeonBase
@@ -26,73 +27,73 @@ namespace Espeon.Commands.Modules
         [Name("Add Prefix")]
         public async Task AddPrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             if (currentGuild.Prefixes.Contains(prefix))
             {
-                await SendMessageAsync("This prefix already exists for this guild");
+                await SendNotOkAsync(0);
                 return;
             }
 
             currentGuild.Prefixes.Add(prefix);
 
-            await Context.Database.SaveChangesAsync();
-            await SendMessageAsync("Prefix has been added");
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(1);
         }
 
         [Command("removeprefix")]
         [Name("Remove Prefix")]
         public async Task RemovePrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Prefixes.Contains(prefix))
             {
-                await SendMessageAsync("This prefix doesn't exist for this guild");
+                await SendNotOkAsync(0);
                 return;
             }
 
             currentGuild.Prefixes.Remove(prefix);
 
-            await Context.Database.SaveChangesAsync();
-            await SendMessageAsync("Prefix has been removed");
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(1);
         }
 
         [Command("restrict")]
         [Name("Restrict Channel")]
         public async Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             channel ??= Context.Channel;
 
             if (currentGuild.RestrictedChannels.Contains(channel.Id))
             {
-                await SendNotOkAsync("The bot is already restricted in this channel");
+                await SendNotOkAsync(0);
                 return;
             }
 
             currentGuild.RestrictedChannels.Add(channel.Id);
 
-            await Context.Database.SaveChangesAsync();
-            await SendOkAsync("The bot has been restricted from this channel");
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(1);
         }
 
         [Command("unrestrict")]
         [Name("Unrestrict Channel")]
         public async Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             channel ??= Context.Channel;
 
             if (!currentGuild.RestrictedChannels.Contains(channel.Id))
             {
-                await SendNotOkAsync("The bot is not restricted in this channel");
+                await SendNotOkAsync(0);
                 return;
             }
 
             currentGuild.RestrictedChannels.Remove(channel.Id);
 
-            await Context.Database.SaveChangesAsync();
-            await SendOkAsync("The bot has been unrestricted from this channel");
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(1);
         }
 
         [Command("admin")]
@@ -100,7 +101,7 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task AdminUserAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Admins.Contains(user.Id))
             {
@@ -109,40 +110,39 @@ namespace Espeon.Commands.Modules
                 if (currentGuild.Moderators.Contains(user.Id))
                 {
                     currentGuild.Moderators.Remove(user.Id);
-                }
-                
+                }                
 
-                await Context.Database.SaveChangesAsync();
+                await Context.GuildStore.SaveChangesAsync();
 
-                await SendOkAsync($"{user.GetDisplayName()} has been promoted to an admin");
+                await SendOkAsync(0, user.GetDisplayName());
                 return;
             }
 
-            await SendNotOkAsync($"{user.GetDisplayName()} is already an admin");
+            await SendNotOkAsync(1, user.GetDisplayName());
         }
 
         [Command("mod")]
         [Name("Moderate User")]
         public async Task ModUserAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
             if (!currentGuild.Moderators.Contains(user.Id))
             {
                 if (currentGuild.Admins.Contains(user.Id))
                 {
-                    await SendOkAsync($"{user.GetDisplayName()} is already an admin");
+                    await SendOkAsync(0, user.GetDisplayName());
                     return;
                 }
 
                 currentGuild.Moderators.Add(user.Id);
 
-                await Context.Database.SaveChangesAsync();
-                await SendOkAsync($"{user.GetDisplayName()} has been promoted to a moderator");
+                await Context.GuildStore.SaveChangesAsync();
+                await SendOkAsync(1, user.GetDisplayName());
                 return;
             }
 
-            await SendOkAsync($"{user.GetDisplayName()} is already a moderator");
+            await SendOkAsync(2, user.GetDisplayName());
         }
 
         [Command("deadmin")]
@@ -150,18 +150,24 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task DemoteAdminAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            if(user.Id == Context.Guild.OwnerId)
+            {
+                await SendNotOkAsync(0);
+                return;
+            }
+
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
             if (currentGuild.Admins.Contains(user.Id))
             {
                 currentGuild.Admins.Remove(user.Id);
 
-                await Context.Database.SaveChangesAsync();
-                await SendOkAsync($"{user.GetDisplayName()} has been demoted");
+                await Context.GuildStore.SaveChangesAsync();
+                await SendOkAsync(1, user.GetDisplayName());
                 return;
             }
 
-            await SendNotOkAsync($"{user.GetDisplayName()} isn't an admin in this guild");
+            await SendNotOkAsync(2, user.GetDisplayName());
         }
 
         [Command("demod")]
@@ -169,30 +175,30 @@ namespace Espeon.Commands.Modules
         [RequireGuildOwner]
         public async Task DemoteModeratorAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
             if (currentGuild.Moderators.Contains(user.Id))
             {
                 currentGuild.Moderators.Remove(user.Id);
 
-                await Context.Database.SaveChangesAsync();
-                await SendOkAsync($"{user.GetDisplayName()} has been demoted");
+                await Context.GuildStore.SaveChangesAsync();
+                await SendOkAsync(0, user.GetDisplayName());
                 return;
             }
 
-            await SendNotOkAsync($"{user.GetDisplayName()} isn't a moderator in this guild");
+            await SendNotOkAsync(1, user.GetDisplayName());
         }
 
         [Command("welcomechannel")]
         [Name("Set Welcome Channel")]
         public async Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeChannelId = channel?.Id ?? 0;
             
-            await Context.Database.SaveChangesAsync();
+            await Context.GuildStore.SaveChangesAsync();
 
-            await SendOkAsync("Welcome channel has been set");
+            await SendOkAsync(0);
         }
 
         [Command("welcomemessage")]
@@ -202,23 +208,23 @@ namespace Espeon.Commands.Modules
             [ParameterLength(1900)]
             string message)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeMessage = message;
             
-            await Context.Database.SaveChangesAsync();
+            await Context.GuildStore.SaveChangesAsync();
 
-            await SendOkAsync("Welcome message has been set");
+            await SendOkAsync(0);
         }
 
         [Command("defaultrole")]
         [Name("Set Default Role")]
         public async Task SetDefaultRoleAsync([Remainder] SocketRole role = null)
         {
-            var currentGuild = await Context.Database.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.DefaultRoleId = role?.Id ?? 0;
             
-            await Context.Database.SaveChangesAsync();
-            await SendOkAsync("Default role has been updated");
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(0);
         }
     }
 }

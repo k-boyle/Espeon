@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Espeon.Database.Entities;
+using Espeon.Databases.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
@@ -21,7 +21,7 @@ namespace Espeon.Commands.TypeParsers
 
             if(result.IsSuccessful)
             {
-                var dbUser = await context.Database.GetOrCreateUserAsync(result.Value);
+                var dbUser = await context.UserStore.GetOrCreateUserAsync(result.Value);
 
                 return new TypeParserResult<(IGuildUser, User)>((result.Value, dbUser));
             }

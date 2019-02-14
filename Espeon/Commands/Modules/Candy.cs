@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Espeon.Commands.TypeParsers;
-using Espeon.Database.Entities;
+using Espeon.Databases.Entities;
 using Espeon.Services;
 using Humanizer;
 using Qmmands;
@@ -39,7 +39,7 @@ namespace Espeon.Commands.Modules
 
             var amount = await CandyService.GetCandiesAsync(Context, user);
 
-            await SendOkAsync($"{user.GetDisplayName()} has {amount}{RareCandy} rare cand{(amount == 1 ? "y" : "ies")}!");
+            await SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies");
         }
 
         [Command("Claim")]
@@ -50,11 +50,11 @@ namespace Espeon.Commands.Modules
 
             if (IsSuccess)
             {
-                await SendOkAsync($"You have received {Amount}{RareCandy} rare cand{(Amount == 1 ? "y" : "ies")}!");
+                await SendOkAsync(0, Amount, RareCandy, Amount == 1 ? "y" : "ies");
                 return;
             }
 
-            await SendNotOkAsync($"You recently claimed your candies, please wait {Cooldown.Humanize(2)}");
+            await SendNotOkAsync(1, Cooldown.Humanize(2));
         }
 
         [Command("House")]
@@ -63,7 +63,7 @@ namespace Espeon.Commands.Modules
         {
             var amount = await CandyService.GetCandiesAsync(Context, Context.Client.CurrentUser);
 
-            await SendOkAsync($"I current have {amount}{RareCandy} rare cand{(amount == 1 ? "y" : "ies")}!");
+            await SendOkAsync(0, amount, RareCandy, amount == 1 ? "y" : "ies");
         }
 
         [Command("Treat")]
@@ -74,14 +74,14 @@ namespace Espeon.Commands.Modules
 
             await CandyService.UpdateCandiesAsync(Context, user.Id, amount);
 
-            await SendOkAsync($"{user.GetDisplayName()} has been treated to {amount}{RareCandy} rare cand{(amount == 1 ? "y" : "ies")}!");
+            await SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies");
         }
 
         [Command("Leaderboard")]
         [Name("Candy Leaderboard")]
         public async Task ViewLeaderboardAsync()
         {
-            var users = await Context.Database.GetAllUsersAsync();
+            var users = await Context.UserStore.GetAllUsersAsync();
             var ordered = users.OrderByDescending(x => x.CandyAmount);
 
             var foundUsers = new List<(IUser, User)>();
@@ -113,7 +113,7 @@ namespace Espeon.Commands.Modules
                     sb.AppendLine($"{i++}: {found.Username} - {user.CandyAmount}");
             }
 
-            await SendOkAsync(sb.ToString());
+            await SendOkAsync(0, sb);
         }
 
         [Command("Gift")]
@@ -122,19 +122,19 @@ namespace Espeon.Commands.Modules
         {
             await CandyService.TransferCandiesAsync(Context, Context.User, user, amount);
 
-            await SendOkAsync("Your gift basket has been made and sent");
+            await SendOkAsync(0);
         }
 
         [Command("Steal")]
         [Name("Try Steal")]
         public async Task TryStealAsync([OverrideTypeParser(typeof(CandyTypeParser))] int amount)
         {
-            var espeon = await Context.Database.GetOrCreateUserAsync(Context.Client.CurrentUser);
+            var espeon = await Context.UserStore.GetOrCreateUserAsync(Context.Client.CurrentUser);
             var espeonCandies = espeon.CandyAmount;
 
             if (espeonCandies < 1000)
             {
-                await SendNotOkAsync($"Steal can only be used when I am at 1000{RareCandy} rare candies!");
+                await SendNotOkAsync(0 , RareCandy);
                 return;
             }
 
@@ -144,16 +144,16 @@ namespace Espeon.Commands.Modules
             {
                 await CandyService.UpdateCandiesAsync(Context, Context.User.Id, -amount);
 
-                await SendNotOkAsync("You fail! You lose!");
+                await SendNotOkAsync(1);
                 return;
             }
 
             await CandyService.UpdateCandiesAsync(Context, Context.User.Id, espeonCandies);
 
             espeon.CandyAmount = 0;
-            await Context.Database.SaveChangesAsync();
+            await Context.UserStore.SaveChangesAsync();
 
-            await SendOkAsync("Holy shit! You actually won!");
+            await SendOkAsync(2);
         }
     }
 }

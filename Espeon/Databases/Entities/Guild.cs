@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Espeon.Database.Entities
+namespace Espeon.Databases.Entities
 {
     public class Guild : DatabaseEntity
     {

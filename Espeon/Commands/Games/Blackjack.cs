@@ -97,6 +97,7 @@ namespace Espeon.Commands.Games
             var playerTotal = CalculateTotal(ref _playerCards);
             var dealerTotal = CalculateTotal(ref _dealerCards);
 
+            int amount;
             string description;
             Color color;
 
@@ -104,8 +105,8 @@ namespace Espeon.Commands.Games
             {
                 //lose 
 
-                await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                description = $"I win! You lose {_bet}{RareCandy} cand{(_bet == 1 ? "y" : "ies")}!";
+                amount = -_bet;
+                description = $"I win! You lose {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                 color = Color.Red;
             }
             else
@@ -115,22 +116,21 @@ namespace Espeon.Commands.Games
                     _dealerCards.Add(_deck.Dequeue());
                     dealerTotal = CalculateTotal(ref _dealerCards);
                 }
-
-                int payout;
-
+                
                 if (dealerTotal > 21)
                 {
                     //win
 
-                    payout = (int)(_bet * NormalPayout);
-
-                    await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"I struck out! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
+                    amount = (int)(_bet * NormalPayout);
+                    
+                    description = $"I struck out! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
                 else if (dealerTotal == playerTotal)
                 {
                     //draw
+
+                    amount = 0;
 
                     description = "It's a draw!";
                     color = Color.Orange;
@@ -139,28 +139,27 @@ namespace Espeon.Commands.Games
                 {
                     //lose
 
-                    await _candy.UpdateCandiesAsync(Context, Context.User.Id, -_bet);
-                    description = $"I win! You lose {_bet}{RareCandy} cand{(_bet == 1 ? "y" : "ies")}!";
+                    amount = -_bet;
+
+                    description = $"I win! You lose {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Red;
                 }
                 else if(playerTotal == 21)
                 {
                     //win 21
 
-                    payout = (int)(_bet * BlackjackPayout);
-
-                    await _candy.UpdateCandiesAsync(Context, Context.User.Id, payout);
-                    description = $"BLACKJACK! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
+                    amount = (int)(_bet * BlackjackPayout);
+                    
+                    description = $"BLACKJACK! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Gold;
                 }
                 else
                 {
                     //win
 
-                    payout = (int)(_bet * NormalPayout);
-
-                    await _candy.UpdateCandiesAsync(Context, Context.User.Id, (payout));
-                    description = $"You have the higher score! You win {payout}{RareCandy} cand{(payout == 1 ? "y" : "ies")}!";
+                    amount = (int)(_bet * NormalPayout);
+                    
+                    description = $"You have the higher score! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
             }
@@ -173,6 +172,7 @@ namespace Espeon.Commands.Games
                 Color = color
             };
 
+            await _candy.UpdateCandiesAsync(Context, Context.User.Id, amount);
             await Message.ModifyAsync(x => x.Embed = builder.Build());
         }
 

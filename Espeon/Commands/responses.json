@@ -1,0 +1,239 @@
+[
+  {
+    "Default": [
+      "{0} has {1}{2} rare cand{3}!"
+    ],
+    "owo": [
+      "{0} has {1}{2} rwar cwand{3}!"
+    ]
+  },
+
+  {
+    "Default": [
+      "You have received {0}{1} rare cand{2}!",
+      "You already claimed recently, please wait {0}"
+    ],
+    "owo": [
+      "\\*pounces on your lap\\* owo heres {0}{1} cwand{2}!!!",
+      "Ohhh noo >><< uu alweadie cwaimd ur cwandies wait {0}"
+    ]
+  },
+
+  {
+    "Default": [
+      "I have {0}{1} rare cand{2}"
+    ],
+    "owo": [
+      "OOOOHHHH i hwve {0}{1} cwand{2}!!!!!! \\*w\\*"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been treated to {1}{2} rare cand{3}"
+    ],
+    "owo": [
+      "{0} mastwur has bween kwind 2 u \\*runs to you tail wagging\\* hweers {1}{2} cwand{3}"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0}"
+    ],
+    "owo": [
+      "{0}"
+    ]
+  },
+
+  {
+    "Default": [
+      "Your gift basket has been made and sent"
+    ],
+    "owo": [
+      "\\*notices package\\* uwu uur swo genurus"
+    ]
+  },
+
+  {
+    "Default": [
+      "Steal can only be used when I have 1000{0} rare candies",
+      "You fool, you lose",
+      "Holy shit you actually won"
+    ],
+    "owo": [
+      "owee im sowweee bwut stweal cn onwee be uzed wen i hwav 1000{0} cwandies",
+      "am swoweee bwut uu lose",
+      "OwO uu wiiin!!!"
+    ]
+  },
+
+  {
+    "Default": [
+      "What do you want the command to be called? Reply with `cancel` to cancel operation",
+      "What do you want the response to be? Reply with `cancel` to cancel operation",
+      "{0} was successfully created",
+      "This command already exists"
+    ],
+    "owo": [
+      "waht du uu wnt the cwomand to bwee cwalled? `cancel` to stwop",
+      "waht du uu wnt the respons to bwee? `cancel` to stwop",
+      "i made u fur uu :3c",
+      "swowee this cwomnd aweadee exists"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} was deleted"
+    ],
+    "owo": [
+      "i gwot wid of tht mweanie {0} >:)"
+    ]
+  },
+
+  {
+    "Default": [
+      "What do you want the new response to be? Reply with `cancel` to cancel operation",
+      "{0} was modified"
+    ],
+    "owo": [
+      "waht du uu want the new wespons to bee? `cancel` to stwop",
+      "i changed {0} fur uu"
+    ]
+  },
+
+  {
+    "Default": [
+      "You're already in a game'"
+    ],
+    "owo": [
+      "owwww u siwwy biwwy ur awready in a game"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been added to {1}",
+      "Failed to add {0} to {1}"
+    ],
+    "owo": [
+      "i addwed {0} tuu {1} fur uu :3",
+      "oweee i cudnt add {0} to {1]}"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been removed from {1}",
+      "Failed to remove {0} from {1}"
+    ],
+    "owo": [
+      "i remved {0} frm {1}",
+      "ooowwww {0} cudnt be wemovd fwom {1}"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been added to {1}",
+      "Failed to add {0} to {1}"
+    ],
+    "owo": [
+      "i addwed {0} tuu {1} fur uu :3",
+      "oweee i cudnt add {0} to {1]}"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been removed from {1}",
+      "Failed to remove {0} from {1}"
+    ],
+    "owo": [
+      "i remved {0} frm {1}",
+      "ooowwww {0} cudnt be wemovd fwom {1}"
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  }
+]

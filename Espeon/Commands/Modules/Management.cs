@@ -25,11 +25,11 @@ namespace Espeon.Commands.Modules
 
             if (result)
             {
-                await SendOkAsync($"{value} has been added to {target.Name}!");
+                await SendOkAsync(0, value, target.Name);
                 return;
             }
 
-            await SendNotOkAsync($"{value} already exists for {target.Name}!");
+            await SendNotOkAsync(1, value, target.Name);
         }
 
         [Command("Remove")]
@@ -40,11 +40,11 @@ namespace Espeon.Commands.Modules
 
             if (result)
             {
-                await SendOkAsync($"{value} has been removed from {target.Name}!");
+                await SendOkAsync(0, value, target.Name);
                 return;
             }
 
-            await SendNotOkAsync($"{value} doesn't exist for {target.Name}!");
+            await SendNotOkAsync(1, value, target.Name);
         }
     }
 
@@ -63,11 +63,11 @@ namespace Espeon.Commands.Modules
 
             if (result)
             {
-                await SendOkAsync($"{value} has been added to {target.Name}!");
+                await SendOkAsync(0, value, target.Name);
                 return;
             }
 
-            await SendNotOkAsync($"{value} already exists for {target.Name}!");
+            await SendNotOkAsync(1, value, target.Name);
         }
 
         [Command("Remove")]
@@ -78,11 +78,11 @@ namespace Espeon.Commands.Modules
 
             if (result)
             {
-                await SendOkAsync($"{value} has been removed from {target.Name}!");
+                await SendOkAsync(0, value, target.Name);
                 return;
             }
 
-            await SendNotOkAsync($"{value} doesn't exist for {target.Name}!");
+            await SendNotOkAsync(1, value, target.Name);
         }
     }
 }

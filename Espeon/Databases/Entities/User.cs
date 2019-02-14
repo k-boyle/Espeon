@@ -1,13 +1,12 @@
-﻿using Espeon.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Espeon.Database.Entities
+namespace Espeon.Databases.Entities
 {
     public class User : DatabaseEntity
     {
         public override ulong Id { get; set; }
         
-        public string ResponsePack { get; set; }
+        public ResponsePack ResponsePack { get; set; }
 
         public List<Reminder> Reminders { get; set; }
 
@@ -16,7 +15,7 @@ namespace Espeon.Database.Entities
         public long LastClaimedCandies { get; set; }
     }
 
-    public class Reminder : IRemovable
+    public class Reminder
     {
         public string Id { get; set; }
 

@@ -4,8 +4,10 @@ using Espeon.Interactive;
 using Espeon.Interactive.Criteria;
 using Espeon.Interactive.Paginator;
 using Espeon.Services;
+using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -13,14 +15,14 @@ namespace Espeon.Commands
     public abstract class EspeonBase : ModuleBase<EspeonContext>
     {
         public MessageService Message { get; set; }
-        public ResponseService Response { get; set; }
         public InteractiveService Interactive { get; set; }
-        public IServiceProvider Services { get; set; }
+        public IServiceProvider Services { get; set; }   
+        
+        [DoNotAutomaticallyInject]
+        public Module Module { get; set; }
 
-        public Module Module { get; private set; }
-        public Command Command { get; private set; }
-
-        public string ResponsePack { get; private set; }
+        [DoNotAutomaticallyInject]
+        public Command Command { get; set; }
 
         protected Task<IUserMessage> SendMessageAsync(Embed embed)
         {
@@ -32,16 +34,34 @@ namespace Espeon.Commands
             return Message.SendMessageAsync(Context, content, embed);
         }
 
-        protected Task<IUserMessage> SendOkAsync(string content)
+        protected async Task<IUserMessage> SendOkAsync(int index, params object[] args)
         {
-            var response = ResponseBuilder.Message(Context, content);
-            return SendMessageAsync(response);
+            var module = await Context.CommandStore.Modules.Include(x => x.Commands)
+                .FirstOrDefaultAsync(x => x.Name == Module.Name);
+
+            var command = module.Commands.FirstOrDefault(x => x.Name == Command.Name);
+
+            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+
+            var responses = command.Responses[user.ResponsePack];
+
+            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args));
+            return await SendMessageAsync(response);
         }
 
-        protected Task<IUserMessage> SendNotOkAsync(string content)
+        protected async Task<IUserMessage> SendNotOkAsync(int index, params object[] args)
         {
-            var response = ResponseBuilder.Message(Context, content, false);
-            return SendMessageAsync(response);
+            var module = await Context.CommandStore.Modules.Include(x => x.Commands)
+                .FirstOrDefaultAsync(x => x.Name == Module.Name);
+
+            var command = module.Commands.FirstOrDefault(x => x.Name == Command.Name);
+
+            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+
+            var responses = command.Responses[user.ResponsePack];
+
+            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args));
+            return await SendMessageAsync(response);
         }
 
         protected Task<SocketUserMessage> NextMessageAsync(ICriterion<SocketUserMessage> criterion,
@@ -60,13 +80,12 @@ namespace Espeon.Commands
             return Interactive.SendPaginatedMessageAsync(paginator, timeout);
         }
 
-        protected override async Task BeforeExecutedAsync(Command command)
+        protected override Task BeforeExecutedAsync(Command command)
         {
             Module = command.Module;
             Command = command;
 
-            var pack = await Response.GetUsersPackAsync(Context);
-            ResponsePack = pack;
+            return Task.CompletedTask;
         }
     }
 }

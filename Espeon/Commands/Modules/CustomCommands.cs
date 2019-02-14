@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 using Espeon.Commands.Checks;
-using Espeon.Database.Entities;
+using Espeon.Databases.Entities;
 using Espeon.Interactive.Criteria;
 using Espeon.Services;
 using Qmmands;
@@ -23,7 +23,7 @@ namespace Espeon.Commands.Modules
         {
             if (name == "")
             {
-                await SendMessageAsync("What do you want the name to be? Repsond with `cancel` to cancel operation.");
+                await SendOkAsync(0);
 
                 var reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
                     new ChannelCriteria(Context.Channel.Id)));
@@ -38,7 +38,7 @@ namespace Espeon.Commands.Modules
 
             if (value == "")
             {
-                await SendMessageAsync("What do you want the response to be? Repsond with `cancel` to cancel operation.");
+                await SendOkAsync(1);
 
                 var reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
                     new ChannelCriteria(Context.Channel.Id)));
@@ -55,20 +55,20 @@ namespace Espeon.Commands.Modules
 
             if (result)
             {
-                await SendOkAsync($"{name} has been successfully created");
+                await SendOkAsync(2, name);
                 return;
             }
 
-            await SendNotOkAsync("Command already exists");
+            await SendNotOkAsync(3);
         }
 
         [Command("delete")]
         [Name("Delete Command")]
         [RunMode(RunMode.Parallel)]
-        public Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
+        public async Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
         {
-            return Task.WhenAll(Commands.DeleteCommandAsync(Context, command),
-                SendOkAsync($"{command.Name} has been deleted"));
+            await Commands.DeleteCommandAsync(Context, command);
+            await SendOkAsync(0, command.Name);
         }
 
         [Command("modify")]
@@ -78,7 +78,7 @@ namespace Espeon.Commands.Modules
         {
             if (newValue == "")
             {
-                await SendMessageAsync("What do you want the new response to be? Repsond with `cancel` to cancel operation.");
+                await SendOkAsync(0);
 
                 var reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
                     new ChannelCriteria(Context.Channel.Id)));
@@ -93,7 +93,7 @@ namespace Espeon.Commands.Modules
             
             await Commands.ModifyCommandAsync(Context, command, newValue);
 
-            await SendOkAsync($"{command.Name} has been updated");
+            await SendOkAsync(0, command.Name);
         }
     }
 }

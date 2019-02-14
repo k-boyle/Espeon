@@ -2,8 +2,9 @@
 using Discord.WebSocket;
 using Espeon.Attributes;
 using Espeon.Commands;
-using Espeon.Database;
-using Espeon.Entities;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Espeon.Interactive.Criteria;
 using Espeon.Interactive.Paginator;
 using Espeon.Services;
@@ -27,7 +28,7 @@ namespace Espeon.Interactive
             _reactionCallbacks = new ConcurrentDictionary<ulong, CallbackData>();
         }
 
-        public override Task InitialiseAsync(DatabaseContext context, IServiceProvider services)
+        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
         {
             _client.ReactionAdded += HandleReactionAsync;
             return Task.CompletedTask;
@@ -52,8 +53,7 @@ namespace Espeon.Interactive
                 ? MessageReceivedAsync(message)
                 : Task.CompletedTask;
 
-            context.Client.MessageReceived += HandleMessageAsync;
-                
+            context.Client.MessageReceived += HandleMessageAsync;                
 
             var resultTask = taskCompletionSource.Task;
             var delay = Task.Delay(timeout.Value);
@@ -101,10 +101,10 @@ namespace Espeon.Interactive
 
             var callbackData = new CallbackData(callback, timeout)
             {
-                WhenToRemove = DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds()
+                //WhenToRemove = DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds()
             };
 
-            var key = await _timer.EnqueueAsync(callbackData, RemoveAsync);
+            var key = await _timer.EnqueueAsync(callbackData, DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds(), RemoveAsync);
 
             callbackData.TaskKey = key;
 
@@ -144,9 +144,8 @@ namespace Espeon.Interactive
             if (!result)
             {
                 await _timer.RemoveAsync(callbackData.TaskKey);
-
-                callbackData.WhenToRemove = DateTimeOffset.UtcNow.Add(callbackData.Timeout).ToUnixTimeMilliseconds();
-                var newKey = await _timer.EnqueueAsync(callbackData, RemoveAsync);
+                
+                var newKey = await _timer.EnqueueAsync(callbackData, DateTimeOffset.UtcNow.Add(callbackData.Timeout).ToUnixTimeMilliseconds(), RemoveAsync);
                 callbackData.TaskKey = newKey;
             }
             else
@@ -156,7 +155,7 @@ namespace Espeon.Interactive
             }
         }
 
-        private async Task RemoveAsync(string key, IRemovable removable)
+        private async Task RemoveAsync(string key, object removable)
         {
             var callbackData = (CallbackData) removable;
 
@@ -166,12 +165,12 @@ namespace Espeon.Interactive
             _reactionCallbacks.TryRemove(callback.Message.Id, out _);
         }
 
-        private class CallbackData : IRemovable
+        private class CallbackData
         {
             public IReactionCallback Callback { get; }
             public TimeSpan Timeout { get; }
             
-            public long WhenToRemove { get; set; }
+            //public long WhenToRemove { get; set; }
 
             public string TaskKey { get; set; }
 

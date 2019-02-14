@@ -29,7 +29,7 @@ namespace Espeon.Commands.Modules
 
             if (!result)
             {
-                await SendNotOkAsync("You're in a game already or some shit lol");
+                await SendNotOkAsync(0);
             }
         }
     }

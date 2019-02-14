@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Espeon.Database.Entities;
+using Espeon.Databases.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
@@ -8,19 +8,24 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Espeon.Database
+namespace Espeon.Databases.GuildStore
 {
-    public class DatabaseContext : DbContext
+    public class GuildStore : DbContext
     {
         private DbSet<Guild> Guilds { get; set; }
-        private DbSet<User> Users { get; set; }
-        public DbSet<Reminder> Reminders { get; set; }
-        public DbSet<ModuleInfo> Modules { get; set; }
-        public DbSet<CommandInfo> Commands { get; set; }
         public DbSet<CustomCommand> CustomCommands { get; set; }
 
+        private static Config _config;
+
+        public GuildStore(Config config)
+            => _config = config;
+
+        public GuildStore()
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-                => optionsBuilder.UseNpgsql($"Host=127.0.0.1;Port=5432;Database=postgres;Username=postgres;Password=casino");
+            => optionsBuilder.UseNpgsql(_config.ConnectionStrings.GuildStore);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,43 +58,8 @@ namespace Espeon.Database
             modelBuilder.Entity<CustomCommand>().HasKey(x => x.Id);
             modelBuilder.Entity<CustomCommand>().Property(x => x.Id)
                 .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<User>(user =>
-            {
-                user.HasKey(x => x.Id);
-
-                user.Property(x => x.CandyAmount)
-                    .HasDefaultValue(10);
-
-                user.Property(x => x.HighestCandies)
-                    .HasDefaultValue(10);
-
-                user.Property(x => x.ResponsePack)
-                    .HasDefaultValue("default");
-
-                user.HasMany(x => x.Reminders)
-                    .WithOne();
-            });
-
-            modelBuilder.Entity<Reminder>().HasKey(x => x.Id);
-
-            modelBuilder.Entity<Reminder>().Property(x => x.Id)
-                .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<ModuleInfo>(module =>
-            {
-                module.HasKey(x => x.Name);
-
-                module.HasMany(x => x.Commands)
-                    .WithOne(y => y.Module)
-                    .HasForeignKey(z => z.ModuleName);
-            });
-
-            modelBuilder.Entity<CommandInfo>().HasKey(x => x.Name);
         }
 
-        //Stolen from:
-        //https://gitlab.com/QuantumToast/Administrator/blob/dev/Administrator/Database/AdminDatabaseContext.cs#L101-116
         private sealed class SnowflakeCollectionParser : ValueConverter<ICollection<ulong>, string>
         {
             public SnowflakeCollectionParser(ConverterMappingHints mappingHints = null)
@@ -106,10 +76,10 @@ namespace Espeon.Database
                     ? str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(ulong.Parse).ToList()
                     : new List<ulong>();
         }
-
+   
         public async Task<Guild> GetOrCreateGuildAsync(IGuild guild)
         {
-            var foundGuild = await Guilds.FindAsync(guild.Id) 
+            var foundGuild = await Guilds.FindAsync(guild.Id)
                 ?? await CreateGuildAsync<ulong>(guild, null); //kinda hacky?
 
             return foundGuild;
@@ -117,7 +87,7 @@ namespace Espeon.Database
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression)
         {
-            var foundGuild = await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id) 
+            var foundGuild = await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id)
                 ?? await CreateGuildAsync(guild, expression);
 
             return foundGuild;
@@ -142,7 +112,7 @@ namespace Espeon.Database
 
             await SaveChangesAsync();
 
-            if(expression is null)
+            if (expression is null)
                 return await Guilds.FindAsync(guild.Id);
 
             return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id);
@@ -153,50 +123,12 @@ namespace Espeon.Database
 
         public async Task<IReadOnlyCollection<Guild>> GetAllGuildsAsync<TProp>(Expression<Func<Guild, TProp>> expression)
         {
-            if(expression is null)
+            if (expression is null)
             {
                 return await Guilds.ToListAsync();
             }
-            
+
             return await Guilds.Include(expression).ToListAsync();
         }
-
-        public async Task<User> GetOrCreateUserAsync(IUser user)
-        {
-            var foundUser = await Users.FindAsync(user.Id)
-                ?? await CreateUserAsync<ulong>(user, null);
-
-            return foundUser;
-        }
-
-        public async Task<User> GetOrCreateUserAsync<TProp>(IUser user, Expression<Func<User, TProp>> expression)
-        {
-            var foundUser = await Users.Include(expression).FirstOrDefaultAsync(x => x.Id == user.Id)
-                ?? await CreateUserAsync(user, expression);
-
-            return foundUser;
-        }
-
-        private async Task<User> CreateUserAsync<TProp>(IUser user, Expression<Func<User, TProp>> expression)
-        {
-            var newUser = new User
-            {
-                Id = user.Id
-            };
-
-            await Users.AddAsync(newUser);
-
-            await SaveChangesAsync();
-
-            if(expression is null)
-                return await Users.FindAsync(user.Id);
-
-            return await Users.Include(expression).FirstOrDefaultAsync(x => x.Id == user.Id);
-        }
-
-        //async needed for the cast
-        public async Task<IReadOnlyCollection<User>> GetAllUsersAsync()
-            => await Users.ToListAsync();
-        
     }
 }

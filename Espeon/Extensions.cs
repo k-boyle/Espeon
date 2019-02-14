@@ -1,7 +1,9 @@
 ﻿using Discord;
 using Espeon.Attributes;
 using Espeon.Commands.TypeParsers;
-using Espeon.Database;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.GuildStore;
+using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -75,8 +77,7 @@ namespace Espeon
             }
         }
 
-        public static async Task RunInitialisersAsync(this IServiceProvider services, DatabaseContext context,
-            IEnumerable<Type> types)
+        public static async Task RunInitialisersAsync(this IServiceProvider services, UserStore userStore, GuildStore guildStore, CommandStore commandStore, IEnumerable<Type> types)
         {
             foreach (var type in types)
             {
@@ -85,7 +86,7 @@ namespace Espeon
                 if (!(service is BaseService validService))
                     throw new InvalidServiceException($"{type}");
 
-                await validService.InitialiseAsync(context, services);
+                await validService.InitialiseAsync(userStore, guildStore, commandStore, services);
             }
         }
 

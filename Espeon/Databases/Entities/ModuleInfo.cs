@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Espeon.Database.Entities
+namespace Espeon.Databases.Entities
 {
     public class ModuleInfo
     {
@@ -17,5 +17,13 @@ namespace Espeon.Database.Entities
 
         public string Name { get; set; }
         public List<string> Aliases { get; set; }
+
+        public IDictionary<ResponsePack, string[]> Responses { get; set; }
+    }
+
+    public enum ResponsePack
+    {
+        Default, 
+        owo
     }
 }

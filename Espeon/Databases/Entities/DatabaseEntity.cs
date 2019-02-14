@@ -1,4 +1,4 @@
-﻿namespace Espeon.Database.Entities
+﻿namespace Espeon.Databases.Entities
 {
     public abstract class DatabaseEntity
     {
