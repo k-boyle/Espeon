@@ -158,7 +158,30 @@
 
   {
     "Default": [
+      "This prefix is already defined for this guild",
+      "Prefix has been added"
+    ],
+    "owo": [
+      "owh noo this pwefix alwedy exists",
+      "i did the pwefix fur \\*uu\\*"
+    ]
+  },
 
+  {
+    "Default": [
+      "This prefix doesn't exists for this guild",
+      "Prefix has been removed"
+    ],
+    "owo": [
+      "owh noo this pwefix dusnt exists",
+      "i wemoved the pwefix fur \\*uu\\*"
+    ]
+  },
+
+  {
+    "Default": [
+      "I am already restricted in this channel",
+      "I can no longer send messages in that channel"
     ],
     "owo": [
 
@@ -230,10 +253,10 @@
 
   {
     "Default": [
-
+      "Response pack has been set to {0}"
     ],
     "owo": [
-
+      "\\*jumps in joy\\* >< i wil talk to uu like dis now uwu"
     ]
   }
 ]
