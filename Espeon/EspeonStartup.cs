@@ -65,14 +65,12 @@ namespace Espeon
             var logger = _services.GetService<LogService>();
             _client.Log += log =>
             {
-                var (source, severity, lMessage, exception) = LogFactory.FromDiscord(log);
-                return logger.LogAsync(source, severity, lMessage, exception);
+                return logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
             };
 
             _push.Log += log =>
             {
-                var (source, severity, lMessage) = LogFactory.FromPusharp(log);
-                return logger.LogAsync(source, severity, lMessage);
+                return logger.LogAsync(Source.Pusharp, 5 - (Severity)(int)log.Level, log.Message);
             };
 
 #if !DEBUG //Don't want to waste my pushes
