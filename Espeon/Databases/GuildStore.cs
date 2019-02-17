@@ -24,8 +24,13 @@ namespace Espeon.Databases.GuildStore
         {
         }
 
+#if !DEBUG
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(_config.ConnectionStrings.GuildStore);
+#else
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=GuildStore;Username=postgres;Password=casino");
+#endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

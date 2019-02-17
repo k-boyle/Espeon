@@ -3,6 +3,7 @@ using Espeon.Databases.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -22,8 +23,13 @@ namespace Espeon.Databases.UserStore
         {
         }
 
+#if !DEBUG
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(_config.ConnectionStrings.UserStore);
+#else
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=UserStore;Username=postgres;Password=casino");        
+#endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +49,15 @@ namespace Espeon.Databases.UserStore
                     y => (int)y, 
                     y => (ResponsePack)y);
 
+                user.Property(x => x.ResponsePacks)
+                    .HasDefaultValue(new List<ResponsePack>
+                    {
+                        ResponsePack.Default
+                    })
+                    .HasConversion(
+                    y => y.Select(x => (int)x).ToArray(),
+                    y => y.Select(x => (ResponsePack)x).ToList());
+                
                 user.HasMany(x => x.Reminders)
                     .WithOne();
             });

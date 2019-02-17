@@ -10,6 +10,8 @@ namespace Espeon.Databases.Entities
 
         public List<Reminder> Reminders { get; set; }
 
+        public List<ResponsePack> ResponsePacks { get; set; }
+
         public int CandyAmount { get; set; }
         public int HighestCandies { get; set; }
         public long LastClaimedCandies { get; set; }

@@ -258,5 +258,32 @@
     "owo": [
       "\\*jumps in joy\\* >< i wil talk to uu like dis now uwu"
     ]
+  },
+
+  {
+    "Default": [
+      "Channel was not found"
+    ],
+    "owo": [
+      "owwwwwno channl not fownd ><"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} was kicked"
+    ],
+    "owo": [
+      "the mweanee is gwon :3"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} was banned"
+    ],
+    "owo": [
+      "the mweanee is gwon :3"
+    ]
   }
 ]

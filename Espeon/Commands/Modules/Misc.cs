@@ -258,7 +258,7 @@ namespace Espeon.Commands.Modules
         {
             return new EmbedBuilder
             {
-                Color = new Color(0xd1a9dd),
+                Color = Utilities.EspeonColor,
                 Title = "Espeon's Help",
                 Author = new EmbedAuthorBuilder
                 {

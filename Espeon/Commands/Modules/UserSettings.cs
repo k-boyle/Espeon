@@ -1,4 +1,5 @@
-﻿using Espeon.Databases.Entities;
+﻿using Espeon.Commands.Checks;
+using Espeon.Databases.Entities;
 using Qmmands;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace Espeon.Commands.Modules
     {
         [Command("setresponses")]
         [Name("Set Responses")]
-        public async Task SetResponsesAsync(ResponsePack pack = ResponsePack.Default)
+        public async Task SetResponsesAsync([RequireUnlocked] ResponsePack pack = ResponsePack.Default)
         {
             var foundUser = await Context.UserStore.GetOrCreateUserAsync(Context.User);
             foundUser.ResponsePack = pack;

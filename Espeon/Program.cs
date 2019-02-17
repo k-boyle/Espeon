@@ -59,10 +59,11 @@ namespace Espeon
                 .BuildServiceProvider()
                 .Inject(types);
 
-            using (var userStore = services.GetService<UserStore>())
-            using (var guildStore = services.GetService<GuildStore>())
-            using (var commandStore = services.GetService<CommandStore>())
-            {
+            using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
+            {                
+                using var guildStore = services.GetService<GuildStore>();
+                using var commandStore = services.GetService<CommandStore>();
+
                 await userStore.Database.MigrateAsync();
                 await guildStore.Database.MigrateAsync();
                 await commandStore.Database.MigrateAsync();                

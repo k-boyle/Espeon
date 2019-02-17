@@ -28,16 +28,17 @@ namespace Espeon.Commands.TypeParsers
                 var hashIndex = value.LastIndexOf('#');
                 if (hashIndex != -1 && hashIndex + 5 == value.Length)
                     user = users.FirstOrDefault(x =>
-                        x.Username == value[0..^5] &&
-                        x.Discriminator == value.Substring(hashIndex + 1));
+                        string.Equals(x.Username, value[0..^5], StringComparison.InvariantCultureIgnoreCase) &&
+                        string.Equals(x.Discriminator, value.Substring(hashIndex + 1), StringComparison.InvariantCultureIgnoreCase));
             }
 
             if (user != null)
                 return new TypeParserResult<IGuildUser>(user);
 
             IReadOnlyList<SocketGuildUser> matchingUsers = context.Guild != null
-                ? users.Where(x => x.Username == value || x.Nickname == value).ToImmutableArray()
-                : users.Where(x => x.Username == value).ToImmutableArray();
+                ? users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase) 
+                    || string.Equals(x.Nickname, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray()
+                : users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray();
 
             if (matchingUsers.Count > 1)
                 return new TypeParserResult<IGuildUser>("Multiple matches found. Mention the user or use their ID.");

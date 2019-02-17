@@ -205,7 +205,7 @@ namespace Espeon.Commands.Modules
         [Name("Set Welcome Message")]
         public async Task SetWelcomeMessageAsync(
             [Remainder]
-            [ParameterLength(1900)]
+            [RequireSpecificLength(1900)]
             string message)
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);

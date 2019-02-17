@@ -18,8 +18,13 @@ namespace Espeon.Databases.CommandStore
         {
         }
 
+#if !DEBUG
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(_config.ConnectionStrings.CommandStore);
+#else
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=CommandStore;Username=postgres;Password=casino");
+#endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

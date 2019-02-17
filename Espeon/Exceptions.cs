@@ -15,6 +15,13 @@ namespace Espeon
         {
         }
     }
+    
+    public class ThisWasQuahusFaultException : Exception
+    {
+        public ThisWasQuahusFaultException() : base("Quahu told you FAKE NEWS. SHE CAN'T BE TRUSTED!!")
+        {
+        }
+    }
 
     public class ExpectedContextException : Exception
     {
@@ -29,4 +36,5 @@ namespace Espeon
         {
         }
     }
+
 }

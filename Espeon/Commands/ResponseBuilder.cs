@@ -4,7 +4,6 @@ namespace Espeon.Commands
 {
     public static class ResponseBuilder
     {
-        private const uint Good = 0xd1a9dd;
         private const uint Bad = 0xf31126;
 
         private static Embed Embed(IGuildUser user, string description, bool isGood)
@@ -16,7 +15,7 @@ namespace Espeon.Commands
                     IconUrl = user.GetAvatarOrDefaultUrl(),
                     Name = user.GetDisplayName()
                 },
-                Color = new Color(isGood ? Good : Bad),
+                Color = isGood ? Utilities.EspeonColor : new Color(Bad),
                 Description = description
             };
 

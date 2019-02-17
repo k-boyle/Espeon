@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands.Checks
 {
-    public class ParameterLengthAttribute : ParameterCheckBaseAttribute
+    public class RequireSpecificLengthAttribute : ParameterCheckBaseAttribute
     {
         private readonly int _minLength;
         private readonly int _maxLength;
 
-        public ParameterLengthAttribute(int maxLength) : this(0, maxLength)
+        public RequireSpecificLengthAttribute(int maxLength) : this(0, maxLength)
         {
         }
 
-        public ParameterLengthAttribute(int minLength, int maxLength)
+        public RequireSpecificLengthAttribute(int minLength, int maxLength)
         {
             _minLength = minLength;
             _maxLength = maxLength;
