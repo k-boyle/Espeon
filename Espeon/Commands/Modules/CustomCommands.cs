@@ -93,7 +93,7 @@ namespace Espeon.Commands.Modules
             
             await Commands.ModifyCommandAsync(Context, command, newValue);
 
-            await SendOkAsync(0, command.Name);
+            await SendOkAsync(1, command.Name);
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Attributes;
+using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Pusharp;
-using Pusharp.Entities;
 using Qmmands;
 using System;
 using System.Linq;
@@ -20,79 +19,98 @@ namespace Espeon
 
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly CommandService _commands;
-        [Inject] private readonly PushBulletClient _push;
 
         private readonly Config _config;
-
-        private Device _phone;
-        private Device Phone => _phone ?? (_phone = _push.Devices.First());
-
-        private readonly TaskCompletionSource<Task> _completionSource;
+        private bool _ran;
 
         public EspeonStartup(IServiceProvider services, Config config)
         {
             _services = services;
             _config = config;
-            _completionSource = new TaskCompletionSource<Task>();
+            _ran = false;
         }
 
-        public async Task StartBotAsync(UserStore context)
+        public async Task StartBotAsync(UserStore userStore)
         {
-            EventHooks();
+            EventHooks(userStore);
             
             _commands.AddModules(Assembly.GetEntryAssembly());
 
-            await _push.ConnectAsync();
-
             await _client.LoginAsync(TokenType.Bot, _config.DiscordToken);
             await _client.StartAsync();
-
-            //'Ready event' that only fires at startup
-            await _completionSource.Task;
-
-            await _services.GetService<ReminderService>().LoadRemindersAsync(context);
         }
 
         //TODO clean this up
-        private void EventHooks()
+        //TODO events to remove stuff from DB e.g. role deleted, user leave
+        private void EventHooks(UserStore userStore)
         {
-            _client.Ready += () =>
+            _client.Ready += async () =>
             {
-                _completionSource.SetResult(Task.CompletedTask);
-                return Task.CompletedTask;
+                if(!_ran)
+                {
+                    await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);
+                    _ran = true;
+                }
             };
-            
+
+            _client.UserJoined += async user =>
+            {
+                using var guildStore = _services.GetService<GuildStore>();
+
+                var dbGuild = await guildStore.GetOrCreateGuildAsync(user.Guild);
+                var guild = user.Guild;
+
+                if (guild.GetTextChannel(dbGuild.WelcomeChannelId) is SocketTextChannel channel 
+                    && !string.IsNullOrWhiteSpace(dbGuild.WelcomeMessage))
+                {
+                    var str = dbGuild.WelcomeMessage
+                        .Replace("{{guild}}", user.Guild.Name)
+                        .Replace("{{user}}", user.GetDisplayName());
+
+                    await channel.SendMessageAsync(user.Mention, embed: new EmbedBuilder
+                    {
+                        Title = "A User Appears!",
+                        Color = Utilities.EspeonColor,
+                        Description = str,
+                        ThumbnailUrl = user.GetAvatarOrDefaultUrl()
+                    }
+                        .Build());
+                }
+
+                if(guild.GetRole(dbGuild.DefaultRoleId) is SocketRole role)
+                {
+                    await user.AddRoleAsync(role);
+                }
+            };
+
+            _client.JoinedGuild += async guild =>
+            {
+                var channelName = new[] { "welcome", "introduction", "general" };
+
+                var channel = guild.TextChannels
+                    .FirstOrDefault(x => channelName.Any(y => x.Name.Contains(y, StringComparison.InvariantCultureIgnoreCase)))
+                        ?? guild.TextChannels.FirstOrDefault(x => guild.CurrentUser.GetPermissions(x).ViewChannel
+                            && guild.CurrentUser.GetPermissions(x).SendMessages);
+
+                if (channel is null)
+                    return;
+
+                await channel.SendMessageAsync(string.Empty, embed: new EmbedBuilder
+                {
+                    Title = "",
+                    Color = Utilities.EspeonColor,
+                    ThumbnailUrl = guild.CurrentUser.GetAvatarOrDefaultUrl(),
+                    Description = $"Hello! I am Espeon{_services.GetService<EmotesService>().Collection["Espeon"]} and I have just been added to your guild!\n" +
+                    $"Type es/help to see all my available commands!"
+                }
+                    .Build());
+            };
+
             var logger = _services.GetService<LogService>();
             _client.Log += log =>
             {
                 return logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
             };
-
-            _push.Log += log =>
-            {
-                return logger.LogAsync(Source.Pusharp, 5 - (Severity)(int)log.Level, log.Message);
-            };
-
-#if !DEBUG //Don't want to waste my pushes
-            _client.Connected += async () => 
-            {
-                await Phone.SendNoteAsync(x =>
-                {
-                    x.Title = "Espeon Connected";
-                    x.Body = "<3";
-                });
-
-            };
-
-            _client.Disconnected += async _ =>
-            {
-                await Phone.SendNoteAsync(x =>
-                {
-                    x.Title = "Espeon Disconnected";
-                    x.Body = "</3";
-                });
-            };
-#endif
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using Espeon.Attributes;
-using Pusharp;
-using Pusharp.Entities;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,12 +6,7 @@ using System.Threading.Tasks;
 namespace Espeon.Services
 {
     public class LogService : BaseService
-    {
-        [Inject] private readonly PushBulletClient _push;
-
-        private Device _phone;
-        private Device Phone => _phone ?? (_phone = _push.Devices.First());
-
+    { 
         private readonly SemaphoreSlim _semaphore;
 
         public LogService()
@@ -71,17 +63,6 @@ namespace Espeon.Services
 
             Console.WriteLine();
             _semaphore.Release();
-
-#if !DEBUG
-            if (severity == Severity.Critical)
-            {
-                await Phone.SendNoteAsync(x =>
-                {
-                    x.Title = "Critical Error";
-                    x.Body = $"{message}\n{ex}";
-                });
-            }
-#endif
         }
     }
 }

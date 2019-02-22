@@ -21,6 +21,7 @@ namespace Espeon.Services
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
+        [Inject] private readonly Random _random;
         [Inject] private readonly TimerService _timer;
         [Inject] private readonly IServiceProvider _services;
 
@@ -47,6 +48,25 @@ namespace Espeon.Services
 
             client.MessageReceived += msg =>
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
+
+            client.MessageReceived += msg =>
+            {
+                if (_random.NextDouble() >= 0.05)
+                    return Task.CompletedTask;
+
+                Task.Run(async () =>
+                {
+                    using var userStore = _services.GetService<UserStore>();
+
+                    var user = await userStore.GetOrCreateUserAsync(msg.Author);
+                    user.CandyAmount += 10;
+
+                    await userStore.SaveChangesAsync();
+                });
+
+                return Task.CompletedTask;
+            };
+
             client.MessageUpdated += (_, msg, __) =>
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
 
@@ -65,6 +85,9 @@ namespace Espeon.Services
                 var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
 
                 prefixes = guild.Prefixes;
+
+                if (guild.RestrictedChannels.Contains(textChannel.Id) || guild.RestrictedUsers.Contains(message.Author.Id))
+                    return;
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
@@ -107,7 +130,7 @@ namespace Espeon.Services
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
-        
+
         //TODO redo this
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {

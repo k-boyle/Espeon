@@ -5,8 +5,6 @@ using Espeon.Commands;
 using Espeon.Databases.Entities;
 using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
-using Pusharp;
-using Pusharp.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -20,15 +18,10 @@ namespace Espeon.Services
         [Inject] private readonly LogService _logger;
         [Inject] private readonly TimerService _timer;
         [Inject] private readonly IServiceProvider _services;
-
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly PushBulletClient _push;
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
-
-        private Device _phone;
-        private Device Phone => _phone ?? (_phone = _push.Devices.First());
         
         //requires client to be populated to send reminders
         public async Task LoadRemindersAsync(UserStore ctx)
@@ -91,17 +84,6 @@ namespace Espeon.Services
         private async Task RemoveAsync(string taskKey, object removable)
         {
             var reminder = (Reminder)removable;
-
-            var appInfo = await _client.GetApplicationInfoAsync();
-
-            if (reminder.UserId == appInfo.Owner.Id)
-            {
-                await Phone.SendNoteAsync(x =>
-                {
-                    x.Title = "Reminder!";
-                    x.Body = reminder.TheReminder;
-                });
-            }
 
             if (!(_client.GetGuild(reminder.GuildId) is SocketGuild guild))
                 return;

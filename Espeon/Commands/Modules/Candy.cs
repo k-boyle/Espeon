@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Espeon.Commands.Checks;
 using Espeon.Commands.TypeParsers;
 using Espeon.Databases.Entities;
 using Espeon.Services;
@@ -68,6 +69,7 @@ namespace Espeon.Commands.Modules
 
         [Command("Treat")]
         [Name("Treat")]
+        [RequireOwner]
         public async Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
@@ -118,7 +120,10 @@ namespace Espeon.Commands.Modules
 
         [Command("Gift")]
         [Name("Gift Candies")]
-        public async Task GiftCandiesAsync(IGuildUser user, [OverrideTypeParser(typeof(CandyTypeParser))] int amount)
+        public async Task GiftCandiesAsync(IGuildUser user, 
+            [OverrideTypeParser(typeof(CandyTypeParser))]
+            [RequireRange(0)]
+            int amount)
         {
             await CandyService.TransferCandiesAsync(Context, Context.User, user, amount);
 
@@ -127,7 +132,10 @@ namespace Espeon.Commands.Modules
 
         [Command("Steal")]
         [Name("Try Steal")]
-        public async Task TryStealAsync([OverrideTypeParser(typeof(CandyTypeParser))] int amount)
+        public async Task TryStealAsync(
+            [OverrideTypeParser(typeof(CandyTypeParser))]
+            [RequireRange(0)]
+            int amount)
         {
             var espeon = await Context.UserStore.GetOrCreateUserAsync(Context.Client.CurrentUser);
             var espeonCandies = espeon.CandyAmount;

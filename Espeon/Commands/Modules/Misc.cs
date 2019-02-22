@@ -49,7 +49,7 @@ namespace Espeon.Commands.Modules
             var message = await SendMessageAsync(response);
 
             sw.Stop();
-            
+
             response = ResponseBuilder.Message(Context, $"Latency: {latency}ms\nPing: {sw.ElapsedMilliseconds}ms");
 
             await message.ModifyAsync(x => x.Embed = response);
@@ -69,19 +69,18 @@ namespace Espeon.Commands.Modules
         {
             var client = ClientFactory.CreateClient();
 
-            using (var response = await client.GetAsync("https://catfact.ninja/fact"))
-            {
-                if(response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var obj = JObject.Parse(content);
+            using var response = await client.GetAsync("https://catfact.ninja/fact");
 
-                    await SendOkAsync(0, obj["fact"]);
-                }
-                else
-                {
-                    await SendNotOkAsync(1);
-                }
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var obj = JObject.Parse(content);
+
+                await SendOkAsync(0, obj["fact"]);
+            }
+            else
+            {
+                await SendNotOkAsync(1);
             }
         }
 
@@ -92,19 +91,18 @@ namespace Espeon.Commands.Modules
         {
             var client = ClientFactory.CreateClient();
 
-            using (var response = await client.GetAsync("https://icanhazdadjoke.com/"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var obj = JObject.Parse(content);
+            using var response = await client.GetAsync("https://icanhazdadjoke.com/");
 
-                    await SendOkAsync(0, obj["joke"]);
-                }
-                else
-                {
-                    await SendNotOkAsync(1);
-                }
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var obj = JObject.Parse(content);
+
+                await SendOkAsync(0, obj["joke"]);
+            }
+            else
+            {
+                await SendNotOkAsync(1);
             }
         }
 
@@ -115,40 +113,37 @@ namespace Espeon.Commands.Modules
         {
             var client = ClientFactory.CreateClient();
 
-            using (var response = await client.GetAsync($"https://api.giphy.com/v1/gifs/random?api_key={Config.GiphyAPIKey}&rating=r&tag={search}"))
+            using var response = await client.GetAsync($"https://api.giphy.com/v1/gifs/random?api_key={Config.GiphyAPIKey}&rating=r&tag={search}");
+
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
+                var content = await response.Content.ReadAsStringAsync();
+                var obj = JObject.Parse(content);
+
+                if (!obj["data"].Any())
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var obj = JObject.Parse(content);
-
-                    if (!obj["data"].Any())
-                    {
-                        await SendNotOkAsync(0);
-                    }
-                    else
-                    {
-                        var gifUrl = obj["data"]["image_original_url"];
-
-                        using (var stream = await client.GetStreamAsync($"{gifUrl}"))
-                        {
-                            //TODO MessageService#SendFileAsync
-
-                            try
-                            {
-                                await Context.Channel.SendFileAsync(stream, $"{search}.gif", string.Empty);
-                            }
-                            catch(HttpException ex) when(ex.DiscordCode == 40003)
-                            {
-                                await SendNotOkAsync(1);
-                            }
-                        }
-                    }
+                    await SendNotOkAsync(0);
                 }
                 else
                 {
-                    await SendNotOkAsync(2);
+                    var gifUrl = obj["data"]["image_original_url"];
+
+                    using var stream = await client.GetStreamAsync($"{gifUrl}");
+                    //TODO MessageService#SendFileAsync
+
+                    try
+                    {
+                        await Context.Channel.SendFileAsync(stream, $"{search}.gif", string.Empty);
+                    }
+                    catch (HttpException ex) when (ex.DiscordCode == 40003)
+                    {
+                        await SendNotOkAsync(1);
+                    }
                 }
+            }
+            else
+            {
+                await SendNotOkAsync(2);
             }
         }
 
@@ -167,11 +162,11 @@ namespace Espeon.Commands.Modules
 
             var canExecute = new List<Module>();
 
-            foreach(var module in modules)
+            foreach (var module in modules)
             {
                 var result = await module.RunChecksAsync(Context, Services);
 
-                if(result.IsSuccessful)
+                if (result.IsSuccessful)
                 {
                     var commandChecks = module.Commands.Select(x => x.RunChecksAsync(Context, Services));
 
@@ -207,7 +202,7 @@ namespace Espeon.Commands.Modules
 
             var canExecute = new List<Command>();
 
-            foreach(var command in module.Commands)
+            foreach (var command in module.Commands)
             {
                 var result = await command.RunChecksAsync(Context, Services);
 
@@ -236,10 +231,10 @@ namespace Espeon.Commands.Modules
             var prefix = currentGuild.Prefixes.First();
 
             var builder = GetBuilder(prefix);
-            
+
             builder.WithFooter("You can't go any deeper than this D:");
 
-            foreach(var command in commands)
+            foreach (var command in commands)
             {
                 //TODO add summaries/examples
                 builder.AddField(command.Name, $"{prefix}{command.FullAliases.First()} " +
@@ -278,18 +273,18 @@ namespace Espeon.Commands.Modules
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
 
-            var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser 
+            var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
 
             var mods = await Task.WhenAll(modTasks);
 
-            if(mods.Length == 0)
+            if (mods.Length == 0)
             {
                 await SendOkAsync(0);
             }
             else
             {
-                await SendOkAsync(1, 
+                await SendOkAsync(1,
                     string.Join(", ", mods.Select(x => $"{Format.Sanitize(x.GetDisplayName())}")));
             }
         }

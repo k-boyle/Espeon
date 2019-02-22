@@ -226,5 +226,27 @@ namespace Espeon.Commands.Modules
             await Context.GuildStore.SaveChangesAsync();
             await SendOkAsync(0);
         }
+
+        [Command("warninglimit")]
+        [Name("Set Warning Limit")]
+        public async Task SetWarningLimitAsync([RequireRange(0)] int limit)
+        {
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            currentGuild.WarningLimit = limit;
+
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(0);
+        }
+
+        [Command("noreactionrole")]
+        [Name("Set No Reactions Role")]
+        public async Task SetNoReactionsRole([Remainder] SocketRole role)
+        {
+            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            currentGuild.NoReactions = role.Id;
+
+            await Context.GuildStore.SaveChangesAsync();
+            await SendOkAsync(0);
+        }
     }
 }

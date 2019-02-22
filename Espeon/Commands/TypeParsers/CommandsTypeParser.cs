@@ -32,6 +32,9 @@ namespace Espeon.Commands.TypeParsers
             if (canExecute.Count == 0)
                 return new TypeParserResult<IReadOnlyCollection<Command>>($"Failed to find any commands matching {value}");
 
+            if (canExecute.Count > 5)
+                return new TypeParserResult<IReadOnlyCollection<Command>>("Too many results. Query was too vauge");
+
             return new TypeParserResult<IReadOnlyCollection<Command>>(found);
         }
     }

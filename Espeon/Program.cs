@@ -6,7 +6,6 @@ using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Pusharp;
 using Qmmands;
 using System;
 using System.Linq;
@@ -39,12 +38,6 @@ namespace Espeon
                     CaseSensitive = false
                 })
                     .AddTypeParsers(assembly))
-                .AddSingleton(new PushBulletClient(new PushBulletClientConfig
-                {
-                    LogLevel = LogLevel.Verbose,
-                    UseCache = true,
-                    Token = config.PushbulletToken
-                }))
                 .AddSingleton(config)
                 .AddSingleton<Random>()
                 .AddHttpClient("", client =>

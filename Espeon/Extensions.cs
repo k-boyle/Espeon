@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Net;
 using Espeon.Attributes;
 using Espeon.Commands.TypeParsers;
 using Espeon.Databases.CommandStore;
@@ -112,7 +113,7 @@ namespace Espeon
 
                 var targetType = parser.BaseType.GetGenericArguments().First();
 
-                internalAddParser.Invoke(commands, new[] {targetType, Activator.CreateInstance(parser), !@override});
+                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), !@override });
             }
 
             return commands;
@@ -149,12 +150,37 @@ namespace Espeon
         {
             return user.Nickname ?? user.Username;
         }
-        
+
         public static string[] FindCommands(this string str)
         {
             var split = str.Split("::", StringSplitOptions.RemoveEmptyEntries);
 
             return split.Select(x => x.Trim()).ToArray();
+        }
+
+        public static async Task<T> RetryTaskAsync<T>(this Task<T> task, int maxAttempts = 5)
+        {
+            var tries = 0;
+
+            do
+            {
+                try
+                {
+                    var result = await task;
+                    return result;
+                }
+                catch(HttpException ex)
+                {
+                    if (ex.DiscordCode < 500 || ex.DiscordCode >= 600)
+                    {
+                        return default;
+                    }
+
+                    tries++;
+                }
+            } while (tries < maxAttempts);
+
+            return default;
         }
     }
 }

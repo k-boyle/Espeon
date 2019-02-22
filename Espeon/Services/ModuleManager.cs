@@ -32,64 +32,63 @@ namespace Espeon.Services
         //REEEEEEEEEEEEEEEEEEEEEE
         private async void OnBuildingAsync(ModuleBuilder moduleBuilder)
         {
-            if(string.IsNullOrEmpty(moduleBuilder.Name))
+            if (string.IsNullOrEmpty(moduleBuilder.Name))
                 throw new NoNullAllowedException(nameof(moduleBuilder));
 
-            using (var ctx = _services.GetService<CommandStore>())
+            using var ctx = _services.GetService<CommandStore>();
+
+            var modules = ctx.Modules.Include(x => x.Commands);
+            var foundModule = await modules.FirstOrDefaultAsync(x => x.Name == moduleBuilder.Name);
+
+            var commandBuilders = moduleBuilder.Commands;
+
+            if (foundModule is null)
             {
-                var modules = ctx.Modules.Include(x => x.Commands);
-                var foundModule = await modules.FirstOrDefaultAsync(x => x.Name == moduleBuilder.Name);
-
-                var commandBuilders = moduleBuilder.Commands;
-
-                if (foundModule is null)
+                foundModule = new ModuleInfo
                 {
-                    foundModule = new ModuleInfo
-                    {
-                        Name = moduleBuilder.Name
-                    };
+                    Name = moduleBuilder.Name
+                };
 
-                    if(commandBuilders.Any(x => string.IsNullOrEmpty(x.Name)))
-                        throw new NoNullAllowedException(nameof(commandBuilders));
+                if (commandBuilders.Any(x => string.IsNullOrEmpty(x.Name)))
+                    throw new NoNullAllowedException(nameof(commandBuilders));
 
-                    foundModule.Commands = commandBuilders.Select(x => new CommandInfo
-                    {
-                        Name = x.Name
-                    }).ToList();
-
-                    await ctx.Modules.AddAsync(foundModule);
-                }
-                else
+                foundModule.Commands = commandBuilders.Select(x => new CommandInfo
                 {
-                    if(!(foundModule.Aliases is null) && foundModule.Aliases.Count > 0)
-                        moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
+                    Name = x.Name
+                }).ToList();
 
-                    foreach (var commandBuilder in commandBuilders)
+                await ctx.Modules.AddAsync(foundModule);
+            }
+            else
+            {
+                if (!(foundModule.Aliases is null) && foundModule.Aliases.Count > 0)
+                    moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
+
+                foreach (var commandBuilder in commandBuilders)
+                {
+                    if (string.IsNullOrWhiteSpace(commandBuilder.Name))
+                        throw new NoNullAllowedException(nameof(commandBuilder));
+
+                    var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandBuilder.Name);
+
+                    if (foundCommand is null)
                     {
-                        if(string.IsNullOrWhiteSpace(commandBuilder.Name))
-                            throw new NoNullAllowedException(nameof(commandBuilder));
-                        
-                        var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandBuilder.Name);
-
-                        if (foundCommand is null)
+                        foundCommand = new CommandInfo
                         {
-                            foundCommand = new CommandInfo
-                            {
-                                Name = commandBuilder.Name,
-                            };
+                            Name = commandBuilder.Name,
+                        };
 
-                            foundModule.Commands.Add(foundCommand);
-                        }
-                        else
-                        {
-                            if(!(foundCommand.Aliases is null) && foundCommand.Aliases.Count > 0)
-                                commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
-                        }
+                        foundModule.Commands.Add(foundCommand);
+                    }
+                    else
+                    {
+                        if (!(foundCommand.Aliases is null) && foundCommand.Aliases.Count > 0)
+                            commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
                     }
                 }
-
-                await ctx.SaveChangesAsync();
             }
+
+            await ctx.SaveChangesAsync();
         }
 
         //TODO doesn't work
@@ -128,7 +127,7 @@ namespace Espeon.Services
                 return false;
 
             foundCommand.Aliases.Add(alias);
-            
+
             await context.CommandStore.SaveChangesAsync();
             await UpdateAsync(module);
 
@@ -143,7 +142,7 @@ namespace Espeon.Services
                 return false;
 
             foundModule.Aliases.Remove(alias);
-            
+
             await context.CommandStore.SaveChangesAsync();
             await UpdateAsync(module);
 

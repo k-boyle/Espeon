@@ -75,6 +75,7 @@ namespace Espeon.Commands
                 case CommandOnCooldownResult commandOnCooldownResult:
                     break;
 
+                //TODO forward to the appropiate authorities
                 case ExecutionFailedResult _:
                     builder.WithDescription("Something went horribly wrong... " +
                                             "The problem has been forwarded to the appropiate authorities");

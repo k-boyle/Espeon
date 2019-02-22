@@ -60,7 +60,7 @@ namespace Espeon.Commands
 
             var responses = command.Responses[user.ResponsePack];
 
-            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args));
+            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args), false);
             return await SendMessageAsync(response);
         }
 

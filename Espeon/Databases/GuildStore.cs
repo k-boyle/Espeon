@@ -13,7 +13,6 @@ namespace Espeon.Databases.GuildStore
     public class GuildStore : DbContext
     {
         private DbSet<Guild> Guilds { get; set; }
-        public DbSet<CustomCommand> CustomCommands { get; set; }
 
         private static Config _config;
 
@@ -55,14 +54,36 @@ namespace Espeon.Databases.GuildStore
                 guild.Property(x => x.SelfAssigningRoles)
                     .HasConversion(snowflakeConverter);
 
+                guild.Property(x => x.WarningLimit)
+                    .HasDefaultValue(3);
+
                 guild.HasMany(x => x.Commands)
+                    .WithOne(y => y.Guild)
+                    .HasForeignKey(z => z.GuildId);
+
+                guild.HasMany(x => x.Warnings)
                     .WithOne(y => y.Guild)
                     .HasForeignKey(z => z.GuildId);
             });
 
-            modelBuilder.Entity<CustomCommand>().HasKey(x => x.Id);
-            modelBuilder.Entity<CustomCommand>().Property(x => x.Id)
-                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<CustomCommand>(command =>
+            {
+                command.HasKey(x => x.Id);
+
+                command.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Warning>(warning =>
+            {
+                warning.HasKey(x => x.Id);
+
+                warning.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+
+                warning.Property(x => x.IssuedOn)
+                    .HasDefaultValue(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            });
         }
 
         private sealed class SnowflakeCollectionParser : ValueConverter<ICollection<ulong>, string>
@@ -110,6 +131,23 @@ namespace Espeon.Databases.GuildStore
                 Admins = new List<ulong>
                 {
                     guild.OwnerId
+                },
+                //lazy hack
+                Moderators = new List<ulong>
+                {
+                    0
+                },
+                RestrictedUsers = new List<ulong>
+                {
+                    0
+                },
+                RestrictedChannels = new List<ulong>
+                {
+                    0
+                },
+                SelfAssigningRoles = new List<ulong>
+                {
+                    0
                 }
             };
 

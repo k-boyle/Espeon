@@ -190,10 +190,19 @@
 
   {
     "Default": [
-
+      "Warning limit has been set"
     ],
     "owo": [
+      "mweaniedar updwated"
+    ]
+  },
 
+  {
+    "Default": [
+      "No reactions role has been set"
+    ],
+    "owo": [
+      "dowone :3"
     ]
   },
 
@@ -248,6 +257,119 @@
     ],
     "owo": [
 
+    ]
+  },
+
+  {
+    "Default": [
+
+    ],
+    "owo": [
+
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been kicked"
+    ],
+    "owo": [
+      "i gwot rid of the mweanie >:3"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has been banned"
+    ],
+    "owo": [
+      "i gwot rid of the mweanie >:3"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0} has exceeded the warning limit and currently has {1} warning(s)",
+      "{0} has been warned"
+    ],
+    "owo": [
+      "owwwwno {0} has {1} warnings, this is too manyy >><<",
+      "{0} uve been warned 0w0"
+    ]
+  },
+
+  {
+    "Default": [
+      "This warning doesn't exist",
+      "Warning has been revoked"
+    ],
+    "owo": [
+      "\\*lookds down\\* owwwno i cudnt fwind dis warnings nowo",
+      "\\*looks up in excitement\\* i did it dwaddy :3"
+    ]
+  },
+
+  {
+    "Default": [
+      "This user doesn't have any warnings",
+      "{0}"
+    ],
+    "owo": [
+      "owwo this user is agwood boi :3c",
+      "{0}"
+    ]
+  },
+
+  {
+    "Default": [
+      "No reactions role was not found or is not set",
+      "Reactions redacted"
+    ],
+    "owo": [
+      "\\*talks softly\\* owww i cudnt fwind the wole",
+      "weaactions wedacted"
+    ]
+  },
+
+  {
+    "Default": [
+      "No reactions role was not found or is not set",
+      "Reactions restored"
+    ],
+    "owo": [
+      "\\*talks softly\\* owww i cudnt fwind the wole",
+      "weaactions westored"
+    ]
+  },
+
+  {
+    "Default": [
+      "Blocked"
+    ],
+    "owo": [
+      "bwocked"
+    ]
+  },
+
+  {
+    "Default": [
+      "This user is already blacklisted",
+      "Blacklisted"
+    ],
+    "owo": [
+      ">>.<< oweee thyre aweady bwackwisted",
+      "meanwee bwusted >:3"
+    ]
+  },
+
+  {
+    "Default": [
+      "This user isn't blacklisted",
+      "Unblacklisted"
+    ],
+    "owo": [
+      ">>.<< owee thyre not bwackwisted",
+      "teh meanwee weturns ><"
     ]
   },
 
@@ -271,19 +393,58 @@
 
   {
     "Default": [
-      "{0} was kicked"
+      "You already have this role",
+      "Role has been assigned to you",
+      "This role is not available as a self assigning role"
     ],
     "owo": [
-      "the mweanee is gwon :3"
+      "owwwww >< yuu aweady hav dis wole",
+      "u hav wole nwo",
+      "owwweeee this wole isnt swelf aswining"
     ]
   },
 
   {
     "Default": [
-      "{0} was banned"
+      "Role is already a self assigning role",
+      "Role has been added to the list of self assigning roles"
     ],
     "owo": [
-      "the mweanee is gwon :3"
+      ">><< wole aweady swelf aswigning",
+      "wole has been adwed to teh wist"
+    ]
+  },
+
+  {
+    "Default": [
+      "You don't currently have this role",
+      "This role isn't a self assigning role",
+      "Role has been removed"
+    ],
+    "owo": [
+      "owwnoo yuu dont hav dis wole ><",
+      "this wole isnt swelf aswining",
+      "wole wemoved!!"
+    ]
+  },
+
+  {
+    "Default": [
+      "This role is not in the list of self assigning roles",
+      "Role has been removed as a self assigning role"
+    ],
+    "owo": [
+      "owee this wole is not swelf aswining",
+      "wole wemoved frmo the wist"
+    ]
+  },
+
+  {
+    "Default": [
+      "{0}"
+    ],
+    "owo": [
+      "{0}"
     ]
   }
 ]

@@ -46,6 +46,7 @@ namespace Espeon.Commands.Checks
     
     public enum ElevationLevel
     {
+        None,
         Mod,
         Admin
     }
