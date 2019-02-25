@@ -158,29 +158,7 @@ namespace Espeon
             return split.Select(x => x.Trim()).ToArray();
         }
 
-        public static async Task<T> RetryTaskAsync<T>(this Task<T> task, int maxAttempts = 5)
-        {
-            var tries = 0;
-
-            do
-            {
-                try
-                {
-                    var result = await task;
-                    return result;
-                }
-                catch(HttpException ex)
-                {
-                    if (ex.DiscordCode < 500 || ex.DiscordCode >= 600)
-                    {
-                        return default;
-                    }
-
-                    tries++;
-                }
-            } while (tries < maxAttempts);
-
-            return default;
-        }
+        public static Task<T[]> AllAsync<T>(this IEnumerable<Task<T>> tasks)
+            => Task.WhenAll(tasks);
     }
 }

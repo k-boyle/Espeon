@@ -10,6 +10,7 @@ using Qmmands;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -131,6 +132,7 @@ namespace Espeon.Services
                 $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
         }
 
+        /*
         //TODO redo this
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
@@ -174,6 +176,103 @@ namespace Espeon.Services
             _messageCache[context.Channel.Id][context.User.Id][key] = message;
 
             return sentMessage;
+        }
+        */
+
+        public async Task<IUserMessage> SendMessageAsync(EspeonContext context, Action<MessageProperties> properties)
+        {
+            if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
+                foundChannel = (_messageCache[context.Channel.Id] =
+                    new ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>());
+
+            if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
+                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<string, CachedMessage>());
+
+            MessageProperties messageProperties = null;
+            properties.Invoke(messageProperties);
+
+            var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
+
+            IUserMessage sentMessage;
+            if(foundMessage.Value is null)
+            {
+                sentMessage = await SendMessageAsync(context, messageProperties);
+
+                var message = new CachedMessage
+                {
+                    ChannelId = context.Channel.Id,
+                    UserId = context.User.Id,
+                    ExecutingId = context.Message.Id,
+                    ResponseIds = new List<ulong>
+                    {
+                        sentMessage.Id
+                    },
+                    CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
+                };
+
+                var key = await _timer.EnqueueAsync(message, 
+                    DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(), 
+                    RemoveAsync);
+
+                _messageCache[context.Channel.Id][context.User.Id][key] = message;
+
+                return sentMessage;
+            }
+
+            if (context.IsEdit)
+            {
+                context.IsEdit = false;
+
+                var m = foundMessage.Value;
+                var foundMessages = await m.ResponseIds.Select(x => GetOrDownloadMessageAsync(m.ChannelId, x))
+                    .AllAsync();
+
+                if (context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages)
+                    await context.Channel.DeleteMessagesAsync(foundMessages);
+                else
+                    await Task.WhenAll(foundMessages.Select(x => x.DeleteAsync()));
+
+                sentMessage = await SendMessageAsync(context, messageProperties);
+
+                m.CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds();
+                m.ResponseIds = new List<ulong>
+                {
+                    sentMessage.Id
+                };
+
+                await _timer.RemoveAsync(foundMessage.Key);
+                var key = await _timer.EnqueueAsync(m,
+                    DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
+                    RemoveAsync);
+
+                _messageCache[context.Channel.Id][context.User.Id][key] = m;
+                _messageCache[context.Channel.Id][context.User.Id].TryRemove(foundMessage.Key, out _);
+
+                return sentMessage;
+            }
+
+            sentMessage = await SendMessageAsync(context, messageProperties);
+            foundMessage.Value.ResponseIds.Add(sentMessage.Id);
+
+            return sentMessage;
+        }
+
+        //async needed for the cast
+        private async Task<IUserMessage> SendMessageAsync(EspeonContext context, MessageProperties properties)
+        {
+            if (properties.Stream is null)
+            {
+                return await context.Channel
+                    .SendMessageAsync(properties.Content, embed: properties.Embed);
+            }
+            else
+            {
+                return await context.Channel.SendFileAsync(
+                    stream:     properties.Stream,
+                    filename:   properties.FileName,
+                    text:       properties.Content,
+                    embed:      properties.Embed);
+            }
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
@@ -252,8 +351,7 @@ namespace Espeon.Services
                 await RemoveAsync(key, cached);
                 await _timer.RemoveAsync(key);
 
-                if (await GetOrDownloadMessageAsync(cached.ChannelId, cached.ResponseId) is IMessage fetchedMessage)
-                    fetchedMessages.Add(fetchedMessage);
+                foreach(var id in messages)
             }
 
             if (manageMessages)
@@ -272,10 +370,19 @@ namespace Espeon.Services
         private class CachedMessage
         {
             public ulong ChannelId { get; set; }
-            public ulong ResponseId { get; set; }
+            //public ulong ResponseId { get; set; }
+            public IList<ulong> ResponseIds { get; set; }
             public ulong ExecutingId { get; set; }
             public ulong UserId { get; set; }
             public long CreatedAt { get; set; }
+        }
+
+        public class MessageProperties
+        {
+            public string Content { get; set; }
+            public Embed Embed { get; set; }
+            public Stream Stream { get; set; }
+            public string FileName { get; set; }
         }
     }
 }

@@ -168,9 +168,7 @@ namespace Espeon.Commands.Modules
 
                 if (result.IsSuccessful)
                 {
-                    var commandChecks = module.Commands.Select(x => x.RunChecksAsync(Context, Services));
-
-                    var results = await Task.WhenAll(commandChecks);
+                    var results = await module.Commands.Select(x => x.RunChecksAsync(Context, Services)).AllAsync();
 
                     if (results.Count(x => x.IsSuccessful) > 0)
                         canExecute.Add(module);
@@ -276,7 +274,7 @@ namespace Espeon.Commands.Modules
             var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
 
-            var mods = await Task.WhenAll(modTasks);
+            var mods = await modTasks.AllAsync();
 
             if (mods.Length == 0)
             {
@@ -298,7 +296,7 @@ namespace Espeon.Commands.Modules
             var adminTasks = currentGuild.Admins.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
 
-            var admins = await Task.WhenAll(adminTasks);
+            var admins = await adminTasks.AllAsync();
 
             if (admins.Length == 0)
             {

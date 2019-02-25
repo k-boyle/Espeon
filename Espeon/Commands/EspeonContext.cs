@@ -24,7 +24,7 @@ namespace Espeon.Commands
         public SocketGuild Guild => User.Guild;
         public SocketTextChannel Channel { get; }
 
-        public bool IsEdit { get; }
+        public bool IsEdit { get; set;  }
 
         public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit)
         {
