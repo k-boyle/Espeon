@@ -151,7 +151,7 @@ namespace Espeon.Commands.Modules
         [Command("Clear")]
         [RunMode(RunMode.Parallel)]
         [Name("Clear Messages")]
-        public Task ClearMessagesAsync(int amount = 5)
+        public Task ClearMessagesAsync(int amount = 2)
             => Message.DeleteMessagesAsync(Context, amount);
 
         [Command("help")]

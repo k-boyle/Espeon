@@ -104,5 +104,11 @@ namespace Espeon.Databases.UserStore
         //async needed for the cast
         public async Task<IReadOnlyCollection<User>> GetAllUsersAsync()
             => await Users.ToListAsync();
+
+        public async Task RemoveUserAsync(IUser user)
+        {
+            var dbUser = await GetOrCreateUserAsync(user);
+            Users.Remove(dbUser);
+        }
     }
 }

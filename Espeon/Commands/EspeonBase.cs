@@ -31,7 +31,11 @@ namespace Espeon.Commands
 
         protected Task<IUserMessage> SendMessageAsync(string content, Embed embed = null)
         {
-            return Message.SendMessageAsync(Context, content, embed);
+            return Message.SendMessageAsync(Context, x =>
+            {
+                x.Content = content;
+                x.Embed = embed;
+            });
         }
 
         protected async Task<IUserMessage> SendOkAsync(int index, params object[] args)

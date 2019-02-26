@@ -76,7 +76,7 @@ namespace Espeon.Services
             var found = commands?.FirstOrDefault(x =>
                 string.Equals(x.Name, command.Name, StringComparison.InvariantCultureIgnoreCase));
 
-            await _message.SendMessageAsync(context, found!.Value);
+            await _message.SendMessageAsync(context, x => x.Content = found!.Value);
 
             return new SuccessfulResult();
         }

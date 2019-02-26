@@ -29,7 +29,11 @@ namespace Espeon.Interactive.Paginator
             _manageMessages = Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages;
 
             var (content, embed) = GetCurrentPage();
-            Message = await MessageService.SendMessageAsync(Context, content, embed);
+            Message = await MessageService.SendMessageAsync(Context, x =>
+            {
+                x.Content = content;
+                x.Embed = embed;
+            });
         }
 
         public virtual Task HandleTimeoutAsync()
@@ -79,7 +83,9 @@ namespace Espeon.Interactive.Paginator
                     return true;
 
                 case Control.Skip:
-                    await MessageService.SendMessageAsync(Context, "What page would you like to skip to?");
+                    await MessageService.SendMessageAsync(Context, 
+                        x => x.Content = "What page would you like to skip to?");
+
                     var reply = await Interactive.NextMessageAsync(Context,
                         new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
                             new ChannelCriteria(Context.Channel.Id)));
@@ -95,7 +101,7 @@ namespace Espeon.Interactive.Paginator
 
                 case Control.Info:
                     await MessageService.SendMessageAsync(Context,
-                        "I am a paginated message! You can press the reactions below to control me!");
+                        x => x.Content = "I am a paginated message! You can press the reactions below to control me!");
                     break;
 
                 default:

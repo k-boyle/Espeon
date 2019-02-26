@@ -120,7 +120,7 @@ namespace Espeon.Services
             if (result is ExecutionFailedResult failed)
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
-            await SendMessageAsync(context, string.Empty, result.GenerateResponse(context));
+            await SendMessageAsync(context, x => x.Embed = result.GenerateResponse(context));
         }
 
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
@@ -351,7 +351,8 @@ namespace Espeon.Services
                 await RemoveAsync(key, cached);
                 await _timer.RemoveAsync(key);
 
-                foreach(var id in messages)
+                foreach (var id in cached.ResponseIds)
+                    fetchedMessages.Add(await GetOrDownloadMessageAsync(cached.ChannelId, id));
             }
 
             if (manageMessages)

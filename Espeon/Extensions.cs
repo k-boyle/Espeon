@@ -141,7 +141,7 @@ namespace Espeon
             return true;
         }
 
-        public static string GetAvatarOrDefaultUrl(this IGuildUser user)
+        public static string GetAvatarOrDefaultUrl(this IUser user)
         {
             return user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
         }

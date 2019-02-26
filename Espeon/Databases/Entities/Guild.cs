@@ -2,9 +2,9 @@
 
 namespace Espeon.Databases.Entities
 {
-    public class Guild : DatabaseEntity
+    public class Guild
     {
-        public override ulong Id { get; set; }
+        public ulong Id { get; set; }
 
         public ulong WelcomeChannelId { get; set; }
         public string WelcomeMessage { get; set; }
@@ -25,7 +25,12 @@ namespace Espeon.Databases.Entities
         public ICollection<ulong> Moderators { get; set; }
 
         public ICollection<ulong> SelfAssigningRoles { get; set; }
+
         public List<CustomCommand> Commands { get; set; }
+
+        public ulong StarboardChannelId { get; set; }
+        public int StarLimit { get; set; }
+        public List<StarredMessage> StarredMessages { get; set; }
     }
 
     public class CustomCommand
@@ -50,5 +55,20 @@ namespace Espeon.Databases.Entities
         public ulong Issuer { get; set; }
         public string Reason { get; set; }
         public long IssuedOn { get; set; }
+    }
+
+    public class StarredMessage
+    {
+        public Guild Guild { get; set; }
+        public ulong GuildId { get; set; }
+
+        public ulong Id { get; set; }
+        public ulong ChannelId { get; set; }
+        public ulong AuthorId { get; set; }
+        public ulong StarboardMessageId { get; set; }        
+        
+        public ICollection<ulong> ReactionUsers { get; set; }
+
+        public string ImageUrl { get; set; }
     }
 }

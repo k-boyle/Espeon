@@ -57,11 +57,18 @@ namespace Espeon.Databases.GuildStore
                 guild.Property(x => x.WarningLimit)
                     .HasDefaultValue(3);
 
+                guild.Property(x => x.StarLimit)
+                    .HasDefaultValue(3);
+
                 guild.HasMany(x => x.Commands)
                     .WithOne(y => y.Guild)
                     .HasForeignKey(z => z.GuildId);
 
                 guild.HasMany(x => x.Warnings)
+                    .WithOne(y => y.Guild)
+                    .HasForeignKey(z => z.GuildId);
+
+                guild.HasMany(x => x.StarredMessages)
                     .WithOne(y => y.Guild)
                     .HasForeignKey(z => z.GuildId);
             });
@@ -83,6 +90,14 @@ namespace Espeon.Databases.GuildStore
 
                 warning.Property(x => x.IssuedOn)
                     .HasDefaultValue(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            });
+
+            modelBuilder.Entity<StarredMessage>(message =>
+            {
+                message.HasKey(x => x.Id);
+
+                message.Property(x => x.ReactionUsers)
+                    .HasConversion(snowflakeConverter);
             });
         }
 
@@ -172,6 +187,12 @@ namespace Espeon.Databases.GuildStore
             }
 
             return await Guilds.Include(expression).ToListAsync();
+        }
+
+        public async Task RemoveGuildAsync(IGuild guild)
+        {
+            var dbGuild = await GetOrCreateGuildAsync(guild);
+            Guilds.Remove(dbGuild);
         }
     }
 }

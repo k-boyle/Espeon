@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using MessageProperties = Espeon.Services.MessageService.MessageProperties;
 
 namespace Espeon.Commands.Modules
 {
@@ -151,11 +152,11 @@ namespace Espeon.Commands.Modules
             public EspeonContext Context { get; set; }
             public IServiceProvider Services { get; set; }
 
-            public Task<IUserMessage> SendMessageAsync(string content, Embed embed = null)
+            public Task<IUserMessage> SendMessageAsync(Action<MessageProperties> func)
             {
                 var message = Services.GetService<MessageService>();
 
-                return message.SendMessageAsync(Context, content, embed);
+                return message.SendMessageAsync(Context, func);
             }
         }
     }

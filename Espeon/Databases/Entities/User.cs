@@ -2,9 +2,9 @@
 
 namespace Espeon.Databases.Entities
 {
-    public class User : DatabaseEntity
+    public class User
     {
-        public override ulong Id { get; set; }
+        public ulong Id { get; set; }
         
         public ResponsePack ResponsePack { get; set; }
 
