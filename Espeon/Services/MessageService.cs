@@ -133,7 +133,6 @@ namespace Espeon.Services
         }
 
         /*
-        //TODO redo this
         public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
@@ -223,30 +222,28 @@ namespace Espeon.Services
             {
                 context.IsEdit = false;
 
-                var m = foundMessage.Value;
-                var foundMessages = await m.ResponseIds.Select(x => GetOrDownloadMessageAsync(m.ChannelId, x))
-                    .AllAsync();
-
-                if (context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages)
-                    await context.Channel.DeleteMessagesAsync(foundMessages);
-                else
-                    await Task.WhenAll(foundMessages.Select(x => x.DeleteAsync()));
+                var perms = context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages;
+                await DeleteMessagesAsync(context, perms, new[] { (foundMessage.Key, foundMessage.Value) });
 
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
-                m.CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds();
-                m.ResponseIds = new List<ulong>
+                var message = new CachedMessage
                 {
-                    sentMessage.Id
+                    ChannelId = context.Channel.Id,
+                    UserId = context.User.Id,
+                    ExecutingId = context.Message.Id,
+                    CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds(),
+                    ResponseIds = new List<ulong>
+                    {
+                        sentMessage.Id
+                    }
                 };
 
-                await _timer.RemoveAsync(foundMessage.Key);
-                var key = await _timer.EnqueueAsync(m,
+                var key = await _timer.EnqueueAsync(message,
                     DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
                     RemoveAsync);
 
-                _messageCache[context.Channel.Id][context.User.Id][key] = m;
-                _messageCache[context.Channel.Id][context.User.Id].TryRemove(foundMessage.Key, out _);
+                _messageCache[context.Channel.Id][context.User.Id][key] = message;
 
                 return sentMessage;
             }

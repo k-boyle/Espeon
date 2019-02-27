@@ -41,7 +41,6 @@ namespace Espeon
         }
 
         //TODO clean this up
-        //TODO events to remove stuff from DB e.g. role deleted, user leave
         private void EventHooks(UserStore userStore)
         {
             _client.Ready += async () =>

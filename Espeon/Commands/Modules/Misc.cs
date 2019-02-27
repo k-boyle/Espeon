@@ -129,11 +129,10 @@ namespace Espeon.Commands.Modules
                     var gifUrl = obj["data"]["image_original_url"];
 
                     using var stream = await client.GetStreamAsync($"{gifUrl}");
-                    //TODO MessageService#SendFileAsync
 
                     try
                     {
-                        await Context.Channel.SendFileAsync(stream, $"{search}.gif", string.Empty);
+                        await SendFileAsync(stream, $"{search}.gif");
                     }
                     catch (HttpException ex) when (ex.DiscordCode == 40003)
                     {

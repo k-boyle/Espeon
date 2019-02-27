@@ -7,6 +7,7 @@ using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +36,18 @@ namespace Espeon.Commands
             {
                 x.Content = content;
                 x.Embed = embed;
+            });
+        }
+
+        protected Task<IUserMessage> SendFileAsync(Stream stream, string fileName, string content = null, 
+            Embed embed = null)
+        {
+            return Message.SendMessageAsync(Context, x =>
+            {
+                x.Content = content;
+                x.Embed = embed;
+                x.Stream = stream;
+                x.FileName = fileName;
             });
         }
 
