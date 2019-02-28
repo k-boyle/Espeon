@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon.Attributes
+namespace Espeon.Services
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class InjectAttribute : Attribute

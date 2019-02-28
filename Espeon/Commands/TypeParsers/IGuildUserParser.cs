@@ -11,7 +11,7 @@ namespace Espeon.Commands.TypeParsers
 {
     public sealed class IGuildUserTypeParser : TypeParser<IGuildUser>
     {
-        public override async Task<TypeParserResult<IGuildUser>> ParseAsync(string value, ICommandContext ctx, IServiceProvider provider)
+        public override async Task<TypeParserResult<IGuildUser>> ParseAsync(Parameter param, string value, ICommandContext ctx, IServiceProvider provider)
         {
             var context = ctx as EspeonContext;
 

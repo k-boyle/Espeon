@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Attributes;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Espeon.Services;

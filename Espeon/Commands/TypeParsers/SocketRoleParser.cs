@@ -8,7 +8,7 @@ namespace Espeon.Commands.TypeParsers
 {
     public sealed class SocketRoleParser : TypeParser<SocketRole>
     {
-        public override Task<TypeParserResult<SocketRole>> ParseAsync(string value, ICommandContext ctx, IServiceProvider provider)
+        public override Task<TypeParserResult<SocketRole>> ParseAsync(Parameter param, string value, ICommandContext ctx, IServiceProvider provider)
         {
             var context = ctx as EspeonContext;
             if (context.Guild == null)

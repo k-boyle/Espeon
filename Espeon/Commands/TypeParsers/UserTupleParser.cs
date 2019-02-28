@@ -9,7 +9,7 @@ namespace Espeon.Commands.TypeParsers
 {
     public class UserTupleParser : TypeParser<(IGuildUser, User)>
     {
-        public override async Task<TypeParserResult<(IGuildUser, User)>> ParseAsync(string value, ICommandContext originalContext, IServiceProvider provider)
+        public override async Task<TypeParserResult<(IGuildUser, User)>> ParseAsync(Parameter param, string value, ICommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 
@@ -17,7 +17,7 @@ namespace Espeon.Commands.TypeParsers
 
             var userParser = commands.GetSpecificTypeParser<IGuildUser, IGuildUserTypeParser>();
 
-            var result = await userParser.ParseAsync(value, context, provider);
+            var result = await userParser.ParseAsync(param, value, context, provider);
 
             if(result.IsSuccessful)
             {

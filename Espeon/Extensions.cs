@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.Net;
-using Espeon.Attributes;
 using Espeon.Commands.TypeParsers;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;

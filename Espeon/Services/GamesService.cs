@@ -1,5 +1,4 @@
-﻿using Espeon.Attributes;
-using Espeon.Commands;
+﻿using Espeon.Commands;
 using Espeon.Commands.Games;
 using Espeon.Interactive;
 using System;

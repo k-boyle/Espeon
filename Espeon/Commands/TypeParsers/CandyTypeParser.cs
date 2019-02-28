@@ -9,7 +9,7 @@ namespace Espeon.Commands.TypeParsers
     [DontOverride]
     public class CandyTypeParser : TypeParser<int>
     {
-        public override async Task<TypeParserResult<int>> ParseAsync(string value, ICommandContext originalContext, IServiceProvider services)
+        public override async Task<TypeParserResult<int>> ParseAsync(Parameter param, string value, ICommandContext originalContext, IServiceProvider services)
         {
             var context = originalContext as EspeonContext;
 

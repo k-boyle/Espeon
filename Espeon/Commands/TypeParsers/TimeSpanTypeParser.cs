@@ -9,7 +9,7 @@ namespace Espeon.Commands.TypeParsers
     {
         private static readonly Regex TimeSpanRegex = new Regex(@"(\d+)(w(?:eeks?)?|d(?:ays?)?|h(?:ours?)?|m(?:inutes?)?|s(?:econds?)?)", RegexOptions.Compiled);
 
-        public override Task<TypeParserResult<TimeSpan>> ParseAsync(string value, ICommandContext context, IServiceProvider provider)
+        public override Task<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
             var matches = TimeSpanRegex.Matches(value);
             if (matches.Count <= 0) return Task.FromResult(new TypeParserResult<TimeSpan>("Failed to parse time span"));

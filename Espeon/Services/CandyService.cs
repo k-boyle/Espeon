@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Espeon.Attributes;
 using Espeon.Commands;
 using System;
 using System.Threading.Tasks;

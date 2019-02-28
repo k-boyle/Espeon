@@ -1,6 +1,5 @@
 using Discord;
 using Discord.WebSocket;
-using Espeon.Attributes;
 using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
