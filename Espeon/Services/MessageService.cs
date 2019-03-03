@@ -186,8 +186,7 @@ namespace Espeon.Services
             if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
                 foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<string, CachedMessage>());
 
-            MessageProperties messageProperties = null;
-            properties.Invoke(messageProperties);
+            var messageProperties = properties.Invoke();
 
             var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
 

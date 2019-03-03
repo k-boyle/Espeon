@@ -446,5 +446,32 @@
     "owo": [
       "{0}"
     ]
+  },
+
+  {
+    "Default": [
+      "Starboard has been enabled"
+    ],
+    "owo": [
+      "\\*stars in eyes\\* wenabled"
+    ]
+  },
+
+  {
+    "Default": [
+      "Starboard has been disabled"
+    ],
+    "owo": [
+      "diswabled"
+    ]
+  },
+
+  {
+    "Default": [
+      "Star limit has been set"
+    ],
+    "owo": [
+      "stwar wimit set"
+    ]
   }
 ]

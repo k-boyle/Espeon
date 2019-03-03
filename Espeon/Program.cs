@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
@@ -69,7 +70,7 @@ namespace Espeon
 
                 var espeon = new EspeonStartup(services, config);
                 services.Inject(espeon);
-                await espeon.StartBotAsync(userStore);
+                await espeon.StartBotAsync(userStore, commandStore);
             }            
 
             await Task.Delay(-1);

@@ -1,11 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
+using Espeon.Databases.CommandStore;
+using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Espeon.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -29,14 +35,93 @@ namespace Espeon
             _ran = false;
         }
 
-        public async Task StartBotAsync(UserStore userStore)
+        public async Task StartBotAsync(UserStore userStore, CommandStore commandStore)
         {
             EventHooks(userStore);
-            
-            _commands.AddModules(Assembly.GetEntryAssembly());
+
+            await SetupCommandsAsync(commandStore);
 
             await _client.LoginAsync(TokenType.Bot, _config.DiscordToken);
             await _client.StartAsync();
+        }
+
+        private async Task SetupCommandsAsync(CommandStore commandStore)
+        {
+            var dbModules = await commandStore.Modules.Include(x => x.Commands).ToArrayAsync();
+
+            var modulesToCreate = new List<ModuleBuilder>();
+            var commandsToCreate = new List<(ModuleBuilder Module, CommandBuilder Command)>();
+
+            _commands.AddModules(Assembly.GetEntryAssembly(),
+                action: moduleBuilder =>
+                {
+                    if (string.IsNullOrEmpty(moduleBuilder.Name))
+                        throw new NoNullAllowedException(nameof(moduleBuilder));
+
+                    var foundModule = dbModules.FirstOrDefault(x => x.Name == moduleBuilder.Name);
+
+                    if (foundModule is null)
+                    {
+                        modulesToCreate.Add(moduleBuilder);
+                        return;
+                    }
+
+                    if (!(foundModule.Aliases is null) && foundModule.Aliases.Count > 0)
+                        moduleBuilder.AddAliases(foundModule.Aliases.ToArray());
+
+                    var commandBuilders = moduleBuilder.Commands;
+
+                    foreach (var commandBuilder in commandBuilders)
+                    {
+                        if (string.IsNullOrWhiteSpace(commandBuilder.Name))
+                            throw new NoNullAllowedException(nameof(commandBuilder));
+
+                        var foundCommand = foundModule.Commands.FirstOrDefault(x => x.Name == commandBuilder.Name);
+
+                        if (foundCommand is null)
+                        {
+                            commandsToCreate.Add((moduleBuilder, commandBuilder));
+                            continue;
+                        }
+
+                        if (!(foundCommand.Aliases is null) && foundCommand.Aliases.Count > 0)
+                            commandBuilder.AddAliases(foundCommand.Aliases.ToArray());
+                    }
+                });
+
+            foreach (var module in modulesToCreate)
+            {
+                var newModule = new ModuleInfo
+                {
+                    Name = module.Name
+                };
+
+                var commandBuilders = module.Commands;
+                if (module.Commands.Any(x => string.IsNullOrEmpty(x.Name)))
+                    throw new NoNullAllowedException(nameof(module));
+
+                if (commandBuilders.Any(x => string.IsNullOrEmpty(x.Name)))
+                    throw new NoNullAllowedException(nameof(commandBuilders));
+
+                newModule.Commands = commandBuilders.Select(x => new CommandInfo
+                {
+                    Name = x.Name
+                }).ToList();
+
+                await commandStore.Modules.AddAsync(newModule);
+            }
+
+            foreach(var (module, command) in commandsToCreate)
+            {
+                var foundModule = await commandStore.Modules.FindAsync(module.Name);
+
+                foundModule.Commands.Add(new CommandInfo
+                {
+                    Name = command.Name
+                });
+            }
+
+            await commandStore.SaveChangesAsync();
         }
 
         //TODO clean this up
@@ -44,7 +129,7 @@ namespace Espeon
         {
             _client.Ready += async () =>
             {
-                if(!_ran)
+                if (!_ran)
                 {
                     await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);
                     _ran = true;
@@ -58,7 +143,7 @@ namespace Espeon
                 var dbGuild = await guildStore.GetOrCreateGuildAsync(user.Guild);
                 var guild = user.Guild;
 
-                if (guild.GetTextChannel(dbGuild.WelcomeChannelId) is SocketTextChannel channel 
+                if (guild.GetTextChannel(dbGuild.WelcomeChannelId) is SocketTextChannel channel
                     && !string.IsNullOrWhiteSpace(dbGuild.WelcomeMessage))
                 {
                     var str = dbGuild.WelcomeMessage
@@ -75,7 +160,7 @@ namespace Espeon
                         .Build());
                 }
 
-                if(guild.GetRole(dbGuild.DefaultRoleId) is SocketRole role)
+                if (guild.GetRole(dbGuild.DefaultRoleId) is SocketRole role)
                 {
                     await user.AddRoleAsync(role);
                 }

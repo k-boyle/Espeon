@@ -19,7 +19,8 @@ namespace Espeon.Services
             await _semaphore.WaitAsync();
 
             var time = DateTime.UtcNow;
-            Console.Write($"{(time.Hour < 10 ? "0" : "")}{time.Hour}:{(time.Minute < 10 ? "0" : "")}{time.Minute}:{(time.Second < 10 ? "0" : "")}{time.Second} ");
+            Console.Write($"{(time.Hour < 10 ? "0" : "")}{time.Hour}:{(time.Minute < 10 ? "0" : "")}" +
+                $"{time.Minute}:{(time.Second < 10 ? "0" : "")}{time.Second} ");
             Console.Write("[");
 
             switch (severity)
@@ -34,7 +35,7 @@ namespace Espeon.Services
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
                     break;
                 case Severity.Info:
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     break;
                 case Severity.Verbose:
                     Console.ForegroundColor = ConsoleColor.Green;

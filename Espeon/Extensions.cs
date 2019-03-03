@@ -158,5 +158,13 @@ namespace Espeon
 
         public static Task<T[]> AllAsync<T>(this IEnumerable<Task<T>> tasks)
             => Task.WhenAll(tasks);
+
+        public static T Invoke<T>(this Action<T> action) where T : new()
+        {
+            var obj = new T();
+            action.Invoke(obj);
+
+            return obj;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Databases.CommandStore;
+using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,19 +44,63 @@ namespace Espeon.Services
             var foundMessage = guild.StarredMessages
                 .FirstOrDefault(x => x.Id == message.Id || x.StarboardMessageId == message.Id);
 
-            if(foundMessage is null)
+            var count = message.Reactions[Star].ReactionCount;
+            var m = $"{Star} **{count}** - {(message.Author as IGuildUser).GetDisplayName()} in <#{message.Channel.Id}>";
+
+            if (foundMessage is null)
             {
-                var newStar = await starChannel.SendMessageAsync(string.Empty, embed: new EmbedBuilder
+                var users = await message.GetReactionUsersAsync(Star, count).FlattenAsync();
+
+                var builder = new EmbedBuilder
                 {
                     Author = new EmbedAuthorBuilder
                     {
                         Name = (message.Author as IGuildUser).GetDisplayName(),
                         IconUrl = message.Author.GetAvatarOrDefaultUrl()
                     },
-                    Description = message.Content,
-                    
+                    Description = message.Content
+                };
+
+                if (message.Embeds.FirstOrDefault() is IEmbed embed)
+                {
+                    if (embed.Type == EmbedType.Image || embed.Type == EmbedType.Gifv)
+                        builder.WithImageUrl(embed.Url);                        
                 }
-                    .Build());
+
+                if(message.Attachments.FirstOrDefault() is IAttachment attachment)
+                {
+                    var extensions = new[] { "png", "jpeg", "jpg", "gif", "webp" };
+
+                    if (extensions.Any(x => attachment.Url.EndsWith(x)))
+                        builder.WithImageUrl(attachment.Url);
+                }
+
+                var newStar = await starChannel.SendMessageAsync(m, embed: builder.Build());
+
+                guild.StarredMessages.Add(new StarredMessage
+                {
+                    AuthorId = message.Author.Id,
+                    ChannelId = message.Channel.Id,
+                    Id = message.Id,
+                    StarboardMessageId = newStar.Id,
+                    ReactionUsers = users.Select(x => x.Id).ToList(),
+                    ImageUrl = builder.ImageUrl
+                });
+
+                await guildStore.SaveChangesAsync();
+            }
+            else
+            {
+                if (foundMessage.ReactionUsers.Contains(reaction.UserId))
+                    return;
+
+                foundMessage.ReactionUsers.Add(reaction.UserId);
+
+                var fetchedMessage = await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) as IUserMessage;
+
+                await fetchedMessage.ModifyAsync(x => x.Content = m);
+
+                await guildStore.SaveChangesAsync();
             }
         }
     }
