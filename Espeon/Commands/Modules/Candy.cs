@@ -2,6 +2,7 @@
 using Espeon.Commands.Checks;
 using Espeon.Commands.TypeParsers;
 using Espeon.Databases.Entities;
+using Espeon.Extensions;
 using Espeon.Services;
 using Humanizer;
 using Qmmands;

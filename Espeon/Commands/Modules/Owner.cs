@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Espeon.Commands.Checks;
+using Espeon.Extensions;
 using Espeon.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;

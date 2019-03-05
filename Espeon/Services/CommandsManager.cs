@@ -2,17 +2,14 @@
 using Espeon.Databases.Entities;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    //TODO add shit like custom summaries
     public class CommandsManager : BaseService
     {
         [Inject] private readonly CommandService _commands;
-        [Inject] private readonly IServiceProvider _services;
 
         //TODO doesn't work
         public async Task<bool> AddAliasAsync(EspeonContext context, Module module, string alias)

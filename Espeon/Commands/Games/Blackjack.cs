@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Extensions;
 using Espeon.Interactive;
 using Espeon.Interactive.Criteria;
 using Espeon.Services;

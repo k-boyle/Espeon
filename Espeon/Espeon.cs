@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
+using Espeon.Extensions;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Espeon
 {
-    public class EspeonStartup
+    public class Espeon
     {
         private readonly IServiceProvider _services;
 
@@ -28,14 +28,14 @@ namespace Espeon
         private readonly Config _config;
         private bool _ran;
 
-        public EspeonStartup(IServiceProvider services, Config config)
+        public Espeon(IServiceProvider services, Config config)
         {
             _services = services;
             _config = config;
             _ran = false;
         }
 
-        public async Task StartBotAsync(UserStore userStore, CommandStore commandStore)
+        public async Task StartAsync(UserStore userStore, CommandStore commandStore)
         {
             EventHooks(userStore);
 

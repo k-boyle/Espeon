@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
+using Espeon.Extensions;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,9 +68,9 @@ namespace Espeon
                 await guildStore.SaveChangesAsync();
                 await commandStore.SaveChangesAsync();
 
-                var espeon = new EspeonStartup(services, config);
+                var espeon = new Espeon(services, config);
                 services.Inject(espeon);
-                await espeon.StartBotAsync(userStore, commandStore);
+                await espeon.StartAsync(userStore, commandStore);
             }            
 
             await Task.Delay(-1);

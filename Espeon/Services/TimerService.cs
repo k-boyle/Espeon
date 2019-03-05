@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Net;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Espeon.Services
 {
     public class TimerService : BaseService
     {
+        [Inject] private readonly LogService _logger;
+
         private readonly Timer _timer;
         private ConcurrentQueue<TaskObject> _taskQueue;
 
@@ -21,7 +24,19 @@ namespace Espeon.Services
             _timer = new Timer(async _ =>
             {
                 if (!_taskQueue.TryDequeue(out var task)) return;
-                await HandleTaskAsync(task, false);
+
+                try
+                {
+                    await HandleTaskAsync(task, false);
+                }
+                catch(HttpException http) when (http.DiscordCode == 404)
+                {
+                }
+                catch(Exception ex)
+                {
+                    await _logger.LogAsync(Source.Timer, Severity.Error, "Something went wrong... ", ex);
+                }
+
                 await SetTimerAsync();
             }, null, -1, -1);
         }

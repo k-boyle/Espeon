@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Espeon.Commands.Checks;
 using Espeon.Databases.Entities;
+using Espeon.Extensions;
 using Humanizer;
 using Qmmands;
 using System;

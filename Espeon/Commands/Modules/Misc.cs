@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Net;
+using Espeon.Extensions;
 using Espeon.Interactive.Callbacks;
 using Espeon.Interactive.Criteria;
 using Espeon.Services;
@@ -179,7 +180,8 @@ namespace Espeon.Commands.Modules
 
             var builder = GetBuilder(prefix);
 
-            builder.AddField("Modules", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
+            builder.AddField("Modules", string.Join(", ", 
+                canExecute.Select(x => $"`{Format.Sanitize(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")));
             builder.WithFooter($"To view help with a specific module invoke {prefix}help Module");
 
             var message = await SendMessageAsync(builder.Build());
