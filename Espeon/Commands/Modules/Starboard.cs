@@ -1,7 +1,9 @@
 ﻿using Discord.WebSocket;
 using Espeon.Commands.Checks;
 using Espeon.Enums;
+using Espeon.Extensions;
 using Qmmands;
+using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands.Modules
@@ -17,6 +19,8 @@ namespace Espeon.Commands.Modules
     [Group("Star")]
     public class Starboard : EspeonBase
     {
+        public Random Random { get; set; }
+
         [Command("enable")]
         [Name("Enable Starboard")]
         [RequireElevation(ElevationLevel.Admin)]
@@ -51,6 +55,28 @@ namespace Espeon.Commands.Modules
 
             await Context.GuildStore.SaveChangesAsync();
             await SendOkAsync(0);
+        }
+
+        //TODO no stars
+        [Command("random")]
+        [Name("Random Star")]
+        public async Task ViewRandomStarAsync()
+        {
+            var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild, x => x.StarredMessages);
+
+            var randomStar = guild.StarredMessages[Random.Next(guild.StarredMessages.Count)];
+
+            var user = await Context.Guild.GetGuildUserAsync(randomStar.AuthorId);
+
+            var starMessage = Utilities.BuildStarMessage(user, randomStar.Content, randomStar.ImageUrl);
+
+            var m = string.Concat(
+                $"{Utilities.Star}" ,
+                $"**{randomStar.ReactionUsers.Count}** - ",
+                $"{user.GetDisplayName()} in <#",
+                $"{randomStar.ChannelId}>");
+
+            await SendMessageAsync(m, starMessage);
         }
     }
 }

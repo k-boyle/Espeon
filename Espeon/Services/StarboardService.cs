@@ -17,7 +17,7 @@ namespace Espeon.Services
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;
 
-        private readonly static Emoji Star = new Emoji("⭐");
+        private Emoji Star => Utilities.Star;
 
         public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
         {
@@ -57,31 +57,9 @@ namespace Espeon.Services
             {
                 var users = await message.GetReactionUsersAsync(Star, count).FlattenAsync();
 
-                var builder = new EmbedBuilder
-                {
-                    Author = new EmbedAuthorBuilder
-                    {
-                        Name = (message.Author as IGuildUser).GetDisplayName(),
-                        IconUrl = message.Author.GetAvatarOrDefaultUrl()
-                    },
-                    Description = message.Content
-                };
+                var embed = Utilities.BuildStarMessage(message);
 
-                if (message.Embeds.FirstOrDefault() is IEmbed embed)
-                {
-                    if (embed.Type == EmbedType.Image || embed.Type == EmbedType.Gifv)
-                        builder.WithImageUrl(embed.Url);                        
-                }
-
-                if(message.Attachments.FirstOrDefault() is IAttachment attachment)
-                {
-                    var extensions = new[] { "png", "jpeg", "jpg", "gif", "webp" };
-
-                    if (extensions.Any(x => attachment.Url.EndsWith(x)))
-                        builder.WithImageUrl(attachment.Url);
-                }
-
-                var newStar = await starChannel.SendMessageAsync(m, embed: builder.Build());
+                var newStar = await starChannel.SendMessageAsync(m, embed: embed);
 
                 guild.StarredMessages.Add(new StarredMessage
                 {
@@ -90,7 +68,8 @@ namespace Espeon.Services
                     Id = message.Id,
                     StarboardMessageId = newStar.Id,
                     ReactionUsers = users.Select(x => x.Id).ToList(),
-                    ImageUrl = builder.ImageUrl
+                    ImageUrl = embed.Image?.Url,
+                    Content = message.Content
                 });
 
                 await guildStore.SaveChangesAsync();
