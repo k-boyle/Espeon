@@ -1,5 +1,5 @@
 ﻿using Espeon.Commands;
-using Espeon.Commands.Checks;
+using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;

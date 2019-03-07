@@ -1,11 +1,11 @@
-﻿using Espeon.Commands.Games;
-using Espeon.Commands.TypeParsers;
+﻿using Espeon.Commands;
+using Espeon.Commands;
 using Espeon.Services;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     /*
      * Blackjack

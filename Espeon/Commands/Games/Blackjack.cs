@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Extensions;
-using Espeon.Interactive;
-using Espeon.Interactive.Criteria;
+using Espeon.Commands.Interactive;
+using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -10,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Games
+namespace Espeon.Commands
 {
     public class Blackjack : IGame
     {

@@ -3,7 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.TypeParsers
+namespace Espeon.Commands
 {
     public sealed class TimeSpanTypeParser : TypeParser<TimeSpan>
     {

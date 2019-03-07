@@ -1,16 +1,15 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
-using Espeon.Databases.Entities;
 using Espeon.Databases.UserStore;
 using Espeon.Enums;
-using Espeon.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Reminder = Espeon.Databases.Entities.Reminder;
 
 namespace Espeon.Services
 {

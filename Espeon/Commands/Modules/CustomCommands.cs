@@ -1,14 +1,14 @@
 ﻿using Discord.WebSocket;
-using Espeon.Commands.Checks;
+using Espeon.Commands;
 using Espeon.Databases.Entities;
 using Espeon.Enums;
-using Espeon.Interactive.Criteria;
+using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     [Name("Custom Commands")]
     [Group("cmd")]

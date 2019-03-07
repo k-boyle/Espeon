@@ -1,8 +1,7 @@
 ﻿using Discord;
-using Espeon.Commands.Checks;
-using Espeon.Commands.TypeParsers;
+using Espeon.Commands;
+using Espeon.Commands;
 using Espeon.Databases.Entities;
-using Espeon.Extensions;
 using Espeon.Services;
 using Humanizer;
 using Qmmands;
@@ -12,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     /*
      * Candies

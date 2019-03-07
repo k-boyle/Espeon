@@ -3,7 +3,7 @@ using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Checks
+namespace Espeon.Commands
 {
     public class RequireElevationAttribute : RequireGuildOwnerAttribute
     {

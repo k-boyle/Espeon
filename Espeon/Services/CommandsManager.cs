@@ -17,7 +17,9 @@ namespace Espeon.Services
             var commands = _commands.GetAllCommands();
 
             if (!Utilities.AvailableName(commands, alias))
+            {
                 return false;
+            }
 
             var foundModule = await context.CommandStore.Modules.FindAsync(module.Name);
 

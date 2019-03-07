@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
-using Espeon.Commands.Checks;
-using Espeon.Extensions;
+using Espeon.Commands;
+using Espeon.Enums;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     /*
      * Star
@@ -56,12 +56,17 @@ namespace Espeon.Commands.Modules
             await SendOkAsync(0);
         }
 
-        //TODO no stars
         [Command("random")]
         [Name("Random Star")]
         public async Task ViewRandomStarAsync()
         {
             var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild, x => x.StarredMessages);
+
+            if(guild.StarredMessages.Count == 0)
+            {
+                await SendNotOkAsync(0);
+                return;
+            }
 
             var randomStar = guild.StarredMessages[Random.Next(guild.StarredMessages.Count)];
 

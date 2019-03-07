@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Checks
+namespace Espeon.Commands
 {
     public class RequireHierarchyAttribute : ParameterCheckBaseAttribute
     {

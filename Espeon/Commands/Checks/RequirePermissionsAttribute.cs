@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PermissionTarget = Espeon.Enums.PermissionTarget;
 
-namespace Espeon.Commands.Checks
+namespace Espeon.Commands
 {
     public class RequirePermissionsAttribute : CheckBaseAttribute
     {

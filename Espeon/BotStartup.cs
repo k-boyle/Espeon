@@ -5,7 +5,6 @@ using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Espeon.Enums;
-using Espeon.Extensions;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

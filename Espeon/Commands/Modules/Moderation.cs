@@ -1,8 +1,7 @@
 ﻿using Discord;
-using Espeon.Commands.Checks;
+using Espeon.Commands;
 using Espeon.Databases.Entities;
 using Espeon.Enums;
-using Espeon.Extensions;
 using Humanizer;
 using Qmmands;
 using System;
@@ -12,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PermissionTarget = Espeon.Enums.PermissionTarget;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     /*
      * Kick

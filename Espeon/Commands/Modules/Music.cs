@@ -1,4 +1,4 @@
-﻿namespace Espeon.Commands.Modules
+﻿namespace Espeon.Commands
 {
     /*
      * Join

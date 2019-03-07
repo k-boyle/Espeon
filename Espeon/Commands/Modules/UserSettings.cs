@@ -1,9 +1,9 @@
-﻿using Espeon.Commands.Checks;
+﻿using Espeon.Commands;
 using Espeon.Databases.Entities;
 using Qmmands;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     [Name("User Settings")]
     public class UserSettings : EspeonBase

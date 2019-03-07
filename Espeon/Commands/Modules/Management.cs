@@ -1,9 +1,9 @@
-﻿using Espeon.Commands.Checks;
+﻿using Espeon.Commands;
 using Espeon.Services;
 using Qmmands;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     //TODO renamed this stuff
     /*

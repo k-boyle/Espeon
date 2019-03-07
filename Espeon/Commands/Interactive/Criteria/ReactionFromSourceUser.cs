@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Espeon.Commands;
 
-namespace Espeon.Interactive.Criteria
+namespace Espeon.Commands.Interactive.Criteria
 {
     public class ReactionFromSourceUser : ICriterion<SocketReaction>
     {

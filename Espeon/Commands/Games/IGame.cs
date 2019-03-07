@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Espeon.Interactive;
+using Espeon.Commands.Interactive;
 
-namespace Espeon.Commands.Games
+namespace Espeon.Commands
 {
     public interface IGame : IReactionCallback
     {

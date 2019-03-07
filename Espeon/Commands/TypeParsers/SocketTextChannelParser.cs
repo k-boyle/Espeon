@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.TypeParsers
+namespace Espeon.Commands
 {
     public class SocketTextChannelParser : TypeParser<SocketTextChannel>
     {

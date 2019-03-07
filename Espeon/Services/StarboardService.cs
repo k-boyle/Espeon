@@ -4,7 +4,6 @@ using Espeon.Databases.CommandStore;
 using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Extensions
+namespace Espeon
 {
     public static partial class Extensions
     {

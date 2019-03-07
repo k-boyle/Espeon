@@ -1,6 +1,5 @@
 ﻿using Discord;
-using Espeon.Commands.Checks;
-using Espeon.Extensions;
+using Espeon.Commands;
 using Espeon.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -15,7 +14,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using MessageProperties = Espeon.Services.MessageService.MessageProperties;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     /*
      * Message

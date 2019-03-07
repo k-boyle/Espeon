@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon.Commands.TypeParsers
+namespace Espeon.Commands
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class DontOverrideAttribute : Attribute

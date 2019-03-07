@@ -5,7 +5,7 @@ using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.TypeParsers
+namespace Espeon.Commands
 {
     public class UserTupleParser : TypeParser<(IGuildUser, User)>
     {

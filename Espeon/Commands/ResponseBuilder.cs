@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Espeon.Extensions;
 
 namespace Espeon.Commands
 {

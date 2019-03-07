@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
-using Espeon.Interactive.Criteria;
+using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Interactive.Paginator
+namespace Espeon.Commands.Interactive.Paginator
 {
     public abstract class PaginatorBase : IReactionCallback
     {

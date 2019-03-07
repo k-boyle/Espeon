@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.Net;
-using Espeon.Extensions;
-using Espeon.Interactive.Callbacks;
-using Espeon.Interactive.Criteria;
+using Espeon.Commands.Interactive.Callbacks;
+using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Modules
+namespace Espeon.Commands
 {
     //TODO rewrite ping
     /*

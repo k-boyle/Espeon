@@ -1,12 +1,12 @@
 ﻿using Discord;
-using Espeon.Commands.TypeParsers;
+using Espeon.Commands;
 using Espeon.Exceptions;
 using Qmmands;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Espeon.Extensions
+namespace Espeon
 {
     public static partial class Extensions
     {

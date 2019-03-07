@@ -4,7 +4,7 @@ using Qmmands;
 using System;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.TypeParsers
+namespace Espeon.Commands
 {
     [DontOverride]
     public class CandyTypeParser : TypeParser<int>

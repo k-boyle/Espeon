@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Interactive.Criteria
+namespace Espeon.Commands.Interactive.Criteria
 {
     public class MultiCriteria<T> : ICriterion<T>
     {
