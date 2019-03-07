@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon
+namespace Espeon.Exceptions
 {
     public class QuahuRenamedException : Exception
     {
@@ -15,26 +15,11 @@ namespace Espeon
         {
         }
     }
-    
+
     public class ThisWasQuahusFaultException : Exception
     {
         public ThisWasQuahusFaultException() : base("Quahu told you FAKE NEWS. SHE CAN'T BE TRUSTED!!")
         {
         }
     }
-
-    public class ExpectedContextException : Exception
-    {
-        public ExpectedContextException(string message) : base($"Expected context type: {message}")
-        {
-        }
-    }
-
-    public class InvalidServiceException : Exception
-    {
-        public InvalidServiceException(string type) : base($"{type} is not a valid service")
-        {
-        }
-    }
-
 }

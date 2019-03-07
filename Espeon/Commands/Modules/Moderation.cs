@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Espeon.Commands.Checks;
 using Espeon.Databases.Entities;
+using Espeon.Enums;
 using Espeon.Extensions;
 using Humanizer;
 using Qmmands;
@@ -9,7 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PermissionTarget = Espeon.Commands.Checks.PermissionTarget;
+using PermissionTarget = Espeon.Enums.PermissionTarget;
 
 namespace Espeon.Commands.Modules
 {

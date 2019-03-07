@@ -1,4 +1,4 @@
-﻿namespace Espeon
+﻿namespace Espeon.Enums
 {
     public enum Source
     {

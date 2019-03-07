@@ -1,4 +1,5 @@
-﻿using Qmmands;
+﻿using Espeon.Enums;
+using Qmmands;
 using System;
 using System.Threading.Tasks;
 
@@ -42,12 +43,5 @@ namespace Espeon.Commands.Checks
                     return CheckResult.Unsuccessful("Something went horribly wrong");
             }
         }
-    }
-    
-    public enum ElevationLevel
-    {
-        None,
-        Mod,
-        Admin
-    }
+    }    
 }

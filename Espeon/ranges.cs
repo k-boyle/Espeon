@@ -1,4 +1,5 @@
-﻿namespace System
+﻿//stolen from csharplang repo until this is implemented properly
+namespace System
 {
     public readonly struct Index
     {

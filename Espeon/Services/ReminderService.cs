@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Espeon.Commands;
 using Espeon.Databases.Entities;
 using Espeon.Databases.UserStore;
+using Espeon.Enums;
 using Espeon.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System;

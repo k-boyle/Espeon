@@ -1,15 +1,9 @@
 ﻿using Discord;
-using Espeon.Databases.CommandStore;
-using Espeon.Databases.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Espeon
 {

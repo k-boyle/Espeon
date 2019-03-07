@@ -12,7 +12,7 @@ namespace Espeon.Services
 {
     public class EmotesService : BaseService
     {
-        private const string EmotesDir = "./emotes.json";
+        private const string EmotesDir = "./Emotes/emotes.json";
 
         public Dictionary<string, Emote> Collection;
 

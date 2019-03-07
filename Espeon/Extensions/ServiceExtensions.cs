@@ -1,11 +1,13 @@
 ﻿using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
+using Espeon.Exceptions;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -84,6 +86,14 @@ namespace Espeon.Extensions
 
                 await validService.InitialiseAsync(userStore, guildStore, commandStore, services);
             }
+        }
+
+        public static IServiceCollection AddConfiguredHttpClient(this IServiceCollection services)
+        {
+            return services.AddHttpClient("", client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }).Services;
         }
     }
 }

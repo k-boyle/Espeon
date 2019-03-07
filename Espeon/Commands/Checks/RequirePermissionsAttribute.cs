@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using PermissionTarget = Espeon.Enums.PermissionTarget;
 
 namespace Espeon.Commands.Checks
 {
@@ -77,11 +78,5 @@ namespace Espeon.Commands.Checks
                 CheckResult.Unsuccessful(
                     $"{(_target == PermissionTarget.User ? "You" : "I")} need the following permissions to execute this command\n{sb}"));
         }
-    }
-
-    public enum PermissionTarget
-    {
-        User,
-        Bot
     }
 }

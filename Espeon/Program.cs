@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -18,7 +18,12 @@ namespace Espeon
 {
     internal class Program
     {
-        private static async Task Main()
+        private static void Main()
+        {
+            new Program().MainAsync().GetAwaiter().GetResult();
+        }
+
+        private async Task MainAsync()
         {
             var config = Config.Create("./config.json");
 
@@ -26,6 +31,33 @@ namespace Espeon
             var types = assembly.GetTypes()
                 .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
+            var services = ConfigureServices(types, assembly, config);
+
+            using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
+            {
+                using var guildStore = services.GetService<GuildStore>();
+                using var commandStore = services.GetService<CommandStore>();
+
+                await userStore.Database.MigrateAsync();
+                await guildStore.Database.MigrateAsync();
+                await commandStore.Database.MigrateAsync();
+
+                await services.RunInitialisersAsync(userStore, guildStore, commandStore, types);
+
+                await userStore.SaveChangesAsync();
+                await guildStore.SaveChangesAsync();
+                await commandStore.SaveChangesAsync();
+
+                var espeon = new BotStartup(services, config);
+                services.Inject(espeon);
+                await espeon.StartAsync(userStore, commandStore);
+            }
+
+            await Task.Delay(-1);
+        }
+
+        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly, Config config)
+        {
             var services = new ServiceCollection()
                 .AddServices(types)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
@@ -41,39 +73,15 @@ namespace Espeon
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
                 .AddSingleton<Random>()
-                .AddHttpClient("", client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                })
-                    .Services //annoying
+                .AddConfiguredHttpClient()
                 .AddEntityFrameworkNpgsql()
                 .AddDbContext<UserStore>(ServiceLifetime.Transient)
-                .AddDbContext<GuildStore>(ServiceLifetime.Transient)     
+                .AddDbContext<GuildStore>(ServiceLifetime.Transient)
                 .AddDbContext<CommandStore>(ServiceLifetime.Transient)
                 .BuildServiceProvider()
                 .Inject(types);
 
-            using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
-            {                
-                using var guildStore = services.GetService<GuildStore>();
-                using var commandStore = services.GetService<CommandStore>();
-
-                await userStore.Database.MigrateAsync();
-                await guildStore.Database.MigrateAsync();
-                await commandStore.Database.MigrateAsync();                
-
-                await services.RunInitialisersAsync(userStore, guildStore, commandStore, types);                
-
-                await userStore.SaveChangesAsync();
-                await guildStore.SaveChangesAsync();
-                await commandStore.SaveChangesAsync();
-
-                var espeon = new Espeon(services, config);
-                services.Inject(espeon);
-                await espeon.StartAsync(userStore, commandStore);
-            }            
-
-            await Task.Delay(-1);
+            return services;
         }
     }
 }
