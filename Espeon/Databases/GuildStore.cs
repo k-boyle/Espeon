@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Espeon.Databases.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;

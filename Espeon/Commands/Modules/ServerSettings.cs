@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands;
-using Espeon.Enums;
 using Qmmands;
 using System.Threading.Tasks;
 

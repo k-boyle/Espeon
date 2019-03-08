@@ -1,4 +1,4 @@
-﻿using Espeon.Databases.Entities;
+﻿using Espeon.Databases;
 using Qmmands;
 using System;
 using System.Linq;

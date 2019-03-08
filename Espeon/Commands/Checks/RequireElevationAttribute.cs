@@ -1,5 +1,4 @@
-﻿using Espeon.Enums;
-using Qmmands;
+﻿using Qmmands;
 using System;
 using System.Threading.Tasks;
 

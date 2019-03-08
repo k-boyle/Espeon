@@ -1,9 +1,7 @@
 ﻿using Discord.WebSocket;
-using Espeon.Commands;
-using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 
-namespace Espeon.Commands.Interactive.Paginator
+namespace Espeon.Commands
 {
     public class DefaultPaginator : PaginatorBase
     {

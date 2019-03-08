@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Espeon.Databases.Entities;
+using Espeon.Databases;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;

@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Espeon.Commands.Interactive;
 
 namespace Espeon.Commands
 {

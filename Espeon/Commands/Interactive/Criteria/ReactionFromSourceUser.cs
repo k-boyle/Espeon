@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord.WebSocket;
-using Espeon.Commands;
 
-namespace Espeon.Commands.Interactive.Criteria
+namespace Espeon.Commands
 {
     public class ReactionFromSourceUser : ICriterion<SocketReaction>
     {

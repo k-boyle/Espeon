@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Espeon.Exceptions;
 using Qmmands;
 using System.Linq;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Espeon.Commands.Interactive.Paginator
+namespace Espeon.Commands
 {
     public class PaginatorOptions
     {

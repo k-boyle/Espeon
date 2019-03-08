@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Espeon.Commands;
 using Espeon.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;

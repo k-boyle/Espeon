@@ -1,9 +1,8 @@
-﻿using Espeon.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive.Criteria
+namespace Espeon.Commands
 {
     public class MultiCriteria<T> : ICriterion<T>
     {

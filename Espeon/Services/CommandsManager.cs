@@ -1,5 +1,5 @@
 ﻿using Espeon.Commands;
-using Espeon.Databases.Entities;
+using Espeon.Databases;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System.Linq;

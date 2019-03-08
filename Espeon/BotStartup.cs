@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Databases;
 using Espeon.Databases.CommandStore;
-using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Enums;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

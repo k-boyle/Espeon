@@ -1,17 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Commands.Interactive.Criteria;
-using Espeon.Commands.Interactive.Paginator;
 using Espeon.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive
+namespace Espeon.Commands
 {
     public class InteractiveService : BaseService
     {

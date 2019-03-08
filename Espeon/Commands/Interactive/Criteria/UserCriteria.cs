@@ -1,8 +1,7 @@
 ﻿using Discord;
-using Espeon.Commands;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive.Criteria
+namespace Espeon.Commands
 {
     public class UserCriteria : ICriterion<IUser>, ICriterion<IMessage>
     {

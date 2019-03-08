@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon.Exceptions
+namespace Espeon
 {
     public class QuahuRenamedException : Exception
     {

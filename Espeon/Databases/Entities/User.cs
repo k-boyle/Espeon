@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Espeon.Databases.Entities
+namespace Espeon.Databases
 {
     public class User
     {

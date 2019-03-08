@@ -4,7 +4,6 @@ using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;

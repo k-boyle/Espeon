@@ -1,6 +1,4 @@
 ﻿using Espeon.Commands;
-using Espeon.Commands;
-using Espeon.Commands.Interactive;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;

@@ -1,10 +1,8 @@
 ﻿using Espeon.Commands;
-using Espeon.Commands;
+using Espeon.Databases;
 using Espeon.Databases.CommandStore;
-using Espeon.Databases.Entities;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Enums;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;

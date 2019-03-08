@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands.Interactive;
-using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;

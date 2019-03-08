@@ -1,7 +1,5 @@
 ﻿using Discord;
-using Espeon.Commands;
-using Espeon.Commands;
-using Espeon.Databases.Entities;
+using Espeon.Databases;
 using Espeon.Services;
 using Humanizer;
 using Qmmands;

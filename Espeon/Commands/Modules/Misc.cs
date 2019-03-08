@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.Net;
-using Espeon.Commands.Interactive.Callbacks;
-using Espeon.Commands.Interactive.Criteria;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;

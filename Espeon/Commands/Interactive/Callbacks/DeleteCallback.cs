@@ -1,12 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands;
-using Espeon.Commands.Interactive.Criteria;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive.Callbacks
+namespace Espeon.Commands
 {
     public class DeleteCallback : IReactionCallback
     {

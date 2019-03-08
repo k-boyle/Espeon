@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands.Interactive.Criteria;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive
+namespace Espeon.Commands
 {
     public interface IReactionCallback
     {

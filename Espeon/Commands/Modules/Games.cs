@@ -1,6 +1,4 @@
-﻿using Espeon.Commands;
-using Espeon.Commands;
-using Espeon.Services;
+﻿using Espeon.Services;
 using Qmmands;
 using System;
 using System.Threading.Tasks;

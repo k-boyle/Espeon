@@ -1,8 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Espeon.Commands.Interactive;
-using Espeon.Commands.Interactive.Criteria;
-using Espeon.Commands.Interactive.Paginator;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;

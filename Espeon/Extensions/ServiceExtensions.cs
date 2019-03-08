@@ -1,7 +1,6 @@
 ﻿using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
-using Espeon.Exceptions;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;

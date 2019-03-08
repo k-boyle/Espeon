@@ -1,8 +1,5 @@
 ﻿using Discord.WebSocket;
-using Espeon.Commands;
-using Espeon.Databases.Entities;
-using Espeon.Enums;
-using Espeon.Commands.Interactive.Criteria;
+using Espeon.Databases;
 using Espeon.Services;
 using Qmmands;
 using System;

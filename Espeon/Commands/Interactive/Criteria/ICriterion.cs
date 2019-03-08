@@ -1,7 +1,6 @@
-﻿using Espeon.Commands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Espeon.Commands.Interactive.Criteria
+namespace Espeon.Commands
 {
     public interface ICriterion<in T>
     {

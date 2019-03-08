@@ -1,4 +1,4 @@
-﻿using Espeon.Databases.Entities;
+﻿using Espeon.Databases;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
