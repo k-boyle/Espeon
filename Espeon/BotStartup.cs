@@ -51,7 +51,7 @@ namespace Espeon
             var modulesToCreate = new List<ModuleBuilder>();
             var commandsToCreate = new List<(ModuleBuilder Module, CommandBuilder Command)>();
 
-            _commands.AddModules(Assembly.GetEntryAssembly(),
+            var modules = _commands.AddModules(Assembly.GetEntryAssembly(),
                 action: moduleBuilder =>
                 {
                     if (string.IsNullOrEmpty(moduleBuilder.Name))
@@ -121,6 +121,8 @@ namespace Espeon
             }
 
             await commandStore.SaveChangesAsync();
+
+            _services.GetService<ResponseService>().LoadResponses(modules);
         }
 
         //TODO clean this up

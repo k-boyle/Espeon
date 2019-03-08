@@ -39,11 +39,6 @@ namespace Espeon.Databases.CommandStore
             modelBuilder.Entity<CommandInfo>(command =>
             {
                 command.HasKey(x => new { x.Name, x.ModuleName });
-
-                command.Property(x => x.Responses)
-                    .HasConversion(
-                    y => JsonConvert.SerializeObject(y, Formatting.Indented),
-                    y => JsonConvert.DeserializeObject<Dictionary<ResponsePack, string[]>>(y));
             });
         }
         

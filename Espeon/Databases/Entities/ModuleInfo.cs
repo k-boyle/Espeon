@@ -17,13 +17,5 @@ namespace Espeon.Databases
 
         public string Name { get; set; }
         public List<string> Aliases { get; set; }
-
-        public IDictionary<ResponsePack, string[]> Responses { get; set; }
-    }
-
-    public enum ResponsePack
-    {
-        Default, 
-        owo
     }
 }

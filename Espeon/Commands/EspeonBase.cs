@@ -14,6 +14,7 @@ namespace Espeon.Commands
     {
         public MessageService Message { get; set; }
         public InteractiveService Interactive { get; set; }
+        public ResponseService Responses { get; set; }
         public IServiceProvider Services { get; set; }   
         
         [DoNotAutomaticallyInject]
@@ -57,9 +58,9 @@ namespace Espeon.Commands
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
 
-            var responses = command.Responses[user.ResponsePack];
+            var responses = Responses.GetRespones(Module.Name, Command.Name);
 
-            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args));
+            var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][index], args));
             return await SendMessageAsync(response);
         }
 
@@ -71,10 +72,11 @@ namespace Espeon.Commands
             var command = module.Commands.FirstOrDefault(x => x.Name == Command.Name);
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            
+            var responses = Responses.GetRespones(Module.Name, Command.Name);
 
-            var responses = command.Responses[user.ResponsePack];
-
-            var response = ResponseBuilder.Message(Context, string.Format(responses[index], args), false);
+            var response = ResponseBuilder.Message(Context, 
+                string.Format(responses[user.ResponsePack][index], args), false);
             return await SendMessageAsync(response);
         }
 
