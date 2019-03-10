@@ -17,8 +17,9 @@ namespace Espeon.Services
             _responses = new Dictionary<string, Dictionary<string, Dictionary<ResponsePack, string[]>>>();
 
             var commandMap =
-                JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<ResponsePack, string[]>>>>
-                    (File.ReadAllText(Dir));
+                JsonConvert
+                    .DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<ResponsePack, string[]>>>>
+                        (File.ReadAllText(Dir));
 
             foreach(var module in modules)
             {
@@ -49,7 +50,7 @@ namespace Espeon.Services
             File.WriteAllText(Dir, JsonConvert.SerializeObject(commandMap, Formatting.Indented));
         }
 
-        public Dictionary<ResponsePack, string[]> GetRespones(string module, string command)
+        public Dictionary<ResponsePack, string[]> GetResponses(string module, string command)
             => _responses[module][command];
     }
 }

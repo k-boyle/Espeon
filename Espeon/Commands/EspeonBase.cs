@@ -58,7 +58,7 @@ namespace Espeon.Commands
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
 
-            var responses = Responses.GetRespones(Module.Name, Command.Name);
+            var responses = Responses.GetResponses(Module.Name, Command.Name);
 
             var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][index], args));
             return await SendMessageAsync(response);
@@ -73,7 +73,7 @@ namespace Espeon.Commands
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
             
-            var responses = Responses.GetRespones(Module.Name, Command.Name);
+            var responses = Responses.GetResponses(Module.Name, Command.Name);
 
             var response = ResponseBuilder.Message(Context, 
                 string.Format(responses[user.ResponsePack][index], args), false);

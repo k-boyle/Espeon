@@ -100,7 +100,8 @@ namespace Espeon.Commands
                 //WhenToRemove = DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds()
             };
 
-            var key = await _timer.EnqueueAsync(callbackData, DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds(), RemoveAsync);
+            var key = await _timer.EnqueueAsync(callbackData, 
+                DateTimeOffset.UtcNow.Add(timeout).ToUnixTimeMilliseconds(), RemoveAsync);
 
             callbackData.TaskKey = key;
 
@@ -141,7 +142,8 @@ namespace Espeon.Commands
             {
                 await _timer.RemoveAsync(callbackData.TaskKey);
                 
-                var newKey = await _timer.EnqueueAsync(callbackData, DateTimeOffset.UtcNow.Add(callbackData.Timeout).ToUnixTimeMilliseconds(), RemoveAsync);
+                var newKey = await _timer.EnqueueAsync(callbackData, 
+                    DateTimeOffset.UtcNow.Add(callbackData.Timeout).ToUnixTimeMilliseconds(), RemoveAsync);
                 callbackData.TaskKey = newKey;
             }
             else

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Espeon
@@ -19,10 +20,11 @@ namespace Espeon
     {
         private static void Main()
         {
-            new Program().MainAsync().GetAwaiter().GetResult();
+            using var cts = new CancellationTokenSource();
+            new Program().MainAsync(cts).GetAwaiter().GetResult();
         }
 
-        private async Task MainAsync()
+        private async Task MainAsync(CancellationTokenSource cts)
         {
             var config = Config.Create("./config.json");
 
@@ -30,7 +32,7 @@ namespace Espeon
             var types = assembly.GetTypes()
                 .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
-            var services = ConfigureServices(types, assembly, config);
+            var services = ConfigureServices(types, assembly, config, cts);
 
             using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
             {
@@ -52,10 +54,11 @@ namespace Espeon
                 await espeon.StartAsync(userStore, commandStore);
             }
 
-            await Task.Delay(-1);
+            await Task.Delay(-1, cts.Token);
         }
 
-        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly, Config config)
+        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly, 
+            Config config, CancellationTokenSource cts)
         {
             var services = new ServiceCollection()
                 .AddServices(types)
@@ -71,6 +74,7 @@ namespace Espeon
                 })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
+                .AddSingleton(cts)
                 .AddSingleton<Random>()
                 .AddConfiguredHttpClient()
                 .AddEntityFrameworkNpgsql()

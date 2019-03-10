@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using MessageProperties = Espeon.Services.MessageService.MessageProperties;
 
@@ -157,6 +158,16 @@ namespace Espeon.Commands
 
                 return message.SendMessageAsync(Context, func);
             }
+        }
+
+        [Command("shutdown")]
+        [Name("Shutdown Bot")]
+        public Task ShutdownAsync()
+        {
+            var cts = Services.GetService<CancellationTokenSource>();
+            cts.Cancel(false);
+
+            return Task.CompletedTask;
         }
     }
 }
