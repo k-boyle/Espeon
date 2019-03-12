@@ -1,5 +1,4 @@
-﻿using Espeon.Databases;
-using Qmmands;
+﻿using Qmmands;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -14,9 +13,7 @@ namespace Espeon.Commands
             var foundUser = await Context.UserStore.GetOrCreateUserAsync(Context.User);
             foundUser.ResponsePack = pack;
 
-            await Context.UserStore.SaveChangesAsync();
-
-            await SendOkAsync(0, pack);
+            await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(0, pack));
         }
     }
 }

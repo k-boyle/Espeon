@@ -36,9 +36,7 @@ namespace Espeon.Commands
 
             if (roles.Contains(role.Id))
             {
-                await Context.User.AddRoleAsync(role);
-                await SendOkAsync(1);
-
+                await Task.WhenAll(Context.User.AddRoleAsync(role), SendOkAsync(1));
                 return;
             }
 
@@ -64,8 +62,7 @@ namespace Espeon.Commands
 
             roles.Add(role.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("remove")]
@@ -78,7 +75,6 @@ namespace Espeon.Commands
             if(!Context.User.Roles.Any(x => x.Id == role.Id))
             {
                 await SendNotOkAsync(0);
-
                 return;
             }
 
@@ -91,8 +87,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            await Context.User.RemoveRoleAsync(role);
-            await SendOkAsync(2);
+            await Task.WhenAll(Context.User.RemoveRoleAsync(role), SendOkAsync(2));
         }
 
         [Command("removeself")]
@@ -110,8 +105,7 @@ namespace Espeon.Commands
 
             roles.Remove(role.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("list")]

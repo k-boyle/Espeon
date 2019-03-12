@@ -68,13 +68,13 @@ namespace Espeon.Commands
         [Command("Treat")]
         [Name("Treat")]
         [RequireOwner]
-        public async Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null)
+        public Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
 
-            await CandyService.UpdateCandiesAsync(Context, user.Id, amount);
-
-            await SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies");
+            return Task.WhenAll(
+                CandyService.UpdateCandiesAsync(Context, user.Id, amount), 
+                SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies"));
         }
 
         [Command("Leaderboard")]
@@ -118,14 +118,14 @@ namespace Espeon.Commands
 
         [Command("Gift")]
         [Name("Gift Candies")]
-        public async Task GiftCandiesAsync(IGuildUser user, 
+        public Task GiftCandiesAsync(IGuildUser user, 
             [OverrideTypeParser(typeof(CandyTypeParser))]
             [RequireRange(0)]
             int amount)
         {
-            await CandyService.TransferCandiesAsync(Context, Context.User, user, amount);
-
-            await SendOkAsync(0);
+            return Task.WhenAll(
+                CandyService.TransferCandiesAsync(Context, Context.User, user, amount),
+                SendOkAsync(0));
         }
 
         [Command("Steal")]
@@ -157,9 +157,8 @@ namespace Espeon.Commands
             await CandyService.UpdateCandiesAsync(Context, Context.User.Id, espeonCandies);
 
             espeon.CandyAmount = 0;
-            await Context.UserStore.SaveChangesAsync();
 
-            await SendOkAsync(2);
+            await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(2));
         }
     }
 }

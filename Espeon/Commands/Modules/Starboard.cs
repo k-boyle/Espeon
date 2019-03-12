@@ -26,8 +26,7 @@ namespace Espeon.Commands
             var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             guild.StarboardChannelId = channel.Id;
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("disable")]
@@ -38,8 +37,7 @@ namespace Espeon.Commands
             var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             guild.StarboardChannelId = 0;
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("limit")]
@@ -50,8 +48,7 @@ namespace Espeon.Commands
             var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             guild.StarLimit = limit;
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("random")]

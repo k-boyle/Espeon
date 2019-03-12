@@ -130,6 +130,8 @@ namespace Espeon
         {
             _client.Ready += async () =>
             {
+                Console.Beep(5000, 100);
+
                 if (!_ran)
                 {
                     await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);

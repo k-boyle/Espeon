@@ -38,8 +38,10 @@ namespace Espeon.Commands
             {
                 await SendOkAsync(1);
 
-                var reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
-                    new ChannelCriteria(Context.Channel.Id)));
+                var reply = await NextMessageAsync(
+                    new MultiCriteria<SocketUserMessage>(
+                        new UserCriteria(Context.User.Id),
+                        new ChannelCriteria(Context.Channel.Id)));
 
                 if (string.Equals(reply.Content, "cancel", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -63,10 +65,9 @@ namespace Espeon.Commands
         [Command("delete")]
         [Name("Delete Command")]
         [RunMode(RunMode.Parallel)]
-        public async Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
+        public Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
         {
-            await Commands.DeleteCommandAsync(Context, command);
-            await SendOkAsync(0, command.Name);
+            return Task.WhenAll(Commands.DeleteCommandAsync(Context, command), SendOkAsync(0, command.Name));
         }
 
         [Command("modify")]
@@ -78,8 +79,10 @@ namespace Espeon.Commands
             {
                 await SendOkAsync(0);
 
-                var reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(new UserCriteria(Context.User.Id),
-                    new ChannelCriteria(Context.Channel.Id)));
+                var reply = await NextMessageAsync(
+                    new MultiCriteria<SocketUserMessage>(
+                        new UserCriteria(Context.User.Id),
+                        new ChannelCriteria(Context.Channel.Id)));
 
                 if (string.Equals(reply.Content, "cancel", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -88,10 +91,8 @@ namespace Espeon.Commands
 
                 newValue = reply.Content;
             }
-            
-            await Commands.ModifyCommandAsync(Context, command, newValue);
 
-            await SendOkAsync(1, command.Name);
+            await Task.WhenAll(Commands.ModifyCommandAsync(Context, command, newValue), SendOkAsync(1, command.Name));
         }
     }
 }

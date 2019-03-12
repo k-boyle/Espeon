@@ -14,10 +14,9 @@ namespace Espeon.Commands
 
         [Command]
         [Name("Reminder")]
-        public async Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
+        public Task CreateReminderAsync(TimeSpan when, [Remainder] string reminder)
         {
-            await ReminderService.CreateReminderAsync(Context, reminder, when);
-            await SendOkAsync(0);
+            return Task.WhenAll(ReminderService.CreateReminderAsync(Context, reminder, when), SendOkAsync(0));
         }
 
         //TODO Make better

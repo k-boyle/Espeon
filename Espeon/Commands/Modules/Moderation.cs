@@ -28,25 +28,23 @@ namespace Espeon.Commands
         [Command("Kick")]
         [Name("Kick User")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.KickMembers)]
-        public async Task KickUserAsync([RequireHierarchy] IGuildUser user, [Remainder] string reason = null)
+        public Task KickUserAsync([RequireHierarchy] IGuildUser user, [Remainder] string reason = null)
         {
-            await user.KickAsync(reason);
-            await SendOkAsync(0, user.GetDisplayName());
+            return Task.WhenAll(user.KickAsync(reason), SendOkAsync(0, user.GetDisplayName()));
         }
 
         [Command("Ban")]
         [Name("Ban User")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.BanMembers)]
-        public async Task BanUserAsync([RequireHierarchy] IGuildUser user, 
+        public Task BanUserAsync([RequireHierarchy] IGuildUser user,
             [RequireRange(-1, 7)] int pruneDays = 0, [Remainder] string reason = null)
         {
-            await user.BanAsync(pruneDays, reason);
-            await SendOkAsync(0, user.GetDisplayName());
+            return Task.WhenAll(user.BanAsync(pruneDays, reason), SendOkAsync(0, user.GetDisplayName()));
         }
 
         [Command("warn")]
         [Name("Warn User")]
-        public async Task WarnUserAsync([RequireHierarchy] IGuildUser targetUser, 
+        public async Task WarnUserAsync([RequireHierarchy] IGuildUser targetUser,
             [RequireSpecificLength(200)]
             [Remainder]
             string reason)
@@ -56,21 +54,19 @@ namespace Espeon.Commands
 
             var currentCount = currentGuild.Warnings.Count(x => x.TargetUser == targetUser.Id) + 1;
 
-            if(currentCount >= currentGuild.WarningLimit)
+            if (currentCount >= currentGuild.WarningLimit)
             {
                 await SendNotOkAsync(0, targetUser.GetDisplayName(), currentCount);
             }
 
             currentGuild.Warnings.Add(new Warning
-            {                
+            {
                 TargetUser = targetUser.Id,
                 Issuer = Context.User.Id,
                 Reason = reason
             });
 
-            await Context.GuildStore.SaveChangesAsync();
-
-            await SendOkAsync(1, targetUser.GetDisplayName());
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, targetUser.GetDisplayName()));
         }
 
         [Command("revoke")]
@@ -82,7 +78,7 @@ namespace Espeon.Commands
 
             var warning = currentGuild.Warnings.FirstOrDefault(x => x.Id == warningId);
 
-            if(warning is null)
+            if (warning is null)
             {
                 await SendNotOkAsync(0);
                 return;
@@ -90,9 +86,7 @@ namespace Espeon.Commands
 
             currentGuild.Warnings.Remove(warning);
 
-            await Context.GuildStore.SaveChangesAsync();
-
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("warnings")]
@@ -104,7 +98,7 @@ namespace Espeon.Commands
 
             var foundWarnings = currentGuild.Warnings.Where(x => x.TargetUser == targetUser.Id).ToArray();
 
-            if(foundWarnings.Length == 0)
+            if (foundWarnings.Length == 0)
             {
                 await SendOkAsync(0);
                 return;
@@ -112,7 +106,7 @@ namespace Espeon.Commands
 
             var sb = new StringBuilder();
 
-            foreach(var warning in foundWarnings)
+            foreach (var warning in foundWarnings)
             {
                 sb.AppendLine($"**Id**: {warning.Id}, ");
 
@@ -144,15 +138,13 @@ namespace Espeon.Commands
 
             var role = Context.Guild.GetRole(currentGuild.NoReactions);
 
-            if(role is null)
+            if (role is null)
             {
                 await SendNotOkAsync(0);
-
                 return;
-            }            
+            }
 
-            await user.AddRoleAsync(role);
-            await SendOkAsync(1);
+            await Task.WhenAll(user.AddRoleAsync(role), SendOkAsync(1));
         }
 
         [Command("restorereactions")]
@@ -170,26 +162,24 @@ namespace Espeon.Commands
             if (role is null)
             {
                 await SendNotOkAsync(0);
-
                 return;
             }
 
-            await user.RemoveRoleAsync(role);
-            await SendOkAsync(1);
+            await Task.WhenAll(user.RemoveRoleAsync(role), SendOkAsync(1));
         }
 
         [Command("block")]
         [Name("Block User")]
         [RequirePermissions(PermissionTarget.Bot, ChannelPermission.ManageChannels)]
-        public async Task BlockUserAsync(
+        public Task BlockUserAsync(
             [RequireHierarchy]
             [Remainder]
             IGuildUser user)
         {
-            await Context.Channel
-                .AddPermissionOverwriteAsync(user, new OverwritePermissions(sendMessages: PermValue.Deny));
-
-            await SendOkAsync(0);
+            return Task.WhenAll(
+                Context.Channel.AddPermissionOverwriteAsync(user, 
+                    new OverwritePermissions(sendMessages: PermValue.Deny)), 
+                SendOkAsync(0));
         }
 
         [Command("blacklist")]
@@ -200,8 +190,8 @@ namespace Espeon.Commands
             IGuildUser user)
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
-            
-            if(currentGuild.RestrictedUsers.Contains(user.Id))
+
+            if (currentGuild.RestrictedUsers.Contains(user.Id))
             {
                 await SendNotOkAsync(0);
                 return;
@@ -209,8 +199,7 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedUsers.Add(user.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("unblacklist")]
@@ -230,8 +219,7 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedUsers.Remove(user.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
     }
 }

@@ -21,24 +21,27 @@ namespace Espeon.Services
         {
             _taskQueue = new ConcurrentQueue<TaskObject>();
 
-            _timer = new Timer(async _ =>
+            _timer = new Timer(_ => _ = TimerCallbackAsync(), null, -1, -1); //async void bad
+        }
+
+        private async Task TimerCallbackAsync()
+        {
+            if (!_taskQueue.TryDequeue(out var task))
+                return;
+
+            try
             {
-                if (!_taskQueue.TryDequeue(out var task)) return;
+                await HandleTaskAsync(task, false);
+            }
+            catch (HttpException http) when (http.DiscordCode == 404)
+            {
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogAsync(Source.Timer, Severity.Error, "Something went wrong... ", ex);
+            }
 
-                try
-                {
-                    await HandleTaskAsync(task, false);
-                }
-                catch(HttpException http) when (http.DiscordCode == 404)
-                {
-                }
-                catch(Exception ex)
-                {
-                    await _logger.LogAsync(Source.Timer, Severity.Error, "Something went wrong... ", ex);
-                }
-
-                await SetTimerAsync();
-            }, null, -1, -1);
+            await SetTimerAsync();
         }
 
         public Task<string> EnqueueAsync(object removable, long whenToRemove, Func<string, object, Task> removeTask)

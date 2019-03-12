@@ -35,8 +35,7 @@ namespace Espeon.Commands
 
             currentGuild.Prefixes.Add(prefix);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("removeprefix")]
@@ -53,8 +52,7 @@ namespace Espeon.Commands
 
             currentGuild.Prefixes.Remove(prefix);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("restrict")]
@@ -72,8 +70,7 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedChannels.Add(channel.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("unrestrict")]
@@ -91,8 +88,7 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedChannels.Remove(channel.Id);
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(1);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
         [Command("admin")]
@@ -110,10 +106,8 @@ namespace Espeon.Commands
                 {
                     currentGuild.Moderators.Remove(user.Id);
                 }                
-
-                await Context.GuildStore.SaveChangesAsync();
-
-                await SendOkAsync(0, user.GetDisplayName());
+                
+                await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
                 return;
             }
 
@@ -136,8 +130,7 @@ namespace Espeon.Commands
 
                 currentGuild.Moderators.Add(user.Id);
 
-                await Context.GuildStore.SaveChangesAsync();
-                await SendOkAsync(1, user.GetDisplayName());
+                await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
                 return;
             }
 
@@ -161,8 +154,7 @@ namespace Espeon.Commands
             {
                 currentGuild.Admins.Remove(user.Id);
 
-                await Context.GuildStore.SaveChangesAsync();
-                await SendOkAsync(1, user.GetDisplayName());
+                await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
                 return;
             }
 
@@ -180,8 +172,7 @@ namespace Espeon.Commands
             {
                 currentGuild.Moderators.Remove(user.Id);
 
-                await Context.GuildStore.SaveChangesAsync();
-                await SendOkAsync(0, user.GetDisplayName());
+                await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
                 return;
             }
 
@@ -194,10 +185,8 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeChannelId = channel?.Id ?? 0;
-            
-            await Context.GuildStore.SaveChangesAsync();
 
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("welcomemessage")]
@@ -209,10 +198,8 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WelcomeMessage = message;
-            
-            await Context.GuildStore.SaveChangesAsync();
 
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("defaultrole")]
@@ -221,9 +208,8 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.DefaultRoleId = role?.Id ?? 0;
-            
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("warninglimit")]
@@ -233,19 +219,17 @@ namespace Espeon.Commands
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
             currentGuild.WarningLimit = limit;
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
 
         [Command("noreactionrole")]
         [Name("Set No Reactions Role")]
-        public async Task SetNoReactionsRole([Remainder] SocketRole role)
+        public async Task SetNoReactionsRole([Remainder] SocketRole role = null)
         {
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
-            currentGuild.NoReactions = role.Id;
+            currentGuild.NoReactions = role?.Id ?? 0;
 
-            await Context.GuildStore.SaveChangesAsync();
-            await SendOkAsync(0);
+            await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
     }
 }
