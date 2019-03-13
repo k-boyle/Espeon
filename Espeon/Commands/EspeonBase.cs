@@ -30,7 +30,7 @@ namespace Espeon.Commands
 
         protected Task<IUserMessage> SendMessageAsync(string content, Embed embed = null)
         {
-            return Message.SendMessageAsync(Context, x =>
+            return Message.SendAsync(Context, x =>
             {
                 x.Content = content;
                 x.Embed = embed;
@@ -40,7 +40,7 @@ namespace Espeon.Commands
         protected Task<IUserMessage> SendFileAsync(Stream stream, string fileName, string content = null, 
             Embed embed = null)
         {
-            return Message.SendMessageAsync(Context, x =>
+            return Message.SendAsync(Context, x =>
             {
                 x.Content = content;
                 x.Embed = embed;

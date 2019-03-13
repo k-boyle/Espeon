@@ -152,11 +152,11 @@ namespace Espeon.Commands
             public EspeonContext Context { get; set; }
             public IServiceProvider Services { get; set; }
 
-            public Task<IUserMessage> SendMessageAsync(Action<MessageProperties> func)
+            public Task<IUserMessage> SendAsync(Action<MessageProperties> func)
             {
                 var message = Services.GetService<MessageService>();
 
-                return message.SendMessageAsync(Context, func);
+                return message.SendAsync(Context, func);
             }
         }
 

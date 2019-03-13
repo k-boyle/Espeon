@@ -119,7 +119,7 @@ namespace Espeon.Services
             if (result is ExecutionFailedResult failed)
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
-            await SendMessageAsync(context, x => x.Embed = result.GenerateResponse(context));
+            await SendAsync(context, x => x.Embed = result.GenerateResponse(context));
         }
 
         private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
@@ -177,7 +177,7 @@ namespace Espeon.Services
         }
         */
 
-        public async Task<IUserMessage> SendMessageAsync(EspeonContext context, Action<MessageProperties> properties)
+        public async Task<IUserMessage> SendAsync(EspeonContext context, Action<MessageProperties> properties)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
                 foundChannel = (_messageCache[context.Channel.Id] =

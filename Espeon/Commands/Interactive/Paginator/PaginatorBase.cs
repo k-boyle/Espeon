@@ -27,7 +27,7 @@ namespace Espeon.Commands
             _manageMessages = Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages;
 
             var (content, embed) = GetCurrentPage();
-            Message = await MessageService.SendMessageAsync(Context, x =>
+            Message = await MessageService.SendAsync(Context, x =>
             {
                 x.Content = content;
                 x.Embed = embed;
@@ -81,7 +81,7 @@ namespace Espeon.Commands
                     return true;
 
                 case Control.Skip:
-                    await MessageService.SendMessageAsync(Context, 
+                    await MessageService.SendAsync(Context, 
                         x => x.Content = "What page would you like to skip to?");
 
                     var reply = await Interactive.NextMessageAsync(Context,
@@ -98,7 +98,7 @@ namespace Espeon.Commands
                     break;
 
                 case Control.Info:
-                    await MessageService.SendMessageAsync(Context,
+                    await MessageService.SendAsync(Context,
                         x => x.Content = "I am a paginated message! You can press the reactions below to control me!");
                     break;
 

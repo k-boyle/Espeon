@@ -74,7 +74,7 @@ namespace Espeon.Commands
             _dealerCards.Add(_deck.Dequeue());
             _playerCards.Add(_deck.Dequeue());
 
-            Message = await _message.SendMessageAsync(Context, x => x.Embed = BuildEmbed());
+            Message = await _message.SendAsync(Context, x => x.Embed = BuildEmbed());
 
             var playerTotal = CalculateTotal(ref _playerCards);
 

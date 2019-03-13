@@ -66,7 +66,7 @@ namespace Espeon.Commands
                     message = string.Concat(
                         result.Reason,
                         "\n",
-                        string.Join('\n', checksFailedResult.FailedChecks.Select(x => x.Error)));
+                        string.Join('\n', checksFailedResult.FailedChecks.Select(x => x.Result.Reason)));
 
                     builder.WithDescription(message);
                     break;
@@ -94,7 +94,7 @@ namespace Espeon.Commands
                     message = string.Concat(
                         result.Reason,
                         "\n",
-                        string.Join('\n', parameterChecksFailedResult.FailedChecks.Select(x => x.Error)));
+                        string.Join('\n', parameterChecksFailedResult.FailedChecks.Select(x => x.Result.Reason)));
 
                     builder.WithDescription(message);
                     break;
