@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireSpecificLengthAttribute : ParameterCheckBaseAttribute
+    public class RequireSpecificLengthAttribute : ParameterCheckAttribute
     {
         private readonly int _minLength;
         private readonly int _maxLength;
@@ -19,11 +19,11 @@ namespace Espeon.Commands
             _maxLength = maxLength;
         }
 
-        public override Task<CheckResult> CheckAsync(object argument, ICommandContext context, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context, IServiceProvider provider)
         {
             var str = argument.ToString();
 
-            return Task.FromResult(str.Length > _minLength && str.Length < _maxLength
+            return new ValueTask<CheckResult>(str.Length > _minLength && str.Length < _maxLength
                 ? CheckResult.Successful
                 : CheckResult.Unsuccessful($"String length must be between {_minLength} and {_maxLength}"));
         }

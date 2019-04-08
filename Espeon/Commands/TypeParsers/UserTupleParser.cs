@@ -9,7 +9,7 @@ namespace Espeon.Commands
 {
     public class UserTupleParser : TypeParser<(IGuildUser, User)>
     {
-        public override async Task<TypeParserResult<(IGuildUser, User)>> ParseAsync(Parameter param, string value, ICommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<TypeParserResult<(IGuildUser, User)>> ParseAsync(Parameter param, string value, CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 

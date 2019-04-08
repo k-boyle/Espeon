@@ -19,7 +19,7 @@ namespace Espeon
 
             var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x));
 
-            var internalAddParser = commands.GetType().GetMethod("AddParserInternal",
+            var internalAddParser = commands.GetType().GetMethod("AddTypeParserInternal",
                 BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (internalAddParser is null)

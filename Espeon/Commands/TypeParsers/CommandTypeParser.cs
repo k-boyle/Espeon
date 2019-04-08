@@ -8,13 +8,13 @@ namespace Espeon.Commands
 {
     public class CommandTypeParser : TypeParser<Command>
     {
-        public override Task<TypeParserResult<Command>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<Command>> ParseAsync(Parameter param, string value, CommandContext context, IServiceProvider provider)
         {
             var commands = provider.GetService<CommandService>();
             var command = commands.GetAllCommands().SingleOrDefault(x =>
                 string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
-            return Task.FromResult(command is null
+            return new ValueTask<TypeParserResult<Command>>(command is null
                 ? new TypeParserResult<Command>("Multiple or no matching commands")
                 : new TypeParserResult<Command>(command));
         }

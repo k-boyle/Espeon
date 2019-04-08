@@ -43,7 +43,14 @@ namespace Espeon.Services
             var commands = services.GetService<CommandService>();
             var client = services.GetService<DiscordSocketClient>();
 
-            commands.CommandErrored += CommandErroredAsync;
+            commands.CommandErrored += args =>
+            {
+                return CommandErroredAsync(new CasinoCommandErroredEventArgs
+                {
+                    Context = args.Context as EspeonContext,
+                    Result = args.Result
+                });
+            };
             commands.CommandExecuted += CommandExecutedAsync;
 
             client.MessageReceived += msg =>
@@ -106,29 +113,34 @@ namespace Espeon.Services
                     }
                     else if (!result.IsSuccessful && !(result is ExecutionFailedResult))
                     {
-                        await CommandErroredAsync(result as FailedResult, commandContext, _services);
+                        await CommandErroredAsync(new CasinoCommandErroredEventArgs
+                        {
+                            Context = commandContext,
+                            Result = result as FailedResult
+                        });
                     }
                 }
             }
         }
 
-        private async Task CommandErroredAsync(FailedResult result, ICommandContext originalContext, IServiceProvider services)
+        private async Task CommandErroredAsync(CasinoCommandErroredEventArgs args)
         {
-            var context = originalContext as EspeonContext;
+            var context = args.Context as EspeonContext;
 
-            if (result is ExecutionFailedResult failed)
+            if (args.Result is ExecutionFailedResult failed)
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
-            await SendAsync(context, x => x.Embed = result.GenerateResponse(context));
+            await SendAsync(context, x => x.Embed = args.Result.GenerateResponse(context));
         }
 
-        private async Task CommandExecutedAsync(Command command, CommandResult originalResult,
-            ICommandContext originalContext, IServiceProvider services)
+        private async Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
-            var context = originalContext as EspeonContext;
+            var context = args.Context as EspeonContext;
 
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
-                $"Successfully executed {{{command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
+                $"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
+
+            context.Dispose();
         }
 
         /*
@@ -379,6 +391,12 @@ namespace Espeon.Services
             public Embed Embed { get; set; }
             public Stream Stream { get; set; }
             public string FileName { get; set; }
+        }
+
+        private class CasinoCommandErroredEventArgs
+        {
+            public EspeonContext Context { get; set; }
+            public FailedResult Result { get; set; }
         }
     }
 }

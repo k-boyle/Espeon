@@ -9,11 +9,11 @@ namespace Espeon.Commands
 {
     public class SocketTextChannelParser : TypeParser<SocketTextChannel>
     {
-        public override Task<TypeParserResult<SocketTextChannel>> ParseAsync(Parameter param, string value, ICommandContext ctx, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<SocketTextChannel>> ParseAsync(Parameter param, string value, CommandContext ctx, IServiceProvider provider)
         {
             var context = ctx as EspeonContext;
             if (context.Guild == null)
-                return Task.FromResult(new TypeParserResult<SocketTextChannel>("This command must be used in a guild."));
+                return new ValueTask<TypeParserResult<SocketTextChannel>>(new TypeParserResult<SocketTextChannel>("This command must be used in a guild."));
 
             IEnumerable<SocketTextChannel> channels = context.Guild.TextChannels;
 
@@ -30,9 +30,9 @@ namespace Espeon.Commands
             if (channel == null)
                 channel = channels.FirstOrDefault(x => x.Name == value);
 
-            return channel == null
-                ? Task.FromResult(new TypeParserResult<SocketTextChannel>("No channel found matching the input."))
-                : Task.FromResult(new TypeParserResult<SocketTextChannel>(channel));
+            return new ValueTask<TypeParserResult<SocketTextChannel>>(channel is null 
+                ? new TypeParserResult<SocketTextChannel>("No channel found matching the input.") 
+                : new TypeParserResult<SocketTextChannel>(channel));
         }
     }
 }

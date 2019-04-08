@@ -4,10 +4,11 @@ using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Qmmands;
+using System;
 
 namespace Espeon.Commands
 {
-    public class EspeonContext : ICommandContext
+    public class EspeonContext : CommandContext, IDisposable
     {
         private UserStore _userStore;
         public UserStore UserStore => _userStore ?? (_userStore = new UserStore());
@@ -34,6 +35,27 @@ namespace Espeon.Commands
             Channel = message.Channel as SocketTextChannel;
 
             IsEdit = isEdit;
+        }
+
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _userStore?.Dispose();
+                    _guildStore?.Dispose();
+                    _commandStore?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

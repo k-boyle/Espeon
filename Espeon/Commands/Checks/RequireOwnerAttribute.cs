@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireOwnerAttribute : CheckBaseAttribute
+    public class RequireOwnerAttribute : CheckAttribute
     {
-        public override async Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 

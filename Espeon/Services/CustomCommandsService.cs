@@ -1,4 +1,4 @@
-﻿using Espeon.Commands;
+using Espeon.Commands;
 using Espeon.Databases;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
@@ -49,11 +49,10 @@ namespace Espeon.Services
 
                 foreach (var command in commands)
                 {
-                    moduleBuilder.AddCommand(commandBuilder =>
+                    moduleBuilder.AddCommand(CommandCallbackAsync, commandBuilder =>
                     {
                         commandBuilder.Name = command.Name;
                         commandBuilder.AddAliases(command.Name);
-                        commandBuilder.WithCallback(CommandCallbackAsync);
                     });
                 }
             });
@@ -63,8 +62,7 @@ namespace Espeon.Services
             return Task.CompletedTask;
         }
 
-        private async Task<IResult> CommandCallbackAsync(Command command, object[] parameters,
-            ICommandContext originalContext, IServiceProvider services)
+        private async ValueTask<IResult> CommandCallbackAsync(CommandContext originalContext, IServiceProvider services)
         {
             var context = originalContext as EspeonContext;
 
@@ -72,7 +70,7 @@ namespace Espeon.Services
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
-                string.Equals(x.Name, command.Name, StringComparison.InvariantCultureIgnoreCase));
+                string.Equals(x.Name, context.Command.Name, StringComparison.InvariantCultureIgnoreCase));
 
             await _message.SendAsync(context, x => x.Content = found!.Value);
 

@@ -15,13 +15,7 @@ namespace Espeon.Commands
         public MessageService Message { get; set; }
         public InteractiveService Interactive { get; set; }
         public ResponseService Responses { get; set; }
-        public IServiceProvider Services { get; set; }   
-        
-        [DoNotAutomaticallyInject]
-        public Module Module { get; set; }
-
-        [DoNotAutomaticallyInject]
-        public Command Command { get; set; }
+        public IServiceProvider Services { get; set; }
 
         protected Task<IUserMessage> SendMessageAsync(Embed embed)
         {
@@ -51,14 +45,15 @@ namespace Espeon.Commands
 
         protected async Task<IUserMessage> SendOkAsync(int index, params object[] args)
         {
+            var cmd = Context.Command;
             var module = await Context.CommandStore.Modules.Include(x => x.Commands)
-                .FirstOrDefaultAsync(x => x.Name == Module.Name);
+                .FirstOrDefaultAsync(x => x.Name == cmd.Module.Name);
 
-            var command = module.Commands.FirstOrDefault(x => x.Name == Command.Name);
+            var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
 
-            var responses = Responses.GetResponses(Module.Name, Command.Name);
+            var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 
             var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][index], args));
             return await SendMessageAsync(response);
@@ -66,14 +61,15 @@ namespace Espeon.Commands
 
         protected async Task<IUserMessage> SendNotOkAsync(int index, params object[] args)
         {
+            var cmd = Context.Command;
             var module = await Context.CommandStore.Modules.Include(x => x.Commands)
-                .FirstOrDefaultAsync(x => x.Name == Module.Name);
+                .FirstOrDefaultAsync(x => x.Name == Context.Command.Module.Name);
 
-            var command = module.Commands.FirstOrDefault(x => x.Name == Command.Name);
+            var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
 
             var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
             
-            var responses = Responses.GetResponses(Module.Name, Command.Name);
+            var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 
             var response = ResponseBuilder.Message(Context, 
                 string.Format(responses[user.ResponsePack][index], args), false);
@@ -94,14 +90,6 @@ namespace Espeon.Commands
         protected Task SendPaginatedMessageAsync(PaginatorBase paginator, TimeSpan? timeout = null)
         {
             return Interactive.SendPaginatedMessageAsync(paginator, timeout);
-        }
-
-        protected override Task BeforeExecutedAsync(Command command)
-        {
-            Module = command.Module;
-            Command = command;
-
-            return Task.CompletedTask;
         }
     }
 }

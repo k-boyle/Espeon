@@ -9,10 +9,11 @@ namespace Espeon.Commands
     {
         private static readonly Regex TimeSpanRegex = new Regex(@"(\d+)(w(?:eeks?)?|d(?:ays?)?|h(?:ours?)?|m(?:inutes?)?|s(?:econds?)?)", RegexOptions.Compiled);
 
-        public override Task<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, CommandContext context, IServiceProvider provider)
         {
             var matches = TimeSpanRegex.Matches(value);
-            if (matches.Count <= 0) return Task.FromResult(new TypeParserResult<TimeSpan>("Failed to parse time span"));
+            if (matches.Count <= 0)
+                return new ValueTask<TypeParserResult<TimeSpan>>(new TypeParserResult<TimeSpan>("Failed to parse time span"));
 
             var result = new TimeSpan();
             bool weeks = false, days = false, hours = false, minutes = false, seconds = false;
@@ -70,7 +71,7 @@ namespace Espeon.Commands
                 }
             }
 
-            return Task.FromResult(result > TimeSpan.FromSeconds(10)
+            return new ValueTask<TypeParserResult<TimeSpan>>(result > TimeSpan.FromSeconds(10)
                 ? new TypeParserResult<TimeSpan>(result)
                 : new TypeParserResult<TimeSpan>("Time span must be greater than 10seconds"));
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireGuildAttribute : CheckBaseAttribute
+    public class RequireGuildAttribute : CheckAttribute
     {
         private readonly ulong _id;
 
@@ -13,11 +13,11 @@ namespace Espeon.Commands
             _id = id;
         }
 
-        public override Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 
-            return Task.FromResult(context!.Guild.Id == _id
+            return new ValueTask<CheckResult>(context!.Guild.Id == _id
                 ? CheckResult.Successful
                 : CheckResult.Unsuccessful("Command cannot be run in this guild"));
         }

@@ -1,14 +1,13 @@
-﻿using Espeon.Databases;
-using Qmmands;
+﻿using Qmmands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireUnlockedAttribute : ParameterCheckBaseAttribute
+    public class RequireUnlockedAttribute : ParameterCheckAttribute
     {
-        public override async Task<CheckResult> CheckAsync(object argument, ICommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 

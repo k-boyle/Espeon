@@ -13,7 +13,7 @@ namespace Espeon.Commands
             _level = level;
         }
 
-        public override async Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var result = await base.CheckAsync(originalContext, provider);
 

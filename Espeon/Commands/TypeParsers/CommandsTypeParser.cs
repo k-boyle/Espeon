@@ -9,7 +9,7 @@ namespace Espeon.Commands
 {
     public class CommandsTypeParser : TypeParser<IReadOnlyCollection<Command>>
     {
-        public override async Task<TypeParserResult<IReadOnlyCollection<Command>>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
+        public override async ValueTask<TypeParserResult<IReadOnlyCollection<Command>>> ParseAsync(Parameter param, string value, CommandContext context, IServiceProvider provider)
         {
             var service = provider.GetService<CommandService>();
             var commands = service.GetAllCommands();

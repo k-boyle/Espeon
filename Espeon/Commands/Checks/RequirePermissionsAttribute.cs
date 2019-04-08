@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequirePermissionsAttribute : CheckBaseAttribute
+    public class RequirePermissionsAttribute : CheckAttribute
     {
         private readonly PermissionTarget _target;
         private readonly GuildPermission[] _guildPerms;
@@ -28,7 +28,7 @@ namespace Espeon.Commands
             _guildPerms = new GuildPermission[0];
         }
 
-        public override Task<CheckResult> CheckAsync(ICommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 
@@ -63,7 +63,7 @@ namespace Espeon.Commands
             }
 
             if (failedGuildPerms.Count == 0 && failedChannelPerms.Count == 0)
-                return Task.FromResult(CheckResult.Successful);
+                return new ValueTask<CheckResult>(CheckResult.Successful);
 
             var sb = new StringBuilder();
 
@@ -73,7 +73,7 @@ namespace Espeon.Commands
             foreach (var channelPerm in failedChannelPerms)
                 sb.AppendLine($"{channelPerm}");
 
-            return Task.FromResult(
+            return new ValueTask<CheckResult>(
                 CheckResult.Unsuccessful(
                     $"{(_target == PermissionTarget.User ? "You" : "I")} need the following permissions to execute this command\n{sb}"));
         }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireHierarchyAttribute : ParameterCheckBaseAttribute
+    public class RequireHierarchyAttribute : ParameterCheckAttribute
     {
-        public override async Task<CheckResult> CheckAsync(object argument, ICommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
             var targetUser = argument as IGuildUser;

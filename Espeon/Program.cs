@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
@@ -70,7 +70,7 @@ namespace Espeon
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
                 {
-                    CaseSensitive = false
+                     StringComparison = StringComparison.InvariantCultureIgnoreCase
                 })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)

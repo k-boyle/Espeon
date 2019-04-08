@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public class RequireRangeAttribute : ParameterCheckBaseAttribute
+    public class RequireRangeAttribute : ParameterCheckAttribute
     {
         private readonly int _minValue;
         private readonly int _maxValue;
@@ -22,11 +22,11 @@ namespace Espeon.Commands
             _maxValue = maxValue;
         }
 
-        public override Task<CheckResult> CheckAsync(object argument, ICommandContext context, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context, IServiceProvider provider)
         {
             var value = (int)argument;
 
-            return Task.FromResult(
+            return new ValueTask<CheckResult>(
                 value > _minValue && value <= _maxValue 
                 ? CheckResult.Successful 
                 : CheckResult.Unsuccessful($"Value must be between {_minValue} and {_maxValue}"));

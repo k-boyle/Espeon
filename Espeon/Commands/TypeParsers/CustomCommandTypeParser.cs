@@ -10,7 +10,7 @@ namespace Espeon.Commands
 {
     public class CustomCommandTypeParser : TypeParser<CustomCommand>
     {
-        public override async Task<TypeParserResult<CustomCommand>> ParseAsync(Parameter param, string value, ICommandContext originalContext,
+        public override async ValueTask<TypeParserResult<CustomCommand>> ParseAsync(Parameter param, string value, CommandContext originalContext,
             IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;

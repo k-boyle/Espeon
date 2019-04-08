@@ -7,19 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Core" Version="2.0.2-dev-01059" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.0.2-dev-01059" />
-    <PackageReference Include="Humanizer.Core" Version="2.5.16" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0-beta4-final" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0-beta4-final" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview.18572.1">
+    <PackageReference Include="Discord.Net.Core" Version="2.0.2-dev-20190326.4" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.0.2-dev-20190326.4" />
+    <PackageReference Include="Humanizer.Core" Version="2.6.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview3.19153.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview3.19153.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview3.19153.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview1" />
-    <PackageReference Include="Qmmands" Version="2.3.1-nightly-00124" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview3" />
+    <PackageReference Include="Qmmands" Version="3.0.0-nightly-00174" />
   </ItemGroup>
 
   <ItemGroup>
