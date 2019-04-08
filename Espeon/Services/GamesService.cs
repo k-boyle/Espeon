@@ -33,7 +33,7 @@ namespace Espeon.Services
             if (!_games.TryGetValue(context.User.Id, out var game))
                 return false;
 
-            if (!await _interactive.TryRemoveCallbackAsync(game))
+            if (!_interactive.TryRemoveCallback(game))
                 return false;
             
             await game.EndAsync();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Espeon.Databases
 {
@@ -29,7 +30,7 @@ namespace Espeon.Databases
         public ulong ChannelId { get; set; }
         public int ReminderId { get; set; }
 
-        public string TaskKey { get; set; }
+        public Guid TaskKey { get; set; }
         public long WhenToRemove { get; set; }
     }
 }

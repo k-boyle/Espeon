@@ -15,7 +15,7 @@ namespace Espeon.Services
     public class ReminderService : BaseService
     {
         [Inject] private readonly LogService _logger;
-        [Inject] private readonly TimerService _timer;
+        [Inject] private readonly TaskSchedulerService _scheduler;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private Random _random;
@@ -36,7 +36,7 @@ namespace Espeon.Services
                     continue;
                 }
 
-                var newKey = await _timer.EnqueueAsync(reminder, reminder.WhenToRemove, RemoveAsync);
+                var newKey = _scheduler.ScheduleTask(reminder, reminder.WhenToRemove, RemoveAsync);
                 reminder.TaskKey = newKey;
             }
 
@@ -56,7 +56,7 @@ namespace Espeon.Services
                 ReminderId = Random.Next(999)
             };
 
-            var key = await _timer.EnqueueAsync(reminder, reminder.WhenToRemove, RemoveAsync);
+            var key = _scheduler.ScheduleTask(reminder, reminder.WhenToRemove, RemoveAsync);
 
             reminder.TaskKey = key;
 
@@ -68,7 +68,7 @@ namespace Espeon.Services
 
         private async Task CancelReminderAsync(EspeonContext context, Reminder reminder)
         {
-            await _timer.RemoveAsync(reminder.TaskKey);
+            _scheduler.CancelTask(reminder.TaskKey);
 
             context.UserStore.Remove(reminder);
             await context.UserStore.SaveChangesAsync();
@@ -80,7 +80,7 @@ namespace Espeon.Services
             return user.Reminders.ToImmutableArray();
         }
 
-        private async Task RemoveAsync(string taskKey, object removable)
+        private async Task RemoveAsync(Guid taskKey, object removable)
         {
             var reminder = (Reminder)removable;
 
@@ -103,7 +103,7 @@ namespace Espeon.Services
             await ctx.SaveChangesAsync();
 
             await _logger.LogAsync(Source.Reminders, Severity.Verbose,
-                $"Executed reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");
+                $"Sent reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");
         }
 
         private static string ReminderString(string reminder, string jumpUrl)

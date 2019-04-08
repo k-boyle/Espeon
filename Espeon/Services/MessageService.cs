@@ -1,7 +1,6 @@
 using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
-using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,11 +21,11 @@ namespace Espeon.Services
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
         [Inject] private readonly Random _random;
-        [Inject] private readonly TimerService _timer;
+        [Inject] private readonly TaskSchedulerService _scheduler;
         [Inject] private readonly IServiceProvider _services;
 
         private readonly
-            ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>>
+            ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, CachedMessage>>>
             _messageCache;
 
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
@@ -34,14 +33,14 @@ namespace Espeon.Services
         public MessageService()
         {
             _messageCache =
-                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<string,
+                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid,
                     CachedMessage>>>();
         }
 
         public override Task InitialiseAsync(InitialiseArgs args)
         {
-            var commands = services.GetService<CommandService>();
-            var client = services.GetService<DiscordSocketClient>();
+            var commands = args.Services.GetService<CommandService>();
+            var client = args.Services.GetService<DiscordSocketClient>();
 
             commands.CommandErrored += args =>
             {
@@ -99,12 +98,13 @@ namespace Espeon.Services
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
-            {
-                var commandContext = new EspeonContext(_client, message, isEdit);
+            {                
                 var foundCommands = output.FindCommands();
 
                 foreach (var command in foundCommands)
                 {
+                    var commandContext = new EspeonContext(_client, message, isEdit); //new context to handle db disposes
+
                     var result = await _commands.ExecuteAsync(command, commandContext, _services);
 
                     if (result is CommandNotFoundResult)
@@ -193,10 +193,10 @@ namespace Espeon.Services
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
                 foundChannel = (_messageCache[context.Channel.Id] =
-                    new ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>());
+                    new ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, CachedMessage>>());
 
             if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
-                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<string, CachedMessage>());
+                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<Guid, CachedMessage>());
 
             var messageProperties = properties.Invoke();
 
@@ -219,7 +219,7 @@ namespace Espeon.Services
                     CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
                 };
 
-                var key = await _timer.EnqueueAsync(message, 
+                var key = _scheduler.ScheduleTask(message, 
                     DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(), 
                     RemoveAsync);
 
@@ -249,7 +249,7 @@ namespace Espeon.Services
                     }
                 };
 
-                var key = await _timer.EnqueueAsync(message,
+                var key = _scheduler.ScheduleTask(message,
                     DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
                     RemoveAsync);
 
@@ -292,7 +292,7 @@ namespace Espeon.Services
                 : Task.FromResult(message);
         }
 
-        private Task RemoveAsync(string key, object removable)
+        private Task RemoveAsync(Guid key, object removable)
         {
             var message = (CachedMessage)removable;
             _messageCache[message!.ChannelId][message.UserId].TryRemove(key, out _);
@@ -337,7 +337,7 @@ namespace Espeon.Services
                 var ordered = found.OrderByDescending(x => x.Value.CreatedAt).ToArray();
                 amount = amount > ordered.Length ? ordered.Length : amount;
 
-                var toDelete = new List<(string, CachedMessage)>();
+                var toDelete = new List<(Guid, CachedMessage)>();
 
                 for (var i = 0; i < amount; i++)
                     toDelete.Add((ordered[i].Key, ordered[i].Value));
@@ -349,14 +349,14 @@ namespace Espeon.Services
         }
 
         private async Task<int> DeleteMessagesAsync(EspeonContext context, bool manageMessages,
-            IEnumerable<(string Key, CachedMessage Cached)> messages)
+            IEnumerable<(Guid Key, CachedMessage Cached)> messages)
         {
             var fetchedMessages = new List<IMessage>();
 
             foreach (var (key, cached) in messages)
             {
                 await RemoveAsync(key, cached);
-                await _timer.RemoveAsync(key);
+                _scheduler.CancelTask(key);
 
                 foreach (var id in cached.ResponseIds)
                     fetchedMessages.Add(await GetOrDownloadMessageAsync(cached.ChannelId, id));

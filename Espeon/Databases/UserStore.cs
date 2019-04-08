@@ -27,7 +27,7 @@ namespace Espeon.Databases.UserStore
             => optionsBuilder.UseNpgsql(_config.ConnectionStrings.UserStore);
 #else
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=UserStore;Username=postgres;Password=casino");        
+            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=UserStore;Username=postgres;Password=casino");
 #endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,8 +45,8 @@ namespace Espeon.Databases.UserStore
                 user.Property(x => x.ResponsePack)
                     .HasDefaultValue(ResponsePack.Default)
                     .HasConversion(
-                    y => (int)y, 
-                    y => (ResponsePack)y);
+                        y => (int)y,
+                        y => (ResponsePack)y);
 
                 user.Property(x => x.ResponsePacks)
                     .HasDefaultValue(new List<ResponsePack>
@@ -54,17 +54,25 @@ namespace Espeon.Databases.UserStore
                         ResponsePack.Default
                     })
                     .HasConversion(
-                    y => y.Select(x => (int)x).ToArray(),
-                    y => y.Select(x => (ResponsePack)x).ToList());
-                
+                        y => y.Select(x => (int)x).ToArray(),
+                        y => y.Select(x => (ResponsePack)x).ToList());
+
                 user.HasMany(x => x.Reminders)
                     .WithOne();
             });
 
-            modelBuilder.Entity<Reminder>().HasKey(x => x.Id);
+            modelBuilder.Entity<Reminder>(reminder =>
+            {
+                reminder.HasKey(x => x.Id);
 
-            modelBuilder.Entity<Reminder>().Property(x => x.Id)
-                .ValueGeneratedOnAdd();
+                reminder.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+
+                reminder.Property(x => x.TaskKey)
+                    .HasConversion(
+                        y => y.ToString(),
+                        y => Guid.Parse(y));
+            });
         }
 
         public async Task<User> GetOrCreateUserAsync(IUser user)

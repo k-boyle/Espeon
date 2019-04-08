@@ -35,7 +35,7 @@ namespace Espeon.Services
                         }
                         else
                         {
-                            commandMap.Add(command.Name, new Dictionary<string, Dictionary<ResponsePack, string[]>>());
+                            commandMap[module.Name].Add(command.Name, new Dictionary<ResponsePack, string[]>());
                         }
                     }
                 }
