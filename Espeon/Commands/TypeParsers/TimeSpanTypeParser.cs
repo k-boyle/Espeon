@@ -71,9 +71,7 @@ namespace Espeon.Commands
                 }
             }
 
-            return new ValueTask<TypeParserResult<TimeSpan>>(result > TimeSpan.FromSeconds(10)
-                ? new TypeParserResult<TimeSpan>(result)
-                : new TypeParserResult<TimeSpan>("Time span must be greater than 10seconds"));
+            return new ValueTask<TypeParserResult<TimeSpan>>(new TypeParserResult<TimeSpan>(result));
 
         }
     }
