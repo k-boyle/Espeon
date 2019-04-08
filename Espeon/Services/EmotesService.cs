@@ -1,9 +1,5 @@
 ﻿using Discord;
-using Espeon.Databases.CommandStore;
-using Espeon.Databases.GuildStore;
-using Espeon.Databases.UserStore;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -21,7 +17,7 @@ namespace Espeon.Services
             Collection = new Dictionary<string, Emote>();
         }
 
-        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public override Task InitialiseAsync(InitialiseArgs args)
         {
             var emotesObject = JObject.Parse(File.ReadAllText(EmotesDir));
 

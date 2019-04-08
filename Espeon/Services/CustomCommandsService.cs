@@ -1,8 +1,5 @@
-using Espeon.Commands;
+﻿using Espeon.Commands;
 using Espeon.Databases;
-using Espeon.Databases.CommandStore;
-using Espeon.Databases.GuildStore;
-using Espeon.Databases.UserStore;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
@@ -25,9 +22,9 @@ namespace Espeon.Services
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
 
-        public override async Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public override async Task InitialiseAsync(InitialiseArgs args)
         {
-            var guilds = await guildStore.GetAllGuildsAsync(x => x.Commands);
+            var guilds = await args.GuildStore.GetAllGuildsAsync(x => x.Commands);
 
             var createCommands = guilds.Select(CreateCommandsAsync);
 

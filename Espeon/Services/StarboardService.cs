@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Databases;
-using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
-using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -18,7 +16,7 @@ namespace Espeon.Services
 
         private Emoji Star => Utilities.Star;
 
-        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public override Task InitialiseAsync(InitialiseArgs args)
         {
             _client.ReactionAdded += ReactionAddedAsync;
             _client.ReactionRemoved += ReactionRemovedAsync;

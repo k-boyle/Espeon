@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
@@ -43,7 +43,13 @@ namespace Espeon
                 await guildStore.Database.MigrateAsync();
                 await commandStore.Database.MigrateAsync();
 
-                await services.RunInitialisersAsync(userStore, guildStore, commandStore, types);
+                await services.RunInitialisersAsync(new InitialiseArgs
+                {
+                    UserStore = userStore,
+                    GuildStore = guildStore,
+                    CommandStore = commandStore, 
+                    Services = services
+                }, types);
 
                 await userStore.SaveChangesAsync();
                 await guildStore.SaveChangesAsync();

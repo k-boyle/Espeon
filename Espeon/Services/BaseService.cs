@@ -8,7 +8,15 @@ namespace Espeon.Services
 {
     public abstract class BaseService
     {
-        public virtual Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public virtual Task InitialiseAsync(InitialiseArgs args)
             => Task.CompletedTask;
+    }
+
+    public class InitialiseArgs
+    {
+        public UserStore UserStore { get; set; }
+        public GuildStore GuildStore { get; set; }
+        public CommandStore CommandStore { get; set; }
+        public IServiceProvider Services { get; set; }
     }
 }

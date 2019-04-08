@@ -38,7 +38,7 @@ namespace Espeon.Services
                     CachedMessage>>>();
         }
 
-        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public override Task InitialiseAsync(InitialiseArgs args)
         {
             var commands = services.GetService<CommandService>();
             var client = services.GetService<DiscordSocketClient>();

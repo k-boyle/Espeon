@@ -1,5 +1,4 @@
 ﻿using Discord.WebSocket;
-using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,7 @@ namespace Espeon.Services
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;
 
-        public override Task InitialiseAsync(UserStore userStore, GuildStore guildStore, CommandStore commandStore, IServiceProvider services)
+        public override Task InitialiseAsync(InitialiseArgs args)
         {
             _client.LeftGuild += LeftGuildAsync;
             _client.UserLeft += UserLeftAsync;
