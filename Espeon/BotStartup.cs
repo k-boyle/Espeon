@@ -27,11 +27,15 @@ namespace Espeon
         private readonly Config _config;
         private bool _ran;
 
+        private readonly TaskCompletionSource<int> _tcs;
+
         public BotStartup(IServiceProvider services, Config config)
         {
             _services = services;
             _config = config;
             _ran = false;
+
+            _tcs = new TaskCompletionSource<int>();
         }
 
         public async Task StartAsync(UserStore userStore, CommandStore commandStore)
@@ -42,6 +46,8 @@ namespace Espeon
 
             await _client.LoginAsync(TokenType.Bot, _config.DiscordToken);
             await _client.StartAsync();
+
+            await _tcs.Task;
         }
 
         private async Task SetupCommandsAsync(CommandStore commandStore)
@@ -136,6 +142,8 @@ namespace Espeon
                 {
                     await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);
                     _ran = true;
+
+                    _tcs.SetResult(0);
                 }
             };
 

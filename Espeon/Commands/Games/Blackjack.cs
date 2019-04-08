@@ -262,11 +262,18 @@ namespace Espeon.Commands
             var attemps = cards.Count(x => x.card == "ace");
 
             for (var a = 0; a < attemps; a++)
-            for (var i = 0; i < cards.Count; i++)
             {
-                if (cards[i].card != "ace" || cards[i].value == 1) continue;
-                cards[i] = (cards[i].suit, cards[i].card, 1);
-                break;
+                total = cards.Sum(x => x.value);
+
+                if (total <= 21)
+                    break;
+
+                for (var i = 0; i < cards.Count; i++)
+                {
+                    if (cards[i].card != "ace" || cards[i].value == 1) continue;
+                    cards[i] = (cards[i].suit, cards[i].card, 1);
+                    break;
+                }
             }
 
             return cards.Sum(x => x.value);

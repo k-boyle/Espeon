@@ -25,6 +25,8 @@ namespace Espeon.Services
         //requires client to be populated to send reminders
         public async Task LoadRemindersAsync(UserStore ctx)
         {
+            await _logger.LogAsync(Source.Reminders, Severity.Info, "Sending all missed reminders");
+
             var toRemove = new List<Reminder>();
 
             var reminders = ctx.Reminders;

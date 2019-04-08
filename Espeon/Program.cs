@@ -47,7 +47,7 @@ namespace Espeon
                 {
                     UserStore = userStore,
                     GuildStore = guildStore,
-                    CommandStore = commandStore, 
+                    CommandStore = commandStore,
                     Services = services
                 }, types);
 
@@ -63,10 +63,10 @@ namespace Espeon
             await Task.Delay(-1, cts.Token);
         }
 
-        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly, 
+        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly,
             Config config, CancellationTokenSource cts)
         {
-            var services = new ServiceCollection()
+            return new ServiceCollection()
                 .AddServices(types)
                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                 {
@@ -76,7 +76,7 @@ namespace Espeon
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
                 {
-                     StringComparison = StringComparison.InvariantCultureIgnoreCase
+                    StringComparison = StringComparison.InvariantCultureIgnoreCase
                 })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
@@ -90,8 +90,6 @@ namespace Espeon
                 .AddDbContext<CommandStore>(ServiceLifetime.Transient)
                 .BuildServiceProvider()
                 .Inject(types);
-
-            return services;
         }
     }
 }
