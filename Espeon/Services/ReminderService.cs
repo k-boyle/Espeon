@@ -15,7 +15,7 @@ namespace Espeon.Services
     public class ReminderService : BaseService
     {
         [Inject] private readonly LogService _logger;
-        [Inject] private readonly TaskSchedulerService _scheduler;
+        [Inject] private readonly TaskScheduler _scheduler;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private Random _random;

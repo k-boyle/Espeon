@@ -10,7 +10,7 @@ namespace Espeon.Commands
     public class InteractiveService : BaseService
     {
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly TaskSchedulerService _scheduler;
+        [Inject] private readonly TaskScheduler _scheduler;
 
         private readonly ConcurrentDictionary<ulong, CallbackData> _reactionCallbacks;
 

@@ -21,7 +21,7 @@ namespace Espeon.Services
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
         [Inject] private readonly Random _random;
-        [Inject] private readonly TaskSchedulerService _scheduler;
+        [Inject] private readonly TaskScheduler _scheduler;
         [Inject] private readonly IServiceProvider _services;
 
         private readonly

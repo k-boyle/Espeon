@@ -81,6 +81,7 @@ namespace Espeon
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
                 .AddSingleton(cts)
+                .AddSingleton(TaskScheduler.Create())
                 .AddSingleton<Random>()
                 .AddConfiguredHttpClient()
                 .AddEntityFrameworkNpgsql()

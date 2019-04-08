@@ -4,23 +4,26 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Espeon.Services
+namespace Espeon
 {
-    public class TaskSchedulerService : BaseService
+    public class TaskScheduler
     {
         private ConcurrentQueue<ScheduledTask> _taskQueue;
         private CancellationTokenSource _cts;
 
-        public TaskSchedulerService()
+        private TaskScheduler()
         {
             _taskQueue = new ConcurrentQueue<ScheduledTask>();
             _cts = new CancellationTokenSource();
         }
 
-        public override Task InitialiseAsync(InitialiseArgs args)
+        public static TaskScheduler Create()
         {
-            _ = HandleCallsbackAsync();
-            return base.InitialiseAsync(args);
+            var scheduler = new TaskScheduler();
+
+            _ = scheduler.HandleCallsbackAsync();
+
+            return scheduler;
         }
 
         public Guid ScheduleTask(object obj, long whenToRemove, Func<Guid, object, Task> task)
