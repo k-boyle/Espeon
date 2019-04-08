@@ -11,10 +11,14 @@ namespace Espeon
         private ConcurrentQueue<ScheduledTask> _taskQueue;
         private CancellationTokenSource _cts;
 
+        private readonly object _queueLock;
+
         private TaskScheduler()
         {
             _taskQueue = new ConcurrentQueue<ScheduledTask>();
             _cts = new CancellationTokenSource();
+
+            _queueLock = new object();
         }
 
         public static TaskScheduler Create()
@@ -28,30 +32,36 @@ namespace Espeon
 
         public Guid ScheduleTask(object obj, long whenToRemove, Func<Guid, object, Task> task)
         {
-            var key = Guid.NewGuid();
-
-            var toAdd = new ScheduledTask
+            lock (_queueLock)
             {
-                Object = obj,
-                WhenToRemove = whenToRemove,
-                Task = task,
-                Key = key
-            };
+                var key = Guid.NewGuid();
 
-            _taskQueue.Enqueue(toAdd);
-            _taskQueue = new ConcurrentQueue<ScheduledTask>(_taskQueue.OrderBy(x => x.WhenToRemove));
+                var toAdd = new ScheduledTask
+                {
+                    Object = obj,
+                    WhenToRemove = whenToRemove,
+                    Task = task,
+                    Key = key
+                };
 
-            _cts.Cancel(true);
+                _taskQueue.Enqueue(toAdd);
+                _taskQueue = new ConcurrentQueue<ScheduledTask>(_taskQueue.OrderBy(x => x.WhenToRemove));
 
-            return key;
+                _cts.Cancel(true);
+
+                return key;
+            }
         }
 
         public void CancelTask(Guid key)
         {
-            var removed = _taskQueue.Where(x => x.Key != key).OrderBy(x => x.WhenToRemove);
-            _taskQueue = new ConcurrentQueue<ScheduledTask>(removed.ToArray()); //collection overload enumerates collection
+            lock (_queueLock)
+            {
+                var removed = _taskQueue.Where(x => x.Key != key).OrderBy(x => x.WhenToRemove);
+                _taskQueue = new ConcurrentQueue<ScheduledTask>(removed.ToArray()); //collection overload enumerates collection
 
-            _cts.Cancel(true);
+                _cts.Cancel(true);
+            }
         }
 
         private async Task HandleCallsbackAsync()
