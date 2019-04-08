@@ -152,16 +152,82 @@
     }
   },
   "Misc": {
-    "Ping": {},
-    "Get Catfact": {},
-    "Get Joke": {},
-    "Get Gif": {},
+    "Ping": {
+      "Default": [
+        "Latency: {0}ms",
+        "Latency: {0}ms\nPing: {1}ms"
+      ],
+      "owo": [
+        "Watancy: {0}puurrs",
+        "Watancy: {0}puurrs\nPwing: {1}puurrs"
+      ]
+    },
+    "Get Catfact": {
+      "Default": [
+        "{0}",
+        "Something went wrong."
+      ],
+      "owo": [
+        "{0}",
+        "ooowwno sumthing went wrronng >>.<<"
+      ]
+    },
+    "Get Joke": {
+      "Default": [
+        "{0}",
+        "Something went wrong."
+      ],
+      "owo": [
+        "{0}",
+        "ooowwno sumthing went wrronng >>.<<"
+      ]
+    },
+    "Get Gif": {
+      "Default": [
+        "Failed to find any matching gifs",
+        "The found gif was too large to upload",
+        "Something went wrong"
+      ],
+      "owo": [
+        "fwailed to fwind a gwif",
+        "oweee the gwif was too bwig owo",
+        "sumthing went wwong"
+      ]
+    },
     "Clear Messages": {},
     "Help Modules": {},
     "Help Module": {},
     "Help Commands": {},
-    "List Mods": {},
-    "List Admins": {}
+    "List Mods": {
+      "Default": [
+        "There are no mods for this guild",
+        "Your mods are:\n{0}"
+      ],
+      "owo": [
+        "theres nu mods fur this gwuild",
+        "hers ur daddies:\n{0]}"
+      ]
+    },
+    "List Admins": {
+      "Default": [
+        "There are no admins for this guild",
+        "Your admins are:\n{0}"
+      ],
+      "owo": [
+        "theres nu admwins fur this gwuild",
+        "hers ur daddies daddies:\n{0]}"
+      ]
+    },
+    "Steal Emote": {
+      "Default": [
+        "Added {0} emotes",
+        "Emote limit reached, failed to add the following emotes: {0}"
+      ],
+      "owo": [
+        "addwed {0} emos",
+        "owwnoo >,< emo wimit weached i cudnt add {0}"
+      ]
+    }
   },
   "Moderation": {
     "Kick User": {
@@ -272,7 +338,14 @@
     "Shutdown Bot": {}
   },
   "Reminders": {
-    "Reminder": {},
+    "Reminder": {
+      "Default": [
+        "Reminder created"
+      ],
+      "owo": [
+        "ill wemind uu"
+      ]
+    },
     "List Reminders": {}
   },
   "Self Assigning Roles": {

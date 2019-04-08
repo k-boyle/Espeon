@@ -7,13 +7,13 @@ using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    //TODO rewrite ping
     /*
      * Cat Fact
      * Joke
@@ -23,6 +23,7 @@ namespace Espeon.Commands
      * Admins
      * Mods
      * Help
+     * Emote
      */
     [Name("Misc")]
     public class Misc : EspeonBase
@@ -33,13 +34,14 @@ namespace Espeon.Commands
 
         private readonly Emoji _delete = new Emoji("🚮");
 
-        //TODO this is a special case
         [Command("Ping")]
         [Name("Ping")]
         public async Task PingAsync()
         {
+            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
             var latency = Context.Client.Latency;
-            var response = ResponseBuilder.Message(Context, $"Latency: {latency}ms");
+            var responses = Responses.GetResponses(Context.Command.Module.Name, Context.Command.Name);
+            var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][0], latency));
 
             var sw = new Stopwatch();
             sw.Start();
@@ -48,14 +50,10 @@ namespace Espeon.Commands
 
             sw.Stop();
 
-            response = ResponseBuilder.Message(Context, $"Latency: {latency}ms\nPing: {sw.ElapsedMilliseconds}ms");
+            response = ResponseBuilder
+                .Message(Context, string.Format(responses[user.ResponsePack][1], latency, sw.ElapsedMilliseconds));
 
             await message.ModifyAsync(x => x.Embed = response);
-
-            var deleteCallback = new DeleteCallback(Context, message, _delete,
-                new ReactionFromSourceUser(Context.User.Id));
-
-            await TryAddCallbackAsync(deleteCallback);
         }
 
 
@@ -111,7 +109,8 @@ namespace Espeon.Commands
         {
             var client = ClientFactory.CreateClient();
 
-            using var response = await client.GetAsync($"https://api.giphy.com/v1/gifs/random?api_key={Config.GiphyAPIKey}&rating=r&tag={search}");
+            using var response = await client
+                .GetAsync($"https://api.giphy.com/v1/gifs/random?api_key={Config.GiphyAPIKey}&rating=r&tag={search}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -306,6 +305,49 @@ namespace Espeon.Commands
                 await SendOkAsync(1,
                     string.Join(", ", admins.Select(x => $"{Format.Sanitize(x.GetDisplayName())}")));
             }
+        }
+
+        [Command("Emote")]
+        [Name("Steal Emote")]
+        [RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageEmojis)]
+        [RequirePermissions(PermissionTarget.User, GuildPermission.ManageEmojis)]
+        public async Task StealEmoteAsync(params Emote[] emotes)
+        {
+            var animatedCount = Context.Guild.Emotes.Count(x => x.Animated);
+            var normalCount = Context.Guild.Emotes.Count(x => !x.Animated);
+
+            var failed = new List<Emote>();
+            var client = ClientFactory.CreateClient();
+            Stream stream = null;
+
+            var added = 0;
+
+            foreach (var emote in emotes)
+            {
+                if (emote.Animated && animatedCount >= 50)
+                {
+                    failed.Add(emote);
+                    continue;
+                }
+
+                if (!emote.Animated && normalCount >= 50)
+                {
+                    failed.Add(emote);
+                    continue;
+                }
+
+                stream = await client.GetStreamAsync(emote.Url);
+                await Context.Guild.CreateEmoteAsync(emote.Name, new Image(stream));
+                added++;
+
+                stream.Dispose();
+            }
+
+            if (failed.Count < emotes.Length)
+                await SendOkAsync(0, added);
+
+            if (failed.Count > 0)
+                await SendNotOkAsync(1, string.Join(", ", failed.Select(x => x.Name)));
         }
     }
 }
