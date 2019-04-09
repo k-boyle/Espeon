@@ -57,10 +57,10 @@ namespace Espeon.Commands
         }
 
 
-        //TODO cooldowns
         [Command("Catfact")]
         [RunMode(RunMode.Parallel)]
         [Name("Get Catfact")]
+        [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
         public async Task GetCatfactAsync()
         {
             var client = ClientFactory.CreateClient();
@@ -83,6 +83,7 @@ namespace Espeon.Commands
         [Command("Joke")]
         [RunMode(RunMode.Parallel)]
         [Name("Get Joke")]
+        [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
         public async Task GetJokeAsync()
         {
             var client = ClientFactory.CreateClient();
@@ -105,6 +106,7 @@ namespace Espeon.Commands
         [Command("Gif")]
         [RunMode(RunMode.Parallel)]
         [Name("Get Gif")]
+        [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
         public async Task GetGifAsync([Remainder] string search)
         {
             var client = ClientFactory.CreateClient();

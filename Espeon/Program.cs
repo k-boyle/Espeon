@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
@@ -76,7 +77,12 @@ namespace Espeon
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
                 {
-                    StringComparison = StringComparison.InvariantCultureIgnoreCase
+                    StringComparison = StringComparison.InvariantCultureIgnoreCase,
+                    CooldownBucketKeyGenerator = (obj, ctx, services) =>
+                    {
+                        var context = ctx as EspeonContext;
+                        return context.User.Id;
+                    }
                 })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
