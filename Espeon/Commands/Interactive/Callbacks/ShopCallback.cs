@@ -10,6 +10,8 @@ namespace Espeon.Commands
     {
         public EspeonContext Context { get; private set; }
 
+        public bool RunOnGatewayThread => false;
+
         public IUserMessage Message { get; private set; }
 
         private readonly Emoji _buy = new Emoji("💵");
@@ -38,22 +40,32 @@ namespace Espeon.Commands
             });
         }
 
+        //this is lame but I'm too lazy to implement properly rn
         public async Task<bool> HandleCallbackAsync(SocketReaction reaction)
         {
             var emote = reaction.Emote;
 
             if(Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages)
             {
-                
+                var user = reaction.User.GetValueOrDefault() 
+                    ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, reaction.UserId);
+
+                await Message.RemoveReactionAsync(emote, user);
             }
 
             if (emote.Equals(_buy))
             {
+                do
+                {
+                    await _message.SendAsync(Context, x => x.Content = "What would you like to buy?");
 
+                    //var resp = 
+                } while (true);
             }
             else if (emote.Equals(_leave))
             {
-
+                await HandleTimeoutAsync();
+                return true;
             }
 
             return false;
@@ -61,7 +73,12 @@ namespace Espeon.Commands
 
         public Task HandleTimeoutAsync()
         {
-            throw new System.NotImplementedException();
+            if (Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages)
+            {
+                return Message.RemoveAllReactionsAsync();
+            }
+
+            return Task.CompletedTask;
         }
 
         private Embed ShopEmbed()

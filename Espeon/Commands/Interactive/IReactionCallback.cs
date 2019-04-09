@@ -9,6 +9,8 @@ namespace Espeon.Commands
     {
         EspeonContext Context { get; }
 
+        bool RunOnGatewayThread { get; }
+
         IUserMessage Message { get; }
         IEnumerable<IEmote> Reactions { get; }
         ICriterion<SocketReaction> Criterion { get; }

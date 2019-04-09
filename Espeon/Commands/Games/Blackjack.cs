@@ -14,6 +14,8 @@ namespace Espeon.Commands
         private const float NormalPayout = 1f;
         private const float BlackjackPayout = 1.5f;
 
+        public bool RunOnGatewayThread => true;
+
         public EspeonContext Context { get; }
         public IUserMessage Message { get; private set; }
         public IEnumerable<IEmote> Reactions => new[] { _hit, _stop };

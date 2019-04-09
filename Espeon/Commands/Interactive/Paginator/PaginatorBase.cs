@@ -9,6 +9,9 @@ namespace Espeon.Commands
     public abstract class PaginatorBase : IReactionCallback
     {
         public abstract EspeonContext Context { get; }
+
+        public bool RunOnGatewayThread => true;
+
         public abstract InteractiveService Interactive { get; }
         public abstract MessageService MessageService { get; }
         public abstract PaginatorOptions Options { get; }

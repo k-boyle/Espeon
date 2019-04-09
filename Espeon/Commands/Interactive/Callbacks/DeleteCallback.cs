@@ -9,6 +9,9 @@ namespace Espeon.Commands
     public class DeleteCallback : IReactionCallback
     {
         public EspeonContext Context { get; }
+
+        public bool RunOnGatewayThread => true;
+
         public IUserMessage Message { get; }
         public ICriterion<SocketReaction> Criterion { get; }
 

@@ -133,20 +133,28 @@ namespace Espeon.Commands
             if (!result)
                 return;
 
-            result = await callback.HandleCallbackAsync(reaction);
+            if (callback.RunOnGatewayThread)
+                await HandleReactionAsync(callbackData, reaction);
+            else
+                _ = HandleReactionAsync(callbackData, reaction);
+        }
+
+        private async Task HandleReactionAsync(CallbackData data, SocketReaction reaction)
+        {
+            var result = await data.Callback.HandleCallbackAsync(reaction);
 
             if (!result)
             {
-                _scheduler.CancelTask(callbackData.TaskKey);
-                
-                var newKey = _scheduler.ScheduleTask(callbackData, 
-                    DateTimeOffset.UtcNow.Add(callbackData.Timeout).ToUnixTimeMilliseconds(), RemoveAsync);
-                callbackData.TaskKey = newKey;
+                _scheduler.CancelTask(data.TaskKey);
+
+                var newKey = _scheduler.ScheduleTask(data,
+                    DateTimeOffset.UtcNow.Add(data.Timeout).ToUnixTimeMilliseconds(), RemoveAsync);
+                data.TaskKey = newKey;
             }
             else
             {
-                _scheduler.CancelTask(callbackData.TaskKey);
-                await RemoveAsync(callbackData.TaskKey, callbackData);
+                _scheduler.CancelTask(data.TaskKey);
+                await RemoveAsync(data.TaskKey, data);
             }
         }
 
