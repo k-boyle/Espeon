@@ -128,9 +128,15 @@ namespace Espeon.Services
             var context = args.Context as EspeonContext;
 
             if (args.Result is ExecutionFailedResult failed)
+            {
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
-            await SendAsync(context, x => x.Embed = args.Result.GenerateResponse(context));
+                var c = _client.GetChannel(463299724326469634) as SocketTextChannel;
+
+                await c.SendMessageAsync(failed.Exception.ToString().Substring(0, 100));
+            }
+
+            await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
         }
 
         private async Task CommandExecutedAsync(CommandExecutedEventArgs args)
