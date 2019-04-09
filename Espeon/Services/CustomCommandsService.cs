@@ -87,7 +87,7 @@ namespace Espeon.Services
             var loadedCommands = _commands.GetAllCommands();
             var filtered = loadedCommands.Where(x => !ulong.TryParse(x.Module.Name, out _));
 
-            if (Utilities.AvailableName(filtered, name))
+            if (!Utilities.AvailableName(filtered, name))
                 return false;
 
             var newCmd = new CustomCommand

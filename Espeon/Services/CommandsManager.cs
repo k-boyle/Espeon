@@ -2,6 +2,7 @@
 using Espeon.Databases;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,6 +27,9 @@ namespace Espeon.Services
             if (foundModule is null)
                 return false;
 
+            if (foundModule.Aliases is null)
+                foundModule.Aliases = new List<string>();
+
             foundModule.Aliases.Add(alias);
             await context.CommandStore.SaveChangesAsync();
             Update(module, foundModule);
@@ -43,10 +47,13 @@ namespace Espeon.Services
             var foundModule = await context.CommandStore.Modules.Include(x => x.Commands)
                 .FirstOrDefaultAsync(x => x.Name == module.Name);
 
-            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == $"{module.Name}{command}");
+            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == command);
 
-            if (foundCommand is null || foundCommand.Aliases.Contains(alias))
+            if (foundCommand is null)
                 return false;
+
+            if (foundCommand.Aliases is null)
+                foundCommand.Aliases = new List<string>();
 
             foundCommand.Aliases.Add(alias);
 
@@ -60,7 +67,7 @@ namespace Espeon.Services
         {
             var foundModule = await context.CommandStore.Modules.FindAsync(module.Name);
 
-            if (foundModule is null || !foundModule.Aliases.Contains(alias))
+            if (foundModule is null || foundModule.Aliases is null || !foundModule.Aliases.Contains(alias))
                 return false;
 
             foundModule.Aliases.Remove(alias);
@@ -76,9 +83,9 @@ namespace Espeon.Services
             var foundModule = await context.CommandStore.Modules.Include(x => x.Commands)
                 .FirstOrDefaultAsync(x => x.Name == module.Name);
 
-            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == $"{module.Name}{command}");
+            var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == command);
 
-            if (foundCommand is null || !foundCommand.Aliases.Contains(alias))
+            if (foundCommand is null || foundCommand.Aliases is null || !foundCommand.Aliases.Contains(alias))
                 return false;
 
             foundCommand.Aliases.Remove(alias);
