@@ -82,7 +82,7 @@ namespace Espeon.Commands
         public async Task ViewLeaderboardAsync()
         {
             var users = await Context.UserStore.GetAllUsersAsync();
-            var ordered = users.OrderByDescending(x => x.CandyAmount);
+            var ordered = users.OrderByDescending(x => x.CandyAmount).ToArray();
 
             var foundUsers = new List<(IUser, User)>();
 
@@ -91,10 +91,8 @@ namespace Espeon.Commands
                 if (foundUsers.Count == 10)
                     break;
 
-                var found = Context.Guild.GetUser(user.Id) as IUser
-                    ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, user.Id)
-                    ?? Context.Client.GetUser(user.Id) as IUser
-                    ?? await Context.Client.Rest.GetUserAsync(user.Id);
+                var found = await Context.Guild.GetGuildUserAsync(user.Id) as IUser
+                    ?? await Context.Client.GetUserAsync(user.Id);
 
                 if (found is null)
                     continue;

@@ -39,5 +39,10 @@ namespace Espeon
 
             return user;
         }
+
+        public static async Task<IUser> GetUserAsync(this DiscordSocketClient client, ulong userId)
+        {
+            return client.GetUser(userId) ?? await client.Rest.GetUserAsync(userId) as IUser;
+        }
     }
 }

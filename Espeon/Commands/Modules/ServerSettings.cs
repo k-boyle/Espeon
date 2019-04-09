@@ -17,7 +17,6 @@ namespace Espeon.Commands
      * Star Limit
      */
 
-    //TODO force language pack
     [Name("Settings")]
     [RequireElevation(ElevationLevel.Admin)]
     public class ServerSettings : EspeonBase
