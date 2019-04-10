@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Services;
 using System;
@@ -10,7 +11,7 @@ namespace Espeon.Commands
     public class InteractiveService : BaseService
     {
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly TaskScheduler _scheduler;
+        [Inject] private readonly TaskQueue _scheduler;
 
         private readonly ConcurrentDictionary<ulong, CallbackData> _reactionCallbacks;
 

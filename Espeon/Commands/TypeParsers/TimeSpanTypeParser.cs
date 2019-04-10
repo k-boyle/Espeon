@@ -7,7 +7,8 @@ namespace Espeon.Commands
 {
     public sealed class TimeSpanTypeParser : TypeParser<TimeSpan>
     {
-        private static readonly Regex TimeSpanRegex = new Regex(@"(\d+)(w(?:eeks?)?|d(?:ays?)?|h(?:ours?)?|m(?:inutes?)?|s(?:econds?)?)", RegexOptions.Compiled);
+        private const string Regex = @"(\d+)(w(?:eeks|eek?)?|d(?:ays|ay?)?|h(?:ours|rs|r?)|m(?:inutes|ins|in?)?|s(?:econds|econd|ecs|ec?)?)";
+        private static readonly Regex TimeSpanRegex = new Regex(Regex, RegexOptions.Compiled);
 
         public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, CommandContext context, IServiceProvider provider)
         {

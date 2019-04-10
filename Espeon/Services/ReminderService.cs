@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
 using Espeon.Databases.UserStore;
@@ -15,7 +16,7 @@ namespace Espeon.Services
     public class ReminderService : BaseService
     {
         [Inject] private readonly LogService _logger;
-        [Inject] private readonly TaskScheduler _scheduler;
+        [Inject] private readonly TaskQueue _scheduler;
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private Random _random;

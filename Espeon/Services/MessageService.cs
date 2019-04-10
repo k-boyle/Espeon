@@ -1,3 +1,4 @@
+using Casino.Common;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
@@ -21,7 +22,7 @@ namespace Espeon.Services
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
         [Inject] private readonly Random _random;
-        [Inject] private readonly TaskScheduler _scheduler;
+        [Inject] private readonly TaskQueue _scheduler;
         [Inject] private readonly IServiceProvider _services;
 
         private readonly

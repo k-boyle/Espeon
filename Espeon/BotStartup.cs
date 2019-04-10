@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Databases;
 using Espeon.Databases.CommandStore;
@@ -182,9 +183,10 @@ namespace Espeon
                 var channelName = new[] { "welcome", "introduction", "general" };
 
                 var channel = guild.TextChannels
-                    .FirstOrDefault(x => channelName.Any(y => x.Name.Contains(y, StringComparison.InvariantCultureIgnoreCase)))
-                        ?? guild.TextChannels.FirstOrDefault(x => guild.CurrentUser.GetPermissions(x).ViewChannel
-                            && guild.CurrentUser.GetPermissions(x).SendMessages);
+                    .FirstOrDefault(
+                        x => channelName.Any(y => x.Name.Contains(y, StringComparison.InvariantCultureIgnoreCase)))
+                            ?? guild.TextChannels.FirstOrDefault(x => guild.CurrentUser.GetPermissions(x).ViewChannel
+                                && guild.CurrentUser.GetPermissions(x).SendMessages);
 
                 if (channel is null)
                     return;
@@ -194,17 +196,20 @@ namespace Espeon
                     Title = "",
                     Color = Utilities.EspeonColor,
                     ThumbnailUrl = guild.CurrentUser.GetAvatarOrDefaultUrl(),
-                    Description = $"Hello! I am Espeon{_services.GetService<EmotesService>().Collection["Espeon"]} and I have just been added to your guild!\n" +
+                    Description = $"Hello! I am Espeon{_services.GetService<EmotesService>().Collection["Espeon"]} " +
+                    $"and I have just been added to your guild!\n" +
                     $"Type es/help to see all my available commands!"
                 }
                     .Build());
             };
 
             var logger = _services.GetService<LogService>();
-            _client.Log += log =>
-            {
-                return logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
-            };
+
+            _client.Log += log 
+                => logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
+
+            _services.GetService<TaskQueue>().Error += ex 
+                => logger.LogAsync(Source.Scheduler, Severity.Error, string.Empty, ex);
         }
     }
 }

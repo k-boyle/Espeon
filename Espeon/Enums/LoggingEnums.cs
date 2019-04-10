@@ -6,7 +6,7 @@
         Discord,
         Pusharp,
         Reminders,
-        Timer
+        Scheduler
     }
 
     public enum Severity

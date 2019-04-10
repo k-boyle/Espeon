@@ -16,8 +16,8 @@ namespace Espeon.Commands
 
             var user = await context.UserStore.GetOrCreateUserAsync(context.User);
 
-            return user.ResponsePacks.Any(x => x == pack) 
-                ? CheckResult.Successful 
+            return user.ResponsePacks.Any(x => x == pack)
+                ? CheckResult.Successful
                 : CheckResult.Unsuccessful("You haven't unlocked this response pack");
         }
     }

@@ -32,13 +32,16 @@ namespace Espeon.Services
             if (!reaction.Emote.Equals(Star))
                 return;
 
+            var message = await msg.GetOrDownloadAsync();
+
+            if (reaction.UserId == message.Author.Id)
+                return;
+
             using var guildStore = _services.GetService<GuildStore>();
             var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild, x => x.StarredMessages);
 
             if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is SocketTextChannel starChannel))
                 return;
-
-            var message = await msg.GetOrDownloadAsync();
 
             var count = message.Reactions[Star].ReactionCount;
 

@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
 using Espeon.Databases.CommandStore;
@@ -87,7 +88,7 @@ namespace Espeon
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
                 .AddSingleton(cts)
-                .AddSingleton(TaskScheduler.Create())
+                .AddSingleton(TaskQueue.Create())
                 .AddSingleton<Random>()
                 .AddConfiguredHttpClient()
                 .AddEntityFrameworkNpgsql()

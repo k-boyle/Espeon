@@ -48,7 +48,7 @@ namespace Espeon.Commands
             if(Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages)
             {
                 var user = reaction.User.GetValueOrDefault() 
-                    ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, reaction.UserId);
+                    ?? await Context.Client.Rest.GetUserAsync(reaction.UserId);
 
                 await Message.RemoveReactionAsync(emote, user);
             }
