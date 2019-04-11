@@ -320,7 +320,7 @@ namespace Espeon.Commands
 
             var failed = new List<Emote>();
             var client = ClientFactory.CreateClient();
-            Stream stream = null;
+            Stream stream;
 
             var added = 0;
 
@@ -340,6 +340,10 @@ namespace Espeon.Commands
 
                 stream = await client.GetStreamAsync(emote.Url);
                 await Context.Guild.CreateEmoteAsync(emote.Name, new Image(stream));
+
+                animatedCount = Context.Guild.Emotes.Count(x => x.Animated);
+                normalCount = Context.Guild.Emotes.Count(x => !x.Animated);
+
                 added++;
 
                 stream.Dispose();

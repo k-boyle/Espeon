@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Espeon
 {
     public static partial class Utilities
     {
-        public static IEnumerable<string> GetCodes(string content)
+        public static List<string> GetCodes(string content)
         {
             var strings = new List<string>();
             var sb = new StringBuilder();
@@ -53,6 +54,30 @@ namespace Espeon
             }
 
             return strings;
+        }
+
+        public static List<string> SplitByLength(string content, int maxLength)
+        {
+            var toReturn = new List<string>();
+
+            var split = content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            var sb = new StringBuilder();
+
+            foreach (var str in split)
+            {
+                if (sb.Length + str.Length > maxLength)
+                {
+                    toReturn.Add(sb.ToString());
+                    sb.Clear();
+                }
+
+                sb.AppendLine(str);
+            }
+
+            toReturn.Add(sb.ToString());
+
+            return toReturn;
         }
     }
 }

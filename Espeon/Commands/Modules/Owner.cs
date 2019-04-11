@@ -1,24 +1,25 @@
 ﻿using Discord;
-using Espeon.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MessageProperties = Espeon.Services.MessageService.MessageProperties;
 
 namespace Espeon.Commands
 {
     /*
      * Message
      * Eval
+     * shutdown
      */
 
     [Name("Owner Commands")]
@@ -41,14 +42,6 @@ namespace Espeon.Commands
         {
             var codes = Utilities.GetCodes(code);
 
-            IEnumerable<Assembly> GetAssemblies()
-            {
-                var entries = Assembly.GetEntryAssembly();
-                foreach (var assembly in entries.GetReferencedAssemblies())
-                    yield return Assembly.Load(assembly);
-                yield return entries;
-            }
-
             var assemblies = GetAssemblies();
 
             var usings = new[]
@@ -64,7 +57,7 @@ namespace Espeon.Commands
                 .Select(x => x.Namespace)
                 .Distinct();
 
-            var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies()
+            var scriptOptions = ScriptOptions.Default.WithReferences(assemblies
                 .Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(namespaces);            
 
             var builder = new EmbedBuilder
@@ -85,10 +78,12 @@ namespace Espeon.Commands
 
             var sw = Stopwatch.StartNew();
 
+            var toEval = codes.Count == 0 ? code : string.Join('\n', codes);
+
             var script = CSharpScript
-                .Create($"{string.Join("", usings.Select(x => $"using {x};"))} {string.Join('\n', codes)}", 
+                .Create($"{string.Join("", usings.Select(x => $"using {x};"))} {toEval}", 
                     scriptOptions, 
-                    typeof(EvalContext));
+                    typeof(RoslynContext));
 
             var diagnostics = script.Compile();
             sw.Stop();
@@ -108,7 +103,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            var context = new EvalContext
+            var context = new RoslynContext
             {
                 //base for clarity
                 Context = base.Context,
@@ -129,8 +124,60 @@ namespace Espeon.Commands
 
                 if (!(result.ReturnValue is null))
                 {
-                    builder.AddField("Returned Type", result.ReturnValue.GetType());
-                    builder.AddField("Returned Value", result.ReturnValue);
+                    var sb = new StringBuilder();
+                    var type = result.ReturnValue.GetType();
+
+                    switch (result.ReturnValue)
+                    {
+                        case string str:
+                            builder.AddField($"{type}", $"\"{str}\"");
+                            break;
+
+                        case IEnumerable enumerable:
+
+                            var list = enumerable.Cast<object>().ToList();
+
+                            if(list.Count > 5)
+                            {
+                                builder.AddField($"{enumerable.GetType()}", "Enumerable has more than 5 elements");
+                                break;
+                            }
+
+                            sb.AppendLine("```css");
+
+                            foreach (var element in list)
+                                sb.AppendLine($"[{element}]");
+
+                            sb.AppendLine("```");
+
+                            builder.AddField($"{enumerable.GetType()}", sb.ToString());
+
+                            break;
+
+                        default:
+
+                            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                            if (props.Length == 0)
+                            {
+                                builder.AddField($"{type}", result.ReturnValue);
+                                break;
+                            }
+
+                            var maxLength = props.Max(x => x.Name.Length);
+
+                            foreach (var prop in props)
+                            {
+                                sb.AppendLine($"#{prop.Name.PadRight(maxLength, ' ')} - [{prop.GetValue(result.ReturnValue)}]");
+                            }
+
+                            var messages = Utilities.SplitByLength(sb.ToString(), 2000);
+
+                            foreach (var msg in messages)
+                                await SendMessageAsync($"```css\n{msg}\n```");
+
+                            break;
+                    }
                 }
             }
             catch(Exception ex)
@@ -147,19 +194,6 @@ namespace Espeon.Commands
             await message.ModifyAsync(x => x.Embed = builder.Build());
         }
 
-        public class EvalContext
-        {
-            public EspeonContext Context { get; set; }
-            public IServiceProvider Services { get; set; }
-
-            public Task<IUserMessage> SendAsync(Action<MessageProperties> func)
-            {
-                var message = Services.GetService<MessageService>();
-
-                return message.SendAsync(Context, func);
-            }
-        }
-
         [Command("shutdown")]
         [Name("Shutdown Bot")]
         public Task ShutdownAsync()
@@ -168,6 +202,15 @@ namespace Espeon.Commands
             cts.Cancel(false);
 
             return Task.CompletedTask;
+        }
+
+        private IEnumerable<Assembly> GetAssemblies()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location));
+
+            foreach (var assembly in assemblies)
+                yield return assembly;
         }
     }
 }

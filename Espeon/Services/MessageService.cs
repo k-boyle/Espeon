@@ -132,9 +132,11 @@ namespace Espeon.Services
             {
                 await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
+#if !DEBUG
                 var c = _client.GetChannel(463299724326469634) as SocketTextChannel;
 
-                await c.SendMessageAsync(failed.Exception.ToString().Substring(0, 100));
+                await c.SendMessageAsync(failed.Exception.ToString().Substring(0, 500));
+#endif
             }
 
             await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
