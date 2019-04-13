@@ -10,7 +10,7 @@ namespace Espeon.Commands
         {
             var context = originalContext as EspeonContext;
 
-            var app = await context!.Client.GetApplicationInfoAsync();
+            var app = await context.Client.GetApplicationInfoAsync();
 
             return app.Owner.Id == context.User.Id
                 ? new CheckResult()

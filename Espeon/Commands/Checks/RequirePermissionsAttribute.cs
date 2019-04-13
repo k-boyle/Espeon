@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Qmmands;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,24 +45,13 @@ namespace Espeon.Commands
                     break;
             }
 
-            var failedGuildPerms = new List<GuildPermission>();
+            var failedGuildPerms = _guildPerms.Where(guildPerm => !user.GuildPermissions.Has(guildPerm)).ToArray();
 
-            foreach (var guildPerm in _guildPerms)
-            {
-                if (!user.GuildPermissions.Has(guildPerm))
-                    failedGuildPerms.Add(guildPerm);
-            }
-
-            var failedChannelPerms = new List<ChannelPermission>();
             var channelPerms = context.User.GetPermissions(context.Channel);
 
-            foreach (var channelPerm in _channelPerms)
-            {
-                if (!channelPerms.Has(channelPerm))
-                    failedChannelPerms.Add(channelPerm);
-            }
+            var failedChannelPerms = _channelPerms.Where(channelPerm => !channelPerms.Has(channelPerm)).ToArray();
 
-            if (failedGuildPerms.Count == 0 && failedChannelPerms.Count == 0)
+            if (failedGuildPerms.Length == 0 && failedChannelPerms.Length == 0)
                 return new ValueTask<CheckResult>(CheckResult.Successful);
 
             var sb = new StringBuilder();

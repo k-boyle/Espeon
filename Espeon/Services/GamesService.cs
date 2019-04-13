@@ -12,7 +12,7 @@ namespace Espeon.Services
 
         private readonly ConcurrentDictionary<ulong, IGame> _games;
 
-        public GamesService()
+        public GamesService(IServiceProvider services) : base(services)
         {
             _games = new ConcurrentDictionary<ulong, IGame>();
         }

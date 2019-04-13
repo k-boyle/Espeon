@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Espeon.Services
 
         public Dictionary<string, Emote> Collection;
 
-        public EmotesService()
+        public EmotesService(IServiceProvider services) : base(services)
         {
             Collection = new Dictionary<string, Emote>();
         }
@@ -21,9 +22,9 @@ namespace Espeon.Services
         {
             var emotesObject = JObject.Parse(File.ReadAllText(EmotesDir));
 
-            foreach(var token in emotesObject)
+            foreach(var (key, value) in emotesObject)
             {
-                Collection.Add(token.Key, Emote.Parse(token.Value.ToString()));
+                Collection.Add(key, Emote.Parse(value.ToString()));
             }
 
             return Task.CompletedTask;

@@ -21,9 +21,7 @@ namespace Espeon
 
         public static async Task<IGuildUser> GetGuildUserAsync(this SocketGuild guild, ulong userId)
         {
-            var user = guild.GetUser(userId) as IGuildUser;
-
-            if(user is null)
+            if(!(guild.GetUser(userId) is IGuildUser user))
             {
                 if (RestClient is null)
                 {

@@ -31,32 +31,25 @@ namespace Espeon.Services
 
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
 
-        public MessageService()
+        public MessageService(IServiceProvider services) : base(services)
         {
             _messageCache =
                 new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid,
                     CachedMessage>>>();
-        }
 
-        public override Task InitialiseAsync(InitialiseArgs args)
-        {
-            var commands = args.Services.GetService<CommandService>();
-            var client = args.Services.GetService<DiscordSocketClient>();
-
-            commands.CommandErrored += args =>
+            _commands.CommandErrored += args => CommandErroredAsync(new CasinoCommandErroredEventArgs
             {
-                return CommandErroredAsync(new CasinoCommandErroredEventArgs
-                {
-                    Context = args.Context as EspeonContext,
-                    Result = args.Result
-                });
-            };
-            commands.CommandExecuted += CommandExecutedAsync;
+                Context = args.Context as EspeonContext,
+                Result = args.Result
+            });
+            _commands.CommandExecuted += CommandExecutedAsync;
 
-            client.MessageReceived += msg =>
-                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, false) : Task.CompletedTask;
+            _client.MessageReceived += msg =>
+                msg is SocketUserMessage message 
+                    ? HandleReceivedMessageAsync(message, false) 
+                    : Task.CompletedTask;
 
-            client.MessageReceived += msg =>
+            _client.MessageReceived += msg =>
             {
                 if (_random.NextDouble() >= 0.05)
                     return Task.CompletedTask;
@@ -74,10 +67,8 @@ namespace Espeon.Services
                 return Task.CompletedTask;
             };
 
-            client.MessageUpdated += (_, msg, __) =>
+            _client.MessageUpdated += (_, msg, __) =>
                 msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
-
-            return Task.CompletedTask;
         }
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
@@ -209,10 +200,10 @@ namespace Espeon.Services
 
             var messageProperties = properties.Invoke();
 
-            var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
+            var (guid, value) = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
 
             IUserMessage sentMessage;
-            if(foundMessage.Value is null)
+            if(value is null)
             {
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
@@ -242,7 +233,7 @@ namespace Espeon.Services
                 context.IsEdit = false;
 
                 var perms = context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages;
-                await DeleteMessagesAsync(context, perms, new[] { (foundMessage.Key, foundMessage.Value) });
+                await DeleteMessagesAsync(context, perms, new[] { (guid, value) });
 
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
@@ -268,27 +259,25 @@ namespace Espeon.Services
             }
 
             sentMessage = await SendMessageAsync(context, messageProperties);
-            foundMessage.Value.ResponseIds.Add(sentMessage.Id);
+            value.ResponseIds.Add(sentMessage.Id);
 
             return sentMessage;
         }
 
         //async needed for the cast
-        private async Task<IUserMessage> SendMessageAsync(EspeonContext context, MessageProperties properties)
+        private static async Task<IUserMessage> SendMessageAsync(EspeonContext context, MessageProperties properties)
         {
             if (properties.Stream is null)
             {
                 return await context.Channel
                     .SendMessageAsync(properties.Content, embed: properties.Embed);
             }
-            else
-            {
-                return await context.Channel.SendFileAsync(
-                    stream:     properties.Stream,
-                    filename:   properties.FileName,
-                    text:       properties.Content,
-                    embed:      properties.Embed);
-            }
+
+            return await context.Channel.SendFileAsync(
+                stream:     properties.Stream,
+                filename:   properties.FileName,
+                text:       properties.Content,
+                embed:      properties.Embed);
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
@@ -304,7 +293,7 @@ namespace Espeon.Services
         private Task RemoveAsync(Guid key, object removable)
         {
             var message = (CachedMessage)removable;
-            _messageCache[message!.ChannelId][message.UserId].TryRemove(key, out _);
+            _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
 
             if (_messageCache[message.ChannelId][message.UserId].Count == 0)
                 _messageCache.Remove(message.UserId, out _);

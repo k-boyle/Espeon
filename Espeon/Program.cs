@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -65,7 +64,7 @@ namespace Espeon
             await Task.Delay(-1, cts.Token);
         }
 
-        private IServiceProvider ConfigureServices(IEnumerable<Type> types, Assembly assembly,
+        private static IServiceProvider ConfigureServices(Type[] types, Assembly assembly,
             Config config, CancellationTokenSource cts)
         {
             return new ServiceCollection()
@@ -77,14 +76,14 @@ namespace Espeon
                     MessageCacheSize = 100
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
-                {
-                    StringComparison = StringComparison.InvariantCultureIgnoreCase,
-                    CooldownBucketKeyGenerator = (obj, ctx, services) =>
                     {
-                        var context = ctx as EspeonContext;
-                        return context.User.Id;
-                    }
-                })
+                        StringComparison = StringComparison.InvariantCultureIgnoreCase,
+                        CooldownBucketKeyGenerator = (obj, ctx, services) =>
+                        {
+                            var context = ctx as EspeonContext;
+                            return context.User.Id;
+                        }
+                    })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
                 .AddSingleton(cts)
@@ -95,8 +94,7 @@ namespace Espeon
                 .AddDbContext<UserStore>(ServiceLifetime.Transient)
                 .AddDbContext<GuildStore>(ServiceLifetime.Transient)
                 .AddDbContext<CommandStore>(ServiceLifetime.Transient)
-                .BuildServiceProvider()
-                .Inject(types);
+                .BuildServiceProvider();
         }
     }
 }

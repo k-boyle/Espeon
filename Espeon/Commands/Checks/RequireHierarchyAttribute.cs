@@ -28,8 +28,8 @@ namespace Espeon.Commands
                     ? ElevationLevel.Mod
                     : ElevationLevel.None;
 
-            var you = "You require hierarchy over this user";
-            var i = "I need hierarchy over this user";
+            const string you = "You require hierarchy over this user";
+            const string i = "I need hierarchy over this user";
 
             if (target >= executor)
                 return CheckResult.Unsuccessful(you);
@@ -51,7 +51,7 @@ namespace Espeon.Commands
             }
 
             var roles = targetUser.RoleIds.Select(x => context.Guild.GetRole(x));
-            var ordered = roles.OrderBy(x => x.Position);
+            var ordered = roles.OrderBy(x => x.Position).ToArray();
 
             if (context.Guild.CurrentUser.Hierarchy <= ordered.First().Position)
                 return CheckResult.Unsuccessful(i);

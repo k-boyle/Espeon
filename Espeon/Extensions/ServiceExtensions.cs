@@ -21,18 +21,6 @@ namespace Espeon
             return collection;
         }
 
-        public static IServiceProvider Inject(this IServiceProvider services, IEnumerable<Type> types)
-        {
-            foreach (var type in types)
-            {
-                var service = services.GetService(type);
-
-                Inject(services, service);
-            }
-
-            return services;
-        }
-
         public static void Inject(this IServiceProvider services, object obj)
         {
             var members = obj.GetType().GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)

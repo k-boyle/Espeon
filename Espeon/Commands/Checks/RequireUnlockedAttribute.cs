@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,9 +17,16 @@ namespace Espeon.Commands
 
             var user = await context.UserStore.GetOrCreateUserAsync(context.User);
 
-            return user.ResponsePacks.Any(x => x == pack)
-                ? CheckResult.Successful
-                : CheckResult.Unsuccessful("You haven't unlocked this response pack");
+            if(user.ResponsePacks.Any(x => x == pack))
+                return CheckResult.Successful;
+
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = "You haven't unlocked this response pack",
+                [ResponsePack.owo] = "ownnno uu dunt hav dis respwons pack"
+            };
+
+            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }
     }
 }

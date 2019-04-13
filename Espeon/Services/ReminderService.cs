@@ -22,6 +22,10 @@ namespace Espeon.Services
         [Inject] private Random _random;
 
         private Random Random => _random ?? (_random = new Random());
+
+        public ReminderService(IServiceProvider services) : base(services)
+        {
+        }
         
         //requires client to be populated to send reminders
         public async Task LoadRemindersAsync(UserStore ctx)

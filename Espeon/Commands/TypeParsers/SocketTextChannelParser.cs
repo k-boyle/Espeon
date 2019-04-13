@@ -27,8 +27,7 @@ namespace Espeon.Commands
                     || ulong.TryParse(value, out id))
                 channel = channels.FirstOrDefault(x => x.Id == id);
 
-            if (channel == null)
-                channel = channels.FirstOrDefault(x => x.Name == value);
+            channel ??= channels.FirstOrDefault(x => x.Name == value);
 
             return new ValueTask<TypeParserResult<SocketTextChannel>>(channel is null 
                 ? new TypeParserResult<SocketTextChannel>("No channel found matching the input.") 

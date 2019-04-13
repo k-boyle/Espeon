@@ -45,15 +45,15 @@ namespace Espeon.Commands
         [Name("Claim Candies")]
         public async Task ClaimCandiesAsync()
         {
-            var (IsSuccess, Amount, Cooldown) = await CandyService.TryClaimCandiesAsync(Context, Context.User);
+            var (isSuccess, amount, cooldown) = await CandyService.TryClaimCandiesAsync(Context, Context.User);
 
-            if (IsSuccess)
+            if (isSuccess)
             {
-                await SendOkAsync(0, Amount, RareCandy, Amount == 1 ? "y" : "ies");
+                await SendOkAsync(0, amount, RareCandy, amount == 1 ? "y" : "ies");
                 return;
             }
 
-            await SendNotOkAsync(1, Cooldown.Humanize(2));
+            await SendNotOkAsync(1, cooldown.Humanize(2));
         }
 
         [Command("House")]
@@ -91,7 +91,7 @@ namespace Espeon.Commands
                 if (foundUsers.Count == 10)
                     break;
 
-                var found = await Context.Guild.GetGuildUserAsync(user.Id) as IUser
+                var found = await Context.Guild.GetGuildUserAsync(user.Id)
                     ?? await Context.Client.GetUserAsync(user.Id);
 
                 if (found is null)

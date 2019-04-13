@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Casino.Common
 {
+    /// <inheritdoc />
     /// <summary>
     /// A simple task scheduler.
     /// </summary>
@@ -154,8 +155,9 @@ namespace Casino.Common
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Disposes of the <see cref="TaskQueue"/> and frees up any managed resources.
+        /// Disposes of the <see cref="T:Casino.Common.TaskQueue" /> and frees up any managed resources.
         /// </summary>
         public void Dispose()
         {

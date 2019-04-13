@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {

@@ -20,10 +20,9 @@ namespace Espeon.Commands
 
             var result = await module.RunChecksAsync(context, provider);
 
-            if (result.IsSuccessful)
-                return new TypeParserResult<Module>(module);
-
-            return new TypeParserResult<Module>("You lack the required permissions to view this module");
+            return result.IsSuccessful 
+                ? new TypeParserResult<Module>(module) 
+                : new TypeParserResult<Module>("You lack the required permissions to view this module");
         }
     }
 }

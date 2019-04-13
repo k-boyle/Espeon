@@ -9,7 +9,7 @@ namespace Espeon.Services
     { 
         private readonly SemaphoreSlim _semaphore;
 
-        public LogService()
+        public LogService(IServiceProvider services) : base(services)
         {
             _semaphore = new SemaphoreSlim(1, 1);
         }

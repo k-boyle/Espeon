@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Qmmands;
+using System;
+using System.Threading.Tasks;
 
 namespace Espeon.Commands.TypeParsers
 {

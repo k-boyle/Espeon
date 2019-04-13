@@ -17,7 +17,7 @@ namespace Espeon.Services
 
         private readonly ConcurrentDictionary<ulong, Module> _moduleCache;
 
-        public CustomCommandsService()
+        public CustomCommandsService(IServiceProvider services) : base(services)
         {
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
@@ -63,13 +63,13 @@ namespace Espeon.Services
         {
             var context = originalContext as EspeonContext;
 
-            var guild = await context!.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
+            var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             var commands = guild?.Commands;
 
             var found = commands?.FirstOrDefault(x =>
                 string.Equals(x.Name, context.Command.Name, StringComparison.InvariantCultureIgnoreCase));
 
-            await _message.SendAsync(context, x => x.Content = found!.Value);
+            await _message.SendAsync(context, x => x.Content = found.Value);
 
             return new SuccessfulResult();
         }

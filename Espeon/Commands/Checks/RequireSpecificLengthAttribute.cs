@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -19,13 +20,24 @@ namespace Espeon.Commands
             _maxLength = maxLength;
         }
 
-        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext ctx, IServiceProvider provider)
         {
             var str = argument.ToString();
 
-            return new ValueTask<CheckResult>(str.Length > _minLength && str.Length < _maxLength
-                ? CheckResult.Successful
-                : CheckResult.Unsuccessful($"String length must be between {_minLength} and {_maxLength}"));
+            if (str.Length > _minLength && str.Length < _maxLength)
+                return CheckResult.Successful;
+
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = $"String length must be between {_minLength} and {_maxLength}",
+                [ResponsePack.owo] = $"ownnno urr mesage must be bweteen {_minLength} n {_maxLength}"
+            };
+
+            var context = (EspeonContext) ctx;
+
+            var user = await context.UserStore.GetOrCreateUserAsync(context.User);
+
+            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }
     }
 }

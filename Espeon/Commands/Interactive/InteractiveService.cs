@@ -17,7 +17,7 @@ namespace Espeon.Commands
 
         private static TimeSpan DefaultTimeout => TimeSpan.FromMinutes(2);
 
-        public InteractiveService()
+        public InteractiveService(IServiceProvider services) : base(services)
         {
             _reactionCallbacks = new ConcurrentDictionary<ulong, CallbackData>();
         }

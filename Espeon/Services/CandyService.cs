@@ -11,6 +11,10 @@ namespace Espeon.Services
 
         private Random Random => _random ?? (_random = new Random());
 
+        public CandyService(IServiceProvider services) : base(services)
+        {
+        }
+
         public async Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
         {
             var bot = context.Client.CurrentUser;

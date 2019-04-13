@@ -12,15 +12,13 @@ namespace Espeon.Services
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;
 
-        public override Task InitialiseAsync(InitialiseArgs args)
+        public PurgingService(IServiceProvider services) : base(services)
         {
             _client.LeftGuild += LeftGuildAsync;
             _client.UserLeft += UserLeftAsync;
             _client.ChannelDestroyed += ChannelDestroyedAsync;
             _client.RoleDeleted += RoleDeletedAsync;
             _client.RoleUpdated += RoleUpdatedAsync;
-
-            return Task.CompletedTask;
         }
 
         private async Task LeftGuildAsync(SocketGuild guild)

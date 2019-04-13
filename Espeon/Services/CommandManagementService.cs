@@ -2,17 +2,21 @@
 using Espeon.Databases;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Services
 {
-    public class CommandsManager : BaseService
+    public class CommandManagementService : BaseService
     {
         [Inject] private readonly CommandService _commands;
 
-        //TODO doesn't work
+        public CommandManagementService(IServiceProvider services) : base(services)
+        {
+        }
+
         public async Task<bool> AddAliasAsync(EspeonContext context, Module module, string alias)
         {
             var commands = _commands.GetAllCommands();
@@ -67,7 +71,7 @@ namespace Espeon.Services
         {
             var foundModule = await context.CommandStore.Modules.FindAsync(module.Name);
 
-            if (foundModule is null || foundModule.Aliases is null || !foundModule.Aliases.Contains(alias))
+            if (foundModule?.Aliases is null || !foundModule.Aliases.Contains(alias))
                 return false;
 
             foundModule.Aliases.Remove(alias);
@@ -85,7 +89,7 @@ namespace Espeon.Services
 
             var foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == command);
 
-            if (foundCommand is null || foundCommand.Aliases is null || !foundCommand.Aliases.Contains(alias))
+            if (foundCommand?.Aliases is null || !foundCommand.Aliases.Contains(alias))
                 return false;
 
             foundCommand.Aliases.Remove(alias);

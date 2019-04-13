@@ -164,13 +164,13 @@ namespace Espeon.Commands
             {
                 var result = await module.RunChecksAsync(Context, Services);
 
-                if (result.IsSuccessful)
-                {
-                    var results = await module.Commands.Select(x => x.RunChecksAsync(Context, Services)).AllAsync();
+                if (!result.IsSuccessful)
+                    continue;
 
-                    if (results.Count(x => x.IsSuccessful) > 0)
-                        canExecute.Add(module);
-                }
+                var results = await module.Commands.Select(x => x.RunChecksAsync(Context, Services)).AllAsync();
+
+                if (results.Count(x => x.IsSuccessful) > 0)
+                    canExecute.Add(module);
             }
 
             var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
@@ -178,8 +178,9 @@ namespace Espeon.Commands
 
             var builder = GetBuilder(prefix);
 
-            builder.AddField("Modules", string.Join(", ", 
-                canExecute.Select(x => $"`{Format.Sanitize(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")));
+            builder.AddField("Modules", string.Join(", ", canExecute
+                    .Select(x => $"`{Format.Sanitize(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")));
+
             builder.WithFooter($"To view help with a specific module invoke {prefix}help Module");
 
             var message = await SendMessageAsync(builder.Build());

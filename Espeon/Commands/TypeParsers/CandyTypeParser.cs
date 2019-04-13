@@ -14,7 +14,7 @@ namespace Espeon.Commands
             var context = originalContext as EspeonContext;
 
             var candy = services.GetService<CandyService>();
-            var userAmount = await candy.GetCandiesAsync(context, context!.User);
+            var userAmount = await candy.GetCandiesAsync(context, context.User);
 
             if (string.Equals(value, "NaN")) //JS meme
                 return TypeParserResult<int>.Successful(0);

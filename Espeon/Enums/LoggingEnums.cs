@@ -4,7 +4,6 @@
     {
         Commands,
         Discord,
-        Pusharp,
         Reminders,
         Scheduler
     }

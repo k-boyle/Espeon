@@ -14,14 +14,12 @@ namespace Espeon.Services
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;
 
-        private Emoji Star => Utilities.Star;
+        private static Emoji Star => Utilities.Star;
 
-        public override Task InitialiseAsync(InitialiseArgs args)
+        public StarboardService(IServiceProvider services) : base(services)
         {
             _client.ReactionAdded += ReactionAddedAsync;
             _client.ReactionRemoved += ReactionRemovedAsync;
-
-            return Task.CompletedTask;
         }
 
         private async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel channel, SocketReaction reaction)
@@ -81,9 +79,8 @@ namespace Espeon.Services
 
                 foundMessage.ReactionUsers.Add(reaction.UserId);
 
-                var fetchedMessage = await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) as IUserMessage;
-
-                await fetchedMessage.ModifyAsync(x => x.Content = m);
+                if (await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) is IUserMessage fetchedMessage)
+                    await fetchedMessage.ModifyAsync(x => x.Content = m);
 
                 await guildStore.SaveChangesAsync();
             }

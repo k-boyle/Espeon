@@ -15,7 +15,7 @@ namespace Espeon.Commands
         {
             var context = ctx as EspeonContext;
 
-            var users = context!.Guild.Users;
+            var users = context.Guild.Users;
 
             IGuildUser user = null;
             var id = ParseId(value);
@@ -51,10 +51,9 @@ namespace Espeon.Commands
 
             user = await context.Client.Rest.GetGuildUserAsync(context.Guild.Id, id);
 
-            if (user is null)
-                return new TypeParserResult<IGuildUser>("Failed to find a matching user");
-
-            return new TypeParserResult<IGuildUser>(user);
+            return user is null 
+                ? new TypeParserResult<IGuildUser>("Failed to find a matching user") 
+                : new TypeParserResult<IGuildUser>(user);
         }
 
         private ulong ParseId(string value)

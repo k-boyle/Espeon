@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Qmmands;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,10 @@ namespace Espeon.Services
         private const string Dir = "./Commands/commandsmap.json";
 
         private Dictionary<string, Dictionary<string, Dictionary<ResponsePack, string[]>>> _responses;
+
+        public ResponseService(IServiceProvider services) : base(services)
+        {
+        }
 
         public void LoadResponses(IEnumerable<Module> modules)
         {

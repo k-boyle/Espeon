@@ -37,11 +37,11 @@ namespace Espeon.Commands
             IsEdit = isEdit;
         }
 
-        private bool disposedValue = false;
+        private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -50,7 +50,7 @@ namespace Espeon.Commands
                     _commandStore?.Dispose();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
         public void Dispose()

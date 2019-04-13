@@ -14,7 +14,7 @@ namespace Espeon.Commands
     [RequireOwner]
     public class ModuleManagement : EspeonBase
     {
-        public CommandsManager Manager { get; set; }
+        public CommandManagementService Manager { get; set; }
 
         [Command("Add")]
         [Name("Module Add Alias")]
@@ -52,7 +52,7 @@ namespace Espeon.Commands
     [RequireOwner]
     public class CommandManagement : EspeonBase
     {
-        public CommandsManager Manager { get; set; }
+        public CommandManagementService Manager { get; set; }
 
         [Command("Add")]
         [Name("Command Add Alias")]

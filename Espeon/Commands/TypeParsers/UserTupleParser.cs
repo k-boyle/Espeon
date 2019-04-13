@@ -19,14 +19,13 @@ namespace Espeon.Commands
 
             var result = await userParser.ParseAsync(param, value, context, provider);
 
-            if(result.IsSuccessful)
-            {
-                var dbUser = await context.UserStore.GetOrCreateUserAsync(result.Value);
+            if (!result.IsSuccessful)
+                return new TypeParserResult<(IGuildUser, User)>(result.Reason);
 
-                return new TypeParserResult<(IGuildUser, User)>((result.Value, dbUser));
-            }
+            var dbUser = await context.UserStore.GetOrCreateUserAsync(result.Value);
 
-            return new TypeParserResult<(IGuildUser, User)>(result.Reason);
+            return new TypeParserResult<(IGuildUser, User)>((result.Value, dbUser));
+
         }
     }
 }

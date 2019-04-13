@@ -8,6 +8,11 @@ namespace Espeon.Services
 {
     public abstract class BaseService
     {
+        protected BaseService(IServiceProvider services)
+        {
+            services.Inject(this);
+        }
+
         public virtual Task InitialiseAsync(InitialiseArgs args)
             => Task.CompletedTask;
     }
