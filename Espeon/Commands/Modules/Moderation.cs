@@ -66,6 +66,8 @@ namespace Espeon.Commands
                 Reason = reason
             });
 
+            Context.GuildStore.Update(currentGuild);
+
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, targetUser.GetDisplayName()));
         }
 
@@ -85,6 +87,8 @@ namespace Espeon.Commands
             }
 
             currentGuild.Warnings.Remove(warning);
+
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
@@ -199,6 +203,8 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedUsers.Add(user.Id);
 
+            Context.GuildStore.Update(currentGuild);
+
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
@@ -218,6 +224,8 @@ namespace Espeon.Commands
             }
 
             currentGuild.RestrictedUsers.Remove(user.Id);
+
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }

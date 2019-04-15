@@ -70,6 +70,8 @@ namespace Espeon.Services
                     Content = message.Content
                 });
 
+                guildStore.Update(guild);
+
                 await guildStore.SaveChangesAsync();
             }
             else
@@ -81,6 +83,8 @@ namespace Espeon.Services
 
                 if (await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) is IUserMessage fetchedMessage)
                     await fetchedMessage.ModifyAsync(x => x.Content = m);
+
+                guildStore.Update(guild);
 
                 await guildStore.SaveChangesAsync();
             }
@@ -127,6 +131,8 @@ namespace Espeon.Services
 
                 await starMessage.ModifyAsync(x => x.Content = m);
             }
+
+            guildStore.Update(guild);
 
             await guildStore.SaveChangesAsync();
         }

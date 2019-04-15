@@ -28,6 +28,7 @@ namespace Espeon.Services
                 var espeon = await store.GetOrCreateUserAsync(bot);
 
                 espeon.CandyAmount += Math.Abs(amount);
+                store.Update(espeon);
             }
 
             var user = await store.GetOrCreateUserAsync(context.User);
@@ -35,6 +36,8 @@ namespace Espeon.Services
 
             if (user.CandyAmount > user.HighestCandies)
                 user.HighestCandies = user.CandyAmount;
+
+            store.Update(user);
 
             await store.SaveChangesAsync();
         }
@@ -49,6 +52,9 @@ namespace Espeon.Services
 
             if (foundReceiver.CandyAmount > foundReceiver.HighestCandies)
                 foundReceiver.HighestCandies = foundReceiver.CandyAmount;
+
+            context.UserStore.Update(foundReceiver);
+            context.UserStore.Update(foundSender);
 
             await context.UserStore.SaveChangesAsync();
         }
@@ -76,6 +82,8 @@ namespace Espeon.Services
                 user.HighestCandies = user.CandyAmount;
 
             user.LastClaimedCandies = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            context.UserStore.Update(user);
 
             await context.UserStore.SaveChangesAsync();
 

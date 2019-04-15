@@ -98,6 +98,7 @@ namespace Espeon.Services
 
             var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             guild.Commands.Add(newCmd);
+            context.GuildStore.Update(guild);
 
             await context.GuildStore.SaveChangesAsync();
             await UpdateCommandsAsync(guild);
@@ -109,6 +110,7 @@ namespace Espeon.Services
         {
             var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             guild.Commands.Remove(command);
+            context.GuildStore.Update(guild);
 
             await context.GuildStore.SaveChangesAsync();
 
@@ -118,6 +120,7 @@ namespace Espeon.Services
         public Task ModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue)
         {
             command.Value = newValue;
+            context.GuildStore.Update(command);
 
             return context.GuildStore.SaveChangesAsync();
         }

@@ -156,6 +156,8 @@ namespace Espeon.Commands
 
             espeon.CandyAmount = 0;
 
+            Context.UserStore.Update(espeon);
+
             await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(2));
         }
     }

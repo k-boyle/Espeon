@@ -25,6 +25,7 @@ namespace Espeon.Commands
         {
             var guild = await Context.GetCurrentGuildAsync();
             guild.StarboardChannelId = channel.Id;
+            Context.GuildStore.Update(guild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -36,6 +37,7 @@ namespace Espeon.Commands
         {
             var guild = await Context.GetCurrentGuildAsync();
             guild.StarboardChannelId = 0;
+            Context.GuildStore.Update(guild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -47,6 +49,7 @@ namespace Espeon.Commands
         {
             var guild = await Context.GetCurrentGuildAsync();
             guild.StarLimit = limit;
+            Context.GuildStore.Update(guild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }

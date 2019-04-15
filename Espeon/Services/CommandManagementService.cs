@@ -35,6 +35,8 @@ namespace Espeon.Services
                 foundModule.Aliases = new List<string>();
 
             foundModule.Aliases.Add(alias);
+            context.CommandStore.Update(foundModule);
+
             await context.CommandStore.SaveChangesAsync();
             Update(module, foundModule);
 
@@ -60,6 +62,7 @@ namespace Espeon.Services
                 foundCommand.Aliases = new List<string>();
 
             foundCommand.Aliases.Add(alias);
+            context.CommandStore.Update(foundModule);
 
             await context.CommandStore.SaveChangesAsync();
             Update(module, foundModule);
@@ -75,6 +78,7 @@ namespace Espeon.Services
                 return false;
 
             foundModule.Aliases.Remove(alias);
+            context.CommandStore.Update(foundModule);
 
             await context.CommandStore.SaveChangesAsync();
             Update(module, foundModule);
@@ -93,6 +97,7 @@ namespace Espeon.Services
                 return false;
 
             foundCommand.Aliases.Remove(alias);
+            context.CommandStore.Update(foundModule);
 
             await context.CommandStore.SaveChangesAsync();
             Update(module, foundModule);

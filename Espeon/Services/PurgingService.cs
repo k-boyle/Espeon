@@ -47,14 +47,19 @@ namespace Espeon.Services
             if (guild.Warnings.RemoveAll(x => x.TargetUser == user.Id) > 0)
                 removed = true;
 
-            if(removed)
+            if (removed)
+            {
+                guildStore.Update(guild);
                 await guildStore.SaveChangesAsync();
+            }
 
             if (user.MutualGuilds.Count == 1)
             {
                 using var userStore = _services.GetService<UserStore>();
 
                 await userStore.RemoveUserAsync(user);
+                userStore.Update(user);
+
                 await userStore.SaveChangesAsync();
             }
         }
@@ -82,7 +87,10 @@ namespace Espeon.Services
             var removed = guild.SelfAssigningRoles.Remove(role.Id);
 
             if (removed)
+            {
+                guildStore.Update(guild);
                 await guildStore.SaveChangesAsync();
+            }
         }
 
         private async Task RoleUpdatedAsync(SocketRole before, SocketRole after)
@@ -108,6 +116,8 @@ namespace Espeon.Services
                 guild.NoReactions = 0;
             else
                 guild.SelfAssigningRoles.Remove(id);
+
+            guildStore.Update(guild);
 
             await guildStore.SaveChangesAsync();
         }

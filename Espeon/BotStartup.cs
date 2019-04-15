@@ -125,6 +125,8 @@ namespace Espeon
                 {
                     Name = command.Name
                 });
+
+                commandStore.Update(foundModule);
             }
 
             await commandStore.SaveChangesAsync();

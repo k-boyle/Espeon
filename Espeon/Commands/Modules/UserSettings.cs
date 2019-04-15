@@ -1,4 +1,6 @@
-﻿using Espeon.Services;
+﻿using System;
+using System.Collections.Generic;
+using Espeon.Services;
 using Qmmands;
 using System.Threading.Tasks;
 
@@ -15,6 +17,7 @@ namespace Espeon.Commands
         {
             var foundUser = await Context.GetInvokerAsync();
             foundUser.ResponsePack = pack;
+            Context.UserStore.Update(foundUser);
 
             await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(0, pack));
         }
@@ -40,6 +43,7 @@ namespace Espeon.Commands
             await Candy.UpdateCandiesAsync(Context, user.Id, -5000);
 
             user.ResponsePacks.Add(ResponsePack.owo);
+            Context.UserStore.Update(user);
 
             await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(2));
         }

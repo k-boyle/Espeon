@@ -60,6 +60,7 @@ namespace Espeon.Services
 
                     var user = await userStore.GetOrCreateUserAsync(msg.Author);
                     user.CandyAmount += 10;
+                    userStore.Update(user);
 
                     await userStore.SaveChangesAsync();
                 });
@@ -130,6 +131,7 @@ namespace Espeon.Services
 #endif
             }
 
+            context.Dispose();
             await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
         }
 

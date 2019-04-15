@@ -78,6 +78,7 @@ namespace Espeon.Services
             _scheduler.CancelTask(reminder.TaskKey);
 
             context.UserStore.Remove(reminder);
+
             await context.UserStore.SaveChangesAsync();
         }
 
@@ -107,6 +108,7 @@ namespace Espeon.Services
             var ctx = _services.GetService<UserStore>();
 
             ctx.Reminders.Remove(reminder);
+
             await ctx.SaveChangesAsync();
 
             await _logger.LogAsync(Source.Reminders, Severity.Verbose,

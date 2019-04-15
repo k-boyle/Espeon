@@ -33,6 +33,7 @@ namespace Espeon.Commands
             }
 
             currentGuild.Prefixes.Add(prefix);
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
@@ -50,6 +51,8 @@ namespace Espeon.Commands
             }
 
             currentGuild.Prefixes.Remove(prefix);
+
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
@@ -69,6 +72,8 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedChannels.Add(channel.Id);
 
+            Context.GuildStore.Update(currentGuild);
+
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
@@ -87,6 +92,7 @@ namespace Espeon.Commands
 
             currentGuild.RestrictedChannels.Remove(channel.Id);
 
+            Context.GuildStore.Update(currentGuild);
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
@@ -106,6 +112,7 @@ namespace Espeon.Commands
                     currentGuild.Moderators.Remove(user.Id);
                 }                
                 
+                Context.GuildStore.Update(currentGuild);
                 await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
                 return;
             }
@@ -129,6 +136,7 @@ namespace Espeon.Commands
 
                 currentGuild.Moderators.Add(user.Id);
 
+                Context.GuildStore.Update(currentGuild);
                 await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
                 return;
             }
@@ -152,6 +160,7 @@ namespace Espeon.Commands
             if (currentGuild.Admins.Contains(user.Id))
             {
                 currentGuild.Admins.Remove(user.Id);
+                Context.GuildStore.Update(currentGuild);
 
                 await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
                 return;
@@ -170,6 +179,7 @@ namespace Espeon.Commands
             if (currentGuild.Moderators.Contains(user.Id))
             {
                 currentGuild.Moderators.Remove(user.Id);
+                Context.GuildStore.Update(currentGuild);
 
                 await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
                 return;
@@ -184,6 +194,7 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.WelcomeChannelId = channel?.Id ?? 0;
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -197,6 +208,7 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.WelcomeMessage = message;
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -207,6 +219,7 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.DefaultRoleId = role?.Id ?? 0;
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -217,6 +230,7 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.WarningLimit = limit;
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }
@@ -227,6 +241,7 @@ namespace Espeon.Commands
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.NoReactions = role?.Id ?? 0;
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
         }

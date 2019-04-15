@@ -62,6 +62,8 @@ namespace Espeon.Commands
 
             roles.Add(role.Id);
 
+            Context.GuildStore.Update(currentGuild);
+
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
 
@@ -104,6 +106,8 @@ namespace Espeon.Commands
             }
 
             roles.Remove(role.Id);
+
+            Context.GuildStore.Update(currentGuild);
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1));
         }
