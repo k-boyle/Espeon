@@ -44,6 +44,7 @@ namespace Espeon
                             message = string.Concat(
                                 result.Reason,
                                 "\n```",
+                                $"\n{context.Message.Content.Replace(context.PrefixUsed, "")}\n",
                                 $"{"^".PadLeft(position, ' ')}",
                                 "\n```");
 
@@ -93,10 +94,7 @@ namespace Espeon
                     break;
 
                 case OverloadsFailedResult overloadsFailedResult:
-                    message = string.Concat(
-                        result.Reason,
-                        "\n",
-                        string.Join('\n', overloadsFailedResult.FailedOverloads.Select(x => x.Value.Reason)));
+                    message = overloadsFailedResult.FailedOverloads.OrderBy(x => x.Key.Priority).Last().Value.Reason;
 
                     builder.WithDescription(message);
                     break;

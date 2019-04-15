@@ -21,6 +21,7 @@ namespace Espeon.Commands
      * Message
      * Eval
      * shutdown
+     * Sudo
      */
 
     [Name("Owner Commands")]
@@ -213,6 +214,13 @@ namespace Espeon.Commands
 
             foreach (var assembly in assemblies)
                 yield return assembly;
+        }
+
+        [Command("sudo")]
+        [Name("Sudo")]
+        public Task SudoAsync([Remainder] string command)
+        {
+            return SendMessageAsync($"{Context.Guild.CurrentUser.Mention} {command}");
         }
     }
 }

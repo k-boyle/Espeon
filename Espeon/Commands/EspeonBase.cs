@@ -51,7 +51,7 @@ namespace Espeon.Commands
 
             var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
 
-            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            var user = await Context.GetInvokerAsync();
 
             var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 
@@ -67,7 +67,7 @@ namespace Espeon.Commands
 
             var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
 
-            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            var user = await Context.GetInvokerAsync();
             
             var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Espeon.Databases.UserStore;
 
 namespace Espeon.Commands
 {
@@ -25,6 +26,7 @@ namespace Espeon.Commands
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly GamesService _games;
         [Inject] private readonly MessageService _message;
+        [Inject] private readonly IServiceProvider _services;
 
         private Emote RareCandy => _emotes.Collection["RareCandy"];
 
@@ -171,7 +173,8 @@ namespace Espeon.Commands
                 Color = color
             };
 
-            await _candy.UpdateCandiesAsync(Context, Context.User.Id, amount);
+            using var store = _services.GetService<UserStore>();
+            await _candy.UpdateCandiesAsync(Context, store, Context.User.Id, amount);
             await Message.ModifyAsync(x => x.Embed = builder.Build());
         }
 

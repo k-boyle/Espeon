@@ -31,7 +31,7 @@ namespace Espeon
 
                 var targetType = parser.BaseType.GetGenericArguments().First();
 
-                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), !@override });
+                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), @override });
             }
 
             return commands;

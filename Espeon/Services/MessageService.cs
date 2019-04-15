@@ -89,13 +89,13 @@ namespace Espeon.Services
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
-                        out _, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
+                        out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
             {                
                 var foundCommands = output.FindCommands();
 
                 foreach (var command in foundCommands)
                 {
-                    var commandContext = new EspeonContext(_client, message, isEdit); //new context to handle db disposes
+                    var commandContext = new EspeonContext(_client, message, isEdit, prefix); //new context to handle db disposes
 
                     var result = await _commands.ExecuteAsync(command, commandContext, _services);
 
@@ -117,7 +117,7 @@ namespace Espeon.Services
 
         private async Task CommandErroredAsync(CasinoCommandErroredEventArgs args)
         {
-            var context = args.Context as EspeonContext;
+            var context = args.Context;
 
             if (args.Result is ExecutionFailedResult failed)
             {

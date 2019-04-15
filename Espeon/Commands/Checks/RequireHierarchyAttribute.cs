@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Espeon.Commands
             var context = originalContext as EspeonContext;
             var targetUser = argument as IGuildUser;
 
-            var currentGuild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild);
+            var currentGuild = await context.GetCurrentGuildAsync();
 
             var executor = currentGuild.Admins.Contains(context.User.Id) 
                 ? ElevationLevel.Admin 
@@ -28,37 +29,54 @@ namespace Espeon.Commands
                     ? ElevationLevel.Mod
                     : ElevationLevel.None;
 
-            const string you = "You require hierarchy over this user";
-            const string i = "I need hierarchy over this user";
-
-            if (target >= executor)
-                return CheckResult.Unsuccessful(you);
-
             if (context.Guild.CurrentUser is null)
                 throw new ThisWasQuahusFaultException();
-            
+
+            var user = await context.GetInvokerAsync();
+
+            var resp = new Dictionary<ResponsePack, string[]>
+            {
+                [ResponsePack.Default] = new []
+                {
+                    "You don't have hierachy over the guild owner",
+                    "I need hierarchy over this user",
+                    "You require hierarchy over this user",
+                },
+                [ResponsePack.owo] = new []
+                {
+                    "u cant tuch the guild daddy >:(",
+                    "im too low fur them >>.<<",
+                    "owwwno ur too low furr themm >>.<<",
+                }
+            };
+
+            var strs = resp[user.ResponsePack];
+
             if (targetUser.Id == context.Guild.OwnerId)
-                return CheckResult.Unsuccessful("You don't have hierachy over the guild owner");
+                return CheckResult.Unsuccessful(strs[0]);
+
+            if (target >= executor)
+                return CheckResult.Unsuccessful(strs[2]);
 
             if (targetUser is SocketGuildUser socket)
             {
                 if (context.Guild.CurrentUser.Hierarchy <= socket.Hierarchy)
-                    return CheckResult.Unsuccessful("I need hierarchy over this user");
+                    return CheckResult.Unsuccessful(strs[1]);
 
                 return context.User.Hierarchy > socket.Hierarchy
                     ? CheckResult.Successful
-                    : CheckResult.Unsuccessful(you);
+                    : CheckResult.Unsuccessful(strs[2]);
             }
 
             var roles = targetUser.RoleIds.Select(x => context.Guild.GetRole(x));
             var ordered = roles.OrderBy(x => x.Position).ToArray();
 
             if (context.Guild.CurrentUser.Hierarchy <= ordered.First().Position)
-                return CheckResult.Unsuccessful(i);
+                return CheckResult.Unsuccessful(strs[1]);
 
             return context.User.Hierarchy > ordered.First().Position
                 ? CheckResult.Successful
-                : CheckResult.Unsuccessful(you);
+                : CheckResult.Unsuccessful(strs[2]);
         }
     }
 }

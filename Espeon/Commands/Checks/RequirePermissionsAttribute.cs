@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace Espeon.Commands
             _guildPerms = new GuildPermission[0];
         }
 
-        public override ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var context = originalContext as EspeonContext;
 
@@ -52,19 +53,25 @@ namespace Espeon.Commands
             var failedChannelPerms = _channelPerms.Where(channelPerm => !channelPerms.Has(channelPerm)).ToArray();
 
             if (failedGuildPerms.Length == 0 && failedChannelPerms.Length == 0)
-                return new ValueTask<CheckResult>(CheckResult.Successful);
+                return CheckResult.Successful;
 
             var sb = new StringBuilder();
 
             foreach (var guildPerm in failedGuildPerms)
-                sb.AppendLine($"{guildPerm}");
+                sb.AppendLine(guildPerm);
 
             foreach (var channelPerm in failedChannelPerms)
-                sb.AppendLine($"{channelPerm}");
+                sb.AppendLine(channelPerm);
 
-            return new ValueTask<CheckResult>(
-                CheckResult.Unsuccessful(
-                    $"{(_target == PermissionTarget.User ? "You" : "I")} need the following permissions to execute this command\n{sb}"));
+            var u = await context.GetInvokerAsync();
+
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = $"{(_target == PermissionTarget.User ? "You" : "I")} need the following permissions to execute this command\n{sb}",
+                [ResponsePack.owo] = $"{(_target == PermissionTarget.User ? "You" : "I")} need these permzz {sb}"
+            };
+
+            return CheckResult.Unsuccessful(resp[u.ResponsePack]);
         }
     }
 }

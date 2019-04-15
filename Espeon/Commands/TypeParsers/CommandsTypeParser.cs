@@ -29,11 +29,8 @@ namespace Espeon.Commands
                 }
             }
 
-            if (canExecute.Count == 0)
-                return new TypeParserResult<IReadOnlyCollection<Command>>($"Failed to find any commands matching {value}");
-
-            return canExecute.Count > 5 
-                ? new TypeParserResult<IReadOnlyCollection<Command>>("Too many results. Query was too vauge") 
+            return canExecute.Count == 0 
+                ? new TypeParserResult<IReadOnlyCollection<Command>>($"Failed to find any commands matching {value}") 
                 : new TypeParserResult<IReadOnlyCollection<Command>>(found);
         }
     }

@@ -17,9 +17,9 @@ namespace Espeon.Commands
         {
             var context = originalContext as EspeonContext;
 
-            return new ValueTask<CheckResult>(context.Guild.Id == _id
+            return context.Guild.Id == _id
                 ? CheckResult.Successful
-                : CheckResult.Unsuccessful("Command cannot be run in this guild"));
+                : CheckResult.Unsuccessful("Command cannot be run in this guild");
         }
     }
 }

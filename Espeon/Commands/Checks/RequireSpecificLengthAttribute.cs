@@ -35,7 +35,7 @@ namespace Espeon.Commands
 
             var context = (EspeonContext) ctx;
 
-            var user = await context.UserStore.GetOrCreateUserAsync(context.User);
+            var user = await context.GetInvokerAsync();
 
             return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }

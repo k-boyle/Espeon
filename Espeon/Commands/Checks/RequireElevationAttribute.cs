@@ -22,7 +22,7 @@ namespace Espeon.Commands
 
             var context = originalContext as EspeonContext;
 
-            var currentGuild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild);
+            var currentGuild = await context.GetCurrentGuildAsync();
 
             switch (_level)
             {

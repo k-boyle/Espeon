@@ -13,7 +13,7 @@ namespace Espeon.Commands
         [Name("Set Responses")]
         public async Task SetResponsesAsync([RequireUnlocked] ResponsePack pack = ResponsePack.Default)
         {
-            var foundUser = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            var foundUser = await Context.GetInvokerAsync();
             foundUser.ResponsePack = pack;
 
             await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(0, pack));
@@ -23,7 +23,7 @@ namespace Espeon.Commands
         [Name("Buy owo")]
         public async Task BuyOwoAsync()
         {
-            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            var user = await Context.GetInvokerAsync();
 
             if(user.ResponsePacks.Contains(ResponsePack.owo))
             {

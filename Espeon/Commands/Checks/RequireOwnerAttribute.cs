@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -12,11 +13,27 @@ namespace Espeon.Commands
 
             var app = await context.Client.GetApplicationInfoAsync();
 
-            return app.Owner.Id == context.User.Id
-                ? new CheckResult()
-                : new CheckResult(Command is null
-                    ? $"{Module.Name} commands can only be used by the bot owner"
-                    : $"{Command.Name} can only be used by the bot owner");
+            if (app.Owner.Id == context.User.Id)
+                return CheckResult.Successful;
+
+            var user = await context.GetInvokerAsync();
+
+            var resp = new Dictionary<ResponsePack, string[]>
+            {
+                [ResponsePack.Default] = new[]
+                {
+                    $"{Module.Name} commands can only be used by the bot owner",
+                    $"{Command.Name} can only be used by the bot owner"
+                },
+
+                [ResponsePack.owo] = new []
+                {
+                    $"only daddy can use {Module.Name}",
+                    $"only daddy can use {Command.Name}"
+                }
+            };
+
+            return CheckResult.Unsuccessful(Command is null ? resp[user.ResponsePack][0] : resp[user.ResponsePack][1]);
         }
     }
 }

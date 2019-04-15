@@ -2,6 +2,7 @@
 using Espeon.Commands;
 using System;
 using System.Threading.Tasks;
+using Espeon.Databases.UserStore;
 
 namespace Espeon.Services
 {
@@ -15,25 +16,28 @@ namespace Espeon.Services
         {
         }
 
-        public async Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
+        public Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
+            => UpdateCandiesAsync(context, context.UserStore, id, amount);
+
+        public async Task UpdateCandiesAsync(EspeonContext context, UserStore store, ulong id, int amount)
         {
             var bot = context.Client.CurrentUser;
 
-            if(amount < 0 && id != bot.Id)
+            if (amount < 0 && id != bot.Id)
             {
-                var espeon = await context.UserStore.GetOrCreateUserAsync(bot);
+                var espeon = await store.GetOrCreateUserAsync(bot);
 
                 espeon.CandyAmount += Math.Abs(amount);
             }
 
-            var user = await context.UserStore.GetOrCreateUserAsync(context.User);
+            var user = await store.GetOrCreateUserAsync(context.User);
             user.CandyAmount += amount;
 
             if (user.CandyAmount > user.HighestCandies)
                 user.HighestCandies = user.CandyAmount;
-            
-            await context.UserStore.SaveChangesAsync();
-        }        
+
+            await store.SaveChangesAsync();
+        }
 
         public async Task TransferCandiesAsync(EspeonContext context, IUser sender, IUser receiver, int amount)
         {

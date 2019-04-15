@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -22,14 +23,24 @@ namespace Espeon.Commands
             _maxValue = maxValue;
         }
 
-        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext ctx, IServiceProvider provider)
         {
             var value = (int)argument;
 
-            return new ValueTask<CheckResult>(
-                value > _minValue && value <= _maxValue 
-                ? CheckResult.Successful 
-                : CheckResult.Unsuccessful($"Value must be between {_minValue} and {_maxValue}"));
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = $"Value must be between {_minValue} and {_maxValue}",
+                [ResponsePack.owo] = $"oowwww walue mst be bitween {_minValue} and {_maxValue}"
+            };
+
+            if (value > _minValue && value <= _maxValue)
+                return CheckResult.Successful;
+
+            var context = (EspeonContext) ctx;
+
+            var user = await context.GetInvokerAsync();
+
+            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }
     }
 }

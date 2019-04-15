@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -15,9 +16,18 @@ namespace Espeon.Commands
 
             var context = originalContext as EspeonContext;
 
-            return context.User.Id == context.Guild.OwnerId
-                ? CheckResult.Successful
-                : CheckResult.Unsuccessful("This command can only be executed by the guilds owner");
+            if (context.User.Id == context.Guild.OwnerId)
+                return CheckResult.Successful;
+
+            var user = await context.GetInvokerAsync();
+
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = "This command can only be executed by the guilds owner",
+                [ResponsePack.owo] = "owwnnoo dis comwand can only bee exercuted bwy the gwuild owoner"
+            };
+
+            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }
     }
 }

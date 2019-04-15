@@ -23,7 +23,7 @@ namespace Espeon.Commands
         [RequireElevation(ElevationLevel.Admin)]
         public async Task EnableStarboardAsync([Remainder] SocketTextChannel channel)
         {
-            var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var guild = await Context.GetCurrentGuildAsync();
             guild.StarboardChannelId = channel.Id;
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
@@ -34,7 +34,7 @@ namespace Espeon.Commands
         [RequireElevation(ElevationLevel.Admin)]
         public async Task DisableStarboardAsync()
         {
-            var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var guild = await Context.GetCurrentGuildAsync();
             guild.StarboardChannelId = 0;
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));
@@ -45,7 +45,7 @@ namespace Espeon.Commands
         [RequireElevation(ElevationLevel.Admin)]
         public async Task SetStarboardLimitAsync([RequireRange(0)] int limit)
         {
-            var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var guild = await Context.GetCurrentGuildAsync();
             guild.StarLimit = limit;
 
             await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0));

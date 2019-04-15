@@ -31,7 +31,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var roles = currentGuild.SelfAssigningRoles;
 
             if (roles.Contains(role.Id))
@@ -51,7 +51,7 @@ namespace Espeon.Commands
             [Remainder]
             SocketRole role)
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var roles = currentGuild.SelfAssigningRoles;
 
             if (roles.Contains(role.Id))
@@ -78,7 +78,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var roles = currentGuild.SelfAssigningRoles;
 
             if(!roles.Contains(role.Id))
@@ -94,7 +94,7 @@ namespace Espeon.Commands
         [Name("Remove SAR")]
         public async Task RemoveSelfAssigningRoleAsync([Remainder] SocketRole role)
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var roles = currentGuild.SelfAssigningRoles;
 
             if(!roles.Contains(role.Id))
@@ -112,7 +112,7 @@ namespace Espeon.Commands
         [Name("List Roles")]
         public async Task ListRolesAsync()
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var roles = currentGuild.SelfAssigningRoles
                 .Select(x => Context.Guild.GetRole(x))
                 .Where(x => !(x is null))

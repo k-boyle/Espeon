@@ -10,7 +10,7 @@ namespace Espeon.Commands
     {
         public abstract EspeonContext Context { get; }
 
-        public bool RunOnGatewayThread => true;
+        public bool RunOnGatewayThread => false;
 
         public abstract InteractiveService Interactive { get; }
         public abstract MessageService MessageService { get; }
@@ -93,10 +93,14 @@ namespace Espeon.Commands
 
                     if (int.TryParse(reply.Content, out var page))
                     {
-                        if (page > 0 && page < Options.Pages.Count - 1)
+                        if (page >= 0 && page < Options.Pages.Count - 1)
                         {
                             _currentPage = page;
                         }
+                    }
+                    else
+                    {
+                        await MessageService.SendAsync(Context, x => x.Content = "Index was out of range");
                     }
                     break;
 

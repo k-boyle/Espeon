@@ -15,7 +15,7 @@ namespace Espeon.Commands
             if (!(argument is ResponsePack pack))
                 throw new InvalidOperationException("Check can only be used on parameters of type ResponsePack");
 
-            var user = await context.UserStore.GetOrCreateUserAsync(context.User);
+            var user = await context.GetInvokerAsync();
 
             if(user.ResponsePacks.Any(x => x == pack))
                 return CheckResult.Successful;

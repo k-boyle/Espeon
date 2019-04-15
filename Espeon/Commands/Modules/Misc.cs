@@ -2,6 +2,7 @@
 using Discord.Net;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
+using MoreLinq;
 using Newtonsoft.Json.Linq;
 using Qmmands;
 using System;
@@ -38,7 +39,7 @@ namespace Espeon.Commands
         [Name("Ping")]
         public async Task PingAsync()
         {
-            var user = await Context.UserStore.GetOrCreateUserAsync(Context.User);
+            var user = await Context.GetInvokerAsync();
             var latency = Context.Client.Latency;
             var responses = Responses.GetResponses(Context.Command.Module.Name, Context.Command.Name);
             var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][0], latency));
@@ -173,7 +174,7 @@ namespace Espeon.Commands
                     canExecute.Add(module);
             }
 
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var prefix = currentGuild.Prefixes.First();
 
             var builder = GetBuilder(prefix);
@@ -193,9 +194,10 @@ namespace Espeon.Commands
 
         [Command("help")]
         [Name("Help Module")]
+        [Priority(0)]
         public async Task HelpAsync([Remainder] Module module)
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
             var prefix = currentGuild.Prefixes.First();
 
             var canExecute = new List<Command>();
@@ -210,7 +212,9 @@ namespace Espeon.Commands
 
             var builder = GetBuilder(prefix);
 
-            builder.AddField("Commands", string.Join(", ", canExecute.Select(x => $"`{Format.Sanitize(x.Name)}`")));
+            builder.AddField("Commands", string.Join(", ", 
+                canExecute.Select(x => $"`{Format.Sanitize(x.FullAliases.First())}`")));
+
             builder.WithFooter($"To view help with a specific command invoke {prefix}help Command Name");
 
             var message = await SendMessageAsync(builder.Build());
@@ -223,28 +227,50 @@ namespace Espeon.Commands
 
         [Command("help")]
         [Name("Help Commands")]
+        [Priority(1)]
         public async Task HelpAsync([Remainder] IReadOnlyCollection<Command> commands)
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
-            var prefix = currentGuild.Prefixes.First();
+            var batch = commands.Batch(3).Select(x => x.ToArray()).ToArray();
+            var toSend = new List<EmbedBuilder>();
 
-            var builder = GetBuilder(prefix);
-
-            builder.WithFooter("You can't go any deeper than this D:");
-
-            foreach (var command in commands)
+            foreach (var col in batch)
             {
-                //TODO add summaries/examples
-                builder.AddField(command.Name, $"{prefix}{command.FullAliases.First()} " +
-                    $"{string.Join(' ', command.Parameters.Select(x => $"[{x.Name}]"))}");
+                var builder = GetBuilder(Context.PrefixUsed);
+
+                builder.WithFooter("You can't go any deeper than this D:");
+
+                foreach (var command in col)
+                {
+                    //TODO add summaries/examples
+                    builder.AddField(command.Name, 
+                            $"{Context.PrefixUsed}{command.FullAliases.First()} " +
+                                $"{string.Join(' ', command.Parameters.Select(x => $"[{x.Name}]"))}");
+                }
+
+                toSend.Add(builder);
             }
 
-            var message = await SendMessageAsync(builder.Build());
+            if (toSend.Count == 1)
+            {
+                var message = await SendMessageAsync(toSend[0].Build());
 
-            var deleteCallback = new DeleteCallback(Context, message, _delete,
-                new ReactionFromSourceUser(Context.User.Id));
+                var deleteCallback = new DeleteCallback(Context, message, _delete,
+                    new ReactionFromSourceUser(Context.User.Id));
 
-            await TryAddCallbackAsync(deleteCallback);
+                await TryAddCallbackAsync(deleteCallback);
+
+                return;
+            }
+
+            var i = 0;
+            var options = PaginatorOptions.Default(
+                toSend.ToDictionary(x => i++, 
+                    x => (string.Empty, x.WithFooter($"Page {i}/{toSend.Count}").Build())));
+
+            var paginator = new DefaultPaginator(Context, Interactive, Message, 
+                options, new ReactionFromSourceUser(Context.User.Id));
+
+            await SendPaginatedMessageAsync(paginator);
         }
 
         private EmbedBuilder GetBuilder(string prefix)
@@ -269,7 +295,7 @@ namespace Espeon.Commands
         [Name("List Mods")]
         public async Task ListModsAsync()
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
 
             var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
@@ -291,7 +317,7 @@ namespace Espeon.Commands
         [Name("List Admins")]
         public async Task ListAdminsAsync()
         {
-            var currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            var currentGuild = await Context.GetCurrentGuildAsync();
 
             var adminTasks = currentGuild.Admins.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));

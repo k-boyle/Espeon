@@ -5,6 +5,8 @@ using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Qmmands;
 using System;
+using System.Threading.Tasks;
+using Espeon.Databases;
 
 namespace Espeon.Commands
 {
@@ -25,9 +27,10 @@ namespace Espeon.Commands
         public SocketGuild Guild => User.Guild;
         public SocketTextChannel Channel { get; }
 
-        public bool IsEdit { get; set;  }
+        public bool IsEdit { get; set; }
+        public string PrefixUsed { get; set; }
 
-        public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit)
+        public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit, string prefix)
         {
             Client = client;
             Message = message;
@@ -35,7 +38,14 @@ namespace Espeon.Commands
             Channel = message.Channel as SocketTextChannel;
 
             IsEdit = isEdit;
+            PrefixUsed = prefix;
         }
+
+        public Task<User> GetInvokerAsync()
+            => UserStore.GetOrCreateUserAsync(User);
+
+        public Task<Guild> GetCurrentGuildAsync()
+            => GuildStore.GetOrCreateGuildAsync(Guild);
 
         private bool _disposedValue;
 
