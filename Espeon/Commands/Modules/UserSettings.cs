@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Espeon.Services;
+﻿using Espeon.Services;
 using Qmmands;
 using System.Threading.Tasks;
 
@@ -10,6 +8,7 @@ namespace Espeon.Commands
     public class UserSettings : EspeonBase
     {
         public CandyService Candy { get; set; }
+        public Config Config { get; set; }
 
         [Command("setresponses")]
         [Name("Set Responses")]
@@ -22,30 +21,30 @@ namespace Espeon.Commands
             await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(0, pack));
         }
 
-        [Command("buyowo")]
-        [Name("Buy owo")]
-        public async Task BuyOwoAsync()
+        [Command("buy")]
+        [Name("Buy")]
+        public async Task BuyOwo(ResponsePack pack)
         {
             var user = await Context.GetInvokerAsync();
 
-            if(user.ResponsePacks.Contains(ResponsePack.owo))
+            if(user.ResponsePacks.Contains(pack))
             {
                 await SendNotOkAsync(0);
                 return;
             }
 
-            if(user.CandyAmount < 5000)
+            if(user.CandyAmount < Config.PackPrice)
             {
-                await SendNotOkAsync(1);
+                await SendNotOkAsync(1, Config.PackPrice);
                 return;
             }
 
-            await Candy.UpdateCandiesAsync(Context, user.Id, -5000);
+            await Candy.UpdateCandiesAsync(Context, user.Id, -Config.PackPrice);
 
-            user.ResponsePacks.Add(ResponsePack.owo);
+            user.ResponsePacks.Add(pack);
             Context.UserStore.Update(user);
 
-            await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(2));
+            await Task.WhenAll(Context.UserStore.SaveChangesAsync(), SendOkAsync(2, pack));
         }
     }
 }

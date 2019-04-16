@@ -522,14 +522,16 @@
         "\\*jumps in joy\\* >< i wil talk to uu like dis now uwu"
       ]
     },
-    "Buy owo": {
+    "Buy": {
       "Default": [
         "You already have this response pack",
-        "This response pack costs 5000 candies",
-        "You have purchased owo"
+        "This response pack costs {0} candies",
+        "You have purchased {0}"
       ],
       "owo": [
-        "uu awready hav meee!!"
+        "uu awready hav meee!!",
+        "uu need {0} cwandies!!",
+        "uu hav purchasd {0}!!"
       ]
     }
   },
