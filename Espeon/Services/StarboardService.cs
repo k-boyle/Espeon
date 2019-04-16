@@ -43,6 +43,11 @@ namespace Espeon.Services
 
             var count = message.Reactions[Star].ReactionCount;
 
+            var flat = await message.GetReactionUsersAsync(Star, count).FlattenAsync();
+            var users = flat.Where(x => x.Id == message.Author.Id).ToArray();
+
+            count = users.Length;
+
             if (count < guild.StarLimit)
                 return;
 
@@ -53,8 +58,6 @@ namespace Espeon.Services
 
             if (foundMessage is null)
             {
-                var users = await message.GetReactionUsersAsync(Star, count).FlattenAsync();
-
                 var embed = Utilities.BuildStarMessage(message);
 
                 var newStar = await starChannel.SendMessageAsync(m, embed: embed);

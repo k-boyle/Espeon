@@ -23,10 +23,12 @@ namespace Espeon
                     imageUrl = attachment.Url;
             }
 
-            return BuildStarMessage(message.Author as IGuildUser, message.Content, imageUrl);
+            var user = message.Author as IGuildUser;
+
+            return BuildStarMessage(user, message.Content, message.GetJumpUrl(), imageUrl);
         }
 
-        public static Embed BuildStarMessage(IGuildUser user, string content, string imageUrl = null)
+        public static Embed BuildStarMessage(IGuildUser user, string content, string jumpUrl, string imageUrl = null)
         {
             var builder = new EmbedBuilder
             {
@@ -35,7 +37,7 @@ namespace Espeon
                     Name = user.GetDisplayName(),
                     IconUrl = user.GetAvatarOrDefaultUrl()
                 },
-                Description = content,
+                Description = $"{content}\n\n{Format.Url("Original Message", jumpUrl)}",
                 Color = Color.Gold
             };
 
@@ -43,6 +45,12 @@ namespace Espeon
                 builder.WithImageUrl(imageUrl);
 
             return builder.Build();
+        }
+
+        public static string BuildJumpUrl(ulong guildId, ulong channelId, ulong messageId)
+        {
+            const string baseUrl = "https://discordapp.com/channels/";
+            return $"{baseUrl}/{guildId}/{channelId}/{messageId}";
         }
 
         public static readonly Emoji Star = new Emoji("⭐");

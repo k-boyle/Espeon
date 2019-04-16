@@ -70,7 +70,9 @@ namespace Espeon.Commands
 
             var user = await Context.Guild.GetGuildUserAsync(randomStar.AuthorId);
 
-            var starMessage = Utilities.BuildStarMessage(user, randomStar.Content, randomStar.ImageUrl);
+            var jump = Utilities.BuildJumpUrl(Context.Guild.Id, randomStar.ChannelId, randomStar.Id);
+
+            var starMessage = Utilities.BuildStarMessage(user, randomStar.Content, jump, randomStar.ImageUrl);
 
             var m = string.Concat(
                 $"{Utilities.Star}" ,
