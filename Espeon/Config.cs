@@ -5,10 +5,18 @@ namespace Espeon
 {
     public class Config
     {
+        public string Dir { get; private set; }
+
         public string DiscordToken { get; set; }
         public string PushbulletToken { get; set; }
         public string GiphyAPIKey { get; set; }
         public ConnectionStrings ConnectionStrings { get; set; }
+
+        public float RandomCandyFrequency { get; set; }
+        public int RandomCandyAmount { get; set; }
+        public int ClaimMin { get; set; }
+        public int ClaimMax { get; set; }
+        public int ClaimCooldown { get; set; }
 
         private Config()
         {
@@ -18,8 +26,15 @@ namespace Espeon
         public static Config Create(string dir)
         {
             var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(dir));
+            config.Dir = dir;
+
             return config;
-        }        
+        }
+
+        public void Serialize()
+        {
+            File.WriteAllText(Dir, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
     }
 
     public class ConnectionStrings

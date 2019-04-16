@@ -18,6 +18,7 @@ namespace Espeon.Services
     public class MessageService : BaseService
     {
         [Inject] private readonly CommandService _commands;
+        [Inject] private readonly Config _config;
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
@@ -51,7 +52,7 @@ namespace Espeon.Services
 
             _client.MessageReceived += msg =>
             {
-                if (_random.NextDouble() >= 0.05)
+                if (_random.NextDouble() >= _config.RandomCandyFrequency)
                     return Task.CompletedTask;
 
                 Task.Run(async () =>
@@ -59,7 +60,7 @@ namespace Espeon.Services
                     using var userStore = _services.GetService<UserStore>();
 
                     var user = await userStore.GetOrCreateUserAsync(msg.Author);
-                    user.CandyAmount += 10;
+                    user.CandyAmount += _config.RandomCandyAmount;
                     userStore.Update(user);
 
                     await userStore.SaveChangesAsync();

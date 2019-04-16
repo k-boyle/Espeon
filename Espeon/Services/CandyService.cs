@@ -1,14 +1,17 @@
 ﻿using Discord;
 using Espeon.Commands;
+using Espeon.Databases.UserStore;
 using System;
 using System.Threading.Tasks;
-using Espeon.Databases.UserStore;
 
 namespace Espeon.Services
 {
     public class CandyService : BaseService
     {
+        [Inject] private readonly Config _config;
         [Inject] private Random _random;
+
+        private TimeSpan Cooldown => TimeSpan.FromHours(_config.ClaimCooldown);
 
         private Random Random => _random ?? (_random = new Random());
 
@@ -70,12 +73,12 @@ namespace Espeon.Services
             var user = await context.UserStore.GetOrCreateUserAsync(toClaim);
             var difference = DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(user.LastClaimedCandies);
 
-            if (difference < TimeSpan.FromHours(8))
+            if (difference < Cooldown)
             {
-                return (false, 0, TimeSpan.FromHours(8) - difference);
+                return (false, 0, Cooldown - difference);
             }
 
-            var amount = Random.Next(1, 21);
+            var amount = Random.Next(_config.ClaimMin, _config.ClaimMax + 1);
             user.CandyAmount += amount;
 
             if (user.CandyAmount > user.HighestCandies)
@@ -87,7 +90,7 @@ namespace Espeon.Services
 
             await context.UserStore.SaveChangesAsync();
 
-            return (true, amount, TimeSpan.FromHours(8));
+            return (true, amount, Cooldown);
         }
     }
 }
