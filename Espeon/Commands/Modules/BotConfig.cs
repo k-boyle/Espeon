@@ -49,6 +49,14 @@ namespace Espeon.Commands
             return SendOkAsync(0);
         }
 
+        [Command("SetPackPrice")]
+        [Name("Set Pack Price")]
+        public Task SetPackPriceAsync(int price)
+        {
+            Config.PackPrice = price;
+            return SendOkAsync(0);
+        }
+
         protected override Task AfterExecutedAsync()
         {
             Config.Serialize();

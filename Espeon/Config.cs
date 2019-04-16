@@ -17,6 +17,7 @@ namespace Espeon
         public int ClaimMin { get; set; }
         public int ClaimMax { get; set; }
         public int ClaimCooldown { get; set; }
+        public int PackPrice { get; set; }
 
         private Config()
         {
