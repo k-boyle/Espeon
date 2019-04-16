@@ -11,7 +11,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -235,6 +234,18 @@ namespace Espeon.Commands
         public Task SudoAsync([Remainder] string command)
         {
             return SendMessageAsync($"{Context.Guild.CurrentUser.Mention} {command}");
+        }
+
+        [Command("reload")]
+        [Name("Reload Responses")]
+        public Task ReloadResponsesAsync()
+        {
+            var modules = Services.GetService<CommandService>().GetAllModules();
+            var filtered = modules.Where(x => !ulong.TryParse(x.Name, out _)).ToArray();
+
+            Responses.LoadResponses(filtered);
+
+            return SendOkAsync(0);
         }
     }
 }

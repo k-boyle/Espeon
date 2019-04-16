@@ -107,50 +107,6 @@
       ]
     }
   },
-  "Module Management": {
-    "Module Add Alias": {
-      "Default": [
-        "{0} has been added to {1}",
-        "Failed to add {0} to {1}"
-      ],
-      "owo": [
-        "i addwed {0} tuu {1} fur uu :3",
-        "oweee i cudnt add {0} to {1]}"
-      ]
-    },
-    "Module Remove Alias": {
-      "Default": [
-        "{0} has been removed from {1}",
-        "Failed to remove {0} from {1}"
-      ],
-      "owo": [
-        "i remved {0} frm {1}",
-        "ooowwww {0} cudnt be wemovd fwom {1}"
-      ]
-    }
-  },
-  "Command Management": {
-    "Command Add Alias": {
-      "Default": [
-        "{0} has been added to {1}",
-        "Failed to add {0} to {1}"
-      ],
-      "owo": [
-        "i addwed {0} tuu {1} fur uu :3",
-        "oweee i cudnt add {0} to {1}"
-      ]
-    },
-    "Command Remove Alias": {
-      "Default": [
-        "{0} has been removed from {1}",
-        "Failed to remove {0} from {1}"
-      ],
-      "owo": [
-        "i remved {0} frm {1}",
-        "ooowwww {0} cudnt be wemovd fwom {1}"
-      ]
-    }
-  },
   "Misc": {
     "Ping": {
       "Default": [
@@ -335,7 +291,9 @@
       ]
     },
     "Eval": {},
-    "Shutdown Bot": {}
+    "Shutdown Bot": {},
+    "Sudo": {},
+    "Reload Responses": {}
   },
   "Reminders": {
     "Reminder": {
@@ -433,14 +391,84 @@
         ":("
       ]
     },
-    "Unrestrict Channel": {},
-    "Admin User": {},
-    "Moderate User": {},
-    "Demote Admin": {},
-    "Demote Moderator": {},
-    "Set Welcome Channel": {},
-    "Set Welcome Message": {},
-    "Set Default Role": {},
+    "Unrestrict Channel": {
+      "Default": [
+        "I am not restricted in this channel",
+        "I am now unrestricted from this channel"
+      ],
+      "owo": [
+        "am not westwicted in dis channl",
+        "\\*wages tail\\* :D"
+      ]
+    },
+    "Admin User": {
+      "Default": [
+        "{0} has been made an admin",
+        "{0} is already an admin"
+      ],
+      "owo": [
+        "{0} is a new daddy :3c",
+        "{0} is awredy a daddy"
+      ]
+    },
+    "Moderate User": {
+      "Default": [
+        "{0} is already an admin",
+        "{0} has been made a moderator",
+        "{0} is already a moderator"
+      ],
+      "owo": [
+        "{0} is awready a daddy",
+        "owo {0} is a mod now :3c",
+        ">>.<< {0} is awreade a mod"
+      ]
+    },
+    "Demote Admin": {
+      "Default": [
+        "You cannot demote the guild owner",
+        "{0} has been demoted",
+        "{0} is not an admin"
+      ],
+      "owo": [
+        "u cant dwemot the owoner",
+        "owno {0} is dwemotd",
+        "{0} is not a daddy"
+      ]
+    },
+    "Demote Moderator": {
+      "Default": [
+        "{0} has been demoted",
+        "{0} is not a moderator"
+      ],
+      "owo": [
+        "{0} has bin dwemotd",
+        "{0} is not a mod >>.<<"
+      ]
+    },
+    "Set Welcome Channel": {
+      "Default": [
+        "Welcome channel has been set"
+      ],
+      "owo": [
+        "welcum chwanel set"
+      ]
+    },
+    "Set Welcome Message": {
+      "Default": [
+        "Welcome message has been set"
+      ],
+      "owo": [
+        "welcum msg set"
+      ]
+    },
+    "Set Default Role": {
+      "Default": [
+        "Default role has been set"
+      ],
+      "owo": [
+        "default wole set"
+      ]
+    },
     "Set Warning Limit": {
       "Default": [
         "Warning limit has been set"
@@ -502,6 +530,86 @@
       ],
       "owo": [
         "uu awready hav meee!!"
+      ]
+    }
+  },
+  "Bot Config": {
+    "Set Random Frequency": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Random Amount": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Claim Max": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Claim Min": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Claim Cooldown": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Pack Price": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    }
+  },
+  "Management": {
+    "Command Alias": {
+      "Default": [
+        "{0} has been added to {1}",
+        "Failed to add {0} to {1}",
+        "{0} has been removed from {1}",
+        "Failed to remove {0} from {1}"
+      ],
+      "owo": [
+        "i addwed {0} tuu {1} fur uu :3",
+        "oweee i cudnt add {0} to {1]}",
+        "i remved {0} frm {1}",
+        "ooowwww {0} cudnt be wemovd fwom {1}"
+      ]
+    },
+    "Module Alias": {
+      "Default": [
+        "{0} has been added to {1}",
+        "Failed to add {0} to {1}",
+        "{0} has been removed from {1}",
+        "Failed to remove {0} from {1}"
+      ],
+      "owo": [
+        "i addwed {0} tuu {1} fur uu :3",
+        "oweee i cudnt add {0} to {1]}",
+        "i remved {0} frm {1}",
+        "ooowwww {0} cudnt be wemovd fwom {1}"
       ]
     }
   }
