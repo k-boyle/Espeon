@@ -9,79 +9,84 @@ namespace Espeon.Commands
      * Summaries
      * Checks?
      */
-    [Name("Module Management")]
-    [Group("Module")]
+    [Name("Management")]
     [RequireOwner]
-    public class ModuleManagement : EspeonBase
+    public class Management : EspeonBase
     {
         public CommandManagementService Manager { get; set; }
-
-        [Command("Add")]
-        [Name("Module Add Alias")]
-        public async Task AddAsync(Module target, string value)
+        
+        [Command("Alias")]
+        [Name("Command Alias")]
+        public async Task CommandAliasAsync(Alias action, Command target, string value)
         {
-            var result = await Manager.AddAliasAsync(Context, target, value);
+            bool result;
 
-            if (result)
+            switch (action)
             {
-                await SendOkAsync(0, value, target.Name);
-                return;
-            }
+                case Alias.Add:
 
-            await SendNotOkAsync(1, value, target.Name);
+                    result = await Manager.AddAliasAsync(Context, target.Module, target.Name, value);
+
+                    if (result)
+                    {
+                        await SendOkAsync(0, value, target.Name);
+                        return;
+                    }
+
+                    await SendNotOkAsync(1, value, target.Name);
+
+                    break;
+                case Alias.Remove:
+
+                    result = await Manager.RemoveAliasAsync(Context, target.Module, target.Name, value);
+
+                    if (result)
+                    {
+                        await SendOkAsync(2, value, target.Name);
+                        return;
+                    }
+
+                    await SendNotOkAsync(3, value, target.Name);
+
+                    break;
+            }
         }
 
-        [Command("Remove")]
-        [Name("Module Remove Alias")]
-        public async Task RemoveAsync(Module target, string value)
+        [Command("Alias")]
+        [Name("Module Alias")]
+        public async Task ModuleAliasAsync(Alias action, Module target, string value)
         {
-            var result = await Manager.RemoveAliasAsync(Context, target, value);
+            bool result;
 
-            if (result)
+            switch (action)
             {
-                await SendOkAsync(0, value, target.Name);
-                return;
+                case Alias.Add:
+
+                    result = await Manager.AddAliasAsync(Context, target, value);
+
+                    if (result)
+                    {
+                        await SendOkAsync(0, value, target.Name);
+                        return;
+                    }
+
+                    await SendNotOkAsync(1, value, target.Name);
+
+                    break;
+                case Alias.Remove:
+
+                    result = await Manager.RemoveAliasAsync(Context, target, value);
+
+                    if (result)
+                    {
+                        await SendOkAsync(2, value, target.Name);
+                        return;
+                    }
+
+                    await SendNotOkAsync(3, value, target.Name);
+
+                    break;
             }
-
-            await SendNotOkAsync(1, value, target.Name);
-        }
-    }
-
-    [Name("Command Management")]
-    [Group("Command")]
-    [RequireOwner]
-    public class CommandManagement : EspeonBase
-    {
-        public CommandManagementService Manager { get; set; }
-
-        [Command("Add")]
-        [Name("Command Add Alias")]
-        public async Task AddAsync(Command target, string value)
-        {
-            var result = await Manager.AddAliasAsync(Context, target.Module, target.Name, value);
-
-            if (result)
-            {
-                await SendOkAsync(0, value, target.Name);
-                return;
-            }
-
-            await SendNotOkAsync(1, value, target.Name);
-        }
-
-        [Command("Remove")]
-        [Name("Command Remove Alias")]
-        public async Task RemoveAsync(Command target, string value)
-        {
-            var result = await Manager.RemoveAliasAsync(Context, target.Module, target.Name, value);
-
-            if (result)
-            {
-                await SendOkAsync(0, value, target.Name);
-                return;
-            }
-
-            await SendNotOkAsync(1, value, target.Name);
         }
     }
 }
