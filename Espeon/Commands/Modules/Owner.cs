@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace Espeon.Commands
                 .Distinct();
 
             var scriptOptions = ScriptOptions.Default.WithReferences(assemblies
-                .Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(namespaces);            
+                .Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(namespaces);
 
             var builder = new EmbedBuilder
             {
@@ -83,8 +84,8 @@ namespace Espeon.Commands
             var toEval = codes.Count == 0 ? code : string.Join('\n', codes);
 
             var script = CSharpScript
-                .Create($"{string.Join("", usings.Select(x => $"using {x};"))} {toEval}", 
-                    scriptOptions, 
+                .Create($"{string.Join("", usings.Select(x => $"using {x};"))} {toEval}",
+                    scriptOptions,
                     typeof(RoslynContext));
 
             var diagnostics = script.Compile();
@@ -92,7 +93,7 @@ namespace Espeon.Commands
 
             var compilationTime = sw.ElapsedMilliseconds;
 
-            if(diagnostics.Any(x => x.Severity == DiagnosticSeverity.Error))
+            if (diagnostics.Any(x => x.Severity == DiagnosticSeverity.Error))
             {
                 builder.WithDescription($"Compilation finished in: {compilationTime}ms");
                 builder.WithColor(Color.Red);
@@ -139,7 +140,7 @@ namespace Espeon.Commands
 
                             var list = enumerable.Cast<object>().ToList();
 
-                            if(list.Count > 5)
+                            if (list.Count > 5)
                             {
                                 builder.AddField($"{enumerable.GetType()}", "Enumerable has more than 5 elements");
                                 break;
@@ -170,7 +171,20 @@ namespace Espeon.Commands
 
                             foreach (var prop in props)
                             {
-                                sb.AppendLine($"#{prop.Name.PadRight(maxLength, ' ')} - [{prop.GetValue(result.ReturnValue)}]");
+                                sb.Append($"#{prop.Name.PadRight(maxLength, ' ')} - ");
+
+                                var value = prop.GetValue(result.ReturnValue);
+
+                                if (value is IEnumerable collection && !(value is string))
+                                {
+                                    var count = collection.Cast<object>().Count();
+
+                                    sb.AppendLine($"[Collection: {count} item{(count == 1 ? "" : "s")}]");
+                                }
+                                else
+                                {
+                                    sb.AppendLine($"[{prop.GetValue(result.ReturnValue)}]");
+                                }
                             }
 
                             var messages = Utilities.SplitByLength(sb.ToString(), 2000);
@@ -182,7 +196,7 @@ namespace Espeon.Commands
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 sw.Stop();
 

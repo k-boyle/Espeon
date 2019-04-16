@@ -26,7 +26,6 @@ namespace Espeon
         [Inject] private readonly CommandService _commands;
 
         private readonly Config _config;
-        private bool _ran;
 
         private readonly TaskCompletionSource<int> _tcs;
 
@@ -34,7 +33,6 @@ namespace Espeon
         {
             _services = services;
             _config = config;
-            _ran = false;
 
             _tcs = new TaskCompletionSource<int>();
         }
@@ -117,7 +115,7 @@ namespace Espeon
                 await commandStore.Modules.AddAsync(newModule);
             }
 
-            foreach(var (module, command) in commandsToCreate)
+            foreach (var (module, command) in commandsToCreate)
             {
                 var foundModule = await commandStore.Modules.FindAsync(module.Name);
 
@@ -137,18 +135,16 @@ namespace Espeon
         //TODO clean this up
         private void EventHooks(UserStore userStore)
         {
-            _client.Ready += async () =>
+            async Task ReadyAsync()
             {
                 Console.Beep(5000, 100);
+                await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);
 
-                if (!_ran)
-                {
-                    await _services.GetService<ReminderService>().LoadRemindersAsync(userStore);
-                    _ran = true;
+                _client.Ready -= ReadyAsync;
+                _tcs.SetResult(0);
+            }
 
-                    _tcs.SetResult(0);
-                }
-            };
+            _client.Ready += ReadyAsync;
 
             _client.UserJoined += async user =>
             {
@@ -207,10 +203,10 @@ namespace Espeon
 
             var logger = _services.GetService<LogService>();
 
-            _client.Log += log 
+            _client.Log += log
                 => logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
 
-            _services.GetService<TaskQueue>().Error += ex 
+            _services.GetService<TaskQueue>().Error += ex
                 => logger.LogAsync(Source.Scheduler, Severity.Error, string.Empty, ex);
         }
     }

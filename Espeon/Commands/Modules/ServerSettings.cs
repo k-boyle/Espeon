@@ -141,7 +141,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            await SendOkAsync(2, user.GetDisplayName());
+            await SendNotOkAsync(2, user.GetDisplayName());
         }
 
         [Command("deadmin")]
