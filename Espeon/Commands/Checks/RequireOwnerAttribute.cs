@@ -13,7 +13,7 @@ namespace Espeon.Commands
 
             var app = await context.Client.GetApplicationInfoAsync();
 
-            if (app.Owner.Id == context.User.Id)
+            if (app.Owner.Id == context.User.Id || context.Client.CurrentUser.Id == context.User.Id)
                 return CheckResult.Successful;
 
             var user = await context.GetInvokerAsync();
