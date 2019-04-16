@@ -215,7 +215,10 @@ namespace Espeon.Commands
 
         [Command("defaultrole")]
         [Name("Set Default Role")]
-        public async Task SetDefaultRoleAsync([Remainder] SocketRole role = null)
+        public async Task SetDefaultRoleAsync(
+            [Remainder]
+            [RequirePositionHierarchy]
+            SocketRole role = null)
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.DefaultRoleId = role?.Id ?? 0;
@@ -237,7 +240,10 @@ namespace Espeon.Commands
 
         [Command("noreactionrole")]
         [Name("Set No Reactions Role")]
-        public async Task SetNoReactionsRole([Remainder] SocketRole role = null)
+        public async Task SetNoReactionsRole(
+            [Remainder]
+            [RequirePositionHierarchy]
+            SocketRole role = null)
         {
             var currentGuild = await Context.GetCurrentGuildAsync();
             currentGuild.NoReactions = role?.Id ?? 0;
