@@ -293,7 +293,14 @@
     "Eval": {},
     "Shutdown Bot": {},
     "Sudo": {},
-    "Reload Responses": {}
+    "Reload Responses": {
+      "Default": [
+        "Reloaded"
+      ],
+      "owo": [
+        "weloadd"
+      ]
+    }
   },
   "Reminders": {
     "Reminder": {
@@ -511,7 +518,14 @@
         "stwar wimit set"
       ]
     },
-    "Random Star": {}
+    "Random Star": {
+      "Default": [
+        "This guild has no starred messages"
+      ],
+      "owo": [
+        "owwnoo >,< dis gwuild has no starrz"
+      ] 
+    }
   },
   "User Settings": {
     "Set Responses": {
