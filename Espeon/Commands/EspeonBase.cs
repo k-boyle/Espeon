@@ -1,11 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Espeon.Services;
-using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -46,12 +44,7 @@ namespace Espeon.Commands
         protected async Task<IUserMessage> SendOkAsync(int index, params object[] args)
         {
             var cmd = Context.Command;
-            var module = await Context.CommandStore.Modules.Include(x => x.Commands)
-                .FirstOrDefaultAsync(x => x.Name == cmd.Module.Name);
-
-            var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
-
-            var user = await Context.GetInvokerAsync();
+            var user = Context.Invoker;
 
             var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 
@@ -62,12 +55,7 @@ namespace Espeon.Commands
         protected async Task<IUserMessage> SendNotOkAsync(int index, params object[] args)
         {
             var cmd = Context.Command;
-            var module = await Context.CommandStore.Modules.Include(x => x.Commands)
-                .FirstOrDefaultAsync(x => x.Name == Context.Command.Module.Name);
-
-            var command = module.Commands.FirstOrDefault(x => x.Name == cmd.Name);
-
-            var user = await Context.GetInvokerAsync();
+            var user = Context.Invoker;
             
             var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 

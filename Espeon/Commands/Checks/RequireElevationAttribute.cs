@@ -20,9 +20,9 @@ namespace Espeon.Commands
             if(result.IsSuccessful)
                 return CheckResult.Successful;
 
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
-            var currentGuild = await context.GetCurrentGuildAsync();
+            var currentGuild = context.CurrentGuild;
 
             switch (_level)
             {

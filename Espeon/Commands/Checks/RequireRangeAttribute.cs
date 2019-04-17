@@ -23,7 +23,7 @@ namespace Espeon.Commands
             _maxValue = maxValue;
         }
 
-        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext ctx, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext ctx, IServiceProvider provider)
         {
             var value = (int)argument;
 
@@ -38,7 +38,7 @@ namespace Espeon.Commands
 
             var context = (EspeonContext) ctx;
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }

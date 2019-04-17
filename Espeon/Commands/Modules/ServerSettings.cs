@@ -25,7 +25,7 @@ namespace Espeon.Commands
         [Name("Add Prefix")]
         public async Task AddPrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             if (currentGuild.Prefixes.Contains(prefix))
             {
                 await SendNotOkAsync(0);
@@ -42,7 +42,7 @@ namespace Espeon.Commands
         [Name("Remove Prefix")]
         public async Task RemovePrefixAsync([Remainder] string prefix)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (!currentGuild.Prefixes.Contains(prefix))
             {
@@ -61,7 +61,7 @@ namespace Espeon.Commands
         [Name("Restrict Channel")]
         public async Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             channel ??= Context.Channel;
 
             if (currentGuild.RestrictedChannels.Contains(channel.Id))
@@ -81,7 +81,7 @@ namespace Espeon.Commands
         [Name("Unrestrict Channel")]
         public async Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             channel ??= Context.Channel;
 
             if (!currentGuild.RestrictedChannels.Contains(channel.Id))
@@ -101,7 +101,7 @@ namespace Espeon.Commands
         [RequireGuildOwner]
         public async Task AdminUserAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (!currentGuild.Admins.Contains(user.Id))
             {
@@ -124,7 +124,7 @@ namespace Espeon.Commands
         [Name("Moderate User")]
         public async Task ModUserAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (!currentGuild.Moderators.Contains(user.Id))
             {
@@ -155,7 +155,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (currentGuild.Admins.Contains(user.Id))
             {
@@ -174,7 +174,7 @@ namespace Espeon.Commands
         [RequireGuildOwner]
         public async Task DemoteModeratorAsync([Remainder] IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (currentGuild.Moderators.Contains(user.Id))
             {
@@ -192,7 +192,7 @@ namespace Espeon.Commands
         [Name("Set Welcome Channel")]
         public async Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             currentGuild.WelcomeChannelId = channel?.Id ?? 0;
             Context.GuildStore.Update(currentGuild);
 
@@ -206,7 +206,7 @@ namespace Espeon.Commands
             [RequireSpecificLength(1900)]
             string message)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             currentGuild.WelcomeMessage = message;
             Context.GuildStore.Update(currentGuild);
 
@@ -220,7 +220,7 @@ namespace Espeon.Commands
             [RequirePositionHierarchy]
             SocketRole role = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             currentGuild.DefaultRoleId = role?.Id ?? 0;
             Context.GuildStore.Update(currentGuild);
 
@@ -231,7 +231,7 @@ namespace Espeon.Commands
         [Name("Set Warning Limit")]
         public async Task SetWarningLimitAsync([RequireRange(0)] int limit)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             currentGuild.WarningLimit = limit;
             Context.GuildStore.Update(currentGuild);
 
@@ -245,7 +245,7 @@ namespace Espeon.Commands
             [RequirePositionHierarchy]
             SocketRole role = null)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
             currentGuild.NoReactions = role?.Id ?? 0;
             Context.GuildStore.Update(currentGuild);
 

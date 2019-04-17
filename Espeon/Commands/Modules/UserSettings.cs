@@ -14,7 +14,7 @@ namespace Espeon.Commands
         [Name("Set Responses")]
         public async Task SetResponsesAsync([RequireUnlocked] ResponsePack pack = ResponsePack.Default)
         {
-            var foundUser = await Context.GetInvokerAsync();
+            var foundUser = Context.Invoker;
             foundUser.ResponsePack = pack;
             Context.UserStore.Update(foundUser);
 
@@ -25,9 +25,9 @@ namespace Espeon.Commands
         [Name("Buy")]
         public async Task BuyOwo(ResponsePack pack)
         {
-            var user = await Context.GetInvokerAsync();
+            var user = Context.Invoker;
 
-            if(user.ResponsePacks.Contains(pack))
+            if (user.ResponsePacks.Contains(pack))
             {
                 await SendNotOkAsync(0);
                 return;

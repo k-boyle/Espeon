@@ -8,14 +8,14 @@ namespace Espeon.Commands
 {
     public class RequireUnlockedAttribute : ParameterCheckAttribute
     {
-        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             if (!(argument is ResponsePack pack))
                 throw new InvalidOperationException("Check can only be used on parameters of type ResponsePack");
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             if(user.ResponsePacks.Any(x => x == pack))
                 return CheckResult.Successful;

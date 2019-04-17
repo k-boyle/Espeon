@@ -15,7 +15,7 @@ namespace Espeon.Commands
 
         public override ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             return context.Guild.Id == _id
                 ? CheckResult.Successful

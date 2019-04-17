@@ -9,14 +9,14 @@ namespace Espeon.Commands
     {
         public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             var app = await context.Client.GetApplicationInfoAsync();
 
             if (app.Owner.Id == context.User.Id || context.Client.CurrentUser.Id == context.User.Id)
                 return CheckResult.Successful;
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             var resp = new Dictionary<ResponsePack, string[]>
             {

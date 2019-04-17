@@ -23,18 +23,16 @@ namespace Espeon
                     imageUrl = attachment.Url;
             }
 
-            var user = message.Author as IGuildUser;
-
-            return BuildStarMessage(user, message.Content, message.GetJumpUrl(), imageUrl);
+            return BuildStarMessage(message.Author, message.Content, message.GetJumpUrl(), imageUrl);
         }
 
-        public static Embed BuildStarMessage(IGuildUser user, string content, string jumpUrl, string imageUrl = null)
+        public static Embed BuildStarMessage(IUser user, string content, string jumpUrl, string imageUrl = null)
         {
             var builder = new EmbedBuilder
             {
                 Author = new EmbedAuthorBuilder
                 {
-                    Name = user.GetDisplayName(),
+                    Name = (user as IGuildUser)?.GetDisplayName() ?? user.Username,
                     IconUrl = user.GetAvatarOrDefaultUrl()
                 },
                 Description = $"{content}\n\n{Format.Url("Original Message", jumpUrl)}",
@@ -49,7 +47,7 @@ namespace Espeon
 
         public static string BuildJumpUrl(ulong guildId, ulong channelId, ulong messageId)
         {
-            const string baseUrl = "https://discordapp.com/channels/";
+            const string baseUrl = "https://discordapp.com/channels";
             return $"{baseUrl}/{guildId}/{channelId}/{messageId}";
         }
 

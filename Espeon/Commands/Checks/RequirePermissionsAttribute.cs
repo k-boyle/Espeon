@@ -29,9 +29,9 @@ namespace Espeon.Commands
             _guildPerms = new GuildPermission[0];
         }
 
-        public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             SocketGuildUser user = null;
 
@@ -63,11 +63,12 @@ namespace Espeon.Commands
             foreach (var channelPerm in failedChannelPerms)
                 sb.AppendLine(channelPerm);
 
-            var u = await context.GetInvokerAsync();
+            var u = context.Invoker;
 
             var resp = new Dictionary<ResponsePack, string>
             {
-                [ResponsePack.Default] = $"{(_target == PermissionTarget.User ? "You" : "I")} need the following permissions to execute this command\n{sb}",
+                [ResponsePack.Default] = $"{(_target == PermissionTarget.User ? "You" : "I")} " +
+                                         $"need the following permissions to execute this command\n{sb}",
                 [ResponsePack.owo] = $"{(_target == PermissionTarget.User ? "You" : "I")} need these permzz {sb}"
             };
 

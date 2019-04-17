@@ -138,7 +138,7 @@ namespace Espeon.Commands
             [Remainder]
             IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             var role = Context.Guild.GetRole(currentGuild.NoReactions);
 
@@ -159,7 +159,7 @@ namespace Espeon.Commands
             [Remainder]
             IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             var role = Context.Guild.GetRole(currentGuild.NoReactions);
 
@@ -193,7 +193,7 @@ namespace Espeon.Commands
             [Remainder]
             IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (currentGuild.RestrictedUsers.Contains(user.Id))
             {
@@ -215,7 +215,7 @@ namespace Espeon.Commands
             [Remainder]
             IGuildUser user)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             if (!currentGuild.RestrictedUsers.Contains(user.Id))
             {

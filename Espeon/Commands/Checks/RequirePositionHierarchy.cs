@@ -8,10 +8,10 @@ namespace Espeon.Commands
 {
     public class RequirePositionHierarchy : ParameterCheckAttribute
     {
-        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
         {
             var role = argument as SocketRole;
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             if (role.Position <= context.Guild.CurrentUser.Hierarchy)
                     return CheckResult.Successful;
@@ -22,7 +22,7 @@ namespace Espeon.Commands
                 [ResponsePack.owo] = "oww this wole is twoo big 4 mee ><"
             };
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             return CheckResult.Unsuccessful(resp[user.ResponsePack]);
         }

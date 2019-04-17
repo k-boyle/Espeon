@@ -11,7 +11,7 @@ namespace Espeon.Commands
     {
         public override async ValueTask<TypeParserResult<int>> ParseAsync(Parameter param, string value, CommandContext originalContext, IServiceProvider services)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             var candy = services.GetService<CandyService>();
             var userAmount = await candy.GetCandiesAsync(context, context.User);

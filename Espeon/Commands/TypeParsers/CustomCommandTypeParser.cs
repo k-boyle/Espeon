@@ -13,7 +13,7 @@ namespace Espeon.Commands
         public override async ValueTask<TypeParserResult<CustomCommand>> ParseAsync(Parameter param, string value, CommandContext originalContext,
             IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             var service = provider.GetService<CustomCommandsService>();
             var commands = await service.GetCommandsAsync(context);

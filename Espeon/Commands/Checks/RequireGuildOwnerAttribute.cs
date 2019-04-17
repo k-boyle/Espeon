@@ -14,12 +14,12 @@ namespace Espeon.Commands
             if(result.IsSuccessful)
                 return CheckResult.Successful;
 
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             if (context.User.Id == context.Guild.OwnerId)
                 return CheckResult.Successful;
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             var resp = new Dictionary<ResponsePack, string>
             {

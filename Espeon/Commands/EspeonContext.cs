@@ -15,8 +15,7 @@ namespace Espeon.Commands
         private UserStore _userStore;
         public UserStore UserStore => _userStore ?? (_userStore = new UserStore());
 
-        private GuildStore _guildStore;
-        public GuildStore GuildStore => _guildStore ?? (_guildStore = new GuildStore());
+        public GuildStore GuildStore { get; }
 
         private CommandStore _commandStore;
         public CommandStore CommandStore => _commandStore ?? (_commandStore = new CommandStore());
@@ -28,10 +27,15 @@ namespace Espeon.Commands
         public SocketTextChannel Channel { get; }
 
         public bool IsEdit { get; set; }
-        public string PrefixUsed { get; set; }
+        public string PrefixUsed { get; }
 
-        public EspeonContext(DiscordSocketClient client, IUserMessage message, bool isEdit, string prefix)
+        public User Invoker { get; private set; }
+        public Guild CurrentGuild { get; }
+
+        private EspeonContext(GuildStore guildStore, Guild currentGuild, DiscordSocketClient client,
+            IUserMessage message, bool isEdit, string prefix)
         {
+            GuildStore = guildStore;
             Client = client;
             Message = message;
             User = message.Author as SocketGuildUser;
@@ -39,13 +43,20 @@ namespace Espeon.Commands
 
             IsEdit = isEdit;
             PrefixUsed = prefix;
+            CurrentGuild = currentGuild;
         }
 
-        public Task<User> GetInvokerAsync()
-            => UserStore.GetOrCreateUserAsync(User);
+        public static async Task<EspeonContext> CreateAsync(GuildStore guildStore, Guild currentGuild,
+            DiscordSocketClient client, IUserMessage message, bool isEdit, string prefix)
+        {
+            var ctx = new EspeonContext(guildStore, currentGuild, client, message, isEdit, prefix);
+            ctx.Invoker = await ctx.GetInvokerAsync();
 
-        public Task<Guild> GetCurrentGuildAsync()
-            => GuildStore.GetOrCreateGuildAsync(Guild);
+            return ctx;
+        }
+
+        private Task<User> GetInvokerAsync()
+            => UserStore.GetOrCreateUserAsync(User);
 
         private bool _disposedValue;
 
@@ -55,8 +66,8 @@ namespace Espeon.Commands
             {
                 if (disposing)
                 {
+                    GuildStore.Dispose();
                     _userStore?.Dispose();
-                    _guildStore?.Dispose();
                     _commandStore?.Dispose();
                 }
 

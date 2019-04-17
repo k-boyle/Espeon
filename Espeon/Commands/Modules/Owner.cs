@@ -44,6 +44,15 @@ namespace Espeon.Commands
         {
             var codes = Utilities.GetCodes(code);
 
+            IEnumerable<Assembly> GetAssemblies()
+            {
+                var assm = AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location));
+
+                foreach (var assembly in assm)
+                    yield return assembly;
+            }
+
             var assemblies = GetAssemblies();
 
             var usings = new[]
@@ -145,12 +154,20 @@ namespace Espeon.Commands
                                 break;
                             }
 
-                            sb.AppendLine("```css");
+                            if (list.Count > 0)
+                            {
 
-                            foreach (var element in list)
-                                sb.AppendLine($"[{element}]");
+                                sb.AppendLine("```css");
 
-                            sb.AppendLine("```");
+                                foreach (var element in list)
+                                    sb.AppendLine($"[{element}]");
+
+                                sb.AppendLine("```");
+                            }
+                            else
+                            {
+                                sb.AppendLine("Collection is empty");
+                            }
 
                             builder.AddField($"{enumerable.GetType()}", sb.ToString());
 
@@ -217,16 +234,6 @@ namespace Espeon.Commands
             cts.Cancel(false);
 
             return Task.CompletedTask;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IEnumerable<Assembly> GetAssemblies()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location));
-
-            foreach (var assembly in assemblies)
-                yield return assembly;
         }
 
         [Command("sudo")]

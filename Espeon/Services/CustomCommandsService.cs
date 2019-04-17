@@ -61,7 +61,7 @@ namespace Espeon.Services
 
         private async ValueTask<IResult> CommandCallbackAsync(CommandContext originalContext, IServiceProvider services)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             var guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
             var commands = guild?.Commands;

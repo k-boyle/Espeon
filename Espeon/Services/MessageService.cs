@@ -46,8 +46,8 @@ namespace Espeon.Services
             _commands.CommandExecuted += CommandExecutedAsync;
 
             _client.MessageReceived += msg =>
-                msg is SocketUserMessage message 
-                    ? HandleReceivedMessageAsync(message, false) 
+                msg is SocketUserMessage message
+                    ? HandleReceivedMessageAsync(message, false)
                     : Task.CompletedTask;
 
             _client.MessageReceived += msg =>
@@ -78,26 +78,24 @@ namespace Espeon.Services
             if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id ||
                 !(message.Channel is SocketTextChannel textChannel)) return;
 
-            IReadOnlyCollection<string> prefixes;
+            var guildStore = _services.GetService<GuildStore>();
 
-            using (var guildStore = _services.GetService<GuildStore>())
-            {
-                var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+            var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
 
-                prefixes = guild.Prefixes;
+            var prefixes = guild.Prefixes;
 
-                if (guild.RestrictedChannels.Contains(textChannel.Id) || guild.RestrictedUsers.Contains(message.Author.Id))
-                    return;
-            }
+            if (guild.RestrictedChannels.Contains(textChannel.Id) || guild.RestrictedUsers.Contains(message.Author.Id))
+                return;
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
-            {                
+            {
                 var foundCommands = output.FindCommands();
 
                 foreach (var command in foundCommands)
                 {
-                    var commandContext = new EspeonContext(_client, message, isEdit, prefix); //new context to handle db disposes
+                    var commandContext = await EspeonContext.CreateAsync(guildStore, guild, 
+                        _client, message, isEdit, prefix);
 
                     var result = await _commands.ExecuteAsync(command, commandContext, _services);
 
@@ -146,52 +144,6 @@ namespace Espeon.Services
             context.Dispose();
         }
 
-        /*
-        public async Task<IUserMessage> SendMessageAsync(EspeonContext context, string content, Embed embed = null)
-        {
-            if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
-                foundChannel = (_messageCache[context.Channel.Id] =
-                    new ConcurrentDictionary<ulong, ConcurrentDictionary<string, CachedMessage>>());
-
-            if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
-                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<string, CachedMessage>());
-
-            var foundMessage = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
-
-            if (context.IsEdit && !foundMessage.Equals(default(KeyValuePair<string, CachedMessage>)))
-            {
-                if (await GetOrDownloadMessageAsync(foundMessage.Value.ChannelId, foundMessage.Value.ResponseId) is
-                    IUserMessage fetchedMessage)
-                {
-                    await fetchedMessage.ModifyAsync(x =>
-                    {
-                        x.Content = content;
-                        x.Embed = embed;
-                    });
-
-                    return fetchedMessage;
-                }
-            }
-
-            var sentMessage = await context.Channel.SendMessageAsync(content, embed: embed);
-
-            var message = new CachedMessage
-            {
-                ChannelId = context.Channel.Id,
-                ExecutingId = context.Message.Id,
-                UserId = context.User.Id,
-                ResponseId = sentMessage.Id,
-                CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
-            };
-
-            var key = await _timer.EnqueueAsync(message, DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(), RemoveAsync);
-
-            _messageCache[context.Channel.Id][context.User.Id][key] = message;
-
-            return sentMessage;
-        }
-        */
-
         public async Task<IUserMessage> SendAsync(EspeonContext context, Action<MessageProperties> properties)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
@@ -206,7 +158,8 @@ namespace Espeon.Services
             var (guid, value) = foundCache.FirstOrDefault(x => x.Value.ExecutingId == context.Message.Id);
 
             IUserMessage sentMessage;
-            if(value is null)
+
+            if (value is null)
             {
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
@@ -222,8 +175,8 @@ namespace Espeon.Services
                     CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
                 };
 
-                var key = _scheduler.ScheduleTask(message, 
-                    DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(), 
+                var key = _scheduler.ScheduleTask(message,
+                    DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
                     RemoveAsync);
 
                 _messageCache[context.Channel.Id][context.User.Id][key] = message;
@@ -277,10 +230,10 @@ namespace Espeon.Services
             }
 
             return await context.Channel.SendFileAsync(
-                stream:     properties.Stream,
-                filename:   properties.FileName,
-                text:       properties.Content,
-                embed:      properties.Embed);
+                stream: properties.Stream,
+                filename: properties.FileName,
+                text: properties.Content,
+                embed: properties.Embed);
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)

@@ -11,7 +11,7 @@ namespace Espeon.Commands
     {
         public override async ValueTask<TypeParserResult<(IGuildUser, User)>> ParseAsync(Parameter param, string value, CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
 
             var commands = provider.GetService<CommandService>();
 

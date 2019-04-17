@@ -39,7 +39,7 @@ namespace Espeon.Commands
         [Name("Ping")]
         public async Task PingAsync()
         {
-            var user = await Context.GetInvokerAsync();
+            var user = Context.Invoker;
             var latency = Context.Client.Latency;
             var responses = Responses.GetResponses(Context.Command.Module.Name, Context.Command.Name);
             var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][0], latency));
@@ -174,8 +174,7 @@ namespace Espeon.Commands
                     canExecute.Add(module);
             }
 
-            var currentGuild = await Context.GetCurrentGuildAsync();
-            var prefix = currentGuild.Prefixes.First();
+            var prefix = Context.PrefixUsed;
 
             var builder = GetBuilder(prefix);
 
@@ -197,8 +196,7 @@ namespace Espeon.Commands
         [Priority(0)]
         public async Task HelpAsync([Remainder] Module module)
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
-            var prefix = currentGuild.Prefixes.First();
+            var prefix = Context.PrefixUsed;
 
             var canExecute = new List<Command>();
 
@@ -212,8 +210,8 @@ namespace Espeon.Commands
 
             var builder = GetBuilder(prefix);
 
-            builder.AddField("Commands", string.Join(", ", 
-                canExecute.Select(x => $"`{Format.Sanitize(x.FullAliases.First())}`")));
+            builder.AddField("Commands", string.Join(", ",
+                canExecute.Select(x => $"`{Format.Sanitize(x.FullAliases.First().ToLower())}`")));
 
             builder.WithFooter($"To view help with a specific command invoke {prefix}help Command Name");
 
@@ -233,6 +231,30 @@ namespace Espeon.Commands
             var batch = commands.Batch(3).Select(x => x.ToArray()).ToArray();
             var toSend = new List<EmbedBuilder>();
 
+            if (batch.Length == 1)
+            {
+                if (batch[0].Length == 1)
+                {
+                    var builder = GetBuilder(Context.PrefixUsed);
+                    var cmd = batch[0][0];
+
+                    builder.AddField(cmd.Name,
+                        $"{Context.PrefixUsed}{cmd.FullAliases.First().ToLower()} " +
+                            $"{string.Join(' ', cmd.Parameters.Select(x => $"[{x.Name}]"))}");
+
+                    builder.AddField("Aliases", string.Join(", ", cmd.Aliases.Select(x => x.ToLower())));
+
+                    var message = await SendMessageAsync(builder.Build());
+
+                    var deleteCallback = new DeleteCallback(Context, message, _delete,
+                        new ReactionFromSourceUser(Context.User.Id));
+
+                    await TryAddCallbackAsync(deleteCallback);
+
+                    return;
+                }
+            }
+
             foreach (var col in batch)
             {
                 var builder = GetBuilder(Context.PrefixUsed);
@@ -242,8 +264,8 @@ namespace Espeon.Commands
                 foreach (var command in col)
                 {
                     //TODO add summaries/examples
-                    builder.AddField(command.Name, 
-                            $"{Context.PrefixUsed}{command.FullAliases.First()} " +
+                    builder.AddField(command.Name,
+                            $"{Context.PrefixUsed}{command.FullAliases.First().ToLower()} " +
                                 $"{string.Join(' ', command.Parameters.Select(x => $"[{x.Name}]"))}");
                 }
 
@@ -264,10 +286,10 @@ namespace Espeon.Commands
 
             var i = 0;
             var options = PaginatorOptions.Default(
-                toSend.ToDictionary(x => i++, 
+                toSend.ToDictionary(x => i++,
                     x => (string.Empty, x.WithFooter($"Page {i}/{toSend.Count}").Build())));
 
-            var paginator = new DefaultPaginator(Context, Interactive, Message, 
+            var paginator = new DefaultPaginator(Context, Interactive, Message,
                 options, new ReactionFromSourceUser(Context.User.Id));
 
             await SendPaginatedMessageAsync(paginator);
@@ -295,7 +317,7 @@ namespace Espeon.Commands
         [Name("List Mods")]
         public async Task ListModsAsync()
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             var modTasks = currentGuild.Moderators.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));
@@ -317,7 +339,7 @@ namespace Espeon.Commands
         [Name("List Admins")]
         public async Task ListAdminsAsync()
         {
-            var currentGuild = await Context.GetCurrentGuildAsync();
+            var currentGuild = Context.CurrentGuild;
 
             var adminTasks = currentGuild.Admins.Select(async x => Context.Guild.GetUser(x) as IGuildUser
                 ?? await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, x)).Where(x => !(x is null));

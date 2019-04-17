@@ -10,12 +10,12 @@ namespace Espeon.Commands
 {
     public class RequireHierarchyAttribute : ParameterCheckAttribute
     {
-        public override async ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(object argument, CommandContext originalContext, IServiceProvider provider)
         {
-            var context = originalContext as EspeonContext;
+            var context = (EspeonContext)originalContext;
             var targetUser = argument as IGuildUser;
 
-            var currentGuild = await context.GetCurrentGuildAsync();
+            var currentGuild = context.CurrentGuild;
 
             var executor = currentGuild.Admins.Contains(context.User.Id) 
                 ? ElevationLevel.Admin 
@@ -32,7 +32,7 @@ namespace Espeon.Commands
             if (context.Guild.CurrentUser is null)
                 throw new ThisWasQuahusFaultException();
 
-            var user = await context.GetInvokerAsync();
+            var user = context.Invoker;
 
             var resp = new Dictionary<ResponsePack, string[]>
             {
