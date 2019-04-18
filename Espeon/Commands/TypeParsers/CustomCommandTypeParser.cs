@@ -3,6 +3,7 @@ using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,9 +22,18 @@ namespace Espeon.Commands
             var found = commands.FirstOrDefault(x =>
                 string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
-            return found is null
-                ? TypeParserResult<CustomCommand>.Unsuccessful("Failed to find command")
-                : TypeParserResult<CustomCommand>.Successful(found);
+            if (found is null)
+            {
+                var resp = new Dictionary<ResponsePack, string>
+                {
+                    [ResponsePack.Default] = "Failed to find a matching command",
+                    [ResponsePack.owo] = "fwailed to fwind cwommand"
+                };
+
+                return TypeParserResult<CustomCommand>.Unsuccessful(resp[context.Invoker.ResponsePack]);
+            }
+
+            return TypeParserResult<CustomCommand>.Successful(found);
         }
     }
 }

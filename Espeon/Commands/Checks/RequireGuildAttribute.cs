@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -17,9 +18,16 @@ namespace Espeon.Commands
         {
             var context = (EspeonContext)originalContext;
 
-            return context.Guild.Id == _id
-                ? CheckResult.Successful
-                : CheckResult.Unsuccessful("Command cannot be run in this guild");
+            if (context.Guild.Id == _id)
+                return CheckResult.Successful;
+
+            var resp = new Dictionary<ResponsePack, string>
+            {
+                [ResponsePack.Default] = "Command cannot be run in this guild",
+                [ResponsePack.owo] = "ownno dis cwommand cant be wun is dis gwuild"
+            };
+
+            return CheckResult.Unsuccessful(resp[context.Invoker.ResponsePack]);
         }
     }
 }

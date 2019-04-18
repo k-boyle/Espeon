@@ -1,5 +1,6 @@
 ﻿using Qmmands;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -10,11 +11,21 @@ namespace Espeon.Commands
         private const string Regex = @"(\d+)(w(?:eeks|eek?)?|d(?:ays|ay?)?|h(?:ours|rs|r?)|m(?:inutes|ins|in?)?|s(?:econds|econd|ecs|ec?)?)";
         private static readonly Regex TimeSpanRegex = new Regex(Regex, RegexOptions.Compiled);
 
-        public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, CommandContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, CommandContext ctx, IServiceProvider provider)
         {
+            var context = (EspeonContext)ctx;
+
             var matches = TimeSpanRegex.Matches(value);
             if (matches.Count <= 0)
-                return new ValueTask<TypeParserResult<TimeSpan>>(new TypeParserResult<TimeSpan>("Failed to parse time span"));
+            {
+                var resp = new Dictionary<ResponsePack, string>
+                {
+                    [ResponsePack.Default] = "Failed to parse time span",
+                    [ResponsePack.owo] = "fwailed to parse twime"
+                };
+
+                return new TypeParserResult<TimeSpan>(resp[context.Invoker.ResponsePack]);
+            }
 
             var result = new TimeSpan();
             bool weeks = false, days = false, hours = false, minutes = false, seconds = false;
@@ -72,7 +83,7 @@ namespace Espeon.Commands
                 }
             }
 
-            return new ValueTask<TypeParserResult<TimeSpan>>(new TypeParserResult<TimeSpan>(result));
+            return new TypeParserResult<TimeSpan>(result);
 
         }
     }

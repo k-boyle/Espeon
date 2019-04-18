@@ -13,7 +13,7 @@ namespace Espeon.Commands
     {
         public override async ValueTask<TypeParserResult<IGuildUser>> ParseAsync(Parameter param, string value, CommandContext ctx, IServiceProvider provider)
         {
-            var context = ctx as EspeonContext;
+            var context = (EspeonContext)ctx;
 
             var users = context.Guild.Users;
 
@@ -36,12 +36,28 @@ namespace Espeon.Commands
                 return new TypeParserResult<IGuildUser>(user);
 
             IReadOnlyList<SocketGuildUser> matchingUsers = context.Guild != null
-                ? users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase) 
+                ? users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)
                     || string.Equals(x.Nickname, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray()
                 : users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray();
 
+            var resp = new Dictionary<ResponsePack, string[]>
+            {
+                [ResponsePack.Default] = new[]
+                {
+                    "Multiple users found, try mentioning them",
+                    "Failed to find a matching user"
+                },
+                [ResponsePack.owo] = new []
+                {
+                    "i fwound twoo many pweopol, twy mentioning them :3",
+                    "fwailed to fwind user"
+                }
+            };
+
+            var p = context.Invoker.ResponsePack;
+
             if (matchingUsers.Count > 1)
-                return new TypeParserResult<IGuildUser>("Multiple matches found. Mention the user or use their ID.");
+                return new TypeParserResult<IGuildUser>(resp[p][0]);
 
             if (matchingUsers.Count == 1)
                 user = matchingUsers[0];
@@ -51,22 +67,21 @@ namespace Espeon.Commands
 
             user = await context.Client.Rest.GetGuildUserAsync(context.Guild.Id, id);
 
-            return user is null 
-                ? new TypeParserResult<IGuildUser>("Failed to find a matching user") 
+            return user is null
+                ? new TypeParserResult<IGuildUser>(resp[p][1])
                 : new TypeParserResult<IGuildUser>(user);
         }
 
         private ulong ParseId(string value)
         {
-            return value.Length > 3 
-                && value[0] == '<' 
-                && value[1] == '@' 
-                && value[^1] == '>' 
-                && ulong.TryParse(value[2] == '!' 
-                    ? value[3..^1] 
-                    : value[2..^1], out var id) 
-                || ulong.TryParse(value, out id) 
-                    ? id 
+            return value.Length > 3 && value[0] == '<'
+                && value[1] == '@'
+                && value[^1] == '>'
+                && ulong.TryParse(value[2] == '!'
+                    ? value[3..^1]
+                    : value[2..^1], out var id)
+                || ulong.TryParse(value, out id)
+                    ? id
                     : 0;
         }
     }

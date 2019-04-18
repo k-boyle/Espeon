@@ -11,27 +11,40 @@ namespace Espeon.Commands
     {
         public override ValueTask<TypeParserResult<SocketTextChannel>> ParseAsync(Parameter param, string value, CommandContext ctx, IServiceProvider provider)
         {
-            var context = ctx as EspeonContext;
-            if (context.Guild == null)
-                return new ValueTask<TypeParserResult<SocketTextChannel>>(new TypeParserResult<SocketTextChannel>("This command must be used in a guild."));
+            var context = (EspeonContext) ctx;
 
-            IEnumerable<SocketTextChannel> channels = context.Guild.TextChannels;
+            var resp = new Dictionary<ResponsePack, string[]>
+            {
+                [ResponsePack.Default] = new []
+                {
+                    "This command must be used in a guild",
+                    "No channel found matching the input"
+                },
+                [ResponsePack.owo] = new []
+                {
+                    "dis cwomand must be wused in a gwuild",
+                    "no chwannel fwound"
+                }
+            };
+
+            var p = context.Invoker.ResponsePack;
+
+            if (context.Guild == null)
+                return new TypeParserResult<SocketTextChannel>(resp[p][0]);
+
+            var channels = context.Guild.TextChannels;
 
             SocketTextChannel channel = null;
 
-            if (value.Length > 3 
-                && value[0] == '<' 
-                && value[1] == '#' 
-                && value[^1] == '>' 
-                && ulong.TryParse(value[2..^1], out var id)
-                    || ulong.TryParse(value, out id))
+            if (value.Length > 3 && value[0] == '<' && value[1] == '#' && value[^1] == '>' &&
+                ulong.TryParse(value[2..^1], out var id) || ulong.TryParse(value, out id))
                 channel = channels.FirstOrDefault(x => x.Id == id);
 
             channel ??= channels.FirstOrDefault(x => x.Name == value);
 
-            return new ValueTask<TypeParserResult<SocketTextChannel>>(channel is null 
-                ? new TypeParserResult<SocketTextChannel>("No channel found matching the input.") 
-                : new TypeParserResult<SocketTextChannel>(channel));
+            return channel is null
+                ? new TypeParserResult<SocketTextChannel>(resp[p][1]) 
+                : new TypeParserResult<SocketTextChannel>(channel);
         }
     }
 }
