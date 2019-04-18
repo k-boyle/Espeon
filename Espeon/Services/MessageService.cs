@@ -38,11 +38,7 @@ namespace Espeon.Services
                 new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid,
                     CachedMessage>>>();
 
-            _commands.CommandErrored += args => CommandErroredAsync(new CasinoCommandErroredEventArgs
-            {
-                Context = args.Context as EspeonContext,
-                Result = args.Result
-            });
+            _commands.CommandErrored += args => CommandErroredAsync(args);
             _commands.CommandExecuted += CommandExecutedAsync;
 
             _client.MessageReceived += msg =>
@@ -70,13 +66,19 @@ namespace Espeon.Services
             };
 
             _client.MessageUpdated += (_, msg, __) =>
-                msg is SocketUserMessage message ? HandleReceivedMessageAsync(message, true) : Task.CompletedTask;
+                msg is SocketUserMessage message 
+                    ? HandleReceivedMessageAsync(message, true) 
+                    : Task.CompletedTask;
         }
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
-            if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id ||
-                !(message.Channel is SocketTextChannel textChannel)) return;
+            if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id)
+                return;
+
+            if (!(message.Channel is SocketTextChannel textChannel) || 
+                !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
+                return;
 
             var guildStore = _services.GetService<GuildStore>();
 
@@ -139,7 +141,8 @@ namespace Espeon.Services
             var context = args.Context as EspeonContext;
 
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
-                $"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
+                $"Successfully executed {{{context.Command.Name}}} for " +
+                $"{{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
 
             context.Dispose();
         }
@@ -230,10 +233,10 @@ namespace Espeon.Services
             }
 
             return await context.Channel.SendFileAsync(
-                stream: properties.Stream,
+                stream:   properties.Stream,
                 filename: properties.FileName,
-                text: properties.Content,
-                embed: properties.Embed);
+                text:     properties.Content,
+                embed:    properties.Embed);
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
@@ -351,6 +354,13 @@ namespace Espeon.Services
         {
             public EspeonContext Context { get; set; }
             public FailedResult Result { get; set; }
+
+            public static implicit operator CasinoCommandErroredEventArgs(CommandErroredEventArgs args)
+                => new CasinoCommandErroredEventArgs
+                {
+                    Context = (EspeonContext)args.Context,
+                    Result = args.Result
+                };
         }
     }
 }
