@@ -105,7 +105,17 @@
       "owo": [
         "owwww u siwwy biwwy ur awready in a game"
       ]
-    }
+    },
+    "Coinflip": {
+      "Default": [
+        "You win {0}{1} rare cand{2}!",
+        "You lose {0}{1} rare cand{2}"
+      ],
+      "owo": [
+        "\\*shakes tail in excitement\\* uu win {0}{1} rwar cwand{2}!!",
+        "\\*evil laughs\\* uu lose {0}{1} rwar cwand{2}!! >:)"
+      ] 
+    } 
   },
   "Misc": {
     "Ping": {
@@ -591,6 +601,14 @@
       ]
     },
     "Set Pack Price": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ]
+    },
+    "Set Coin Flip": {
       "Default": [
         "Set"
       ],

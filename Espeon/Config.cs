@@ -18,6 +18,7 @@ namespace Espeon
         public int ClaimMax { get; set; }
         public int ClaimCooldown { get; set; }
         public int PackPrice { get; set; }
+        public float CoinFlip { get; set; }
 
         private Config()
         {

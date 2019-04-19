@@ -64,6 +64,15 @@ namespace Espeon.Commands
             return SendOkAsync(0);
         }
 
+        [Command("SetCoinFlip")]
+        [Name("Set Coin Flip")]
+        [Description("Sets the payout multipler for coinflip")]
+        public Task SetCoinFlipAsync(float payout)
+        {
+            Config.CoinFlip = payout;
+            return SendOkAsync(0);
+        }
+
         protected override Task AfterExecutedAsync()
         {
             Config.Serialize();

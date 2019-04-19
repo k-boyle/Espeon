@@ -126,7 +126,8 @@ namespace Espeon
             [typeof(SocketRole)] = "@Role",
             [typeof(Emote[])] = "<:pepehands:2394873298>",
             [typeof(SocketTextChannel)] = "#channel",
-            [typeof(ResponsePack)] = "owo"
+            [typeof(ResponsePack)] = "owo",
+            [typeof(Face)] = "Heads/Tails"
         };
     }
 }

@@ -16,7 +16,11 @@ namespace Espeon.Commands
     [Description("Games that can be played with the bot")]
     public class Games : EspeonBase
     {
+        public CandyService Candy { get; set; }
+        public Config Config { get; set; }
+        public EmotesService Emotes { get; set; }
         public GamesService GameService { get; set; }
+        public Random Random { get; set; }
         
         [Command("blackjack")]
         [Name("Blackjack")]
@@ -31,6 +35,22 @@ namespace Espeon.Commands
             {
                 await SendNotOkAsync(0);
             }
+        }
+
+        [Command("Coinflip")]
+        [Name("Coinflip")]
+        [Description("Flip a coin the specified amount of times")]
+        public Task CoinFlipAsync(Face choice, [OverrideTypeParser(typeof(CandyTypeParser))] int bet = 0)
+        {
+            var flip = Random.Next(100) > 50 ? Face.Heads : Face.Tails;
+            var win = flip == choice;
+            var payout = (int)(bet * Config.CoinFlip);
+            var plural = payout == 1 ? "y" : "ies";
+
+            return Task.WhenAll(win
+                    ? SendOkAsync(0, payout, Emotes.Collection["RareCandy"], plural)
+                    : SendNotOkAsync(1, payout, Emotes.Collection["RareCandy"], plural),
+                Candy.UpdateCandiesAsync(Context, Context.User, (win ? 1 : -1) * payout));
         }
     }
 }
