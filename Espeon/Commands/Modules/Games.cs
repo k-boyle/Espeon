@@ -13,12 +13,14 @@ namespace Espeon.Commands
      */
 
     [Name("Games")]
+    [Description("Games that can be played with the bot")]
     public class Games : EspeonBase
     {
         public GamesService GameService { get; set; }
         
         [Command("blackjack")]
         [Name("Blackjack")]
+        [Description("Starts a game of blackjack, gamble safe kids")]
         public async Task StartBlackjackAsync([OverrideTypeParser(typeof(CandyTypeParser))] int bet = 0)
         {
             var bj = new Blackjack(Context, Services, bet);

@@ -11,7 +11,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace Espeon.Commands
 {
@@ -27,6 +29,7 @@ namespace Espeon.Commands
      * Emote
      */
     [Name("Misc")]
+    [Description("Commands that don't have their own home")]
     public class Misc : EspeonBase
     {
         public Config Config { get; set; }
@@ -37,6 +40,7 @@ namespace Espeon.Commands
 
         [Command("Ping")]
         [Name("Ping")]
+        [Description("View the bots gateway latency and REST ping")]
         public async Task PingAsync()
         {
             var user = Context.Invoker;
@@ -62,6 +66,7 @@ namespace Espeon.Commands
         [RunMode(RunMode.Parallel)]
         [Name("Get Catfact")]
         [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
+        [Description("Gets a random cat fact")]
         public async Task GetCatfactAsync()
         {
             var client = ClientFactory.CreateClient();
@@ -85,6 +90,7 @@ namespace Espeon.Commands
         [RunMode(RunMode.Parallel)]
         [Name("Get Joke")]
         [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
+        [Description("Gets a random joke")]
         public async Task GetJokeAsync()
         {
             var client = ClientFactory.CreateClient();
@@ -108,6 +114,7 @@ namespace Espeon.Commands
         [RunMode(RunMode.Parallel)]
         [Name("Get Gif")]
         [Cooldown(1, 1, CooldownMeasure.Minutes, CooldownBucket.API)]
+        [Description("Gets a gif based on the specified search")]
         public async Task GetGifAsync([Remainder] string search)
         {
             var client = ClientFactory.CreateClient();
@@ -150,11 +157,13 @@ namespace Espeon.Commands
         [Command("Clear")]
         [RunMode(RunMode.Parallel)]
         [Name("Clear Messages")]
+        [Description("Clears the bots responses")]
         public Task ClearMessagesAsync(int amount = 2)
             => Message.DeleteMessagesAsync(Context, amount);
 
         [Command("help")]
         [Name("Help Modules")]
+        [Description("View generic help on the bot")]
         public async Task HelpAsync()
         {
             var modules = Services.GetService<CommandService>().GetAllModules();
@@ -176,12 +185,12 @@ namespace Espeon.Commands
 
             var prefix = Context.PrefixUsed;
 
-            var builder = GetBuilder(prefix);
-
-            builder.AddField("Modules", string.Join(", ", canExecute
-                    .Select(x => $"`{Format.Sanitize(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")));
-
-            builder.WithFooter($"To view help with a specific module invoke {prefix}help Module");
+            var builder = GetBuilder()
+                .AddField("Modules", string.Join(", ", canExecute
+                    .Select(x => $"`{Format.Sanitize(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")))
+                .WithFooter($"To view help with a specific module invoke {prefix}help Module")
+                .WithDescription($"Hello, my name is Espeon{Emotes.Collection["Espeon"]}! " +
+                                 $"You can invoke my commands either by mentioning me or using the `{Format.Sanitize(prefix)}` prefix!");
 
             var message = await SendMessageAsync(builder.Build());
 
@@ -194,6 +203,7 @@ namespace Espeon.Commands
         [Command("help")]
         [Name("Help Module")]
         [Priority(0)]
+        [Description("View help on the specified module")]
         public async Task HelpAsync([Remainder] Module module)
         {
             var prefix = Context.PrefixUsed;
@@ -208,12 +218,12 @@ namespace Espeon.Commands
                     canExecute.Add(command);
             }
 
-            var builder = GetBuilder(prefix);
-
-            builder.AddField("Commands", string.Join(", ",
-                canExecute.Select(x => $"`{Format.Sanitize(x.FullAliases.First().ToLower())}`")));
-
-            builder.WithFooter($"To view help with a specific command invoke {prefix}help Command Name");
+            var builder = GetBuilder()
+                .AddField(ulong.TryParse(module.Name, out _) ? Context.Guild.Name : module.Name ?? "\u200b",
+                    module.Description ?? "\u200b")
+                .AddField("Commands", string.Join(", ",
+                    canExecute.Select(x => $"`{Format.Sanitize(x.FullAliases.First().ToLower())}`")))
+                .WithFooter($"To view help with a specific command invoke {prefix}help Command Name");
 
             var message = await SendMessageAsync(builder.Build());
 
@@ -226,6 +236,7 @@ namespace Espeon.Commands
         [Command("help")]
         [Name("Help Commands")]
         [Priority(1)]
+        [Description("View help on the specified command(s)")]
         public async Task HelpAsync([Remainder] IReadOnlyCollection<Command> commands)
         {
             var batch = commands.Batch(3).Select(x => x.ToArray()).ToArray();
@@ -235,14 +246,27 @@ namespace Espeon.Commands
             {
                 if (batch[0].Length == 1)
                 {
-                    var builder = GetBuilder(Context.PrefixUsed);
                     var cmd = batch[0][0];
 
-                    builder.AddField(cmd.Name,
-                        $"{Context.PrefixUsed}{cmd.FullAliases.First().ToLower()} " +
-                            $"{string.Join(' ', cmd.Parameters.Select(x => $"[{x.Name}]"))}");
+                    string GetParameters(Command command)
+                    {
+                        var sb = new StringBuilder();
 
-                    builder.AddField("Aliases", string.Join(", ", cmd.Aliases.Select(x => x.ToLower())));
+                        foreach (var param in command.Parameters)
+                        {
+                            sb.Append(Utilities.ExampleUsage.TryGetValue(param.Type, out var usage)
+                                ? $" [{usage}]"
+                                : $" [{param.Name}]");
+                        }
+
+                        return sb.ToString();
+                    }
+
+                    var builder = GetBuilder()
+                        .AddField(cmd.Name,
+                            $"{Context.PrefixUsed}{cmd.FullAliases.First().ToLower()}{GetParameters(cmd)}")
+                        .AddField("Summary", cmd.Description ?? "\u200b")
+                        .AddField("Aliases", string.Join(", ", cmd.FullAliases.Select(x => x.ToLower())) ?? "\u200b");
 
                     var message = await SendMessageAsync(builder.Build());
 
@@ -257,9 +281,8 @@ namespace Espeon.Commands
 
             foreach (var col in batch)
             {
-                var builder = GetBuilder(Context.PrefixUsed);
-
-                builder.WithFooter("You can't go any deeper than this D:");
+                var builder = GetBuilder()
+                    .WithFooter("You can't go any deeper than this D:");
 
                 foreach (var command in col)
                 {
@@ -295,7 +318,7 @@ namespace Espeon.Commands
             await SendPaginatedMessageAsync(paginator);
         }
 
-        private EmbedBuilder GetBuilder(string prefix)
+        private EmbedBuilder GetBuilder()
         {
             return new EmbedBuilder
             {
@@ -307,14 +330,13 @@ namespace Espeon.Commands
                     Name = Context.User.GetDisplayName()
                 },
                 ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
-                Timestamp = DateTimeOffset.UtcNow,
-                Description = $"Hello, my name is Espeon{Emotes.Collection["Espeon"]}! " +
-                $"You can invoke my commands either by mentioning me or using the `{Format.Sanitize(prefix)}` prefix!"
+                Timestamp = DateTimeOffset.UtcNow
             };
         }
 
         [Command("Mods")]
         [Name("List Mods")]
+        [Description("List the guilds bot moderators")]
         public async Task ListModsAsync()
         {
             var currentGuild = Context.CurrentGuild;
@@ -337,6 +359,7 @@ namespace Espeon.Commands
 
         [Command("Admins")]
         [Name("List Admins")]
+        [Description("List the guilds bot admins")]
         public async Task ListAdminsAsync()
         {
             var currentGuild = Context.CurrentGuild;
@@ -362,6 +385,7 @@ namespace Espeon.Commands
         [Name("Steal Emote")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageEmojis)]
         [RequirePermissions(PermissionTarget.User, GuildPermission.ManageEmojis)]
+        [Description("Adds the specified emote(s) to your guild")]
         public async Task StealEmoteAsync(params Emote[] emotes)
         {
             var animatedCount = Context.Guild.Emotes.Count(x => x.Animated);

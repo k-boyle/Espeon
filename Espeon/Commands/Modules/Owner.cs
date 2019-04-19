@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,10 +25,12 @@ namespace Espeon.Commands
 
     [Name("Owner Commands")]
     [RequireOwner]
+    [Description("big boy commands")]
     public class Owner : EspeonBase
     {
         [Command("Message")]
         [Name("Message Channel")]
+        [Description("Sends a message to the specified channel")]
         public Task MessageChannelAsync(ulong channelId, [Remainder] string content)
         {
             var channel = Context.Client.GetChannel(channelId) as IMessageChannel;
@@ -40,6 +41,7 @@ namespace Espeon.Commands
         [Command("Eval")]
         [Name("Eval")]
         [RunMode(RunMode.Parallel)]
+        [Description("Evaluates C# code")]
         public async Task EvalAsync([Remainder] string code)
         {
             var codes = Utilities.GetCodes(code);
@@ -228,6 +230,7 @@ namespace Espeon.Commands
 
         [Command("shutdown")]
         [Name("Shutdown Bot")]
+        [Description("Shuts the bot down")]
         public Task ShutdownAsync()
         {
             var cts = Services.GetService<CancellationTokenSource>();
@@ -238,6 +241,7 @@ namespace Espeon.Commands
 
         [Command("sudo")]
         [Name("Sudo")]
+        [Description("Runs a command as sudo")]
         public Task SudoAsync([Remainder] string command)
         {
             return SendMessageAsync($"{Context.Guild.CurrentUser.Mention} {command}");
@@ -245,6 +249,7 @@ namespace Espeon.Commands
 
         [Command("reload")]
         [Name("Reload Responses")]
+        [Description("Reloads the bots responses")]
         public Task ReloadResponsesAsync()
         {
             var modules = Services.GetService<CommandService>().GetAllModules();

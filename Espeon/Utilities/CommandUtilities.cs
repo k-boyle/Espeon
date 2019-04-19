@@ -5,6 +5,8 @@ using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Discord.WebSocket;
+using Qommon.Collections;
 
 namespace Espeon
 {
@@ -115,5 +117,16 @@ namespace Espeon
 
             return builder.Build();
         }
+
+        public static IReadOnlyDictionary<Type, string> ExampleUsage = new Dictionary<Type, string>
+        {
+            [typeof(IGuildUser)] = "@User",
+            [typeof(TimeSpan)] = "1day3hrs14mins30s",
+            [typeof(Alias)] = "Add/Remove",
+            [typeof(SocketRole)] = "@Role",
+            [typeof(Emote[])] = "<:pepehands:2394873298>",
+            [typeof(SocketTextChannel)] = "#channel",
+            [typeof(ResponsePack)] = "owo"
+        };
     }
 }

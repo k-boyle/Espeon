@@ -15,10 +15,12 @@ namespace Espeon.Commands
 
     [Group("Roles")]
     [Name("Self Assigning Roles")]
+    [Description("Manage your own roles")]
     public class Roles : EspeonBase
     {
         [Command("add")]
         [Name("Add Role")]
+        [Description("Adds a role from the available self assigning roles")]
         public async Task AddRoleAsync(
             [RequirePositionHierarchy]
             [Remainder]
@@ -45,6 +47,7 @@ namespace Espeon.Commands
 
         [Command("addself")]
         [Name("Add SAR")]
+        [Description("Adds a new role to the available self assigning roles")]
         [RequireElevation(ElevationLevel.Mod)]
         public async Task AddSelfRoleAsync(
             [RequirePositionHierarchy]
@@ -69,6 +72,7 @@ namespace Espeon.Commands
 
         [Command("remove")]
         [Name("Remove Role")]
+        [Description("Removes one of your roles if that role is in the self assigning roles collection")]
         public async Task RemoveRoleAsync(
             [RequirePositionHierarchy]
             [Remainder]
@@ -94,6 +98,7 @@ namespace Espeon.Commands
 
         [Command("removeself")]
         [Name("Remove SAR")]
+        [Description("Removes a role from the available self assinging roles")]
         public async Task RemoveSelfAssigningRoleAsync([Remainder] SocketRole role)
         {
             var currentGuild = Context.CurrentGuild;
@@ -114,6 +119,7 @@ namespace Espeon.Commands
 
         [Command("list")]
         [Name("List Roles")]
+        [Description("Gets all of the available self assigning roles")]
         public async Task ListRolesAsync()
         {
             var currentGuild = Context.CurrentGuild;

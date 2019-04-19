@@ -23,11 +23,13 @@ namespace Espeon.Commands
 
     [Name("Moderation")]
     [RequireElevation(ElevationLevel.Mod)]
+    [Description("Commands for moderation of your guild")]
     public class Moderation : EspeonBase
     {
         [Command("Kick")]
         [Name("Kick User")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.KickMembers)]
+        [Description("Kicks a user from the guild")]
         public Task KickUserAsync([RequireHierarchy] IGuildUser user, [Remainder] string reason = null)
         {
             return Task.WhenAll(user.KickAsync(reason), SendOkAsync(0, user.GetDisplayName()));
@@ -36,6 +38,7 @@ namespace Espeon.Commands
         [Command("Ban")]
         [Name("Ban User")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.BanMembers)]
+        [Description("Bans a user from your guild")]
         public Task BanUserAsync([RequireHierarchy] IGuildUser user,
             [RequireRange(-1, 7)] int pruneDays = 0, [Remainder] string reason = null)
         {
@@ -44,6 +47,7 @@ namespace Espeon.Commands
 
         [Command("warn")]
         [Name("Warn User")]
+        [Description("Adds a warning to the specified user")]
         public async Task WarnUserAsync([RequireHierarchy] IGuildUser targetUser,
             [RequireSpecificLength(200)]
             [Remainder]
@@ -73,6 +77,7 @@ namespace Espeon.Commands
 
         [Command("revoke")]
         [Name("Revoke Warning")]
+        [Description("Revokes the warning corresponding to the specified id")]
         public async Task RevokeWarningAsync(string warningId)
         {
             var currentGuild = await Context.GuildStore
@@ -95,6 +100,7 @@ namespace Espeon.Commands
 
         [Command("warnings")]
         [Name("View Warnings")]
+        [Description("View a users warnings")]
         public async Task ViewWarningsAsync([Remainder] IGuildUser targetUser)
         {
             var currentGuild = await Context.GuildStore
@@ -133,6 +139,7 @@ namespace Espeon.Commands
         [Command("noreactions")]
         [Name("Revoke Reactions")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        [Description("Adds the no reactions role to the specified user")]
         public async Task RevokeReactionsAsync(
             [RequireHierarchy]
             [Remainder]
@@ -154,6 +161,7 @@ namespace Espeon.Commands
         [Command("restorereactions")]
         [Name("Restore Reactions")]
         [RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        [Description("Removes the no reactions role from the specified user")]
         public async Task RestoreReactionsAsync(
             [RequireHierarchy]
             [Remainder]
@@ -175,6 +183,7 @@ namespace Espeon.Commands
         [Command("block")]
         [Name("Block User")]
         [RequirePermissions(PermissionTarget.Bot, ChannelPermission.ManageChannels)]
+        [Description("Stops the specified user from talking in this channel")]
         public Task BlockUserAsync(
             [RequireHierarchy]
             [Remainder]
@@ -188,6 +197,7 @@ namespace Espeon.Commands
 
         [Command("blacklist")]
         [Name("Blacklist User")]
+        [Description("Blacklists a user from using the bot")]
         public async Task BlacklistAsync(
             [RequireHierarchy]
             [Remainder]
@@ -210,6 +220,7 @@ namespace Espeon.Commands
 
         [Command("unblacklist")]
         [Name("Unblacklist")]
+        [Description("Removes a user from the bots blacklist")]
         public async Task UnblacklistAsync(
             [RequireHierarchy]
             [Remainder]

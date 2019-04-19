@@ -2,6 +2,7 @@
 {
     public enum CooldownBucket
     {
-        API
+        API,
+        Support
     }
 }

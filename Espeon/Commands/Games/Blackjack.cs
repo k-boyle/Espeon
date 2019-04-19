@@ -84,6 +84,7 @@ namespace Espeon.Commands
 
             if (playerTotal == 21)
             {
+                //TODO doesn't work, need to redo games system
                 await _games.TryLeaveGameAsync(Context);
             }
         }
@@ -174,7 +175,7 @@ namespace Espeon.Commands
             };
 
             using var store = _services.GetService<UserStore>();
-            await _candy.UpdateCandiesAsync(Context, store, Context.User.Id, amount);
+            await _candy.UpdateCandiesAsync(Context, store, Context.User, amount);
             await Message.ModifyAsync(x => x.Embed = builder.Build());
         }
 

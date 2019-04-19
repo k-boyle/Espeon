@@ -303,7 +303,7 @@
     }
   },
   "Reminders": {
-    "Reminder": {
+    "New Reminder": {
       "Default": [
         "Reminder created"
       ],
@@ -524,7 +524,7 @@
       ],
       "owo": [
         "owwnoo >,< dis gwuild has no starrz"
-      ] 
+      ]
     }
   },
   "User Settings": {
@@ -628,5 +628,24 @@
         "ooowwww {0} cudnt be wemovd fwom {1}"
       ]
     }
+  },
+  "Bot Support": {
+    "Report Bug": {
+      "Default": [
+        "Bug has been reported"
+      ],
+      "owo": [
+        "wepwoted"
+      ] 
+    },
+    "Feature Request": {
+      "Default": [
+        "Feature has been requested"
+      ],
+      "owo": [
+        "reqwuested"
+      ]
+    },
+    "Source Code": {}
   }
 }

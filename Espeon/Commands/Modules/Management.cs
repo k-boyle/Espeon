@@ -11,12 +11,14 @@ namespace Espeon.Commands
      */
     [Name("Management")]
     [RequireOwner]
+    [Description("Commands modification")]
     public class Management : EspeonBase
     {
         public CommandManagementService Manager { get; set; }
         
         [Command("Alias")]
         [Name("Command Alias")]
+        [Description("Add or removes an alias from the specified command")]
         public async Task CommandAliasAsync(Alias action, Command target, string value)
         {
             bool result;
@@ -54,6 +56,7 @@ namespace Espeon.Commands
 
         [Command("Alias")]
         [Name("Module Alias")]
+        [Description("Add or removes an alias from the specified module")]
         public async Task ModuleAliasAsync(Alias action, Module target, string value)
         {
             bool result;

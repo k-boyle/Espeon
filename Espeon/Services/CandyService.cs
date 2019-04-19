@@ -19,14 +19,14 @@ namespace Espeon.Services
         {
         }
 
-        public Task UpdateCandiesAsync(EspeonContext context, ulong id, int amount)
-            => UpdateCandiesAsync(context, context.UserStore, id, amount);
+        public Task UpdateCandiesAsync(EspeonContext context, IUser user, int amount)
+            => UpdateCandiesAsync(context, context.UserStore, user, amount);
 
-        public async Task UpdateCandiesAsync(EspeonContext context, UserStore store, ulong id, int amount)
+        public async Task UpdateCandiesAsync(EspeonContext context, UserStore store, IUser user, int amount)
         {
             var bot = context.Client.CurrentUser;
 
-            if (amount < 0 && id != bot.Id)
+            if (amount < 0 && user.Id != bot.Id)
             {
                 var espeon = await store.GetOrCreateUserAsync(bot);
 
@@ -34,13 +34,13 @@ namespace Espeon.Services
                 store.Update(espeon);
             }
 
-            var user = await store.GetOrCreateUserAsync(context.User);
-            user.CandyAmount += amount;
+            var dbUser = await store.GetOrCreateUserAsync(user);
+            dbUser.CandyAmount += amount;
 
-            if (user.CandyAmount > user.HighestCandies)
-                user.HighestCandies = user.CandyAmount;
+            if (dbUser.CandyAmount > dbUser.HighestCandies)
+                dbUser.HighestCandies = dbUser.CandyAmount;
 
-            store.Update(user);
+            store.Update(dbUser);
 
             await store.SaveChangesAsync();
         }

@@ -1,8 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Espeon.Commands
 {
@@ -15,6 +15,7 @@ namespace Espeon.Commands
 
     [Name("Starboard")]
     [Group("Star")]
+    [Description("Display messages in a hall of fame")]
     public class Starboard : EspeonBase
     {
         public Random Random { get; set; }
@@ -22,6 +23,7 @@ namespace Espeon.Commands
         [Command("enable")]
         [Name("Enable Starboard")]
         [RequireElevation(ElevationLevel.Admin)]
+        [Description("Enables starboard settings the specified channel as the star channel")]
         public async Task EnableStarboardAsync([Remainder] SocketTextChannel channel)
         {
             var guild = Context.CurrentGuild;
@@ -34,6 +36,7 @@ namespace Espeon.Commands
         [Command("disable")]
         [Name("Disable Starboard")]
         [RequireElevation(ElevationLevel.Admin)]
+        [Description("Disables starboard for this guild")]
         public async Task DisableStarboardAsync()
         {
             var guild = Context.CurrentGuild;
@@ -46,6 +49,7 @@ namespace Espeon.Commands
         [Command("limit")]
         [Name("Set Starboard Limit")]
         [RequireElevation(ElevationLevel.Admin)]
+        [Description("Change the number of stars needed for a message to be added to the starboard")]
         public async Task SetStarboardLimitAsync([RequireRange(0)] int limit)
         {
             var guild = Context.CurrentGuild;
@@ -57,6 +61,7 @@ namespace Espeon.Commands
 
         [Command("random")]
         [Name("Random Star")]
+        [Description("Get a random message from the starboard")]
         public async Task ViewRandomStarAsync()
         {
             var guild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild, x => x.StarredMessages);

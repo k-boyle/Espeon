@@ -5,12 +5,14 @@ namespace Espeon.Commands
 {
     [Name("Bot Config")]
     [RequireOwner]
+    [Description("Change how the bot behaves")]
     public class BotConfig : EspeonBase
     {
         public Config Config { get; set; }
 
         [Command("SetRandomFrequency")]
         [Name("Set Random Frequency")]
+        [Description("Set how frequently message based candies are added")]
         public Task SetRandomFrequencyAsync(float frequency)
         {
             Config.RandomCandyFrequency = frequency;
@@ -19,6 +21,7 @@ namespace Espeon.Commands
 
         [Command("SetRandomAmount")]
         [Name("Set Random Amount")]
+        [Description("Set the upper bound of message based candies")]
         public Task SetRandomAmountAsync(int amount)
         {
             Config.RandomCandyAmount = amount;
@@ -27,6 +30,7 @@ namespace Espeon.Commands
 
         [Command("SetClaimMax")]
         [Name("Set Claim Max")]
+        [Description("Set the upper bound of claim based candies")]
         public Task SetClaimMaxAsync(int max)
         {
             Config.ClaimMax = max;
@@ -35,6 +39,7 @@ namespace Espeon.Commands
 
         [Command("SetClaimMin")]
         [Name("Set Claim Min")]
+        [Description("Set the lower bound of claim based candies")]
         public Task SetClaimMinAsync(int min)
         {
             Config.ClaimMin = min;
@@ -43,6 +48,7 @@ namespace Espeon.Commands
 
         [Command("SetClaimCooldown")]
         [Name("Set Claim Cooldown")]
+        [Description("Set how frequently candies can be claimed")]
         public Task SetClaimCooldownAsync(int cooldown)
         {
             Config.ClaimCooldown = cooldown;
@@ -51,6 +57,7 @@ namespace Espeon.Commands
 
         [Command("SetPackPrice")]
         [Name("Set Pack Price")]
+        [Description("Set the price of response packs")]
         public Task SetPackPriceAsync(int price)
         {
             Config.PackPrice = price;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 namespace Espeon.Commands
 {
     [Name("User Settings")]
+    [Description("Change your personal settings within the bot")]
     public class UserSettings : EspeonBase
     {
         public CandyService Candy { get; set; }
@@ -12,6 +13,7 @@ namespace Espeon.Commands
 
         [Command("setresponses")]
         [Name("Set Responses")]
+        [Description("Change how the bot responds to you")]
         public async Task SetResponsesAsync([RequireUnlocked] ResponsePack pack = ResponsePack.Default)
         {
             var foundUser = Context.Invoker;
@@ -23,6 +25,7 @@ namespace Espeon.Commands
 
         [Command("buy")]
         [Name("Buy")]
+        [Description("Buy new responses. Each pack costs 5000 candies. Available to buy:\n1) owo")]
         public async Task BuyOwo(ResponsePack pack)
         {
             var user = Context.Invoker;
@@ -39,7 +42,7 @@ namespace Espeon.Commands
                 return;
             }
 
-            await Candy.UpdateCandiesAsync(Context, user.Id, -Config.PackPrice);
+            await Candy.UpdateCandiesAsync(Context, Context.User, -Config.PackPrice);
 
             user.ResponsePacks.Add(pack);
             Context.UserStore.Update(user);

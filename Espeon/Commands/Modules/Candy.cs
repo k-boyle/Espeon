@@ -22,6 +22,7 @@ namespace Espeon.Commands
      */
 
     [Name("Candies")]
+    [Description("Do stuff with your rare candies")]
     public class Candy : EspeonBase
     {
         public CandyService CandyService { get; set; }
@@ -32,6 +33,7 @@ namespace Espeon.Commands
 
         [Command("Candies")]
         [Name("View Candies")]
+        [Description("See how many rare candies you, or the specified user has")]
         public async Task ViewCandiesAsync([Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
@@ -43,6 +45,7 @@ namespace Espeon.Commands
 
         [Command("Claim")]
         [Name("Claim Candies")]
+        [Description("Claim your free candies")]
         public async Task ClaimCandiesAsync()
         {
             var (isSuccess, amount, cooldown) = await CandyService.TryClaimCandiesAsync(Context, Context.User);
@@ -58,6 +61,7 @@ namespace Espeon.Commands
 
         [Command("House")]
         [Name("View House")]
+        [Description("See how many candies the bot has")]
         public async Task ViewHouseAsync()
         {
             var amount = await CandyService.GetCandiesAsync(Context, Context.Client.CurrentUser);
@@ -68,17 +72,19 @@ namespace Espeon.Commands
         [Command("Treat")]
         [Name("Treat")]
         [RequireOwner]
+        [Description("Generate free candies for the specified user")]
         public Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null)
         {
             user ??= Context.User;
 
             return Task.WhenAll(
-                CandyService.UpdateCandiesAsync(Context, user.Id, amount), 
+                CandyService.UpdateCandiesAsync(Context, user, amount), 
                 SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies"));
         }
 
         [Command("Leaderboard")]
         [Name("Candy Leaderboard")]
+        [Description("See the current top candy holders")]
         public async Task ViewLeaderboardAsync()
         {
             var users = await Context.UserStore.GetAllUsersAsync();
@@ -116,6 +122,7 @@ namespace Espeon.Commands
 
         [Command("Gift")]
         [Name("Gift Candies")]
+        [Description("Gift candies to another user")]
         public Task GiftCandiesAsync(IGuildUser user, 
             [OverrideTypeParser(typeof(CandyTypeParser))]
             [RequireRange(0)]
@@ -128,6 +135,7 @@ namespace Espeon.Commands
 
         [Command("Steal")]
         [Name("Try Steal")]
+        [Description("Attemps to steal all of the bots candies")]
         public async Task TryStealAsync(
             [OverrideTypeParser(typeof(CandyTypeParser))]
             [RequireRange(0)]
@@ -146,13 +154,13 @@ namespace Espeon.Commands
 
             if(chance < Random.NextDouble())
             {
-                await CandyService.UpdateCandiesAsync(Context, Context.User.Id, -amount);
+                await CandyService.UpdateCandiesAsync(Context, Context.User, -amount);
 
                 await SendNotOkAsync(1);
                 return;
             }
 
-            await CandyService.UpdateCandiesAsync(Context, Context.User.Id, espeonCandies);
+            await CandyService.UpdateCandiesAsync(Context, Context.User, espeonCandies);
 
             espeon.CandyAmount = 0;
 

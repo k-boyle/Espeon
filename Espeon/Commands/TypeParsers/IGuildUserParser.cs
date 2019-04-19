@@ -65,6 +65,9 @@ namespace Espeon.Commands
             if (!(user is null))
                 return new TypeParserResult<IGuildUser>(user);
 
+            if(id == 0)
+                return new TypeParserResult<IGuildUser>(resp[p][1]);
+
             user = await context.Client.Rest.GetGuildUserAsync(context.Guild.Id, id);
 
             return user is null

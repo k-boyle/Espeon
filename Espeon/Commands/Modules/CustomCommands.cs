@@ -10,6 +10,7 @@ namespace Espeon.Commands
     [Name("Custom Commands")]
     [Group("cmd")]
     [RequireElevation(ElevationLevel.Mod)]
+    [Description("Add some custom commands to your guild")]
     public class CustomCommands : EspeonBase
     {
         public CustomCommandsService Commands { get; set; }
@@ -17,6 +18,7 @@ namespace Espeon.Commands
         [Command("create")]
         [Name("Create Command")]
         [RunMode(RunMode.Parallel)]
+        [Description("Creates a new command")]
         public async Task CreateCustomCommandAsync(string name = "", [Remainder] string value = "")
         {
             if (name == "")
@@ -65,6 +67,7 @@ namespace Espeon.Commands
         [Command("delete")]
         [Name("Delete Command")]
         [RunMode(RunMode.Parallel)]
+        [Description("Deletes a custom command")]
         public Task DeleteCustomCommandAsync([Remainder] CustomCommand command)
         {
             return Task.WhenAll(Commands.DeleteCommandAsync(Context, command), SendOkAsync(0, command.Name));
@@ -73,6 +76,7 @@ namespace Espeon.Commands
         [Command("modify")]
         [Name("Modify Command")]
         [RunMode(RunMode.Parallel)]
+        [Description("Modify a response of a custom command")]
         public async Task ModifyCommandAsync(CustomCommand command, [Remainder] string newValue = "")
         {
             if (newValue == "")

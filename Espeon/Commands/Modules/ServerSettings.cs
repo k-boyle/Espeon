@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Security.Cryptography;
+using Discord;
 using Discord.WebSocket;
 using Qmmands;
 using System.Threading.Tasks;
@@ -19,10 +20,12 @@ namespace Espeon.Commands
 
     [Name("Settings")]
     [RequireElevation(ElevationLevel.Admin)]
+    [Description("Control the settings for your guild")]
     public class ServerSettings : EspeonBase
     {
         [Command("addprefix")]
         [Name("Add Prefix")]
+        [Description("Add a new prefix for this guild")]
         public async Task AddPrefixAsync([Remainder] string prefix)
         {
             var currentGuild = Context.CurrentGuild;
@@ -40,6 +43,7 @@ namespace Espeon.Commands
 
         [Command("removeprefix")]
         [Name("Remove Prefix")]
+        [Description("Remove a prefix from the guild")]
         public async Task RemovePrefixAsync([Remainder] string prefix)
         {
             var currentGuild = Context.CurrentGuild;
@@ -59,6 +63,7 @@ namespace Espeon.Commands
 
         [Command("restrict")]
         [Name("Restrict Channel")]
+        [Description("Restrict the bots access to a channel")]
         public async Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
             var currentGuild = Context.CurrentGuild;
@@ -79,6 +84,7 @@ namespace Espeon.Commands
 
         [Command("unrestrict")]
         [Name("Unrestrict Channel")]
+        [Description("Unrestrict the bots access to a channel")]
         public async Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null)
         {
             var currentGuild = Context.CurrentGuild;
@@ -99,6 +105,7 @@ namespace Espeon.Commands
         [Command("admin")]
         [Name("Admin User")]
         [RequireGuildOwner]
+        [Description("Promote a user to bot admin")]
         public async Task AdminUserAsync([Remainder] IGuildUser user)
         {
             var currentGuild = Context.CurrentGuild;
@@ -122,6 +129,7 @@ namespace Espeon.Commands
 
         [Command("mod")]
         [Name("Moderate User")]
+        [Description("Promote a user to bot moderator")]
         public async Task ModUserAsync([Remainder] IGuildUser user)
         {
             var currentGuild = Context.CurrentGuild;
@@ -147,6 +155,7 @@ namespace Espeon.Commands
         [Command("deadmin")]
         [Name("Demote Admin")]
         [RequireGuildOwner]
+        [Description("Demote a user from bot admin")]
         public async Task DemoteAdminAsync([Remainder] IGuildUser user)
         {
             if(user.Id == Context.Guild.OwnerId)
@@ -172,6 +181,7 @@ namespace Espeon.Commands
         [Command("demod")]
         [Name("Demote Moderator")]
         [RequireGuildOwner]
+        [Description("Demote a user from bot moderator")]
         public async Task DemoteModeratorAsync([Remainder] IGuildUser user)
         {
             var currentGuild = Context.CurrentGuild;
@@ -190,6 +200,7 @@ namespace Espeon.Commands
 
         [Command("welcomechannel")]
         [Name("Set Welcome Channel")]
+        [Description("Set the default channel for welcoming new members")]
         public async Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null)
         {
             var currentGuild = Context.CurrentGuild;
@@ -201,6 +212,8 @@ namespace Espeon.Commands
 
         [Command("welcomemessage")]
         [Name("Set Welcome Message")]
+        [Description("Set the welcome message. {{guild}} will be replaced by your guilds name, " +
+                     "and {{user}} will be replaced by the newly joined members name")]
         public async Task SetWelcomeMessageAsync(
             [Remainder]
             [RequireSpecificLength(1900)]
@@ -215,6 +228,7 @@ namespace Espeon.Commands
 
         [Command("defaultrole")]
         [Name("Set Default Role")]
+        [Description("Set the role to be added to new members")]
         public async Task SetDefaultRoleAsync(
             [Remainder]
             [RequirePositionHierarchy]
@@ -229,6 +243,7 @@ namespace Espeon.Commands
 
         [Command("warninglimit")]
         [Name("Set Warning Limit")]
+        [Description("Set the limit to how many warnings a user can have before they're flagged up")]
         public async Task SetWarningLimitAsync([RequireRange(0)] int limit)
         {
             var currentGuild = Context.CurrentGuild;
@@ -240,6 +255,7 @@ namespace Espeon.Commands
 
         [Command("noreactionrole")]
         [Name("Set No Reactions Role")]
+        [Description("Set the role that stops people from reacting")]
         public async Task SetNoReactionsRole(
             [Remainder]
             [RequirePositionHierarchy]

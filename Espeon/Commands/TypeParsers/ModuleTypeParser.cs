@@ -15,7 +15,8 @@ namespace Espeon.Commands
 
             var commands = provider.GetService<CommandService>();
 
-            var module = commands.GetAllModules().SingleOrDefault(x =>
+            var modules = commands.GetAllModules();
+            var module = modules.SingleOrDefault(x =>
                 string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
             var resp = new Dictionary<ResponsePack, string[]>
@@ -35,7 +36,15 @@ namespace Espeon.Commands
             var p = context.Invoker.ResponsePack;
 
             if (module is null)
-                return new TypeParserResult<Module>(resp[p][0]);
+            {
+                var guild = context.Client.Guilds.FirstOrDefault(x =>
+                    x.Name.Equals(value, StringComparison.InvariantCultureIgnoreCase));
+
+                if(guild is null)
+                    return new TypeParserResult<Module>(resp[p][0]);
+
+                module = modules.SingleOrDefault(x => x.Name == guild.ToString());
+            }
 
             var result = await module.RunChecksAsync(context, provider);
 
