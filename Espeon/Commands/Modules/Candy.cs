@@ -21,7 +21,7 @@ namespace Espeon.Commands
      * Steal
      */
 
-    [Name("Candies")]
+    [Name("Candy Commands")]
     [Description("Do stuff with your rare candies")]
     public class Candy : EspeonBase
     {

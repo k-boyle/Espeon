@@ -33,7 +33,7 @@ namespace Espeon.Commands
                 [ResponsePack.owo] = $"oowwww walue mst be bitween {_minValue} and {_maxValue}"
             };
 
-            if (value > _minValue && value <= _maxValue)
+            if (value >= _minValue && value < _maxValue)
                 return CheckResult.Successful;
 
             var context = (EspeonContext) ctx;

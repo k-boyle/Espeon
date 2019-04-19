@@ -1,5 +1,5 @@
 {
-  "Candies": {
+  "Candy Commands": {
     "View Candies": {
       "Default": [
         "{0} has {1}{2} rare cand{3}!"

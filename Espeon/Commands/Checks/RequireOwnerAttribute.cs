@@ -22,13 +22,13 @@ namespace Espeon.Commands
             {
                 [ResponsePack.Default] = new[]
                 {
-                    $"{Module.Name} commands can only be used by the bot owner",
+                    $"{Module?.Name} commands can only be used by the bot owner",
                     $"{Command?.Name} can only be used by the bot owner"
                 },
 
                 [ResponsePack.owo] = new []
                 {
-                    $"only daddy can use {Module.Name}",
+                    $"only daddy can use {Module?.Name}",
                     $"only daddy can use {Command?.Name}"
                 }
             };

@@ -242,25 +242,27 @@ namespace Espeon.Commands
             var batch = commands.Batch(3).Select(x => x.ToArray()).ToArray();
             var toSend = new List<EmbedBuilder>();
 
+            string GetParameters(Command command)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var param in command.Parameters)
+                {
+                    sb.Append(Utilities.ExampleUsage.TryGetValue(param.Type, out var usage)
+                        ? $" `{usage}`"
+                        : $" `{param.Name}`");
+                }
+
+                return sb.ToString();
+            }
+
             if (batch.Length == 1)
             {
                 if (batch[0].Length == 1)
                 {
                     var cmd = batch[0][0];
 
-                    string GetParameters(Command command)
-                    {
-                        var sb = new StringBuilder();
-
-                        foreach (var param in command.Parameters)
-                        {
-                            sb.Append(Utilities.ExampleUsage.TryGetValue(param.Type, out var usage)
-                                ? $" [{usage}]"
-                                : $" [{param.Name}]");
-                        }
-
-                        return sb.ToString();
-                    }
+                    
 
                     var builder = GetBuilder()
                         .AddField(cmd.Name,
@@ -282,14 +284,13 @@ namespace Espeon.Commands
             foreach (var col in batch)
             {
                 var builder = GetBuilder()
-                    .WithFooter("You can't go any deeper than this D:");
+                    .WithFooter($"Type {Context.PrefixUsed}help Command Name to view help for that specific command");
 
                 foreach (var command in col)
                 {
                     //TODO add summaries/examples
                     builder.AddField(command.Name,
-                            $"{Context.PrefixUsed}{command.FullAliases.First().ToLower()} " +
-                                $"{string.Join(' ', command.Parameters.Select(x => $"[{x.Name}]"))}");
+                            $"{Context.PrefixUsed}{command.FullAliases.First().ToLower()}{GetParameters(command)}");
                 }
 
                 toSend.Add(builder);

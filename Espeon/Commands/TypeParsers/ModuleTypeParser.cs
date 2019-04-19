@@ -37,13 +37,12 @@ namespace Espeon.Commands
 
             if (module is null)
             {
-                var guild = context.Client.Guilds.FirstOrDefault(x =>
-                    x.Name.Equals(value, StringComparison.InvariantCultureIgnoreCase));
+                var isGuild = string.Equals(value, context.Guild.Name, StringComparison.InvariantCultureIgnoreCase);
 
-                if(guild is null)
+                if(!isGuild)
                     return new TypeParserResult<Module>(resp[p][0]);
 
-                module = modules.SingleOrDefault(x => x.Name == guild.ToString());
+                module = modules.Single(x => x.Name == context.Guild.Id.ToString());
             }
 
             var result = await module.RunChecksAsync(context, provider);

@@ -1,12 +1,11 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Espeon.Commands;
 using Humanizer;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord.WebSocket;
-using Qommon.Collections;
 
 namespace Espeon
 {
@@ -120,14 +119,14 @@ namespace Espeon
 
         public static IReadOnlyDictionary<Type, string> ExampleUsage = new Dictionary<Type, string>
         {
-            [typeof(IGuildUser)] = "@User",
+            [typeof(IGuildUser)] = "@user",
             [typeof(TimeSpan)] = "1day3hrs14mins30s",
-            [typeof(Alias)] = "Add/Remove",
-            [typeof(SocketRole)] = "@Role",
+            [typeof(Alias)] = "add/remove",
+            [typeof(SocketRole)] = "@role",
             [typeof(Emote[])] = "<:pepehands:2394873298>",
             [typeof(SocketTextChannel)] = "#channel",
             [typeof(ResponsePack)] = "owo",
-            [typeof(Face)] = "Heads/Tails"
+            [typeof(Face)] = "heads/tails"
         };
     }
 }
