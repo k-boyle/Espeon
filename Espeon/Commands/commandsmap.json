@@ -44,9 +44,11 @@
     },
     "Gift Candies": {
       "Default": [
+        "You can't gift yourself",
         "Your gift basket has been made and sent"
       ],
       "owo": [
+        ">>.<< u cant gwift urself",
         "\\*notices package\\* uwu uur swo genurus"
       ]
     },

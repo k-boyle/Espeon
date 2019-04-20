@@ -42,11 +42,13 @@ namespace Espeon
                             var position = argumentParseFailedResult.Position ??
                                            throw new QuahuLiedException("Result.Position");
 
+                            var padding = position + context.PrefixUsed.Length + string.Join(' ', context.Path).Length + 2;
+
                             message = string.Concat(
                                 result.Reason,
                                 "\n```",
-                                $"\n{context.Message.Content.Replace(context.PrefixUsed, "")}\n",
-                                $"{"^".PadLeft(position, ' ')}",
+                                $"\n{context.Message.Content}\n",
+                                $"{"^".PadLeft(padding, ' ')}",
                                 "\n```");
 
                             builder.WithDescription(message);

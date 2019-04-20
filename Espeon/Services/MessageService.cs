@@ -57,6 +57,10 @@ namespace Espeon.Services
 
                     var user = await userStore.GetOrCreateUserAsync(msg.Author);
                     user.CandyAmount += _config.RandomCandyAmount;
+
+                    if (user.HighestCandies > user.CandyAmount)
+                        user.HighestCandies = user.CandyAmount;
+
                     userStore.Update(user);
 
                     await userStore.SaveChangesAsync();

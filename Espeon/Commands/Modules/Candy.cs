@@ -128,9 +128,12 @@ namespace Espeon.Commands
             [RequireRange(0)]
             int amount)
         {
+            if (user.Id == Context.User.Id)
+                return SendNotOkAsync(0);
+
             return Task.WhenAll(
                 CandyService.TransferCandiesAsync(Context, Context.User, user, amount),
-                SendOkAsync(0));
+                SendOkAsync(1));
         }
 
         [Command("Steal")]
