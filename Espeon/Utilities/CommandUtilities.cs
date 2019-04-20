@@ -6,6 +6,7 @@ using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Espeon
 {
@@ -42,13 +43,17 @@ namespace Espeon
                             var position = argumentParseFailedResult.Position ??
                                            throw new QuahuLiedException("Result.Position");
 
-                            var padding = position + context.PrefixUsed.Length + string.Join(' ', context.Path).Length + 2;
+                            var padding = position + context.PrefixUsed.Length 
+                                                   + string.Join(' ', context.Path).Length + 2;
+
+                            var leftPad = "^".PadLeft(padding, ' ');
+                            var rightPad = leftPad.PadRight(context.Message.Content.Length, '^');
 
                             message = string.Concat(
                                 result.Reason,
                                 "\n```",
                                 $"\n{context.Message.Content}\n",
-                                $"{"^".PadLeft(padding, ' ')}",
+                                rightPad,
                                 "\n```");
 
                             builder.WithDescription(message);
@@ -130,5 +135,18 @@ namespace Espeon
             [typeof(ResponsePack)] = "owo",
             [typeof(Face)] = "heads/tails"
         };
+
+        public static IReadOnlyCollection<Type> GetTypeParserTypes(CommandService commands, Assembly assembly)
+        {
+            var typeParserInterface = commands.GetType().Assembly.GetTypes()
+                .FirstOrDefault(x => x.Name == "ITypeParser")?.GetTypeInfo();
+
+            if (typeParserInterface is null)
+                throw new QuahuRenamedException("ITypeParser");
+
+            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x));
+
+            return parsers.ToArray();
+        }
     }
 }

@@ -25,7 +25,10 @@ namespace Espeon.Services
             _services.Inject(game);
 
             _games[context.User.Id] = game;
-            return await _interactive.TryAddCallbackAsync(game, timeout);
+
+            var res = await game.StartAsync();
+
+            return res || await _interactive.TryAddCallbackAsync(game, timeout);
         }
 
         public async Task<bool> TryLeaveGameAsync(EspeonContext context)

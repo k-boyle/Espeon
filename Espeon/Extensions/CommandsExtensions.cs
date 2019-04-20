@@ -11,13 +11,7 @@ namespace Espeon
     {
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
-            var typeParserInterface = commands.GetType().Assembly.GetTypes()
-                .FirstOrDefault(x => x.Name == "ITypeParser")?.GetTypeInfo();
-
-            if (typeParserInterface is null)
-                throw new QuahuRenamedException("ITypeParser");
-
-            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x));
+            var parsers = Utilities.GetTypeParserTypes(commands, assembly);
 
             var internalAddParser = commands.GetType().GetMethod("AddTypeParserInternal",
                 BindingFlags.NonPublic | BindingFlags.Instance);
