@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Espeon.Services;
 
 namespace Espeon.Commands
 {
@@ -34,13 +35,11 @@ namespace Espeon.Commands
             if (canExecute.Count > 0)
                 return new TypeParserResult<IReadOnlyCollection<Command>>(canExecute);
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = $"Failed to find commands matching {value}",
-                [ResponsePack.owo] = $"fwailed to fwind cwommands machwin {value}"
-            };
+            var response = provider.GetService<ResponseService>();
+            var user = context.Invoker;
 
-            return new TypeParserResult<IReadOnlyCollection<Command>>(resp[context.Invoker.ResponsePack]);
+            return new TypeParserResult<IReadOnlyCollection<Command>>(
+                response.GetResponse(this, user.ResponsePack, 0, value));
         }
     }
 }

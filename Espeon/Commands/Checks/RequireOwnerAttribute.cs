@@ -1,6 +1,7 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -10,6 +11,7 @@ namespace Espeon.Commands
         public override async ValueTask<CheckResult> CheckAsync(CommandContext originalContext, IServiceProvider provider)
         {
             var context = (EspeonContext)originalContext;
+            var response = provider.GetService<ResponseService>();
 
             var app = await context.Client.GetApplicationInfoAsync();
 
@@ -18,22 +20,9 @@ namespace Espeon.Commands
 
             var user = context.Invoker;
 
-            var resp = new Dictionary<ResponsePack, string[]>
-            {
-                [ResponsePack.Default] = new[]
-                {
-                    $"{Module?.Name} commands can only be used by the bot owner",
-                    $"{Command?.Name} can only be used by the bot owner"
-                },
-
-                [ResponsePack.owo] = new []
-                {
-                    $"only daddy can use {Module?.Name}",
-                    $"only daddy can use {Command?.Name}"
-                }
-            };
-
-            return CheckResult.Unsuccessful(Command is null ? resp[user.ResponsePack][0] : resp[user.ResponsePack][1]);
+            return CheckResult.Unsuccessful(Command is null 
+                ? response.GetResponse(this, user.ResponsePack, 0, Module?.Name) 
+                : response.GetResponse(this, user.ResponsePack, 1, Command?.Name));
         }
     }
 }

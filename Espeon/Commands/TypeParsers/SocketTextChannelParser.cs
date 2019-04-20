@@ -1,7 +1,8 @@
 ﻿using Discord.WebSocket;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,24 +14,11 @@ namespace Espeon.Commands
         {
             var context = (EspeonContext) ctx;
 
-            var resp = new Dictionary<ResponsePack, string[]>
-            {
-                [ResponsePack.Default] = new []
-                {
-                    "This command must be used in a guild",
-                    "No channel found matching the input"
-                },
-                [ResponsePack.owo] = new []
-                {
-                    "dis cwomand must be wused in a gwuild",
-                    "no chwannel fwound"
-                }
-            };
-
             var p = context.Invoker.ResponsePack;
+            var response = provider.GetService<ResponseService>();
 
             if (context.Guild == null)
-                return new TypeParserResult<SocketTextChannel>(resp[p][0]);
+                return new TypeParserResult<SocketTextChannel>(response.GetResponse(this, p, 0));
 
             var channels = context.Guild.TextChannels;
 
@@ -43,7 +31,7 @@ namespace Espeon.Commands
             channel ??= channels.FirstOrDefault(x => x.Name == value);
 
             return channel is null
-                ? new TypeParserResult<SocketTextChannel>(resp[p][1]) 
+                ? new TypeParserResult<SocketTextChannel>(response.GetResponse(this, p, 1)) 
                 : new TypeParserResult<SocketTextChannel>(channel);
         }
     }

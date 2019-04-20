@@ -1,6 +1,7 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -27,20 +28,15 @@ namespace Espeon.Commands
         {
             var value = (int)argument;
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = $"Value must be between {_minValue} and {_maxValue}",
-                [ResponsePack.owo] = $"oowwww walue mst be bitween {_minValue} and {_maxValue}"
-            };
-
             if (value >= _minValue && value < _maxValue)
                 return CheckResult.Successful;
 
             var context = (EspeonContext) ctx;
+            var response = provider.GetService<ResponseService>();
 
             var user = context.Invoker;
 
-            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
+            return CheckResult.Unsuccessful(response.GetResponse(this, user.ResponsePack, 0, _minValue, _maxValue));
         }
     }
 }

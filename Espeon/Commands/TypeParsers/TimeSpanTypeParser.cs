@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Commands
 {
@@ -18,13 +20,10 @@ namespace Espeon.Commands
             var matches = TimeSpanRegex.Matches(value);
             if (matches.Count <= 0)
             {
-                var resp = new Dictionary<ResponsePack, string>
-                {
-                    [ResponsePack.Default] = "Failed to parse time span",
-                    [ResponsePack.owo] = "fwailed to parse twime"
-                };
+                var response = provider.GetService<ResponseService>();
+                var user = context.Invoker;
 
-                return new TypeParserResult<TimeSpan>(resp[context.Invoker.ResponsePack]);
+                return new TypeParserResult<TimeSpan>(response.GetResponse(this, user.ResponsePack, 0));
             }
 
             var result = new TimeSpan();

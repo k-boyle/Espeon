@@ -72,7 +72,7 @@ namespace Espeon.Commands
             _manageMessages = Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages;
         }
 
-        async Task IGame.StartAsync()
+        async Task<bool> IGame.StartAsync()
         {
             _playerCards.Add(_deck.Dequeue());
             _dealerCards.Add(_deck.Dequeue());
@@ -82,11 +82,11 @@ namespace Espeon.Commands
 
             var playerTotal = CalculateTotal(ref _playerCards);
 
-            if (playerTotal == 21)
-            {
-                //TODO doesn't work, need to redo games system
-                await _games.TryLeaveGameAsync(Context);
-            }
+            if (playerTotal != 21)
+                return false;
+
+            await ((IGame) this).EndAsync();
+            return true;
         }
 
         async Task IGame.EndAsync()
@@ -181,7 +181,7 @@ namespace Espeon.Commands
 
         //TODO don't like => Rethink game system?
         Task IReactionCallback.InitialiseAsync()
-            => ((IGame)this).StartAsync();
+            => Task.CompletedTask;
 
         Task IReactionCallback.HandleTimeoutAsync()
             => _games.TryLeaveGameAsync(Context);

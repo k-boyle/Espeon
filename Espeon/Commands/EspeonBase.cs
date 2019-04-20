@@ -46,9 +46,9 @@ namespace Espeon.Commands
             var cmd = Context.Command;
             var user = Context.Invoker;
 
-            var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
+            var resp = Responses.GetResponse(cmd.Module.Name, cmd.Name, user.ResponsePack, index, args);
 
-            var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][index], args));
+            var response = ResponseBuilder.Message(Context, resp);
             return await SendMessageAsync(response);
         }
 
@@ -56,11 +56,10 @@ namespace Espeon.Commands
         {
             var cmd = Context.Command;
             var user = Context.Invoker;
-            
-            var responses = Responses.GetResponses(cmd.Module.Name, cmd.Name);
 
-            var response = ResponseBuilder.Message(Context, 
-                string.Format(responses[user.ResponsePack][index], args), false);
+            var resp = Responses.GetResponse(cmd.Module.Name, cmd.Name, user.ResponsePack, index, args);
+
+            var response = ResponseBuilder.Message(Context, resp, false);
             return await SendMessageAsync(response);
         }
 

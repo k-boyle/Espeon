@@ -1,6 +1,7 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -20,14 +21,9 @@ namespace Espeon.Commands
                 return CheckResult.Successful;
 
             var user = context.Invoker;
+            var response = provider.GetService<ResponseService>();
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = "This command can only be executed by the guilds owner",
-                [ResponsePack.owo] = "owwnnoo dis comwand can only bee exercuted bwy the gwuild owoner"
-            };
-
-            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
+            return CheckResult.Unsuccessful(response.GetResponse(this, user.ResponsePack, 0));
         }
     }
 }

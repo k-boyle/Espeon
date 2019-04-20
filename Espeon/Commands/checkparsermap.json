@@ -1,0 +1,182 @@
+{
+  "RequireElevationAttribute": {
+    "Default": [
+      "You need to be at least a moderator of this guild to use this command",
+      "You need to be an admin of this guild to use this command",
+      "something went horribly wrong"
+    ],
+    "owo": [
+      "ownno >,< u need to be a mod",
+      "ownnooo u need to bwe a daddy",
+      "sumting went hirribly wong"
+    ]
+  },
+  "RequireGuildAttribute": {
+    "Default": [
+      "Command cannot be run in this guild"
+    ],
+    "owo": [
+      "ownno dis cwommand cant be wun is dis gwuild"
+    ]
+  },
+  "RequireGuildOwnerAttribute": {
+    "Default": [
+      "This command can only be executed by the guilds owner"
+    ],
+    "owo": [
+      "owwnnoo dis comwand can only bee exercuted bwy the gwuild owoner"
+    ]
+  },
+  "RequireHierarchyAttribute": {
+    "Default": [
+      "You don't have hierachy over the guild owner",
+      "I need hierarchy over this user",
+      "You require hierarchy over this user"
+    ],
+    "owo": [
+      "u cant tuch the guild daddy >:(",
+      "im too low fur them >>.<<",
+      "owwwno ur too low furr themm >>.<<"
+    ]
+  },
+  "RequireOwnerAttribute": {
+    "Default": [
+      "{0} commands can only be used by the bot owner",
+      "{0} can only be used by the bot owner"
+    ],
+    "owo": [
+      "only daddy can use {0} cwommands",
+      "only daddy can use {0}"
+    ]
+  },
+  "RequirePermissionsAttribute": {
+    "Default": [
+      "{0} need the following permissions to execute this command\n{1}"
+    ],
+    "owo": [
+      "{0} need these permzz {1}"
+    ]
+  },
+  "RequirePositionHierarchy": {
+    "Default": [
+      "I require hierarchy over this role"
+    ],
+    "owo": [
+      "oww this wole is twoo big 4 mee ><"
+    ]
+  },
+  "RequireRangeAttribute": {
+    "Default": [
+      "Value must be between {0} and {1}"
+    ],
+    "owo": [
+      "oowwww walue mst be bitween {0} and {1}"
+    ]
+  },
+  "RequireSpecificLengthAttribute": {
+    "Default": [
+      "String length must be between {0} and {1}"
+    ],
+    "owo": [
+      "ownnno urr mesage must be bweteen {0} n {1}"
+    ]
+  },
+  "RequireUnlockedAttribute": {
+    "Default": [
+      "You haven't unlocked this response pack"
+    ],
+    "owo": [
+      "ownnno uu dunt hav dis respwons pack"
+    ]
+  },
+  "CandyTypeParser": {
+    "Default": [
+      "Amount specified is not a valid integer",
+      "Amount specified must be a positive integer",
+      "You don't have enough candies"
+    ],
+    "owo": [
+      "awmount spwecifed is not an intwiger",
+      "awmount spwecified must be pwositive",
+      "ownnoo >.< u dont hav enuff cwandies"
+    ]
+  },
+  "CommandsTypeParser": {
+    "Default": [
+      "Failed to find commands matching {0}"
+    ],
+    "owo": [
+      "fwailed to fwind cwommands machwin {0}"
+    ]
+  },
+  "CommandTypeParser": {
+    "Default": [
+      "Multiple or no matching commands"
+    ],
+    "owo": [
+      "multwiple or no mwaching cwommands"
+    ]
+  },
+  "CustomCommandTypeParser": {
+    "Default": [
+      "Failed to find a matching command"
+    ],
+    "owo": [
+      "fwailed to fwind cwommand"
+    ]
+  },
+  "IGuildUserTypeParser": {
+    "Default": [
+      "Multiple users found, try mentioning them",
+      "Failed to find a matching user"
+    ],
+    "owo": [
+      "i fwound twoo many pweopol, twy mentioning them :3",
+      "fwailed to fwind user"
+    ]
+  },
+  "ModuleTypeParser": {
+    "Default": [
+      "Failed to find module with name {0}",
+      "You lack the required permissions to view this module"
+    ],
+    "owo": [
+      "fwailed to fwind module wid name {0}",
+      "u wack purrrmissions"
+    ]
+  },
+  "SocketRoleParser": {
+    "Default": [
+      "No role found matching the input"
+    ],
+    "owo": [
+      "no wole fwound"
+    ]
+  },
+  "SocketTextChannelParser": {
+    "Default": [
+      "This command must be used in a guild",
+      "No channel found matching the input"
+    ],
+    "owo": [
+      "dis cwomand must be wused in a gwuild",
+      "no chwannel fwound"
+    ]
+  },
+  "TimeSpanTypeParser": {
+    "Default": [
+      "Failed to parse time span"
+    ],
+    "owo": [
+      "fwailed to parse twime"
+    ]
+  },
+  "EmoteTypeParser": {
+    "Default": [
+      "Failed to parse emote"
+    ],
+    "owo": [
+      "fwailed to pwarse wemote"
+    ]
+  }
+}

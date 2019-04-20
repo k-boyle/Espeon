@@ -1,7 +1,8 @@
 ﻿using Discord.WebSocket;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,13 +23,11 @@ namespace Espeon.Commands
             role ??= context.Guild.Roles
                 .FirstOrDefault(x => string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = "No role found matching the input",
-                [ResponsePack.owo] = "no wole fwound"
-            };
+            var response = provider.GetService<ResponseService>();
+            var user = context.Invoker;
 
-            return role is null ? new TypeParserResult<SocketRole>(resp[context.Invoker.ResponsePack]) 
+            return role is null 
+                ? new TypeParserResult<SocketRole>(response.GetResponse(this, user.ResponsePack, 0)) 
                 : new TypeParserResult<SocketRole>(role);
         }
     }

@@ -4,7 +4,7 @@ namespace Espeon.Commands
 {
     public interface IGame : IReactionCallback
     {
-        Task StartAsync();
+        Task<bool> StartAsync();
         Task EndAsync();
     }
 }

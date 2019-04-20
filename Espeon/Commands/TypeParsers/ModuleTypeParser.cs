@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,28 +19,15 @@ namespace Espeon.Commands
             var module = modules.SingleOrDefault(x =>
                 string.Equals(x.Name, value, StringComparison.InvariantCultureIgnoreCase));
 
-            var resp = new Dictionary<ResponsePack, string[]>
-            {
-                [ResponsePack.Default] = new []
-                {
-                    $"Failed to find module with name {value}",
-                    "You lack the required permissions to view this module"
-                },
-                [ResponsePack.owo] = new []
-                {
-                    $"fwailed to fwind module wid name {value}",
-                    "u wack purrrmissions"
-                }
-            };
-
             var p = context.Invoker.ResponsePack;
+            var response = provider.GetService<ResponseService>();
 
             if (module is null)
             {
                 var isGuild = string.Equals(value, context.Guild.Name, StringComparison.InvariantCultureIgnoreCase);
 
                 if(!isGuild)
-                    return new TypeParserResult<Module>(resp[p][0]);
+                    return new TypeParserResult<Module>(response.GetResponse(this, p, 0, value));
 
                 module = modules.Single(x => x.Name == context.Guild.Id.ToString());
             }
@@ -49,7 +36,7 @@ namespace Espeon.Commands
 
             return result.IsSuccessful 
                 ? new TypeParserResult<Module>(module) 
-                : new TypeParserResult<Module>(resp[p][1]);
+                : new TypeParserResult<Module>(response.GetResponse(this, p, 1));
         }
     }
 }

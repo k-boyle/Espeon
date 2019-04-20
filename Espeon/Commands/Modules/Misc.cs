@@ -13,7 +13,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.Scripting;
 
 namespace Espeon.Commands
 {
@@ -45,8 +44,11 @@ namespace Espeon.Commands
         {
             var user = Context.Invoker;
             var latency = Context.Client.Latency;
-            var responses = Responses.GetResponses(Context.Command.Module.Name, Context.Command.Name);
-            var response = ResponseBuilder.Message(Context, string.Format(responses[user.ResponsePack][0], latency));
+
+            var resp = Responses.GetResponse(Context.Command.Module.Name, 
+                Context.Command.Name, user.ResponsePack, 0, latency);
+
+            var response = ResponseBuilder.Message(Context, resp);
 
             var sw = new Stopwatch();
             sw.Start();
@@ -55,8 +57,10 @@ namespace Espeon.Commands
 
             sw.Stop();
 
-            response = ResponseBuilder
-                .Message(Context, string.Format(responses[user.ResponsePack][1], latency, sw.ElapsedMilliseconds));
+            resp = Responses.GetResponse(Context.Command.Module.Name, 
+                Context.Command.Name, user.ResponsePack, 0, latency, sw.ElapsedMilliseconds);
+
+            response = ResponseBuilder.Message(Context, resp);
 
             await message.ModifyAsync(x => x.Embed = response);
         }

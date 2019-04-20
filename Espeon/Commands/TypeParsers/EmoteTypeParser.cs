@@ -1,7 +1,8 @@
 ﻿using Discord;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands.TypeParsers
@@ -15,13 +16,10 @@ namespace Espeon.Commands.TypeParsers
             if (Emote.TryParse(value, out var emote))
                 return TypeParserResult<Emote>.Successful(emote);
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = "Failed to parse emote",
-                [ResponsePack.owo] = "fwailed to pwarse wemote"
-            };
+            var response = provider.GetService<ResponseService>();
+            var user = context.Invoker;
 
-            return TypeParserResult<Emote>.Unsuccessful(resp[context.Invoker.ResponsePack]);
+            return TypeParserResult<Emote>.Unsuccessful(response.GetResponse(this, user.ResponsePack, 0));
         }
     }
 }

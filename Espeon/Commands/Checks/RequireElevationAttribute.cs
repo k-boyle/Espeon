@@ -1,6 +1,7 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands
@@ -22,24 +23,9 @@ namespace Espeon.Commands
                 return CheckResult.Successful;
 
             var context = (EspeonContext)originalContext;
+            var response = provider.GetService<ResponseService>();
 
             var currentGuild = context.CurrentGuild;
-
-            var resp = new Dictionary<ResponsePack, string[]>
-            {
-                [ResponsePack.Default] = new []
-                {
-                    "You need to be at least a moderator of this guild to use this command",
-                    "You need to be an admin of this guild to use this command",
-                    "something went horribly wrong"
-                },
-                [ResponsePack.owo] = new []
-                {
-                    "ownno >,< u need to be a mod",
-                    "ownnooo u need to bwe a daddy",
-                    "sumting went hirribly wong"
-                }
-            };
 
             var p = context.Invoker.ResponsePack;
 
@@ -49,15 +35,15 @@ namespace Espeon.Commands
                     return currentGuild.Moderators.Contains(context.User.Id) ||
                            currentGuild.Admins.Contains(context.User.Id)
                         ? CheckResult.Successful
-                        : CheckResult.Unsuccessful(resp[p][0]);
+                        : CheckResult.Unsuccessful(response.GetResponse(this, p, 0));
 
                 case ElevationLevel.Admin:
                     return currentGuild.Admins.Contains(context.User.Id)
                         ? CheckResult.Successful
-                        : CheckResult.Unsuccessful(resp[p][1]);
+                        : CheckResult.Unsuccessful(response.GetResponse(this, p, 1));
 
                 default:
-                    return CheckResult.Unsuccessful(resp[p][2]);
+                    return CheckResult.Unsuccessful(response.GetResponse(this, p, 2));
             }
         }
     }    

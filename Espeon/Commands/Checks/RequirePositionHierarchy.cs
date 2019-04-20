@@ -1,8 +1,9 @@
 ﻿using Discord.WebSocket;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Commands
 {
@@ -12,19 +13,14 @@ namespace Espeon.Commands
         {
             var role = argument as SocketRole;
             var context = (EspeonContext)originalContext;
+            var response = provider.GetService<ResponseService>();
 
             if (role.Position <= context.Guild.CurrentUser.Hierarchy)
                     return CheckResult.Successful;
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = "I require hierarchy over this role",
-                [ResponsePack.owo] = "oww this wole is twoo big 4 mee ><"
-            };
-
             var user = context.Invoker;
 
-            return CheckResult.Unsuccessful(resp[user.ResponsePack]);
+            return CheckResult.Unsuccessful(response.GetResponse(this, user.ResponsePack, 0));
         }
     }
 }

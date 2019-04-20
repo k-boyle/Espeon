@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -40,24 +42,11 @@ namespace Espeon.Commands
                     || string.Equals(x.Nickname, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray()
                 : users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray();
 
-            var resp = new Dictionary<ResponsePack, string[]>
-            {
-                [ResponsePack.Default] = new[]
-                {
-                    "Multiple users found, try mentioning them",
-                    "Failed to find a matching user"
-                },
-                [ResponsePack.owo] = new []
-                {
-                    "i fwound twoo many pweopol, twy mentioning them :3",
-                    "fwailed to fwind user"
-                }
-            };
-
             var p = context.Invoker.ResponsePack;
+            var response = provider.GetService<ResponseService>();
 
             if (matchingUsers.Count > 1)
-                return new TypeParserResult<IGuildUser>(resp[p][0]);
+                return new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 0));
 
             if (matchingUsers.Count == 1)
                 user = matchingUsers[0];
@@ -66,12 +55,12 @@ namespace Espeon.Commands
                 return new TypeParserResult<IGuildUser>(user);
 
             if(id == 0)
-                return new TypeParserResult<IGuildUser>(resp[p][1]);
+                return new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 1));
 
             user = await context.Client.Rest.GetGuildUserAsync(context.Guild.Id, id);
 
             return user is null
-                ? new TypeParserResult<IGuildUser>(resp[p][1])
+                ? new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 1))
                 : new TypeParserResult<IGuildUser>(user);
         }
 

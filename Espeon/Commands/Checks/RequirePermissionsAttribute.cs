@@ -1,8 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,15 +65,12 @@ namespace Espeon.Commands
                 sb.AppendLine(channelPerm);
 
             var u = context.Invoker;
+            var response = provider.GetService<ResponseService>();
 
-            var resp = new Dictionary<ResponsePack, string>
-            {
-                [ResponsePack.Default] = $"{(_target == PermissionTarget.User ? "You" : "I")} " +
-                                         $"need the following permissions to execute this command\n{sb}",
-                [ResponsePack.owo] = $"{(_target == PermissionTarget.User ? "You" : "I")} need these permzz {sb}"
-            };
+            var target = _target == PermissionTarget.User ? "You" : "I";
 
-            return CheckResult.Unsuccessful(resp[u.ResponsePack]);
+            return CheckResult.Unsuccessful(
+                response.GetResponse(this, u.ResponsePack, 0, target, sb));
         }
     }
 }
