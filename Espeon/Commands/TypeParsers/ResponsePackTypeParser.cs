@@ -18,11 +18,14 @@ namespace Espeon.Commands
         {
             var commands = provider.GetService<CommandService>();
 
-            if (_parseMethod is null)
+            if (_parseMethod is null || _parser is null)
             {
                 var type = commands.GetType();
                 var field = type.GetField("_primitiveTypeParsers",
                     BindingFlags.Instance | BindingFlags.NonPublic);
+
+                if(field is null)
+                    throw new QuahuRenamedException("_primitiveTypeParsers");
 
                 var dict = (IDictionary)field.GetValue(commands);
                 _parser = dict[typeof(ResponsePack)];
@@ -30,6 +33,9 @@ namespace Espeon.Commands
                 type = _parser.GetType();
 
                 _parseMethod = type.GetMethod("TryParse");
+
+                if(_parseMethod is null)
+                    throw new QuahuRenamedException("TypeParse");
             }
 
             var parameters = new object[] { parameter, value, null };
@@ -45,7 +51,7 @@ namespace Espeon.Commands
             var context = (EspeonContext)ctx;
             var user = context.Invoker;
 
-            return new TypeParserResult<ResponsePack>(
+            return TypeParserResult<ResponsePack>.Unsuccessful(
                 response.GetResponse(this, user.ResponsePack, 0, toSend));
         }
     }
