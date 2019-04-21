@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Espeon.Databases;
 
 namespace Espeon.Services
 {
@@ -70,8 +71,8 @@ namespace Espeon.Services
             };
 
             _client.MessageUpdated += (_, msg, __) =>
-                msg is SocketUserMessage message 
-                    ? HandleReceivedMessageAsync(message, true) 
+                msg is SocketUserMessage message
+                    ? HandleReceivedMessageAsync(message, true)
                     : Task.CompletedTask;
         }
 
@@ -80,43 +81,41 @@ namespace Espeon.Services
             if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id)
                 return;
 
-            if (!(message.Channel is SocketTextChannel textChannel) || 
+            if (!(message.Channel is SocketTextChannel textChannel) ||
                 !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
                 return;
 
-            var guildStore = _services.GetService<GuildStore>();
+            IReadOnlyCollection<string> prefixes;
 
-            var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+            using (var guildStore = _services.GetService<GuildStore>())
+            {
+                var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+                prefixes = guild.Prefixes;
 
-            var prefixes = guild.Prefixes;
-
-            if (guild.RestrictedChannels.Contains(textChannel.Id) || guild.RestrictedUsers.Contains(message.Author.Id))
-                return;
+                if (guild.RestrictedChannels.Contains(textChannel.Id) || guild.RestrictedUsers.Contains(message.Author.Id))
+                    return;
+            }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
             {
-                var foundCommands = output.FindCommands();
+                var commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
 
-                foreach (var command in foundCommands)
+                var result = await _commands.ExecuteAsync(output, commandContext, _services);
+
+                if (result is CommandNotFoundResult)
                 {
-                    var commandContext = await EspeonContext.CreateAsync(guildStore, guild, 
-                        _client, message, isEdit, prefix);
+                    commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
+                    result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
+                }
 
-                    var result = await _commands.ExecuteAsync(command, commandContext, _services);
-
-                    if (result is CommandNotFoundResult)
+                if (!result.IsSuccessful && !(result is ExecutionFailedResult))
+                {
+                    await CommandErroredAsync(new CasinoCommandErroredEventArgs
                     {
-                        await message.AddReactionAsync(_emotes.Collection["BlobCat"]);
-                    }
-                    else if (!result.IsSuccessful && !(result is ExecutionFailedResult))
-                    {
-                        await CommandErroredAsync(new CasinoCommandErroredEventArgs
-                        {
-                            Context = commandContext,
-                            Result = result as FailedResult
-                        });
-                    }
+                        Context = commandContext,
+                        Result = result as FailedResult
+                    });
                 }
             }
         }
@@ -237,10 +236,10 @@ namespace Espeon.Services
             }
 
             return await context.Channel.SendFileAsync(
-                stream:   properties.Stream,
+                stream: properties.Stream,
                 filename: properties.FileName,
-                text:     properties.Content,
-                embed:    properties.Embed);
+                text: properties.Content,
+                embed: properties.Embed);
         }
 
         private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
