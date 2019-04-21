@@ -35,7 +35,7 @@ namespace Espeon.Commands
                 _parseMethod = type.GetMethod("TryParse");
 
                 if(_parseMethod is null)
-                    throw new QuahuRenamedException("TypeParse");
+                    throw new QuahuRenamedException("TryParse");
             }
 
             var parameters = new object[] { parameter, value, null };
