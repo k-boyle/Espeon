@@ -106,7 +106,7 @@
       "Failed to find commands matching {0}"
     ],
     "owo": [
-      "fwailed to fwind cwommands machwin {0}"
+      "fwailed to fwind cwommands machin {0}"
     ]
   },
   "CommandTypeParser": {
@@ -178,5 +178,13 @@
     "owo": [
       "fwailed to pwarse wemote"
     ]
-  }
+  },
+  "ResponsePackTypeParser": {
+    "Default": [
+      "Pack must be one of the following: {0}"
+    ],
+    "owo": [
+      "pack mwust be one of the fwolling: {0}"
+    ] 
+  } 
 }
