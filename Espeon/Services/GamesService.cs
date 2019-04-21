@@ -24,9 +24,10 @@ namespace Espeon.Services
 
             _services.Inject(game);
 
-            _games[context.User.Id] = game;
-
             var res = await game.StartAsync();
+
+            if (!res)
+                _games[context.User.Id] = game;
 
             return res || await _interactive.TryAddCallbackAsync(game, timeout);
         }

@@ -108,7 +108,7 @@ namespace Espeon.Commands
                 //lose 
 
                 amount = -_bet;
-                description = $"I win! You lose {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
+                description = $"I win! You lose {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                 color = Color.Red;
             }
             else
@@ -125,7 +125,7 @@ namespace Espeon.Commands
 
                     amount = (int)(_bet * NormalPayout);
                     
-                    description = $"I struck out! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
+                    description = $"I struck out! You win {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
                 else if (dealerTotal == playerTotal)
@@ -143,7 +143,7 @@ namespace Espeon.Commands
 
                     amount = -_bet;
 
-                    description = $"I win! You lose {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
+                    description = $"I win! You lose {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Red;
                 }
                 else if(playerTotal == 21)
@@ -152,7 +152,7 @@ namespace Espeon.Commands
 
                     amount = (int)(_bet * BlackjackPayout);
                     
-                    description = $"BLACKJACK! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
+                    description = $"BLACKJACK! You win {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Gold;
                 }
                 else
@@ -161,7 +161,7 @@ namespace Espeon.Commands
 
                     amount = (int)(_bet * NormalPayout);
                     
-                    description = $"You have the higher score! You win {amount}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
+                    description = $"You have the higher score! You win {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
                     color = Color.Green;
                 }
             }
