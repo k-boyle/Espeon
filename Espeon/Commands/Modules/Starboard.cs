@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
+using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {
@@ -74,8 +75,8 @@ namespace Espeon.Commands
 
             var randomStar = guild.StarredMessages[Random.Next(guild.StarredMessages.Count)];
 
-            var user = await Context.Guild.GetGuildUserAsync(randomStar.AuthorId)
-                ?? await Context.Client.GetUserAsync(randomStar.AuthorId);
+            var user = await Context.Guild.GetOrFetchUserAsync(randomStar.AuthorId)
+                ?? await Context.Client.GetOrFetchUserAsync(randomStar.AuthorId);
 
             var jump = Utilities.BuildJumpUrl(Context.Guild.Id, randomStar.ChannelId, randomStar.Id);
 

@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class CommandManagementService : BaseService
+    public class CommandManagementService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly CommandService _commands;
 

@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class EmotesService : BaseService
+    public class EmotesService : BaseService<InitialiseArgs>
     {
         private const string EmotesDir = "./Emotes/emotes.json";
 
@@ -18,7 +19,7 @@ namespace Espeon.Services
             Collection = new Dictionary<string, Emote>();
         }
 
-        public override Task InitialiseAsync(InitialiseArgs args)
+        public override Task InitialiseAsync(IServiceProvider services, InitialiseArgs args)
         {
             var emotesObject = JObject.Parse(File.ReadAllText(EmotesDir));
 

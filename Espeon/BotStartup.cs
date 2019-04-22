@@ -1,4 +1,6 @@
 ﻿using Casino.Common;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Databases;
@@ -129,7 +131,7 @@ namespace Espeon
 
             await commandStore.SaveChangesAsync();
 
-            _services.GetService<ResponseService>().LoadResponses(modules);
+            _services.GetService<ResponseService>()?.LoadResponses(modules);
         }
 
         //TODO clean this up

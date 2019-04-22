@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class LogService : BaseService
+    public class LogService : BaseService<InitialiseArgs>
     { 
         private readonly SemaphoreSlim _semaphore;
 

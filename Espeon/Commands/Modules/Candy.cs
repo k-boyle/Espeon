@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {
@@ -97,8 +98,8 @@ namespace Espeon.Commands
                 if (foundUsers.Count == 10)
                     break;
 
-                var found = await Context.Guild.GetGuildUserAsync(user.Id)
-                    ?? await Context.Client.GetUserAsync(user.Id);
+                var found = await Context.Guild.GetOrFetchUserAsync(user.Id)
+                    ?? await Context.Client.GetOrFetchUserAsync(user.Id);
 
                 if (found is null)
                     continue;

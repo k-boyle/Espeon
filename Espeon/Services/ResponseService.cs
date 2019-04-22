@@ -1,16 +1,17 @@
-﻿using Espeon.Commands;
+﻿using Casino.Common.DependencyInjection;
+using Espeon.Commands;
 using Newtonsoft.Json;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Casino.Common.Qmmands;
 using Module = Qmmands.Module;
 
 namespace Espeon.Services
 {
-    public class ResponseService : BaseService
+    public class ResponseService : BaseService<InitialiseArgs>
     {
         private const string CommandMapDir = "./Commands/commandsmap.json";
         private const string CheckParserMapDir = "./Commands/checkparsermap.json";
@@ -74,7 +75,7 @@ namespace Espeon.Services
                 !x.IsAbstract &&
                 x.IsSubclassOf(typeof(CheckAttribute)) || x.IsSubclassOf(typeof(ParameterCheckAttribute)));
 
-            var parserTypes = Utilities.GetTypeParserTypes(_commands, assembly);
+            var parserTypes = _commands.FindTypeParsers(assembly);
 
             var joint = checkTypes.Concat(parserTypes);
 

@@ -5,10 +5,11 @@ using Espeon.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Commands
 {
-    public class InteractiveService : BaseService
+    public class InteractiveService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly TaskQueue _scheduler;
@@ -22,7 +23,7 @@ namespace Espeon.Commands
             _reactionCallbacks = new ConcurrentDictionary<ulong, CallbackData>();
         }
 
-        public override Task InitialiseAsync(InitialiseArgs args)
+        public override Task InitialiseAsync(IServiceProvider services, InitialiseArgs args)
         {
             _client.ReactionAdded += HandleReactionAsync;
             return Task.CompletedTask;

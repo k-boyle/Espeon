@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System.Linq;
+using Casino.Common.Discord.Net;
 
 namespace Espeon
 {

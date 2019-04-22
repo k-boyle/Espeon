@@ -12,16 +12,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Espeon.Databases;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 
 namespace Espeon.Services
 {
-    public class MessageService : BaseService
+    public class MessageService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly CommandService _commands;
         [Inject] private readonly Config _config;
         [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly EmotesService _emotes;
         [Inject] private readonly LogService _logger;
         [Inject] private readonly Random _random;
         [Inject] private readonly TaskQueue _scheduler;
@@ -99,6 +99,9 @@ namespace Espeon.Services
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
                         out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
             {
+                if (string.IsNullOrWhiteSpace(output))
+                    return;
+
                 var commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
 
                 var result = await _commands.ExecuteAsync(output, commandContext, _services);

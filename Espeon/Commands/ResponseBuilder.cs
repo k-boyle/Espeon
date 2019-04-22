@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common.Discord.Net;
+using Discord;
 
 namespace Espeon.Commands
 {

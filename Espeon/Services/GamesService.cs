@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class GamesService : BaseService
+    public class GamesService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly IServiceProvider _services;
         [Inject] private readonly InteractiveService _interactive;

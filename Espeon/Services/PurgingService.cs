@@ -4,10 +4,11 @@ using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class PurgingService : BaseService
+    public class PurgingService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;

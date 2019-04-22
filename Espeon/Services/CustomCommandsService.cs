@@ -6,10 +6,12 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Espeon.Services
 {
-    public class CustomCommandsService : BaseService
+    public class CustomCommandsService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly LogService _log;
         [Inject] private readonly MessageService _message;
@@ -22,7 +24,7 @@ namespace Espeon.Services
             _moduleCache = new ConcurrentDictionary<ulong, Module>();
         }
 
-        public override async Task InitialiseAsync(InitialiseArgs args)
+        public override async Task InitialiseAsync(IServiceProvider services, InitialiseArgs args)
         {
             var guilds = await args.GuildStore.GetAllGuildsAsync(x => x.Commands);
 
@@ -46,6 +48,9 @@ namespace Espeon.Services
 
                 foreach (var command in commands)
                 {
+                    if (command.Name is null)
+                        continue;
+
                     moduleBuilder.AddCommand(CommandCallbackAsync, commandBuilder =>
                     {
                         commandBuilder.Name = command.Name;

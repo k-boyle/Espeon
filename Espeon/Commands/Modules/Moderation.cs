@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {

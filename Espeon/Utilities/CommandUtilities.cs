@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Casino.Common.Discord.Net;
 
 namespace Espeon
 {
@@ -135,18 +136,5 @@ namespace Espeon
             [typeof(ResponsePack)] = "owo",
             [typeof(Face)] = "heads/tails"
         };
-
-        public static IReadOnlyCollection<Type> GetTypeParserTypes(CommandService commands, Assembly assembly)
-        {
-            var typeParserInterface = commands.GetType().Assembly.GetTypes()
-                .FirstOrDefault(x => x.Name == "ITypeParser")?.GetTypeInfo();
-
-            if (typeParserInterface is null)
-                throw new QuahuRenamedException("ITypeParser");
-
-            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x));
-
-            return parsers.ToArray();
-        }
     }
 }

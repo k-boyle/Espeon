@@ -14,6 +14,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Qmmands;
 
 namespace Espeon
 {
@@ -31,7 +33,7 @@ namespace Espeon
 
             var assembly = Assembly.GetEntryAssembly();
             var types = assembly.GetTypes()
-                .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
+                .Where(x => typeof(BaseService<InitialiseArgs>).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
             var services = ConfigureServices(types, assembly, config, cts);
 
@@ -48,8 +50,7 @@ namespace Espeon
                 {
                     UserStore = userStore,
                     GuildStore = guildStore,
-                    CommandStore = commandStore,
-                    Services = services
+                    CommandStore = commandStore
                 }, types);
 
                 await userStore.SaveChangesAsync();

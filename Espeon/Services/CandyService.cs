@@ -3,10 +3,11 @@ using Espeon.Commands;
 using Espeon.Databases.UserStore;
 using System;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
-    public class CandyService : BaseService
+    public class CandyService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly Config _config;
         [Inject] private Random _random;

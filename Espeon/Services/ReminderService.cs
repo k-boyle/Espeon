@@ -9,11 +9,13 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 using Reminder = Espeon.Databases.Reminder;
 
 namespace Espeon.Services
 {
-    public class ReminderService : BaseService
+    public class ReminderService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly LogService _logger;
         [Inject] private readonly TaskQueue _scheduler;

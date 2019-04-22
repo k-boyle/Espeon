@@ -6,10 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 
 namespace Espeon.Services
 {
-    public class StarboardService : BaseService
+    public class StarboardService : BaseService<InitialiseArgs>
     {
         [Inject] private readonly DiscordSocketClient _client;
         [Inject] private readonly IServiceProvider _services;

@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 using Espeon.Databases.UserStore;
 
 namespace Espeon.Commands
