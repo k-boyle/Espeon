@@ -1,4 +1,6 @@
 ﻿using Casino.Common;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Qmmands;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
@@ -14,8 +16,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
-using Casino.Common.Qmmands;
 
 namespace Espeon
 {
@@ -77,14 +77,14 @@ namespace Espeon
                     MessageCacheSize = 100
                 }))
                 .AddSingleton(new CommandService(new CommandServiceConfiguration
+                {
+                    StringComparison = StringComparison.InvariantCultureIgnoreCase,
+                    CooldownBucketKeyGenerator = (obj, ctx, services) =>
                     {
-                        StringComparison = StringComparison.InvariantCultureIgnoreCase,
-                        CooldownBucketKeyGenerator = (obj, ctx, services) =>
-                        {
-                            var context = ctx as EspeonContext;
-                            return context.User.Id;
-                        }
-                    })
+                        var context = ctx as EspeonContext;
+                        return context.User.Id;
+                    }
+                })
                     .AddTypeParsers(assembly))
                 .AddSingleton(config)
                 .AddSingleton(cts)
