@@ -6,7 +6,10 @@
       ],
       "owo": [
         "{0} has {1}{2} rwar cwand{3}!"
-      ]
+      ],
+      "Abusive": [
+        "{0} has {1}{2} rare fucking candies"
+      ] 
     },
     "Claim Candies": {
       "Default": [
@@ -16,6 +19,10 @@
       "owo": [
         "\\*pounces on your lap\\* owo heres {0}{1} cwand{2}!!!",
         "Ohhh noo >><< uu alweadie cwaimd ur cwandies wait {0}"
+      ],
+      "Abusive": [
+        "Here's {0}{1} fucking cand{2}",
+        "Calm the fuck down cunt you've already claimed your fucking candies fucking wait {0}"
       ]
     },
     "View House": {
@@ -24,6 +31,9 @@
       ],
       "owo": [
         "OOOOHHHH i hwve {0}{1} cwand{2}!!!!!! \\*w\\*"
+      ],
+      "Abusive": [
+        "I have {0}{1} fucking cand{2}"
       ]
     },
     "Treat": {
@@ -32,6 +42,9 @@
       ],
       "owo": [
         "{0} mastwur has bween kwind 2 u \\*runs to you tail wagging\\* hweers {1}{2} cwand{3}"
+      ],
+      "Abusive": [
+        "This cunt has fucking given you {0}{1} fucking cand{2}"
       ]
     },
     "Candy Leaderboard": {
@@ -39,6 +52,9 @@
         "{0}"
       ],
       "owo": [
+        "{0}"
+      ],
+      "Abusive": [
         "{0}"
       ]
     },
@@ -50,6 +66,10 @@
       "owo": [
         ">>.<< u cant gwift urself",
         "\\*notices package\\* uwu uur swo genurus"
+      ],
+      "Abusive": [
+        "You can't gift yourself you fucking idiot",
+        "Dumb cunt giving away their fucking candy"
       ]
     },
     "Try Steal": {
@@ -62,6 +82,11 @@
         "owee im sowweee bwut stweal cn onwee be uzed wen i hwav 1000{0} cwandies",
         "am swoweee bwut uu lose",
         "OwO uu wiiin!!!"
+      ],
+      "Abusive": [
+        "Stop trying to take from the fucking poor wait till I have 1000{0} you bastard",
+        "Lmao you lose cunt",
+        "Fuck off you win"
       ]
     }
   },
@@ -78,6 +103,12 @@
         "waht du uu wnt the respons to bwee? `cancel` to stwop",
         "i made it fur uu :3c",
         "swowee this cwomnd aweadee exists"
+      ],
+      "Abusive": [
+        "What do you want the fucking command to be fucking called? `cancel` to cancel",
+        "What do you want the fucking response to fucking be? `cancel` to cancel",
+        "It's been fucking made",
+        "This already exists dickhead"
       ]
     },
     "Delete Command": {
@@ -86,6 +117,9 @@
       ],
       "owo": [
         "i gwot wid of tht mweanie {0} >:)"
+      ],
+      "Abusive": [
+        "It's been fucking deleted"
       ]
     },
     "Modify Command": {
@@ -96,6 +130,10 @@
       "owo": [
         "waht du uu want the new wespons to bee? `cancel` to stwop",
         "i changed {0} fur uu"
+      ],
+      "Abusive": [
+        "What do you want the new fucking response to be? `cancel` to cancel",
+        "It's been fucking changed"
       ]
     }
   },
@@ -106,6 +144,9 @@
       ],
       "owo": [
         "owwww u siwwy biwwy ur awready in a game"
+      ],
+      "Abusive": [
+        "Dickhead, you're already in a fucking game"
       ]
     },
     "Coinflip": {
@@ -116,7 +157,11 @@
       "owo": [
         "\\*shakes tail in excitement\\* uu win {0}{1} rwar cwand{2}!!",
         "\\*evil laughs\\* uu lose {0}{1} rwar cwand{2}!! >:)"
-      ] 
+      ],
+      "Abusive": [
+        "You bloody win {0}{1} shitting rare cand{2}",
+        "You lose, wanker. Thanks for the {0}{1} cand{2}"
+      ]
     } 
   },
   "Misc": {
@@ -128,6 +173,10 @@
       "owo": [
         "Watancy: {0}puurrs",
         "Watancy: {0}puurrs\nPwing: {1}puurrs"
+      ],
+      "Abusive": [
+        "Latency: {0}ms",
+        "Latency: {0}ms\nPing: {1}ms"
       ]
     },
     "Get Catfact": {
@@ -138,6 +187,10 @@
       "owo": [
         "{0}",
         "ooowwno sumthing went wrronng >>.<<"
+      ],
+      "Abusive": [
+        "{0}",
+        "Something went fucking wrong, and I'm not talking about your birth"
       ]
     },
     "Get Joke": {
@@ -148,6 +201,10 @@
       "owo": [
         "{0}",
         "ooowwno sumthing went wrronng >>.<<"
+      ],
+      "Abusive": [
+        "{0}",
+        "Like your dads condoms, this didn't fucking work"
       ]
     },
     "Get Gif": {
@@ -160,6 +217,11 @@
         "fwailed to fwind a gwif",
         "oweee the gwif was too bwig owo",
         "sumthing went wwong"
+      ],
+      "Abusive": [
+        "Failed to find a fucking gif",
+        "The found gif was too fucking big",
+        "Dunno what is a bigger fail, this command or your life"
       ]
     },
     "Clear Messages": {},
@@ -174,6 +236,10 @@
       "owo": [
         "theres nu mods fur this gwuild",
         "hers ur daddies:\n{0]}"
+      ],
+      "Abusive": [
+        "What do this guilds mods and your braincells have in common? There's fucking none",
+        "Here's your fucking mods:\n{0}"
       ]
     },
     "List Admins": {
@@ -184,6 +250,10 @@
       "owo": [
         "theres nu admwins fur this gwuild",
         "hers ur daddies daddies:\n{0]}"
+      ],
+      "Abusive": [
+        "Your iq + number of admins in this guild = 0",
+        "Here's your fucking admins:\n{0}"
       ]
     },
     "Steal Emote": {
@@ -194,6 +264,10 @@
       "owo": [
         "addwed {0} emos",
         "owwnoo >,< emo wimit weached i cudnt add {0}"
+      ],
+      "Abusive": [
+        "{0} has been fucking added",
+        "Get less fucking emotes you basic bitch"
       ]
     }
   },
@@ -204,6 +278,9 @@
       ],
       "owo": [
         "i gwot rid of the mweanie >:3"
+      ],
+      "Abusive": [
+        "{0} is a cunt so they've been kicked"
       ]
     },
     "Ban User": {
@@ -212,6 +289,9 @@
       ],
       "owo": [
         "i gwot rid of the mweanie >:3"
+      ],
+      "Abusive": [
+        "{0} is a megacunt so has been banned"
       ]
     },
     "Warn User": {
@@ -222,6 +302,10 @@
       "owo": [
         "owwwwno {0} has {1} warnings, this is too manyy >><<",
         "{0} uve been warned 0w0"
+      ],
+      "Abusive": [
+        "{0} has {1} warnings because they're aids",
+        "{0} you've been warned cunt"
       ]
     },
     "Revoke Warning": {
@@ -232,6 +316,10 @@
       "owo": [
         "\\*lookds down\\* owwwno i cudnt fwind dis warnings nowo",
         "\\*looks up in excitement\\* i did it dwaddy :3"
+      ],
+      "Abusive": [
+        "Oi, retard, warning doesn't exist",
+        "Stop being a nice cunt"
       ]
     },
     "View Warnings": {
@@ -241,6 +329,10 @@
       ],
       "owo": [
         "owwo this user is agwood boi :3c",
+        "{0}"
+      ],
+      "Abusive": [
+        "This user is a goody two-shoes",
         "{0}"
       ]
     },
@@ -252,6 +344,10 @@
       "owo": [
         "\\*talks softly\\* owww i cudnt fwind the wole",
         "weaactions wedacted"
+      ],
+      "Abusive": [
+        "Try setting the no reactions role dickhead",
+        "Shitheads reactions removed"
       ]
     },
     "Restore Reactions": {
@@ -262,6 +358,10 @@
       "owo": [
         "\\*talks softly\\* owww i cudnt fwind the wole",
         "weaactions westored"
+      ],
+      "Abusive": [
+        "Try setting the no reactions role dickhead",
+        "Shitheads reactions restored"
       ]
     },
     "Block User": {
@@ -270,6 +370,9 @@
       ],
       "owo": [
         "bwocked"
+      ],
+      "Abusive": [
+        "Cunt be gone"
       ]
     },
     "Blacklist User": {
@@ -280,6 +383,10 @@
       "owo": [
         ">>.<< oweee thyre aweady bwackwisted",
         "meanwee bwusted >:3"
+      ],
+      "Abusive": [
+        "Dickhead is already blacklisted",
+        "Dick be gone"
       ]
     },
     "Unblacklist": {
@@ -290,6 +397,10 @@
       "owo": [
         ">>.<< owee thyre not bwackwisted",
         "teh meanwee weturns ><"
+      ],
+      "Abusive": [
+        "They're not a dickhead, but they may as well be",
+        "Why are you letting this dickhead return?"
       ]
     }
   },
@@ -300,6 +411,9 @@
       ],
       "owo": [
         "owwwwwno channl not fownd ><"
+      ],
+      "Abusive": [
+        "Channel not fucking found"
       ]
     },
     "Eval": {},
@@ -311,6 +425,9 @@
       ],
       "owo": [
         "weloadd"
+      ],
+      "Abusive": [
+        "Refuckingloaded"
       ]
     }
   },
@@ -321,6 +438,9 @@
       ],
       "owo": [
         "ill wemind uu"
+      ],
+      "Abusive": [
+        "Brain too small to remember? I'll fucking do it I guess"
       ]
     },
     "List Reminders": {}
@@ -336,6 +456,11 @@
         "owwwww >< yuu aweady hav dis wole",
         "u hav wole nwo",
         "owwweeee this wole isnt swelf aswining"
+      ],
+      "Abusive": [
+        "Tiny brain, you already have this role",
+        "There, you fucking have it",
+        "Imagine not being smart enough to know this role isn't self assigning?"
       ]
     },
     "Add SAR": {
@@ -346,6 +471,10 @@
       "owo": [
         ">><< wole aweady swelf aswigning",
         "wole has been adwed to teh wist"
+      ],
+      "Abusive": [
+        "Already a fucking self assigning role dickshit",
+        "Fucking added"
       ]
     },
     "Remove Role": {
@@ -358,6 +487,11 @@
         "owwnoo yuu dont hav dis wole ><",
         "this wole isnt swelf aswining",
         "wole wemoved!!"
+      ],
+      "Abusive": [
+        "Retard, you don't have this role",
+        "The role isn't self assigning dickhead",
+        "Fucking removed"
       ]
     },
     "Remove SAR": {
@@ -368,6 +502,10 @@
       "owo": [
         "owee this wole is not swelf aswining",
         "wole wemoved frmo the wist"
+      ],
+      "Abusive": [
+        "This. Is. Not. Self. Assigning. Idiot.",
+        "Fucking removed from the fucking list"
       ]
     },
     "List Roles": {
@@ -375,6 +513,9 @@
         "{0}"
       ],
       "owo": [
+        "{0}"
+      ],
+      "Abusive": [
         "{0}"
       ]
     }
@@ -388,6 +529,10 @@
       "owo": [
         "owh noo this pwefix alwedy exists",
         "i did the pwefix fur \\*uu\\*"
+      ],
+      "Abusive": [
+        "This prefix already exists you absolute spastic",
+        "Your retarded prefix has been added"
       ]
     },
     "Remove Prefix": {
@@ -398,6 +543,10 @@
       "owo": [
         "owh noo this pwefix dusnt exists",
         "i wemoved the pwefix fur \\*uu\\*"
+      ],
+      "Abusive": [
+        "This prefix doesn't exist you degenerate",
+        "Your dumb prefix was removed, thank God"
       ]
     },
     "Restrict Channel": {
@@ -408,6 +557,10 @@
       "owo": [
         "owww im alweady restwicted here",
         ":("
+      ],
+      "Abusive": [
+        "I already can't speak here you dumb cunt",
+        "I didn't even want to respond to you"
       ]
     },
     "Unrestrict Channel": {
@@ -418,6 +571,10 @@
       "owo": [
         "am not westwicted in dis channl",
         "\\*wages tail\\* :D"
+      ],
+      "Abusive": [
+        "I'm not restrict in this channel you dumb cunt",
+        "ffs now I have to respond to you again"
       ]
     },
     "Admin User": {
@@ -428,6 +585,10 @@
       "owo": [
         "{0} is a new daddy :3c",
         "{0} is awredy a daddy"
+      ],
+      "Abusive": [
+        "{0} joins the league of cunts",
+        "{0} is already an admin dickshit"
       ]
     },
     "Moderate User": {
@@ -440,6 +601,11 @@
         "{0} is awready a daddy",
         "owo {0} is a mod now :3c",
         ">>.<< {0} is awreade a mod"
+      ],
+      "Abusive": [
+        "{0} is already a fucking admin you dickhead",
+        "{0} is now a power holding shitbag",
+        "{0} is already a fucking mod"
       ]
     },
     "Demote Admin": {
@@ -452,6 +618,11 @@
         "u cant dwemot the owoner",
         "owno {0} is dwemotd",
         "{0} is not a daddy"
+      ],
+      "Abusive": [
+        "You can't demote the owner you cheeky cunt",
+        "dickhead --> {0}",
+        "{0} is not a fucking admin shit-for-brains"
       ]
     },
     "Demote Moderator": {
@@ -462,6 +633,10 @@
       "owo": [
         "{0} has bin dwemotd",
         "{0} is not a mod >>.<<"
+      ],
+      "Abusive": [
+        "wanker --> {0}",
+        "not a wanker --> {0}"
       ]
     },
     "Set Welcome Channel": {
@@ -470,6 +645,9 @@
       ],
       "owo": [
         "welcum chwanel set"
+      ],
+      "Abusive": [
+        "Not that anyone wants to join this shitfest, but it's set"
       ]
     },
     "Set Welcome Message": {
@@ -478,6 +656,9 @@
       ],
       "owo": [
         "welcum msg set"
+      ],
+      "Abusive": [
+        "What's the point when no one is gonna fucking join anyway?"
       ]
     },
     "Set Default Role": {
@@ -486,6 +667,9 @@
       ],
       "owo": [
         "default wole set"
+      ],
+      "Abusive": [
+        "Shit role"
       ]
     },
     "Set Warning Limit": {
@@ -494,6 +678,9 @@
       ],
       "owo": [
         "mweaniedar updwated"
+      ],
+      "Abusive": [
+        "Just kick the cunts already"
       ]
     },
     "Set No Reactions Role": {
@@ -502,6 +689,9 @@
       ],
       "owo": [
         "dowone :3"
+      ],
+      "Abusive": [
+        "Fine"
       ]
     }
   },
@@ -512,6 +702,9 @@
       ],
       "owo": [
         "\\*stars in eyes\\* wenabled"
+      ],
+      "Abusive": [
+        "Not that you cunts say anything funny anyway"
       ]
     },
     "Disable Starboard": {
@@ -520,6 +713,9 @@
       ],
       "owo": [
         "diswabled"
+      ],
+      "Abusive": [
+        "Now I don't need to keep a history of your unfunny shit"
       ]
     },
     "Set Starboard Limit": {
@@ -528,6 +724,9 @@
       ],
       "owo": [
         "stwar wimit set"
+      ],
+      "Abusive": [
+        "If only you could set it to 0 so you'd have a chance"
       ]
     },
     "Random Star": {
@@ -536,6 +735,9 @@
       ],
       "owo": [
         "owwnoo >,< dis gwuild has no starrz"
+      ],
+      "Abusive": [
+        "No one has said anything worthy (I'll pretend I'm surprised)"
       ]
     }
   },
@@ -546,6 +748,9 @@
       ],
       "owo": [
         "\\*jumps in joy\\* >< i wil talk to uu like dis now uwu"
+      ],
+      "Abusive": [
+        "Bad choice, fuckface"
       ]
     },
     "Buy": {
@@ -558,6 +763,11 @@
         "uu awready hav meee!!",
         "uu need {0} cwandies!!",
         "uu hav purchasd {0}!!"
+      ],
+      "Abusive": [
+        "You already have this pack dickhead",
+        "Expecting you to know that your candies is less than {0} was obviously too much",
+        "Terrible idea you fucking idiot"
       ]
     }
   },
@@ -568,6 +778,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Random Amount": {
@@ -576,6 +789,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Claim Max": {
@@ -584,6 +800,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Claim Min": {
@@ -592,6 +811,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Claim Cooldown": {
@@ -600,6 +822,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Pack Price": {
@@ -608,6 +833,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     },
     "Set Coin Flip": {
@@ -616,6 +844,9 @@
       ],
       "owo": [
         "set"
+      ],
+      "Abusive": [
+        "fuck"
       ]
     }
   },
@@ -632,6 +863,12 @@
         "oweee i cudnt add {0} to {1]}",
         "i remved {0} frm {1}",
         "ooowwww {0} cudnt be wemovd fwom {1}"
+      ],
+      "Abusive": [
+        "I added fucking {0} to fucking {1}",
+        "{0} couldn't be fucking added to {1}",
+        "I removed fucking {0} from fucking {1}",
+        "{0} couldn't be fucking removed from {1}"
       ]
     },
     "Module Alias": {
@@ -646,6 +883,12 @@
         "oweee i cudnt add {0} to {1]}",
         "i remved {0} frm {1}",
         "ooowwww {0} cudnt be wemovd fwom {1}"
+      ],
+      "Abusive": [
+        "I added fucking {0} to fucking {1}",
+        "{0} couldn't be fucking added to {1}",
+        "I removed fucking {0} from fucking {1}",
+        "{0} couldn't be fucking removed from {1}"
       ]
     }
   },
@@ -656,7 +899,10 @@
       ],
       "owo": [
         "wepwoted"
-      ] 
+      ],
+      "Abusive": [
+        "Fuck off I'm flawless"
+      ]
     },
     "Feature Request": {
       "Default": [
@@ -664,6 +910,9 @@
       ],
       "owo": [
         "reqwuested"
+      ],
+      "Abusive": [
+        "That request was bad and you should feel bad"
       ]
     },
     "Source Code": {}

@@ -3,6 +3,7 @@
     public enum ResponsePack
     {
         Default,
-        owo
+        owo,
+        Abusive
     }
 }

@@ -3,12 +3,17 @@
     "Default": [
       "You need to be at least a moderator of this guild to use this command",
       "You need to be an admin of this guild to use this command",
-      "something went horribly wrong"
+      "Something went horribly wrong"
     ],
     "owo": [
       "ownno >,< u need to be a mod",
       "ownnooo u need to bwe a daddy",
       "sumting went hirribly wong"
+    ],
+    "Abusive": [
+      "You need to be a dickhead to use this command",
+      "You need to be a cunt to use this command",
+      "Can't tell what was more horrific, this command or your birth"
     ]
   },
   "RequireGuildAttribute": {
@@ -17,6 +22,9 @@
     ],
     "owo": [
       "ownno dis cwommand cant be wun is dis gwuild"
+    ],
+    "Abusive": [
+      "This command is for intellectuals only"
     ]
   },
   "RequireGuildOwnerAttribute": {
@@ -25,6 +33,9 @@
     ],
     "owo": [
       "owwnnoo dis comwand can only bee exercuted bwy the gwuild owoner"
+    ],
+    "Abusive": [
+      "This command can only be executed by the owner, you're too stupid to be the owner though"
     ]
   },
   "RequireHierarchyAttribute": {
@@ -37,6 +48,11 @@
       "u cant tuch the guild daddy >:(",
       "im too low fur them >>.<<",
       "owwwno ur too low furr themm >>.<<"
+    ],
+    "Abusive": [
+      "You don't have hierarchy over the top dog, you cunt",
+      "This dickhead is too fucking high for me",
+      "You don't you hierarchy you fucking peasant"
     ]
   },
   "RequireOwnerAttribute": {
@@ -47,6 +63,10 @@
     "owo": [
       "only daddy can use {0} cwommands",
       "only daddy can use {0}"
+    ],
+    "Abusive": [
+      "{0} command only be used by the one person who's not a sack of shit",
+      "{0} can only be used by the one person who's not a sack of shit"
     ]
   },
   "RequirePermissionsAttribute": {
@@ -55,6 +75,9 @@
     ],
     "owo": [
       "{0} need these permzz {1}"
+    ],
+    "Abusive": [
+      "{0} need these fucking permissions you useless dickhead\n{1}"
     ]
   },
   "RequirePositionHierarchy": {
@@ -63,6 +86,9 @@
     ],
     "owo": [
       "oww this wole is twoo big 4 mee ><"
+    ],
+    "Abusive": [
+      "This role is too bloody high"
     ]
   },
   "RequireRangeAttribute": {
@@ -71,6 +97,9 @@
     ],
     "owo": [
       "oowwww walue mst be bitween {0} and {1}"
+    ],
+    "Abusive": [
+      "Maybe if you'd give me something between {0} and {1} then we could get some shit done"
     ]
   },
   "RequireSpecificLengthAttribute": {
@@ -79,6 +108,9 @@
     ],
     "owo": [
       "ownnno urr mesage must be bweteen {0} n {1}"
+    ],
+    "Abusive": [
+      "You can't do anything right, can you? Message length must be between {0} and {1}"
     ]
   },
   "RequireUnlockedAttribute": {
@@ -87,6 +119,9 @@
     ],
     "owo": [
       "ownnno uu dunt hav dis respwons pack"
+    ],
+    "Abusive": [
+      "Maybe try not being poor and unlocking this response pack"
     ]
   },
   "CandyTypeParser": {
@@ -99,6 +134,11 @@
       "awmount spwecifed is not an intwiger",
       "awmount spwecified must be pwositive",
       "ownnoo >.< u dont hav enuff cwandies"
+    ],
+    "Abusive": [
+      "I get expecting you to know what a number is is asking a bit much of you, but at least try",
+      "What does the retard test you took and the number you're meant to give me in common? They're both positive",
+      "Stop being fucking poor"
     ]
   },
   "CommandsTypeParser": {
@@ -107,6 +147,9 @@
     ],
     "owo": [
       "fwailed to fwind cwommands machin {0}"
+    ],
+    "Abusive": [
+      "What does your penis and commands matching {0} have in common? Neither can be found"
     ]
   },
   "CommandTypeParser": {
@@ -115,6 +158,9 @@
     ],
     "owo": [
       "multwiple or no mwaching cwommands"
+    ],
+    "Abusive": [
+      "Too many or no commands found, I don't fucking know"
     ]
   },
   "CustomCommandTypeParser": {
@@ -123,6 +169,9 @@
     ],
     "owo": [
       "fwailed to fwind cwommand"
+    ],
+    "Abusive": [
+      "Like the inside of your skull, I couldn't find shit"
     ]
   },
   "IGuildUserTypeParser": {
@@ -133,6 +182,10 @@
     "owo": [
       "i fwound twoo many pweopol, twy mentioning them :3",
       "fwailed to fwind user"
+    ],
+    "Abusive": [
+      "Too many basic bitches called this",
+      "Failed to find the cunt"
     ]
   },
   "ModuleTypeParser": {
@@ -143,6 +196,10 @@
     "owo": [
       "fwailed to fwind module wid name {0}",
       "u wack purrrmissions"
+    ],
+    "Abusive": [
+      "Failed to your brain cells and the module with the name {0}",
+      "You're too stupid to see this module"
     ]
   },
   "SocketRoleParser": {
@@ -151,6 +208,9 @@
     ],
     "owo": [
       "no wole fwound"
+    ],
+    "Abusive": [
+      "No fucking role"
     ]
   },
   "SocketTextChannelParser": {
@@ -161,6 +221,10 @@
     "owo": [
       "dis cwomand must be wused in a gwuild",
       "no chwannel fwound"
+    ],
+    "Abusive": [
+      "This should never happen",
+      "There's no fucking channel"
     ]
   },
   "TimeSpanTypeParser": {
@@ -169,6 +233,9 @@
     ],
     "owo": [
       "fwailed to parse twime"
+    ],
+    "Abusive": [
+      "Failed to parse the bloody timr"
     ]
   },
   "EmoteTypeParser": {
@@ -177,6 +244,9 @@
     ],
     "owo": [
       "fwailed to pwarse wemote"
+    ],
+    "Abusive": [
+      "That emote was garbage, just like you"
     ]
   },
   "ResponsePackTypeParser": {
@@ -185,6 +255,9 @@
     ],
     "owo": [
       "pack mwust be one of the fwolling: {0}"
-    ] 
+    ],
+    "Abusive": [
+      "Pack must be one of the fucking following: {0}"
+    ]
   } 
 }
