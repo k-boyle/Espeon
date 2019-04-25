@@ -51,7 +51,7 @@ namespace Espeon.Commands
         [Name("Set Starboard Limit")]
         [RequireElevation(ElevationLevel.Admin)]
         [Description("Change the number of stars needed for a message to be added to the starboard")]
-        public async Task SetStarboardLimitAsync([RequireRange(0)] int limit)
+        public async Task SetStarboardLimitAsync([RequireRange(1)] int limit)
         {
             var guild = Context.CurrentGuild;
             guild.StarLimit = limit;

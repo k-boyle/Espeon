@@ -59,7 +59,7 @@ namespace Espeon
         {
             var toReturn = new List<string>();
 
-            var split = content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var split = content.Split(Environment.NewLine);
 
             var sb = new StringBuilder();
 

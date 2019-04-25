@@ -59,7 +59,7 @@ namespace Espeon.Commands
             sw.Stop();
 
             resp = Responses.GetResponse(Context.Command.Module.Name, 
-                Context.Command.Name, user.ResponsePack, 0, latency, sw.ElapsedMilliseconds);
+                Context.Command.Name, user.ResponsePack, 1, latency, sw.ElapsedMilliseconds);
 
             response = ResponseBuilder.Message(Context, resp);
 
