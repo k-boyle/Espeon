@@ -97,7 +97,7 @@ namespace Espeon.Services
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
-                        out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out output))
+                        out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out prefix, out output))
             {
                 if (string.IsNullOrWhiteSpace(output))
                     return;

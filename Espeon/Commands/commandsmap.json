@@ -9,7 +9,7 @@
       ],
       "Abusive": [
         "{0} has {1}{2} rare fucking candies"
-      ] 
+      ]
     },
     "Claim Candies": {
       "Default": [
@@ -162,7 +162,7 @@
         "You bloody win {0}{1} shitting rare cand{2}",
         "You lose, wanker. Thanks for the {0}{1} cand{2}"
       ]
-    } 
+    }
   },
   "Misc": {
     "Ping": {
