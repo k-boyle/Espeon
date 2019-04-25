@@ -1,4 +1,5 @@
 ﻿using Casino.Common.DependencyInjection;
+using Casino.Common.Qmmands;
 using Espeon.Commands;
 using Newtonsoft.Json;
 using Qmmands;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Casino.Common.Qmmands;
 using Module = Qmmands.Module;
 
 namespace Espeon.Services

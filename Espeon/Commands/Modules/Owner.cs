@@ -140,9 +140,14 @@ namespace Espeon.Commands
                 {
                     var sb = new StringBuilder();
                     var type = result.ReturnValue.GetType();
+                    var rValue = result.ReturnValue;
 
-                    switch (result.ReturnValue)
+                    switch (rValue)
                     {
+                        case Color col:
+                            builder.WithColor(col);
+                            break;
+
                         case string str:
                             builder.AddField($"{type}", $"\"{str}\"");
                             break;
@@ -178,13 +183,17 @@ namespace Espeon.Commands
 
                         default:
 
-                            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                .OrderBy(x => x.Name).ToArray();
 
                             if (props.Length == 0)
                             {
-                                builder.AddField($"{type}", result.ReturnValue);
+                                builder.AddField($"{type}", rValue);
                                 break;
                             }
+
+                            sb.AppendLine($"{{{type}: '{(Equals(type.ToString(), rValue.ToString()) ? "No ToString() overload" : rValue)}'}}");
+                            sb.AppendLine();
 
                             var maxLength = props.Max(x => x.Name.Length);
 
@@ -192,7 +201,7 @@ namespace Espeon.Commands
                             {
                                 sb.Append($"#{prop.Name.PadRight(maxLength, ' ')} - ");
 
-                                var value = prop.GetValue(result.ReturnValue);
+                                var value = prop.GetValue(rValue);
 
                                 if (value is IEnumerable collection && !(value is string))
                                 {
@@ -202,7 +211,7 @@ namespace Espeon.Commands
                                 }
                                 else
                                 {
-                                    sb.AppendLine($"[{prop.GetValue(result.ReturnValue)}]");
+                                    sb.AppendLine($"[{prop.GetValue(rValue)}]");
                                 }
                             }
 

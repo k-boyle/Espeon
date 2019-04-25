@@ -81,7 +81,7 @@ namespace Espeon
                     StringComparison = StringComparison.InvariantCultureIgnoreCase,
                     CooldownBucketKeyGenerator = (obj, ctx, services) =>
                     {
-                        var context = ctx as EspeonContext;
+                        var context = (EspeonContext)ctx;
                         return context.User.Id;
                     }
                 })
