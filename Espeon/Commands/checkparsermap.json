@@ -262,23 +262,24 @@
   },
   "AliasTypeParser": {    
     "Default": [
-      "Pack must be one of the following: {0}"
+      "Alias must be one of the following: {0}"
     ],
     "owo": [
-      "pack mwust be one of the fwolling: {0}"
+      "alias mwust be one of the fwolling: {0}"
     ],
     "Abusive": [
-      "Pack must be one of the fucking following: {0}"
+      "Alias must be one of the fucking following: {0}"
     ]
   },
   "FaceTypeParser": {
     "Default": [
-      "Pack must be one of the following: {0}"
+      "Face must be one of the following: {0}"
     ],
     "owo": [
-      "pack mwust be one of the fwolling: {0}"
+      "face mwust be one of the fwolling: {0}"
     ],
     "Abusive": [
-      "Pack must be one of the fucking following: {0}"
-    ]}
+      "Face must be one of the fucking following: {0}"
+    ]
+  }
 }
