@@ -97,28 +97,36 @@ namespace Espeon.Services
             }
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture,
-                        out var prefix, out var output) || message.HasMentionPrefix(_client.CurrentUser, out prefix, out output))
+                    out var prefix, out var output) ||
+                message.HasMentionPrefix(_client.CurrentUser, out prefix, out output))
             {
                 if (string.IsNullOrWhiteSpace(output))
                     return;
 
-                var commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
-
-                var result = await _commands.ExecuteAsync(output, commandContext, _services);
-
-                if (result is CommandNotFoundResult)
+                try
                 {
-                    commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
-                    result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
-                }
+                    var commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
 
-                if (!result.IsSuccessful && !(result is ExecutionFailedResult))
-                {
-                    await CommandErroredAsync(new CasinoCommandErroredEventArgs
+                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
+
+                    if (result is CommandNotFoundResult)
                     {
-                        Context = commandContext,
-                        Result = result as FailedResult
-                    });
+                        commandContext = await EspeonContext.CreateAsync(_client, message, isEdit, prefix);
+                        result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
+                    }
+
+                    if (!result.IsSuccessful && !(result is ExecutionFailedResult))
+                    {
+                        await CommandErroredAsync(new CasinoCommandErroredEventArgs
+                        {
+                            Context = commandContext,
+                            Result = result as FailedResult
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, ex);
                 }
             }
         }

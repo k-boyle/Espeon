@@ -10,16 +10,16 @@
     <PackageReference Include="Discord.Net.Core" Version="2.0.2-dev-20190326.4" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.0.2-dev-20190326.4" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview3.19153.1">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0-beta2-final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.1.0-beta2-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview4.19216.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview4.19216.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview3" />
-    <PackageReference Include="Qmmands" Version="3.0.0-nightly-00181" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
+    <PackageReference Include="Qmmands" Version="3.0.0-nightly-00182" />
     <PackageReference Include="TheCasino.Common" Version="1.0.7" />
   </ItemGroup>
 

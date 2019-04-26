@@ -5,7 +5,8 @@
         Commands,
         Discord,
         Reminders,
-        Scheduler
+        Scheduler,
+        Starboard
     }
 
     public enum Severity
