@@ -34,9 +34,9 @@ namespace Espeon.Commands
         [Description("Sends a message to the specified channel")]
         public Task MessageChannelAsync(ulong channelId, [Remainder] string content)
         {
-            var channel = Context.Client.GetChannel(channelId) as IMessageChannel;
-
-            return channel is null ? SendNotOkAsync(0) : SendMessageAsync(content);
+            return !(Context.Client.GetChannel(channelId) is IMessageChannel channel)
+                ? SendNotOkAsync(0)
+                : channel.SendMessageAsync(content);
         }
 
         [Command("Eval")]
@@ -60,6 +60,7 @@ namespace Espeon.Commands
 
             var usings = new[]
             {
+                "Casino.Common", "Casino.Common.Qmmands", "Casino.Common.DependencyInjection",
                 "Discord", "Discord.WebSocket",
                 "Microsoft.Extensions.DependencyInjection",
                 "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks",
@@ -141,6 +142,8 @@ namespace Espeon.Commands
                     var sb = new StringBuilder();
                     var type = result.ReturnValue.GetType();
                     var rValue = result.ReturnValue;
+                    var tStr = type.ToString();
+                    var vStr = rValue.ToString();
 
                     switch (rValue)
                     {
@@ -155,10 +158,11 @@ namespace Espeon.Commands
                         case IEnumerable enumerable:
 
                             var list = enumerable.Cast<object>().ToList();
+                            var enumType = enumerable.GetType();
 
                             if (list.Count > 5)
                             {
-                                builder.AddField($"{enumerable.GetType()}", "Enumerable has more than 5 elements");
+                                builder.AddField($"{enumType}", "Enumerable has more than 5 elements");
                                 break;
                             }
 
@@ -177,7 +181,7 @@ namespace Espeon.Commands
                                 sb.AppendLine("Collection is empty");
                             }
 
-                            builder.AddField($"{enumerable.GetType()}", sb.ToString());
+                            builder.AddField($"{enumType}", sb.ToString());
 
                             break;
 
@@ -188,11 +192,12 @@ namespace Espeon.Commands
 
                             if (props.Length == 0)
                             {
-                                builder.AddField($"{type}", rValue);
+                                builder.AddField($"{tStr}",
+                                    Equals(tStr, vStr) ? "Nothing special to see here" : vStr);
                                 break;
                             }
 
-                            sb.AppendLine($"{{{type}: '{(Equals(type.ToString(), rValue.ToString()) ? "No ToString() overload" : rValue)}'}}");
+                            sb.AppendLine($"{{{type}: '{(Equals(tStr, vStr) ? "No ToString() overload" : vStr)}'}}");
                             sb.AppendLine();
 
                             var maxLength = props.Max(x => x.Name.Length);
