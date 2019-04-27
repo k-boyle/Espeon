@@ -205,11 +205,17 @@ namespace Espeon
 
             var logger = _services.GetService<LogService>();
 
-            _client.Log += log
-                => logger.LogAsync(Source.Discord, (Severity)(int)log.Severity, log.Message, log.Exception);
+            _client.Log += log =>
+            {
+                logger.Log(Source.Discord, (Severity) (int) log.Severity, log.Message, log.Exception);
+                return Task.CompletedTask;
+            };
 
-            _services.GetService<TaskQueue>().Error += ex
-                => logger.LogAsync(Source.Scheduler, Severity.Error, string.Empty, ex);
+            _services.GetService<TaskQueue>().Error += ex =>
+            {
+                logger.Log(Source.Scheduler, Severity.Error, string.Empty, ex);
+                return Task.CompletedTask;
+            };
         }
     }
 }

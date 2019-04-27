@@ -30,7 +30,7 @@ namespace Espeon.Services
             var createCommands = guilds.Select(CreateCommandsAsync);
 
             await Task.WhenAll(createCommands);
-            await _log.LogAsync(Source.Commands, Severity.Verbose, "All custom commands loaded");
+            _log.Log(Source.Commands, Severity.Verbose, "All custom commands loaded");
         }
 
         private Task CreateCommandsAsync(Guild guild)

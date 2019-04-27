@@ -99,7 +99,7 @@ namespace Espeon.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogAsync(Source.Starboard, Severity.Error, string.Empty, ex);
+                _logger.Log(Source.Starboard, Severity.Error, string.Empty, ex);
             }
         }
 
@@ -154,7 +154,7 @@ namespace Espeon.Services
             }
             catch (Exception ex)
             {
-                await _logger.LogAsync(Source.Starboard, Severity.Error, string.Empty, ex);
+                _logger.Log(Source.Starboard, Severity.Error, string.Empty, ex);
             }
         }
     }

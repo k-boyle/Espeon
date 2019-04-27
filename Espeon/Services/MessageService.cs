@@ -126,7 +126,7 @@ namespace Espeon.Services
                 }
                 catch (Exception ex)
                 {
-                    await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, ex);
+                    _logger.Log(Source.Commands, Severity.Error, string.Empty, ex);
                 }
             }
         }
@@ -137,7 +137,7 @@ namespace Espeon.Services
 
             if (args.Result is ExecutionFailedResult failed)
             {
-                await _logger.LogAsync(Source.Commands, Severity.Error, string.Empty, failed.Exception);
+                _logger.Log(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
 #if !DEBUG
                 var c = _client.GetChannel(463299724326469634) as SocketTextChannel;
@@ -150,13 +150,15 @@ namespace Espeon.Services
             await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
         }
 
-        private async Task CommandExecutedAsync(CommandExecutedEventArgs args)
+        private Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
             var context = (EspeonContext)args.Context;
 
-            await _logger.LogAsync(Source.Commands, Severity.Verbose,
+            _logger.Log(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{context.Command.Name}}} for " +
                 $"{{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
+
+            return Task.CompletedTask;
         }
 
         public async Task<IUserMessage> SendAsync(EspeonContext context, Action<MessageProperties> properties)

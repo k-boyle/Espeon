@@ -1,4 +1,4 @@
-﻿using Casino.Common;
+using Casino.Common;
 using Casino.Common.DependencyInjection;
 using Casino.Common.Discord.Net;
 using Discord;
@@ -32,7 +32,7 @@ namespace Espeon.Services
         //requires client to be populated to send reminders
         public async Task LoadRemindersAsync(UserStore ctx)
         {
-            await _logger.LogAsync(Source.Reminders, Severity.Info, "Sending all missed reminders");
+            _logger.Log(Source.Reminders, Severity.Info, "Sending all missed reminders");
 
             var toRemove = new List<Reminder>();
 
@@ -114,7 +114,7 @@ namespace Espeon.Services
 
             await ctx.SaveChangesAsync();
 
-            await _logger.LogAsync(Source.Reminders, Severity.Verbose,
+            _logger.Log(Source.Reminders, Severity.Verbose,
                 $"Sent reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");
         }
 
