@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using Casino.Common.Discord.Net;
+using Discord;
 using Discord.WebSocket;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {

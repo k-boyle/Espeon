@@ -1,4 +1,6 @@
 using Casino.Common;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
@@ -12,8 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
-using Casino.Common.Discord.Net;
 
 namespace Espeon.Services
 {
@@ -152,23 +152,21 @@ namespace Espeon.Services
 
         private async Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
-            var context = args.Context as EspeonContext;
+            var context = (EspeonContext)args.Context;
 
             await _logger.LogAsync(Source.Commands, Severity.Verbose,
                 $"Successfully executed {{{context.Command.Name}}} for " +
                 $"{{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
-
-            context.Dispose();
         }
 
         public async Task<IUserMessage> SendAsync(EspeonContext context, Action<MessageProperties> properties)
         {
             if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
-                foundChannel = (_messageCache[context.Channel.Id] =
-                    new ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, CachedMessage>>());
+                foundChannel = _messageCache[context.Channel.Id] =
+                    new ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, CachedMessage>>();
 
             if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
-                foundCache = (foundChannel[context.User.Id] = new ConcurrentDictionary<Guid, CachedMessage>());
+                foundCache = foundChannel[context.User.Id] = new ConcurrentDictionary<Guid, CachedMessage>();
 
             var messageProperties = properties.Invoke();
 
@@ -180,17 +178,7 @@ namespace Espeon.Services
             {
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
-                var message = new CachedMessage
-                {
-                    ChannelId = context.Channel.Id,
-                    UserId = context.User.Id,
-                    ExecutingId = context.Message.Id,
-                    ResponseIds = new List<ulong>
-                    {
-                        sentMessage.Id
-                    },
-                    CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds()
-                };
+                var message = new CachedMessage(context, sentMessage);
 
                 var key = _scheduler.ScheduleTask(message,
                     DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
@@ -210,17 +198,7 @@ namespace Espeon.Services
 
                 sentMessage = await SendMessageAsync(context, messageProperties);
 
-                var message = new CachedMessage
-                {
-                    ChannelId = context.Channel.Id,
-                    UserId = context.User.Id,
-                    ExecutingId = context.Message.Id,
-                    CreatedAt = sentMessage.CreatedAt.ToUnixTimeMilliseconds(),
-                    ResponseIds = new List<ulong>
-                    {
-                        sentMessage.Id
-                    }
-                };
+                var message = new CachedMessage(context, sentMessage);
 
                 var key = _scheduler.ScheduleTask(message,
                     DateTimeOffset.UtcNow.Add(MessageLifeTime).ToUnixTimeMilliseconds(),
@@ -348,12 +326,23 @@ namespace Espeon.Services
 
         private class CachedMessage
         {
-            public ulong ChannelId { get; set; }
-            //public ulong ResponseId { get; set; }
-            public IList<ulong> ResponseIds { get; set; }
-            public ulong ExecutingId { get; set; }
-            public ulong UserId { get; set; }
-            public long CreatedAt { get; set; }
+            public ulong ChannelId { get; }
+            public IList<ulong> ResponseIds { get; }
+            public ulong ExecutingId { get; }
+            public ulong UserId { get; }
+            public long CreatedAt { get; }
+
+            public CachedMessage(EspeonContext context, IMessage message)
+            {
+                ChannelId = context.Channel.Id;
+                UserId = context.User.Id;
+                ExecutingId = context.Message.Id;
+                ResponseIds = new List<ulong>
+                {
+                    message.Id
+                };
+                CreatedAt = message.CreatedAt.ToUnixTimeMilliseconds();
+            }
         }
 
         public class MessageProperties

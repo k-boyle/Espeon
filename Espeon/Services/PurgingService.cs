@@ -1,10 +1,10 @@
-﻿using Discord.WebSocket;
+﻿using Casino.Common.DependencyInjection;
+using Discord.WebSocket;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
@@ -34,19 +34,10 @@ namespace Espeon.Services
             using var guildStore = _services.GetService<GuildStore>();
             var guild = await guildStore.GetOrCreateGuildAsync(user.Guild, x => x.Warnings);
 
-            var removed = false;
-
-            if (guild.Admins.Remove(user.Id))
-                removed = true;
-
-            if (guild.Moderators.Remove(user.Id))
-                removed = true;
-
-            if (guild.RestrictedUsers.Remove(user.Id))
-                removed = true;
-
-            if (guild.Warnings.RemoveAll(x => x.TargetUser == user.Id) > 0)
-                removed = true;
+            var removed = guild.Admins.Remove(user.Id) || 
+                          guild.Moderators.Remove(user.Id) ||
+                          guild.RestrictedUsers.Remove(user.Id) ||
+                          guild.Warnings.RemoveAll(x => x.TargetUser == user.Id) > 0;
 
             if (removed)
             {

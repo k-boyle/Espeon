@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common.Discord.Net;
+using Discord;
 using Discord.Net;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {

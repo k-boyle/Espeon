@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common.Discord.Net;
+using Discord;
 using Espeon.Databases;
 using Humanizer;
 using Qmmands;
@@ -7,7 +8,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Casino.Common.Discord.Net;
 
 namespace Espeon.Commands
 {

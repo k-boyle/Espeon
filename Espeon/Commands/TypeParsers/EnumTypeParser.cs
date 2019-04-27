@@ -1,15 +1,16 @@
 ﻿using Casino.Common.Qmmands;
+using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Espeon.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Commands
 {
     public abstract class EnumTypeParser<T> : TypeParser<T> where T : Enum
     {
-        private PrimiteTypeParser<T> _parser;
+        private PrimitiveTypeParser<T> _parser;
+        private string[] _names;
 
         public override ValueTask<TypeParserResult<T>> ParseAsync(Parameter parameter, string value, CommandContext ctx, IServiceProvider provider)
         {
@@ -22,8 +23,9 @@ namespace Espeon.Commands
             if (result)
                 return TypeParserResult<T>.Successful(res);
 
-            var packs = typeof(T).GetEnumNames();
-            var toSend = string.Join(", ", packs);
+            _names ??= typeof(T).GetEnumNames();
+
+            var toSend = string.Join(", ", _names);
             var response = provider.GetService<ResponseService>();
             var context = (EspeonContext)ctx;
             var user = context.Invoker;

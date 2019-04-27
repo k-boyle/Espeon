@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {
-    public abstract class EspeonBase : ModuleBase<EspeonContext>
+    public abstract class EspeonBase : ModuleBase<EspeonContext>, IDisposable
     {
         public MessageService Message { get; set; }
         public InteractiveService Interactive { get; set; }
@@ -77,6 +77,11 @@ namespace Espeon.Commands
         protected Task SendPaginatedMessageAsync(PaginatorBase paginator, TimeSpan? timeout = null)
         {
             return Interactive.SendPaginatedMessageAsync(paginator, timeout);
+        }
+
+        public void Dispose()
+        {
+            Context.Dispose();
         }
     }
 }

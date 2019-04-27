@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Qmmands;
+﻿using Qmmands;
+using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {

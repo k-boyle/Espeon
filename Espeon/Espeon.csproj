@@ -20,7 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview4.19216.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
     <PackageReference Include="Qmmands" Version="3.0.0-nightly-00182" />
-    <PackageReference Include="TheCasino.Common" Version="1.0.7" />
+    <PackageReference Include="TheCasino.Common" Version="1.0.8" />
   </ItemGroup>
 
   <ItemGroup>

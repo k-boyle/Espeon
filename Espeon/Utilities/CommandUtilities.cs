@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common.Discord.Net;
+using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
 using Humanizer;
@@ -6,8 +7,6 @@ using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Casino.Common.Discord.Net;
 
 namespace Espeon
 {
@@ -131,7 +130,7 @@ namespace Espeon
             [typeof(TimeSpan)] = "1day3hrs14mins30s",
             [typeof(Alias)] = "add/remove",
             [typeof(SocketRole)] = "@role",
-            [typeof(Emote[])] = "<:pepehands:2394873298>",
+            [typeof(Emote[])] = "<:espeon:491227561385525248>",
             [typeof(SocketTextChannel)] = "#channel",
             [typeof(ResponsePack)] = "owo",
             [typeof(Face)] = "heads/tails"

@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Qmmands;
+using System.Threading.Tasks;
 
 namespace Espeon.Commands
 {

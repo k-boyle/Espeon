@@ -1,14 +1,14 @@
-﻿using Discord;
+﻿using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
+using Discord;
 using Discord.WebSocket;
+using Espeon.Databases.UserStore;
 using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
-using Casino.Common.Discord.Net;
-using Espeon.Databases.UserStore;
 
 namespace Espeon.Commands
 {

@@ -1,9 +1,9 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Espeon.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Commands
 {

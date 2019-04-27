@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using Casino.Common.DependencyInjection;
+using Discord;
 using Espeon.Commands;
 using Espeon.Databases.UserStore;
 using System;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {

@@ -1,10 +1,9 @@
-﻿using Qmmands;
+﻿using Espeon.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Espeon.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Espeon.Commands
 {

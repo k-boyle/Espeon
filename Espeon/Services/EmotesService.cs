@@ -1,10 +1,10 @@
-﻿using Discord;
+﻿using Casino.Common.DependencyInjection;
+using Discord;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {

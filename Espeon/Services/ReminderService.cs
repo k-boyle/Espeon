@@ -1,4 +1,6 @@
 ﻿using Casino.Common;
+using Casino.Common.DependencyInjection;
+using Casino.Common.Discord.Net;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Commands;
@@ -9,8 +11,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
-using Casino.Common.Discord.Net;
 using Reminder = Espeon.Databases.Reminder;
 
 namespace Espeon.Services
@@ -75,6 +75,7 @@ namespace Espeon.Services
             return reminder;
         }
 
+        //TODO implement this
         private async Task CancelReminderAsync(EspeonContext context, Reminder reminder)
         {
             _scheduler.CancelTask(reminder.TaskKey);

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Casino.Common.DependencyInjection;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {

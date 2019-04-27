@@ -1,22 +1,20 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Espeon.Databases;
 using Espeon.Databases.CommandStore;
 using Espeon.Databases.GuildStore;
 using Espeon.Databases.UserStore;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
-using Espeon.Databases;
 
 namespace Espeon.Commands
 {
     public class EspeonContext : CommandContext, IDisposable
     {
-        private UserStore _userStore;
-        public UserStore UserStore => _userStore ?? (_userStore = new UserStore());
+        public UserStore UserStore { get; }
 
-        private GuildStore _guildStore;
-        public GuildStore GuildStore => _guildStore ?? (_guildStore = new GuildStore());
+        public GuildStore GuildStore { get; }
 
         private CommandStore _commandStore;
         public CommandStore CommandStore => _commandStore ?? (_commandStore = new CommandStore());
@@ -42,6 +40,9 @@ namespace Espeon.Commands
 
             IsEdit = isEdit;
             PrefixUsed = prefix;
+
+            UserStore = new UserStore();
+            GuildStore = new GuildStore();
         }
 
         public static async Task<EspeonContext> CreateAsync(DiscordSocketClient client, IUserMessage message,
@@ -62,8 +63,8 @@ namespace Espeon.Commands
             {
                 if (disposing)
                 {
-                    _guildStore?.Dispose();
-                    _userStore?.Dispose();
+                    GuildStore.Dispose();
+                    UserStore.Dispose();
                     _commandStore?.Dispose();
                 }
 

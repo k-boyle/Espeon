@@ -56,7 +56,7 @@ namespace Espeon
             var dbModules = await commandStore.Modules.Include(x => x.Commands).ToArrayAsync();
 
             var modulesToCreate = new List<ModuleBuilder>();
-            var commandsToCreate = new List<(ModuleBuilder Module, CommandBuilder Command)>();
+            var commandsToCreate = new List<CommandBuilder>();
 
             var modules = _commands.AddModules(Assembly.GetEntryAssembly(),
                 action: moduleBuilder =>
@@ -86,7 +86,7 @@ namespace Espeon
 
                         if (foundCommand is null)
                         {
-                            commandsToCreate.Add((moduleBuilder, commandBuilder));
+                            commandsToCreate.Add(commandBuilder);
                             continue;
                         }
 
@@ -117,9 +117,9 @@ namespace Espeon
                 await commandStore.Modules.AddAsync(newModule);
             }
 
-            foreach (var (module, command) in commandsToCreate)
+            foreach (var command in commandsToCreate)
             {
-                var foundModule = await commandStore.Modules.FindAsync(module.Name);
+                var foundModule = await commandStore.Modules.FindAsync(command.Module.Name);
 
                 foundModule.Commands.Add(new CommandInfo
                 {

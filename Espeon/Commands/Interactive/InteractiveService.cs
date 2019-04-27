@@ -1,11 +1,11 @@
 ﻿using Casino.Common;
+using Casino.Common.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Espeon.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Commands
 {

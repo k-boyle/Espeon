@@ -1,4 +1,5 @@
-﻿using Espeon.Commands;
+﻿using Casino.Common.DependencyInjection;
+using Espeon.Commands;
 using Espeon.Databases;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Casino.Common.DependencyInjection;
 
 namespace Espeon.Services
 {
