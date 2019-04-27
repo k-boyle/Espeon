@@ -4,6 +4,7 @@
     {
         Default,
         owo,
-        Abusive
+        Abusive,
+        Leet
     }
 }

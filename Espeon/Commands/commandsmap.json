@@ -9,6 +9,9 @@
       ],
       "Abusive": [
         "{0} has {1}{2} rare fucking candies"
+      ],
+      "Leet": [
+        "{0} h45 {1}{2} r4r3 c4nd{3}!"
       ]
     },
     "Claim Candies": {
@@ -23,6 +26,10 @@
       "Abusive": [
         "Here's {0}{1} fucking cand{2}",
         "Calm the fuck down cunt you've already claimed your fucking candies fucking wait {0}"
+      ],
+      "Leet": [
+        "Y0u h4v3 r3c31v3d {0}{1} r4r3 c4nd{2}!",
+        "Y0u 4lr34dy cl41m3d r3c3n7ly, pl3453 w417 {0}"
       ]
     },
     "View House": {
@@ -34,6 +41,9 @@
       ],
       "Abusive": [
         "I have {0}{1} fucking cand{2}"
+      ],
+      "Leet": [
+        "1 h4v3 {0}{1} r4r3 c4nd{2}"
       ]
     },
     "Treat": {
@@ -45,6 +55,9 @@
       ],
       "Abusive": [
         "This cunt has fucking given you {0}{1} fucking cand{2}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 7r3473d 70 {1}{2} r4r3 c4nd{3}"
       ]
     },
     "Candy Leaderboard": {
@@ -55,6 +68,9 @@
         "{0}"
       ],
       "Abusive": [
+        "{0}"
+      ],
+      "Leet": [
         "{0}"
       ]
     },
@@ -70,6 +86,10 @@
       "Abusive": [
         "You can't gift yourself you fucking idiot",
         "Dumb cunt giving away their fucking candy"
+      ],
+      "Leet": [
+        "Y0u c4n'7 61f7 y0ur53lf",
+        "Y0ur 61f7 b45k37 h45 b33n m4d3 4nd 53n7"
       ]
     },
     "Try Steal": {
@@ -87,6 +107,11 @@
         "Stop trying to take from the fucking poor wait till I have 1000{0} you bastard",
         "Lmao you lose cunt",
         "Fuck off you win"
+      ],
+      "Leet": [
+        "5734l c4n 0nly b3 u53d wh3n 1 h4v3 1000{0} r4r3 c4nd135",
+        "Y0u f00l, y0u l053",
+        "H0ly 5h17 y0u 4c7u4lly w0n"
       ]
     }
   },
@@ -109,6 +134,12 @@
         "What do you want the fucking response to fucking be? `cancel` to cancel",
         "It's been fucking made",
         "This already exists dickhead"
+      ],
+      "Leet": [
+        "Wh47 d0 y0u w4n7 7h3 c0mm4nd 70 b3 c4ll3d? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "Wh47 d0 y0u w4n7 7h3 r35p0n53 70 b3? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "{0} w45 5ucc355fully cr3473d",
+        "7h15 c0mm4nd 4lr34dy 3x1575"
       ]
     },
     "Delete Command": {
@@ -120,6 +151,9 @@
       ],
       "Abusive": [
         "It's been fucking deleted"
+      ],
+      "Leet": [
+        "{0} w45 d3l373d"
       ]
     },
     "Modify Command": {
@@ -134,6 +168,10 @@
       "Abusive": [
         "What do you want the new fucking response to be? `cancel` to cancel",
         "It's been fucking changed"
+      ],
+      "Leet": [
+        "Wh47 d0 y0u w4n7 7h3 n3w r35p0n53 70 b3? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "{0} w45 m0d1f13d"
       ]
     }
   },
@@ -147,6 +185,9 @@
       ],
       "Abusive": [
         "Dickhead, you're already in a fucking game"
+      ],
+      "Leet": [
+        "Y0u'r3 4lr34dy 1n 4 64m3"
       ]
     },
     "Coinflip": {
@@ -161,6 +202,10 @@
       "Abusive": [
         "You bloody win {0}{1} shitting rare cand{2}",
         "You lose, wanker. Thanks for the {0}{1} cand{2}"
+      ],
+      "Leet": [
+        "Y0u w1n {0}{1} r4r3 c4nd{2}!",
+        "Y0u l053 {0}{1} r4r3 c4nd{2}"
       ]
     }
   },
@@ -177,6 +222,10 @@
       "Abusive": [
         "Latency: {0}ms",
         "Latency: {0}ms\nPing: {1}ms"
+      ],
+      "Leet": [
+        "L473ncy: {0}m5",
+        "L473ncy: {0}m5\nP1n6: {1}m5"
       ]
     },
     "Get Catfact": {
@@ -191,6 +240,10 @@
       "Abusive": [
         "{0}",
         "Something went fucking wrong, and I'm not talking about your birth"
+      ],
+      "Leet": [
+        "{0}",
+        "50m37h1n6 w3n7 wr0n6."
       ]
     },
     "Get Joke": {
@@ -205,6 +258,10 @@
       "Abusive": [
         "{0}",
         "Like your dads condoms, this didn't fucking work"
+      ],
+      "Leet": [
+        "{0}",
+        "50m37h1n6 w3n7 wr0n6."
       ]
     },
     "Get Gif": {
@@ -222,6 +279,11 @@
         "Failed to find a fucking gif",
         "The found gif was too fucking big",
         "Dunno what is a bigger fail, this command or your life"
+      ],
+      "Leet": [
+        "F41l3d 70 f1nd 4ny m47ch1n6 61f5",
+        "7h3 f0und 61f w45 700 l4r63 70 upl04d",
+        "50m37h1n6 w3n7 wr0n6"
       ]
     },
     "Clear Messages": {},
@@ -240,6 +302,10 @@
       "Abusive": [
         "What do this guilds mods and your braincells have in common? There's fucking none",
         "Here's your fucking mods:\n{0}"
+      ],
+      "Leet": [
+        "7h3r3 4r3 n0 m0d5 f0r 7h15 6u1ld",
+        "Y0ur m0d5 4r3:\n{0}"
       ]
     },
     "List Admins": {
@@ -254,6 +320,10 @@
       "Abusive": [
         "Your iq + number of admins in this guild = 0",
         "Here's your fucking admins:\n{0}"
+      ],
+      "Leet": [
+        "7h3r3 4r3 n0 4dm1n5 f0r 7h15 6u1ld",
+        "Y0ur 4dm1n5 4r3:\n{0}"
       ]
     },
     "Steal Emote": {
@@ -268,6 +338,10 @@
       "Abusive": [
         "{0} has been fucking added",
         "Get less fucking emotes you basic bitch"
+      ],
+      "Leet": [
+        "4dd3d {0} 3m0735",
+        "3m073 l1m17 r34ch3d, f41l3d 70 4dd 7h3 f0ll0w1n6 3m0735: {0}"
       ]
     }
   },
@@ -281,6 +355,9 @@
       ],
       "Abusive": [
         "{0} is a cunt so they've been kicked"
+      ],
+      "Leet": [
+        "{0} h45 b33n k1ck3d"
       ]
     },
     "Ban User": {
@@ -292,6 +369,9 @@
       ],
       "Abusive": [
         "{0} is a megacunt so has been banned"
+      ],
+      "Leet": [
+        "{0} h45 b33n b4nn3d"
       ]
     },
     "Warn User": {
@@ -306,6 +386,10 @@
       "Abusive": [
         "{0} has {1} warnings because they're aids",
         "{0} you've been warned cunt"
+      ],
+      "Leet": [
+        "{0} h45 3xc33d3d 7h3 w4rn1n6 l1m17 4nd curr3n7ly h45 {1} w4rn1n6(5)",
+        "{0} h45 b33n w4rn3d"
       ]
     },
     "Revoke Warning": {
@@ -320,6 +404,10 @@
       "Abusive": [
         "Oi, retard, warning doesn't exist",
         "Stop being a nice cunt"
+      ],
+      "Leet": [
+        "7h15 w4rn1n6 d035n'7 3x157",
+        "W4rn1n6 h45 b33n r3v0k3d"
       ]
     },
     "View Warnings": {
@@ -333,6 +421,10 @@
       ],
       "Abusive": [
         "This user is a goody two-shoes",
+        "{0}"
+      ],
+      "Leet": [
+        "7h15 u53r d035n'7 h4v3 4ny w4rn1n65",
         "{0}"
       ]
     },
@@ -348,6 +440,10 @@
       "Abusive": [
         "Try setting the no reactions role dickhead",
         "Shitheads reactions removed"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 w45 n07 f0und 0r 15 n07 537",
+        "R34c710n5 r3d4c73d"
       ]
     },
     "Restore Reactions": {
@@ -362,6 +458,10 @@
       "Abusive": [
         "Try setting the no reactions role dickhead",
         "Shitheads reactions restored"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 w45 n07 f0und 0r 15 n07 537",
+        "R34c710n5 r3570r3d"
       ]
     },
     "Block User": {
@@ -373,6 +473,9 @@
       ],
       "Abusive": [
         "Cunt be gone"
+      ],
+      "Leet": [
+        "Bl0ck3d"
       ]
     },
     "Blacklist User": {
@@ -387,6 +490,10 @@
       "Abusive": [
         "Dickhead is already blacklisted",
         "Dick be gone"
+      ],
+      "Leet": [
+        "7h15 u53r 15 4lr34dy bl4ckl1573d",
+        "Bl4ckl1573d"
       ]
     },
     "Unblacklist": {
@@ -401,6 +508,10 @@
       "Abusive": [
         "They're not a dickhead, but they may as well be",
         "Why are you letting this dickhead return?"
+      ],
+      "Leet": [
+        "7h15 u53r 15n'7 bl4ckl1573d",
+        "Unbl4ckl1573d"
       ]
     }
   },
@@ -414,6 +525,9 @@
       ],
       "Abusive": [
         "Channel not fucking found"
+      ],
+      "Leet": [
+        "Ch4nn3l w45 n07 f0und"
       ]
     },
     "Eval": {},
@@ -428,6 +542,9 @@
       ],
       "Abusive": [
         "Refuckingloaded"
+      ],
+      "Leet": [
+        "R3l04d3d"
       ]
     }
   },
@@ -441,6 +558,9 @@
       ],
       "Abusive": [
         "Brain too small to remember? I'll fucking do it I guess"
+      ],
+      "Leet": [
+        "R3m1nd3r cr3473d"
       ]
     },
     "List Reminders": {}
@@ -461,6 +581,11 @@
         "Tiny brain, you already have this role",
         "There, you fucking have it",
         "Imagine not being smart enough to know this role isn't self assigning?"
+      ],
+      "Leet": [
+        "Y0u 4lr34dy h4v3 7h15 r0l3",
+        "R0l3 h45 b33n 45516n3d 70 y0u",
+        "7h15 r0l3 15 n07 4v41l4bl3 45 4 53lf 45516n1n6 r0l3"
       ]
     },
     "Add SAR": {
@@ -475,6 +600,10 @@
       "Abusive": [
         "Already a fucking self assigning role dickshit",
         "Fucking added"
+      ],
+      "Leet": [
+        "R0l3 15 4lr34dy 4 53lf 45516n1n6 r0l3",
+        "R0l3 h45 b33n 4dd3d 70 7h3 l157 0f 53lf 45516n1n6 r0l35"
       ]
     },
     "Remove Role": {
@@ -492,6 +621,11 @@
         "Retard, you don't have this role",
         "The role isn't self assigning dickhead",
         "Fucking removed"
+      ],
+      "Leet": [
+        "Y0u d0n'7 curr3n7ly h4v3 7h15 r0l3",
+        "7h15 r0l3 15n'7 4 53lf 45516n1n6 r0l3",
+        "R0l3 h45 b33n r3m0v3d"
       ]
     },
     "Remove SAR": {
@@ -506,6 +640,10 @@
       "Abusive": [
         "This. Is. Not. Self. Assigning. Idiot.",
         "Fucking removed from the fucking list"
+      ],
+      "Leet": [
+        "7h15 r0l3 15 n07 1n 7h3 l157 0f 53lf 45516n1n6 r0l35",
+        "R0l3 h45 b33n r3m0v3d 45 4 53lf 45516n1n6 r0l3"
       ]
     },
     "List Roles": {
@@ -516,6 +654,9 @@
         "{0}"
       ],
       "Abusive": [
+        "{0}"
+      ],
+      "Leet": [
         "{0}"
       ]
     }
@@ -533,6 +674,10 @@
       "Abusive": [
         "This prefix already exists you absolute spastic",
         "Your retarded prefix has been added"
+      ],
+      "Leet": [
+        "7h15 pr3f1x 15 4lr34dy d3f1n3d f0r 7h15 6u1ld",
+        "Pr3f1x h45 b33n 4dd3d"
       ]
     },
     "Remove Prefix": {
@@ -547,6 +692,10 @@
       "Abusive": [
         "This prefix doesn't exist you degenerate",
         "Your dumb prefix was removed, thank God"
+      ],
+      "Leet": [
+        "7h15 pr3f1x d035n'7 3x1575 f0r 7h15 6u1ld",
+        "Pr3f1x h45 b33n r3m0v3d"
       ]
     },
     "Restrict Channel": {
@@ -561,6 +710,10 @@
       "Abusive": [
         "I already can't speak here you dumb cunt",
         "I didn't even want to respond to you"
+      ],
+      "Leet": [
+        "1 4m 4lr34dy r357r1c73d 1n 7h15 ch4nn3l",
+        "1 c4n n0 l0n63r 53nd m3554635 1n 7h47 ch4nn3l"
       ]
     },
     "Unrestrict Channel": {
@@ -575,6 +728,10 @@
       "Abusive": [
         "I'm not restrict in this channel you dumb cunt",
         "ffs now I have to respond to you again"
+      ],
+      "Leet": [
+        "1 4m n07 r357r1c73d 1n 7h15 ch4nn3l",
+        "1 4m n0w unr357r1c73d fr0m 7h15 ch4nn3l"
       ]
     },
     "Admin User": {
@@ -589,6 +746,10 @@
       "Abusive": [
         "{0} joins the league of cunts",
         "{0} is already an admin dickshit"
+      ],
+      "Leet": [
+        "{0} h45 b33n m4d3 4n 4dm1n",
+        "{0} 15 4lr34dy 4n 4dm1n"
       ]
     },
     "Moderate User": {
@@ -606,6 +767,11 @@
         "{0} is already a fucking admin you dickhead",
         "{0} is now a power holding shitbag",
         "{0} is already a fucking mod"
+      ],
+      "Leet": [
+        "{0} 15 4lr34dy 4n 4dm1n",
+        "{0} h45 b33n m4d3 4 m0d3r470r",
+        "{0} 15 4lr34dy 4 m0d3r470r"
       ]
     },
     "Demote Admin": {
@@ -623,6 +789,11 @@
         "You can't demote the owner you cheeky cunt",
         "dickhead --> {0}",
         "{0} is not a fucking admin shit-for-brains"
+      ],
+      "Leet": [
+        "Y0u c4nn07 d3m073 7h3 6u1ld 0wn3r",
+        "{0} h45 b33n d3m073d",
+        "{0} 15 n07 4n 4dm1n"
       ]
     },
     "Demote Moderator": {
@@ -637,6 +808,10 @@
       "Abusive": [
         "wanker --> {0}",
         "not a wanker --> {0}"
+      ],
+      "Leet": [
+        "{0} h45 b33n d3m073d",
+        "{0} 15 n07 4 m0d3r470r"
       ]
     },
     "Set Welcome Channel": {
@@ -648,6 +823,9 @@
       ],
       "Abusive": [
         "Not that anyone wants to join this shitfest, but it's set"
+      ],
+      "Leet": [
+        "W3lc0m3 ch4nn3l h45 b33n 537"
       ]
     },
     "Set Welcome Message": {
@@ -659,6 +837,9 @@
       ],
       "Abusive": [
         "What's the point when no one is gonna fucking join anyway?"
+      ],
+      "Leet": [
+        "W3lc0m3 m355463 h45 b33n 537"
       ]
     },
     "Set Default Role": {
@@ -670,6 +851,9 @@
       ],
       "Abusive": [
         "Shit role"
+      ],
+      "Leet": [
+        "D3f4ul7 r0l3 h45 b33n 537"
       ]
     },
     "Set Warning Limit": {
@@ -681,6 +865,9 @@
       ],
       "Abusive": [
         "Just kick the cunts already"
+      ],
+      "Leet": [
+        "W4rn1n6 l1m17 h45 b33n 537"
       ]
     },
     "Set No Reactions Role": {
@@ -692,6 +879,9 @@
       ],
       "Abusive": [
         "Fine"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 h45 b33n 537"
       ]
     }
   },
@@ -705,6 +895,9 @@
       ],
       "Abusive": [
         "Not that you cunts say anything funny anyway"
+      ],
+      "Leet": [
+        "574rb04rd h45 b33n 3n4bl3d"
       ]
     },
     "Disable Starboard": {
@@ -716,6 +909,9 @@
       ],
       "Abusive": [
         "Now I don't need to keep a history of your unfunny shit"
+      ],
+      "Leet": [
+        "574rb04rd h45 b33n d154bl3d"
       ]
     },
     "Set Starboard Limit": {
@@ -727,6 +923,9 @@
       ],
       "Abusive": [
         "If only you could set it to 0 so you'd have a chance"
+      ],
+      "Leet": [
+        "574r l1m17 h45 b33n 537"
       ]
     },
     "Random Star": {
@@ -738,6 +937,9 @@
       ],
       "Abusive": [
         "No one has said anything worthy (I'll pretend I'm surprised)"
+      ],
+      "Leet": [
+        "7h15 6u1ld h45 n0 574rr3d m3554635"
       ]
     }
   },
@@ -751,6 +953,9 @@
       ],
       "Abusive": [
         "Bad choice, fuckface"
+      ],
+      "Leet": [
+        "R35p0n53 p4ck h45 b33n 537 70 {0}"
       ]
     },
     "Buy": {
@@ -768,6 +973,11 @@
         "You already have this pack dickhead",
         "Expecting you to know that your candies is less than {0} was obviously too much",
         "Terrible idea you fucking idiot"
+      ],
+      "Leet": [
+        "Y0u 4lr34dy h4v3 7h15 r35p0n53 p4ck",
+        "7h15 r35p0n53 p4ck c0575 {0} c4nd135",
+        "Y0u h4v3 purch453d {0}"
       ]
     }
   },
@@ -781,6 +991,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Random Amount": {
@@ -792,6 +1005,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Claim Max": {
@@ -803,6 +1019,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Claim Min": {
@@ -814,6 +1033,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Claim Cooldown": {
@@ -825,6 +1047,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Pack Price": {
@@ -836,6 +1061,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     },
     "Set Coin Flip": {
@@ -847,6 +1075,9 @@
       ],
       "Abusive": [
         "fuck"
+      ],
+      "Leet": [
+        "537"
       ]
     }
   },
@@ -869,6 +1100,12 @@
         "{0} couldn't be fucking added to {1}",
         "I removed fucking {0} from fucking {1}",
         "{0} couldn't be fucking removed from {1}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 4dd3d 70 {1}",
+        "F41l3d 70 4dd {0} 70 {1}",
+        "{0} h45 b33n r3m0v3d fr0m {1}",
+        "F41l3d 70 r3m0v3 {0} fr0m {1}"
       ]
     },
     "Module Alias": {
@@ -889,6 +1126,12 @@
         "{0} couldn't be fucking added to {1}",
         "I removed fucking {0} from fucking {1}",
         "{0} couldn't be fucking removed from {1}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 4dd3d 70 {1}",
+        "F41l3d 70 4dd {0} 70 {1}",
+        "{0} h45 b33n r3m0v3d fr0m {1}",
+        "F41l3d 70 r3m0v3 {0} fr0m {1}"
       ]
     }
   },
@@ -902,6 +1145,9 @@
       ],
       "Abusive": [
         "Fuck off I'm flawless"
+      ],
+      "Leet": [
+        "Bu6 h45 b33n r3p0r73d"
       ]
     },
     "Feature Request": {
@@ -913,6 +1159,9 @@
       ],
       "Abusive": [
         "That request was bad and you should feel bad"
+      ],
+      "Leet": [
+        "F347ur3 h45 b33n r3qu3573d"
       ]
     },
     "Source Code": {}
