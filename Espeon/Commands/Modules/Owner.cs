@@ -206,7 +206,15 @@ namespace Espeon.Commands
                             {
                                 sb.Append($"#{prop.Name.PadRight(maxLength, ' ')} - ");
 
-                                var value = prop.GetValue(rValue);
+                                object value = null;
+
+                                try
+                                {
+                                    value = prop.GetValue(rValue);
+                                }
+                                catch (TargetInvocationException) //c# bad
+                                {
+                                }
 
                                 if (value is IEnumerable collection && !(value is string))
                                 {
@@ -216,11 +224,11 @@ namespace Espeon.Commands
                                 }
                                 else
                                 {
-                                    sb.AppendLine($"[{prop.GetValue(rValue)}]");
+                                    sb.AppendLine($"[{value}]");
                                 }
                             }
 
-                            var messages = Utilities.SplitByLength(sb.ToString(), 2000);
+                            var messages = Utilities.SplitByLength(sb.ToString(), 1980);
 
                             foreach (var msg in messages)
                                 await SendMessageAsync($"```css\n{msg}\n```");

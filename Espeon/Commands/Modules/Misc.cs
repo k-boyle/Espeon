@@ -188,7 +188,7 @@ namespace Espeon.Commands
                     canExecute.Add(module);
             }
 
-            var prefix = Context.PrefixUsed;
+            var prefix = GetPrefix(Context.PrefixUsed);
 
             var builder = GetBuilder()
                 .AddField("Modules", string.Join(", ", canExecute
@@ -211,7 +211,7 @@ namespace Espeon.Commands
         [Description("View help on the specified module")]
         public async Task HelpAsync([Remainder] Module module)
         {
-            var prefix = Context.PrefixUsed;
+            var prefix = GetPrefix(Context.PrefixUsed);
 
             var canExecute = new List<Command>();
 
@@ -247,6 +247,8 @@ namespace Espeon.Commands
             var batch = commands.Batch(3).Select(x => x.ToArray()).ToArray();
             var toSend = new List<EmbedBuilder>();
 
+            var prefix = GetPrefix(Context.PrefixUsed);
+
             string GetParameters(Command command)
             {
                 var sb = new StringBuilder();
@@ -271,7 +273,7 @@ namespace Espeon.Commands
 
                     var builder = GetBuilder()
                         .AddField(cmd.Name,
-                            $"{Context.PrefixUsed}{cmd.FullAliases.First().ToLower()}{GetParameters(cmd)}")
+                            $"{prefix}{cmd.FullAliases.First().ToLower()}{GetParameters(cmd)}")
                         .AddField("Summary", cmd.Description ?? "\u200b")
                         .AddField("Aliases", string.Join(", ", cmd.FullAliases.Select(x => x.ToLower())) ?? "\u200b");
 
@@ -289,13 +291,13 @@ namespace Espeon.Commands
             foreach (var col in batch)
             {
                 var builder = GetBuilder()
-                    .WithFooter($"Type {Context.PrefixUsed}help Command Name to view help for that specific command");
+                    .WithFooter($"Type {prefix}help Command Name to view help for that specific command");
 
                 foreach (var command in col)
                 {
                     //TODO add summaries/examples
                     builder.AddField(command.Name,
-                            $"{Context.PrefixUsed}{command.FullAliases.First().ToLower()}{GetParameters(command)}");
+                            $"{prefix}{command.FullAliases.First().ToLower()}{GetParameters(command)}");
                 }
 
                 toSend.Add(builder);
@@ -338,6 +340,13 @@ namespace Espeon.Commands
                 ThumbnailUrl = Context.Guild.CurrentUser.GetAvatarOrDefaultUrl(),
                 Timestamp = DateTimeOffset.UtcNow
             };
+        }
+
+        private string GetPrefix(string prefix)
+        {
+            return prefix == Context.Guild.CurrentUser.Mention
+                ? $"@{Context.Guild.CurrentUser.GetDisplayName()}"
+                : prefix;
         }
 
         [Command("Mods")]
