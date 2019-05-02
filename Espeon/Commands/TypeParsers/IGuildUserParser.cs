@@ -31,37 +31,32 @@ namespace Espeon.Commands
                 if (hashIndex != -1 && hashIndex + 5 == value.Length)
                     user = users.FirstOrDefault(x =>
                         string.Equals(x.Username, value[0..^5], StringComparison.InvariantCultureIgnoreCase) &&
-                        string.Equals(x.Discriminator, value.Substring(hashIndex + 1), StringComparison.InvariantCultureIgnoreCase));
+                        x.Discriminator == value.Substring(hashIndex + 1));
             }
 
             if (user != null)
                 return new TypeParserResult<IGuildUser>(user);
 
-            IReadOnlyList<SocketGuildUser> matchingUsers = context.Guild != null
-                ? users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)
-                    || string.Equals(x.Nickname, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray()
-                : users.Where(x => string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray();
-
+            IReadOnlyList<SocketGuildUser> matchingUsers = users.Where(x =>
+                string.Equals(x.Username, value, StringComparison.InvariantCultureIgnoreCase)
+                || string.Equals(x.Nickname, value, StringComparison.InvariantCultureIgnoreCase)).ToImmutableArray();
+            
             var p = context.Invoker.ResponsePack;
             var response = provider.GetService<ResponseService>();
+            
+            switch (matchingUsers.Count)
+            {
+                case 0:
+                    return TypeParserResult<IGuildUser>.Unsuccessful(response.GetResponse(this, p, 1));
+                case 1:
+                    return TypeParserResult<IGuildUser>.Successful(matchingUsers[0]);
+                default:
+                    matchingUsers = matchingUsers.Where(x => x.Username == value || x.Nickname == value).ToArray();
+                    if (matchingUsers.Count == 1)
+                        return TypeParserResult<IGuildUser>.Successful(matchingUsers[0]);
 
-            if (matchingUsers.Count > 1)
-                return new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 0));
-
-            if (matchingUsers.Count == 1)
-                user = matchingUsers[0];
-
-            if (!(user is null))
-                return new TypeParserResult<IGuildUser>(user);
-
-            if(id == 0)
-                return new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 1));
-
-            user = await context.Client.Rest.GetGuildUserAsync(context.Guild.Id, id);
-
-            return user is null
-                ? new TypeParserResult<IGuildUser>(response.GetResponse(this, p, 1))
-                : new TypeParserResult<IGuildUser>(user);
+                    return TypeParserResult<IGuildUser>.Unsuccessful(response.GetResponse(this, p, 0));
+            }
         }
 
         private ulong ParseId(string value)
