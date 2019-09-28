@@ -1,0 +1,1 @@
+﻿Interactive is based on https://github.com/foxbot/Discord.Addons.Interactive

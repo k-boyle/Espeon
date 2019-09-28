@@ -1,0 +1,1335 @@
+{
+  "Candy Commands": {
+    "View Candies": {
+      "Default": [
+        "{0} has {1}{2} rare cand{3}!"
+      ],
+      "owo": [
+        "{0} has {1}{2} rwar cwand{3}!"
+      ],
+      "Abusive": [
+        "{0} has {1}{2} rare fucking candies"
+      ],
+      "Leet": [
+        "{0} h45 {1}{2} r4r3 c4nd{3}!"
+      ]
+    },
+    "Claim Candies": {
+      "Default": [
+        "You have received {0}{1} rare cand{2}!",
+        "You already claimed recently, please wait {0}"
+      ],
+      "owo": [
+        "\\*pounces on your lap\\* owo heres {0}{1} cwand{2}!!!",
+        "Ohhh noo >><< uu alweadie cwaimd ur cwandies wait {0}"
+      ],
+      "Abusive": [
+        "Here's {0}{1} fucking cand{2}",
+        "Calm the fuck down cunt you've already claimed your fucking candies fucking wait {0}"
+      ],
+      "Leet": [
+        "Y0u h4v3 r3c31v3d {0}{1} r4r3 c4nd{2}!",
+        "Y0u 4lr34dy cl41m3d r3c3n7ly, pl3453 w417 {0}"
+      ]
+    },
+    "View House": {
+      "Default": [
+        "I have {0}{1} rare cand{2}"
+      ],
+      "owo": [
+        "OOOOHHHH i hwve {0}{1} cwand{2}!!!!!! \\*w\\*"
+      ],
+      "Abusive": [
+        "I have {0}{1} fucking cand{2}"
+      ],
+      "Leet": [
+        "1 h4v3 {0}{1} r4r3 c4nd{2}"
+      ]
+    },
+    "Treat": {
+      "Default": [
+        "{0} has been treated to {1}{2} rare cand{3}"
+      ],
+      "owo": [
+        "{0} mastwur has bween kwind 2 u \\*runs to you tail wagging\\* hweers {1}{2} cwand{3}"
+      ],
+      "Abusive": [
+        "This cunt has fucking given you {0}{1} fucking cand{2}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 7r3473d 70 {1}{2} r4r3 c4nd{3}"
+      ]
+    },
+    "Candy Leaderboard": {
+      "Default": [
+        "{0}"
+      ],
+      "owo": [
+        "{0}"
+      ],
+      "Abusive": [
+        "{0}"
+      ],
+      "Leet": [
+        "{0}"
+      ]
+    },
+    "Gift Candies": {
+      "Default": [
+        "You can't gift yourself",
+        "Your gift basket has been made and sent"
+      ],
+      "owo": [
+        ">>.<< u cant gwift urself",
+        "\\*notices package\\* uwu uur swo genurus"
+      ],
+      "Abusive": [
+        "You can't gift yourself you fucking idiot",
+        "Dumb cunt giving away their fucking candy"
+      ],
+      "Leet": [
+        "Y0u c4n'7 61f7 y0ur53lf",
+        "Y0ur 61f7 b45k37 h45 b33n m4d3 4nd 53n7"
+      ]
+    },
+    "Try Steal": {
+      "Default": [
+        "Steal can only be used when I have 1000{0} rare candies",
+        "You fool, you lose",
+        "Holy shit you actually won"
+      ],
+      "owo": [
+        "owee im sowweee bwut stweal cn onwee be uzed wen i hwav 1000{0} cwandies",
+        "am swoweee bwut uu lose",
+        "OwO uu wiiin!!!"
+      ],
+      "Abusive": [
+        "Stop trying to take from the fucking poor wait till I have 1000{0} you bastard",
+        "Lmao you lose cunt",
+        "Fuck off you win"
+      ],
+      "Leet": [
+        "5734l c4n 0nly b3 u53d wh3n 1 h4v3 1000{0} r4r3 c4nd135",
+        "Y0u f00l, y0u l053",
+        "H0ly 5h17 y0u 4c7u4lly w0n"
+      ]
+    }
+  },
+  "Custom Commands": {
+    "Create Command": {
+      "Default": [
+        "What do you want the command to be called? Reply with `cancel` to cancel operation",
+        "What do you want the response to be? Reply with `cancel` to cancel operation",
+        "{0} was successfully created",
+        "This command already exists"
+      ],
+      "owo": [
+        "waht du uu wnt the cwomand to bwee cwalled? `cancel` to stwop",
+        "waht du uu wnt the respons to bwee? `cancel` to stwop",
+        "i made it fur uu :3c",
+        "swowee this cwomnd aweadee exists"
+      ],
+      "Abusive": [
+        "What do you want the fucking command to be fucking called? `cancel` to cancel",
+        "What do you want the fucking response to fucking be? `cancel` to cancel",
+        "It's been fucking made",
+        "This already exists dickhead"
+      ],
+      "Leet": [
+        "Wh47 d0 y0u w4n7 7h3 c0mm4nd 70 b3 c4ll3d? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "Wh47 d0 y0u w4n7 7h3 r35p0n53 70 b3? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "{0} w45 5ucc355fully cr3473d",
+        "7h15 c0mm4nd 4lr34dy 3x1575"
+      ]
+    },
+    "Delete Command": {
+      "Default": [
+        "{0} was deleted"
+      ],
+      "owo": [
+        "i gwot wid of tht mweanie {0} >:)"
+      ],
+      "Abusive": [
+        "It's been fucking deleted"
+      ],
+      "Leet": [
+        "{0} w45 d3l373d"
+      ]
+    },
+    "Modify Command": {
+      "Default": [
+        "What do you want the new response to be? Reply with `cancel` to cancel operation",
+        "{0} was modified"
+      ],
+      "owo": [
+        "waht du uu want the new wespons to bee? `cancel` to stwop",
+        "i changed {0} fur uu"
+      ],
+      "Abusive": [
+        "What do you want the new fucking response to be? `cancel` to cancel",
+        "It's been fucking changed"
+      ],
+      "Leet": [
+        "Wh47 d0 y0u w4n7 7h3 n3w r35p0n53 70 b3? R3ply w17h `c4nc3l` 70 c4nc3l 0p3r4710n",
+        "{0} w45 m0d1f13d"
+      ]
+    }
+  },
+  "Games": {
+    "Blackjack": {
+      "Default": [
+        "You're already in a game"
+      ],
+      "owo": [
+        "owwww u siwwy biwwy ur awready in a game"
+      ],
+      "Abusive": [
+        "Dickhead, you're already in a fucking game"
+      ],
+      "Leet": [
+        "Y0u'r3 4lr34dy 1n 4 64m3"
+      ]
+    },
+    "Coinflip": {
+      "Default": [
+        "You win {0}{1} rare cand{2}!",
+        "You lose {0}{1} rare cand{2}"
+      ],
+      "owo": [
+        "\\*shakes tail in excitement\\* uu win {0}{1} rwar cwand{2}!!",
+        "\\*evil laughs\\* uu lose {0}{1} rwar cwand{2}!! >:)"
+      ],
+      "Abusive": [
+        "You bloody win {0}{1} shitting rare cand{2}",
+        "You lose, wanker. Thanks for the {0}{1} cand{2}"
+      ],
+      "Leet": [
+        "Y0u w1n {0}{1} r4r3 c4nd{2}!",
+        "Y0u l053 {0}{1} r4r3 c4nd{2}"
+      ]
+    }
+  },
+  "Misc": {
+    "Ping": {
+      "Default": [
+        "Websocket Latency: {0}ms",
+        "Websocket Latency: {0}ms\nRest: {1}ms"
+      ],
+      "owo": [
+        "Webswocket Watancy: {0}puurrs",
+        "Webswocket Watancy: {0}puurrs\nWest: {1}puurrs"
+      ],
+      "Abusive": [
+        "Websocket Latency: {0}ms",
+        "Websocket Latency: {0}ms\nRest: {1}ms"
+      ],
+      "Leet": [
+        "L473ncy: {0}m5",
+        "W3b50ck37 L473ncy: {0}m5\nR357: {1}m5"
+      ]
+    },
+    "Get Catfact": {
+      "Default": [
+        "{0}",
+        "Something went wrong."
+      ],
+      "owo": [
+        "{0}",
+        "ooowwno sumthing went wrronng >>.<<"
+      ],
+      "Abusive": [
+        "{0}",
+        "Something went fucking wrong, and I'm not talking about your birth"
+      ],
+      "Leet": [
+        "{0}",
+        "50m37h1n6 w3n7 wr0n6."
+      ]
+    },
+    "Get Joke": {
+      "Default": [
+        "{0}",
+        "Something went wrong."
+      ],
+      "owo": [
+        "{0}",
+        "ooowwno sumthing went wrronng >>.<<"
+      ],
+      "Abusive": [
+        "{0}",
+        "Like your dads condoms, this didn't fucking work"
+      ],
+      "Leet": [
+        "{0}",
+        "50m37h1n6 w3n7 wr0n6."
+      ]
+    },
+    "Get Gif": {
+      "Default": [
+        "Failed to find any matching gifs",
+        "The found gif was too large to upload",
+        "Something went wrong"
+      ],
+      "owo": [
+        "fwailed to fwind a gwif",
+        "oweee the gwif was too bwig owo",
+        "sumthing went wwong"
+      ],
+      "Abusive": [
+        "Failed to find a fucking gif",
+        "The found gif was too fucking big",
+        "Dunno what is a bigger fail, this command or your life"
+      ],
+      "Leet": [
+        "F41l3d 70 f1nd 4ny m47ch1n6 61f5",
+        "7h3 f0und 61f w45 700 l4r63 70 upl04d",
+        "50m37h1n6 w3n7 wr0n6"
+      ]
+    },
+    "Clear Messages": {},
+    "Help Modules": {},
+    "Help Module": {},
+    "Help Commands": {},
+    "List Mods": {
+      "Default": [
+        "There are no mods for this guild",
+        "Your mods are:\n{0}"
+      ],
+      "owo": [
+        "theres nu mods fur this gwuild",
+        "hers ur daddies:\n{0]}"
+      ],
+      "Abusive": [
+        "What do this guilds mods and your braincells have in common? There's fucking none",
+        "Here's your fucking mods:\n{0}"
+      ],
+      "Leet": [
+        "7h3r3 4r3 n0 m0d5 f0r 7h15 6u1ld",
+        "Y0ur m0d5 4r3:\n{0}"
+      ]
+    },
+    "List Admins": {
+      "Default": [
+        "There are no admins for this guild",
+        "Your admins are:\n{0}"
+      ],
+      "owo": [
+        "theres nu admwins fur this gwuild",
+        "hers ur daddies daddies:\n{0]}"
+      ],
+      "Abusive": [
+        "Your iq + number of admins in this guild = 0",
+        "Here's your fucking admins:\n{0}"
+      ],
+      "Leet": [
+        "7h3r3 4r3 n0 4dm1n5 f0r 7h15 6u1ld",
+        "Y0ur 4dm1n5 4r3:\n{0}"
+      ]
+    },
+    "Steal Emote": {
+      "Default": [
+        "Added {0} emotes",
+        "Emote limit reached, failed to add the following emotes: {0}"
+      ],
+      "owo": [
+        "addwed {0} emos",
+        "owwnoo >,< emo wimit weached i cudnt add {0}"
+      ],
+      "Abusive": [
+        "{0} has been fucking added",
+        "Get less fucking emotes you basic bitch"
+      ],
+      "Leet": [
+        "4dd3d {0} 3m0735",
+        "3m073 l1m17 r34ch3d, f41l3d 70 4dd 7h3 f0ll0w1n6 3m0735: {0}"
+      ]
+    },
+    "Quote Message": {
+      "Default": [
+        "No message found with that id"
+      ],
+      "owo": [
+        ">><< oowwww i cudnt fwind dat msg"
+      ],
+      "Abusive": [
+        "Try passing a valid fucking message id"
+      ],
+      "Leet": [
+        "N0 m355463 f0und w17h 7h47 1d"
+      ]
+    },
+    "Quote Link": {
+      "Default": [
+        "No message found for that link, or I don't have access to that message"
+      ],
+      "owo": [
+        "owwe >><< i either dwont hav accwess or no msg fwound"
+      ],
+      "Abusive": [
+        "Give me a fucking message I can see or fuck off"
+      ],
+      "Leet": [
+        "N0 m355463 f0und f0r 7h47 l1nk, 0r 1 d0n'7 h4v3 4cc355 70 7h47 m355463"
+      ]
+    },
+    "Last Quote": {
+      "Default": [
+        "Failed to find a recent message with a jump link",
+        "Failed to find message",
+        "Quoted message doesn't exist or I don't have access to it"
+      ],
+      "owo": [
+        "fwailed to fwind a recent msg with a jwump wink",
+        "fwailed to fwind msg",
+        "qwoted msg dusnt exist"
+      ],
+      "Abusive": [
+        "No recent bloody messages dickhead",
+        "Just like your brain, I can't find it",
+        "Shit doesn't exist or I can't fucking view it"
+      ],
+      "Leet": [
+        "F41l3d 70 f1nd 4 r3c3n7 m355463 w17h 4 jump l1nk",
+        "F41l3d 70 f1nd m355463",
+        "Qu073d m355463 d035n'7 3x157 0r 1 d0n'7 h4v3 4cc355 70 17"
+      ]
+    },
+    "Inspect": {},
+    "Mock Message": {
+      "Default": [
+        "Failed to find message"
+      ],
+      "owo": [
+        "fwailed to fwind msg"
+      ],
+      "Abusive": [
+        "Just like your brain, I can't fucking find it"
+      ],
+      "Leet": [
+        "F41l3d 70 f1nd m355463"
+      ]
+    },
+    "Delayed Execution": {
+      "Default": [
+        "Command scheduled"
+      ],
+      "owo": [
+        "cwomand scweduled"
+      ],
+      "Abusive": [
+        "You're really this useless?"
+      ]
+    }
+  },
+  "Moderation": {
+    "Kick User": {
+      "Default": [
+        "{0} has been kicked"
+      ],
+      "owo": [
+        "i gwot rid of the mweanie >:3"
+      ],
+      "Abusive": [
+        "{0} is a cunt so they've been kicked"
+      ],
+      "Leet": [
+        "{0} h45 b33n k1ck3d"
+      ]
+    },
+    "Ban User": {
+      "Default": [
+        "{0} has been banned"
+      ],
+      "owo": [
+        "i gwot rid of the mweanie >:3"
+      ],
+      "Abusive": [
+        "{0} is a megacunt so has been banned"
+      ],
+      "Leet": [
+        "{0} h45 b33n b4nn3d"
+      ]
+    },
+    "Warn User": {
+      "Default": [
+        "{0} has exceeded the warning limit and currently has {1} warning(s)",
+        "{0} has been warned"
+      ],
+      "owo": [
+        "owwwwno {0} has {1} warnings, this is too manyy >><<",
+        "{0} uve been warned 0w0"
+      ],
+      "Abusive": [
+        "{0} has {1} warnings because they're aids",
+        "{0} you've been warned cunt"
+      ],
+      "Leet": [
+        "{0} h45 3xc33d3d 7h3 w4rn1n6 l1m17 4nd curr3n7ly h45 {1} w4rn1n6(5)",
+        "{0} h45 b33n w4rn3d"
+      ]
+    },
+    "Revoke Warning": {
+      "Default": [
+        "This warning doesn't exist",
+        "Warning has been revoked"
+      ],
+      "owo": [
+        "\\*lookds down\\* owwwno i cudnt fwind dis warnings nowo",
+        "\\*looks up in excitement\\* i did it dwaddy :3"
+      ],
+      "Abusive": [
+        "Oi, retard, warning doesn't exist",
+        "Stop being a nice cunt"
+      ],
+      "Leet": [
+        "7h15 w4rn1n6 d035n'7 3x157",
+        "W4rn1n6 h45 b33n r3v0k3d"
+      ]
+    },
+    "View Warnings": {
+      "Default": [
+        "This user doesn't have any warnings",
+        "{0}"
+      ],
+      "owo": [
+        "owwo this user is agwood boi :3c",
+        "{0}"
+      ],
+      "Abusive": [
+        "This user is a goody two-shoes",
+        "{0}"
+      ],
+      "Leet": [
+        "7h15 u53r d035n'7 h4v3 4ny w4rn1n65",
+        "{0}"
+      ]
+    },
+    "Revoke Reactions": {
+      "Default": [
+        "No reactions role was not found or is not set",
+        "Reactions redacted"
+      ],
+      "owo": [
+        "\\*talks softly\\* owww i cudnt fwind the wole",
+        "weaactions wedacted"
+      ],
+      "Abusive": [
+        "Try setting the no reactions role dickhead",
+        "Shitheads reactions removed"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 w45 n07 f0und 0r 15 n07 537",
+        "R34c710n5 r3d4c73d"
+      ]
+    },
+    "Restore Reactions": {
+      "Default": [
+        "No reactions role was not found or is not set",
+        "Reactions restored"
+      ],
+      "owo": [
+        "\\*talks softly\\* owww i cudnt fwind the wole",
+        "weaactions westored"
+      ],
+      "Abusive": [
+        "Try setting the no reactions role dickhead",
+        "Shitheads reactions restored"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 w45 n07 f0und 0r 15 n07 537",
+        "R34c710n5 r3570r3d"
+      ]
+    },
+    "Block User": {
+      "Default": [
+        "Blocked"
+      ],
+      "owo": [
+        "bwocked"
+      ],
+      "Abusive": [
+        "Cunt be gone"
+      ],
+      "Leet": [
+        "Bl0ck3d"
+      ]
+    },
+    "Blacklist User": {
+      "Default": [
+        "This user is already blacklisted",
+        "Blacklisted"
+      ],
+      "owo": [
+        ">>.<< oweee thyre aweady bwackwisted",
+        "meanwee bwusted >:3"
+      ],
+      "Abusive": [
+        "Dickhead is already blacklisted",
+        "Dick be gone"
+      ],
+      "Leet": [
+        "7h15 u53r 15 4lr34dy bl4ckl1573d",
+        "Bl4ckl1573d"
+      ]
+    },
+    "Unblacklist": {
+      "Default": [
+        "This user isn't blacklisted",
+        "Unblacklisted"
+      ],
+      "owo": [
+        ">>.<< owee thyre not bwackwisted",
+        "teh meanwee weturns ><"
+      ],
+      "Abusive": [
+        "They're not a dickhead, but they may as well be",
+        "Why are you letting this dickhead return?"
+      ],
+      "Leet": [
+        "7h15 u53r 15n'7 bl4ckl1573d",
+        "Unbl4ckl1573d"
+      ]
+    }
+  },
+  "Owner Commands": {
+    "Message Channel": {
+      "Default": [
+        "Channel was not found"
+      ],
+      "owo": [
+        "owwwwwno channl not fownd ><"
+      ],
+      "Abusive": [
+        "Channel not fucking found"
+      ],
+      "Leet": [
+        "Ch4nn3l w45 n07 f0und"
+      ]
+    },
+    "Eval": {},
+    "Shutdown Bot": {},
+    "Sudo": {},
+    "Reload Responses": {
+      "Default": [
+        "Reloaded"
+      ],
+      "owo": [
+        "weloadd"
+      ],
+      "Abusive": [
+        "Refuckingloaded"
+      ],
+      "Leet": [
+        "R3l04d3d"
+      ]
+    }
+  },
+  "Reminders": {
+    "New Reminder": {
+      "Default": [
+        "I'll remind you in {0}"
+      ],
+      "owo": [
+        "ill wemind uu in {0}"
+      ],
+      "Abusive": [
+        "Brain too small to remember? I'll fucking do it in {0} I guess"
+      ],
+      "Leet": [
+        "1'll r3m1nd y0u 1n {0}"
+      ]
+    },
+    "List Reminders": {
+      "Default": [
+        "You have no reminders"
+      ],
+      "owo": [
+        "uu hav no wemindwers >><<"
+      ],
+      "Abusive": [
+        "Brain too small to remember that you don't have any?"
+      ],
+      "Leet": [
+        "Y0u h4v3 n0 r3m1nd3r5"
+      ]
+    },
+    "Cancel Reminder": {
+      "Default": [
+        "Failed to find reminder with id {0}",
+        "Reminder cancelled"
+      ],
+      "owo": [
+        "fwailed to fwind weminder wid id {0}",
+        "weminder cwnceld"
+      ],
+      "Abusive": [
+        "Dumbo, give me a valid id",
+        "Was that task too hard for you? Don't worry baby I cancelled it for you"
+      ],
+      "Leet": [
+        "F41l3d 70 f1nd r3m1nd3r w17h 1d {0}",
+        "R3m1nd3r c4nc3ll3d"
+      ]
+    }
+  },
+  "Self Assigning Roles": {
+    "Add Role": {
+      "Default": [
+        "You already have this role",
+        "Role has been assigned to you",
+        "This role is not available as a self assigning role"
+      ],
+      "owo": [
+        "owwwww >< yuu aweady hav dis wole",
+        "u hav wole nwo",
+        "owwweeee this wole isnt swelf aswining"
+      ],
+      "Abusive": [
+        "Tiny brain, you already have this role",
+        "There, you fucking have it",
+        "Imagine not being smart enough to know this role isn't self assigning?"
+      ],
+      "Leet": [
+        "Y0u 4lr34dy h4v3 7h15 r0l3",
+        "R0l3 h45 b33n 45516n3d 70 y0u",
+        "7h15 r0l3 15 n07 4v41l4bl3 45 4 53lf 45516n1n6 r0l3"
+      ]
+    },
+    "Add SAR": {
+      "Default": [
+        "Role is already a self assigning role",
+        "Role has been added to the list of self assigning roles"
+      ],
+      "owo": [
+        ">><< wole aweady swelf aswigning",
+        "wole has been adwed to teh wist"
+      ],
+      "Abusive": [
+        "Already a fucking self assigning role dickshit",
+        "Fucking added"
+      ],
+      "Leet": [
+        "R0l3 15 4lr34dy 4 53lf 45516n1n6 r0l3",
+        "R0l3 h45 b33n 4dd3d 70 7h3 l157 0f 53lf 45516n1n6 r0l35"
+      ]
+    },
+    "Remove Role": {
+      "Default": [
+        "You don't currently have this role",
+        "This role isn't a self assigning role",
+        "Role has been removed"
+      ],
+      "owo": [
+        "owwnoo yuu dont hav dis wole ><",
+        "this wole isnt swelf aswining",
+        "wole wemoved!!"
+      ],
+      "Abusive": [
+        "Retard, you don't have this role",
+        "The role isn't self assigning dickhead",
+        "Fucking removed"
+      ],
+      "Leet": [
+        "Y0u d0n'7 curr3n7ly h4v3 7h15 r0l3",
+        "7h15 r0l3 15n'7 4 53lf 45516n1n6 r0l3",
+        "R0l3 h45 b33n r3m0v3d"
+      ]
+    },
+    "Remove SAR": {
+      "Default": [
+        "This role is not in the list of self assigning roles",
+        "Role has been removed as a self assigning role"
+      ],
+      "owo": [
+        "owee this wole is not swelf aswining",
+        "wole wemoved frmo the wist"
+      ],
+      "Abusive": [
+        "This. Is. Not. Self. Assigning. Idiot.",
+        "Fucking removed from the fucking list"
+      ],
+      "Leet": [
+        "7h15 r0l3 15 n07 1n 7h3 l157 0f 53lf 45516n1n6 r0l35",
+        "R0l3 h45 b33n r3m0v3d 45 4 53lf 45516n1n6 r0l3"
+      ]
+    },
+    "List Roles": {
+      "Default": [
+        "{0}"
+      ],
+      "owo": [
+        "{0}"
+      ],
+      "Abusive": [
+        "{0}"
+      ],
+      "Leet": [
+        "{0}"
+      ]
+    }
+  },
+  "Settings": {
+    "Add Prefix": {
+      "Default": [
+        "This prefix is already defined for this guild",
+        "Prefix has been added"
+      ],
+      "owo": [
+        "owh noo this pwefix alwedy exists",
+        "i did the pwefix fur \\*uu\\*"
+      ],
+      "Abusive": [
+        "This prefix already exists you absolute spastic",
+        "Your retarded prefix has been added"
+      ],
+      "Leet": [
+        "7h15 pr3f1x 15 4lr34dy d3f1n3d f0r 7h15 6u1ld",
+        "Pr3f1x h45 b33n 4dd3d"
+      ]
+    },
+    "Remove Prefix": {
+      "Default": [
+        "This prefix doesn't exists for this guild",
+        "Prefix has been removed"
+      ],
+      "owo": [
+        "owh noo this pwefix dusnt exists",
+        "i wemoved the pwefix fur \\*uu\\*"
+      ],
+      "Abusive": [
+        "This prefix doesn't exist you degenerate",
+        "Your dumb prefix was removed, thank God"
+      ],
+      "Leet": [
+        "7h15 pr3f1x d035n'7 3x1575 f0r 7h15 6u1ld",
+        "Pr3f1x h45 b33n r3m0v3d"
+      ]
+    },
+    "Restrict Channel": {
+      "Default": [
+        "I am already restricted in this channel",
+        "I can no longer send messages in that channel"
+      ],
+      "owo": [
+        "owww im alweady restwicted here",
+        ":("
+      ],
+      "Abusive": [
+        "I already can't speak here you dumb cunt",
+        "I didn't even want to respond to you"
+      ],
+      "Leet": [
+        "1 4m 4lr34dy r357r1c73d 1n 7h15 ch4nn3l",
+        "1 c4n n0 l0n63r 53nd m3554635 1n 7h47 ch4nn3l"
+      ]
+    },
+    "Unrestrict Channel": {
+      "Default": [
+        "I am not restricted in this channel",
+        "I am now unrestricted from this channel"
+      ],
+      "owo": [
+        "am not westwicted in dis channl",
+        "\\*wages tail\\* :D"
+      ],
+      "Abusive": [
+        "I'm not restrict in this channel you dumb cunt",
+        "ffs now I have to respond to you again"
+      ],
+      "Leet": [
+        "1 4m n07 r357r1c73d 1n 7h15 ch4nn3l",
+        "1 4m n0w unr357r1c73d fr0m 7h15 ch4nn3l"
+      ]
+    },
+    "Admin User": {
+      "Default": [
+        "{0} has been made an admin",
+        "{0} is already an admin"
+      ],
+      "owo": [
+        "{0} is a new daddy :3c",
+        "{0} is awredy a daddy"
+      ],
+      "Abusive": [
+        "{0} joins the league of cunts",
+        "{0} is already an admin dickshit"
+      ],
+      "Leet": [
+        "{0} h45 b33n m4d3 4n 4dm1n",
+        "{0} 15 4lr34dy 4n 4dm1n"
+      ]
+    },
+    "Moderate User": {
+      "Default": [
+        "{0} is already an admin",
+        "{0} has been made a moderator",
+        "{0} is already a moderator"
+      ],
+      "owo": [
+        "{0} is awready a daddy",
+        "owo {0} is a mod now :3c",
+        ">>.<< {0} is awreade a mod"
+      ],
+      "Abusive": [
+        "{0} is already a fucking admin you dickhead",
+        "{0} is now a power holding shitbag",
+        "{0} is already a fucking mod"
+      ],
+      "Leet": [
+        "{0} 15 4lr34dy 4n 4dm1n",
+        "{0} h45 b33n m4d3 4 m0d3r470r",
+        "{0} 15 4lr34dy 4 m0d3r470r"
+      ]
+    },
+    "Demote Admin": {
+      "Default": [
+        "You cannot demote the guild owner",
+        "{0} has been demoted",
+        "{0} is not an admin"
+      ],
+      "owo": [
+        "u cant dwemot the owoner",
+        "owno {0} is dwemotd",
+        "{0} is not a daddy"
+      ],
+      "Abusive": [
+        "You can't demote the owner you cheeky cunt",
+        "dickhead --> {0}",
+        "{0} is not a fucking admin shit-for-brains"
+      ],
+      "Leet": [
+        "Y0u c4nn07 d3m073 7h3 6u1ld 0wn3r",
+        "{0} h45 b33n d3m073d",
+        "{0} 15 n07 4n 4dm1n"
+      ]
+    },
+    "Demote Moderator": {
+      "Default": [
+        "{0} has been demoted",
+        "{0} is not a moderator"
+      ],
+      "owo": [
+        "{0} has bin dwemotd",
+        "{0} is not a mod >>.<<"
+      ],
+      "Abusive": [
+        "wanker --> {0}",
+        "not a wanker --> {0}"
+      ],
+      "Leet": [
+        "{0} h45 b33n d3m073d",
+        "{0} 15 n07 4 m0d3r470r"
+      ]
+    },
+    "Set Welcome Channel": {
+      "Default": [
+        "Welcome channel has been set"
+      ],
+      "owo": [
+        "welcum chwanel set"
+      ],
+      "Abusive": [
+        "Not that anyone wants to join this shitfest, but it's set"
+      ],
+      "Leet": [
+        "W3lc0m3 ch4nn3l h45 b33n 537"
+      ]
+    },
+    "Set Welcome Message": {
+      "Default": [
+        "Welcome message has been set"
+      ],
+      "owo": [
+        "welcum msg set"
+      ],
+      "Abusive": [
+        "What's the point when no one is gonna fucking join anyway?"
+      ],
+      "Leet": [
+        "W3lc0m3 m355463 h45 b33n 537"
+      ]
+    },
+    "Set Default Role": {
+      "Default": [
+        "Default role has been set"
+      ],
+      "owo": [
+        "default wole set"
+      ],
+      "Abusive": [
+        "Shit role"
+      ],
+      "Leet": [
+        "D3f4ul7 r0l3 h45 b33n 537"
+      ]
+    },
+    "Set Warning Limit": {
+      "Default": [
+        "Warning limit has been set"
+      ],
+      "owo": [
+        "mweaniedar updwated"
+      ],
+      "Abusive": [
+        "Just kick the cunts already"
+      ],
+      "Leet": [
+        "W4rn1n6 l1m17 h45 b33n 537"
+      ]
+    },
+    "Set No Reactions Role": {
+      "Default": [
+        "No reactions role has been set"
+      ],
+      "owo": [
+        "dowone :3"
+      ],
+      "Abusive": [
+        "Fine"
+      ],
+      "Leet": [
+        "N0 r34c710n5 r0l3 h45 b33n 537"
+      ]
+    },
+    "Toggle Auto-quoting": {
+      "Default": [
+        "Auto-quoting has been {0}"
+      ],
+      "owo": [
+        "autoqwoting haz been {0}"
+      ],
+      "Abusive": [
+        "Fucking {0}"
+      ],
+      "Leet": [
+        "4u70-qu071n6 h45 b33n {0}"
+      ]
+    }
+  },
+  "Starboard": {
+    "Enable Starboard": {
+      "Default": [
+        "Starboard has been enabled"
+      ],
+      "owo": [
+        "\\*stars in eyes\\* wenabled"
+      ],
+      "Abusive": [
+        "Not that you cunts say anything funny anyway"
+      ],
+      "Leet": [
+        "574rb04rd h45 b33n 3n4bl3d"
+      ]
+    },
+    "Disable Starboard": {
+      "Default": [
+        "Starboard has been disabled"
+      ],
+      "owo": [
+        "diswabled"
+      ],
+      "Abusive": [
+        "Now I don't need to keep a history of your unfunny shit"
+      ],
+      "Leet": [
+        "574rb04rd h45 b33n d154bl3d"
+      ]
+    },
+    "Set Starboard Limit": {
+      "Default": [
+        "Star limit has been set"
+      ],
+      "owo": [
+        "stwar wimit set"
+      ],
+      "Abusive": [
+        "If only you could set it to 0 so you'd have a chance"
+      ],
+      "Leet": [
+        "574r l1m17 h45 b33n 537"
+      ]
+    },
+    "Random Star": {
+      "Default": [
+        "This guild has no starred messages"
+      ],
+      "owo": [
+        "owwnoo >,< dis gwuild has no starrz"
+      ],
+      "Abusive": [
+        "No one has said anything worthy (I'll pretend I'm surprised)"
+      ],
+      "Leet": [
+        "7h15 6u1ld h45 n0 574rr3d m3554635"
+      ]
+    }
+  },
+  "User Settings": {
+    "Set Responses": {
+      "Default": [
+        "Response pack has been set to {0}"
+      ],
+      "owo": [
+        "\\*jumps in joy\\* >< i wil talk to uu like dis now uwu"
+      ],
+      "Abusive": [
+        "Bad choice, fuckface"
+      ],
+      "Leet": [
+        "R35p0n53 p4ck h45 b33n 537 70 {0}"
+      ]
+    },
+    "Buy": {
+      "Default": [
+        "You already have this response pack",
+        "This response pack costs {0} candies",
+        "You have purchased {0}"
+      ],
+      "owo": [
+        "uu awready hav meee!!",
+        "uu need {0} cwandies!!",
+        "uu hav purchasd {0}!!"
+      ],
+      "Abusive": [
+        "You already have this pack dickhead",
+        "Expecting you to know that your candies is less than {0} was obviously too much",
+        "Terrible idea you fucking idiot"
+      ],
+      "Leet": [
+        "Y0u 4lr34dy h4v3 7h15 r35p0n53 p4ck",
+        "7h15 r35p0n53 p4ck c0575 {0} c4nd135",
+        "Y0u h4v3 purch453d {0}"
+      ]
+    }
+  },
+  "Bot Config": {
+    "Set Random Frequency": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Random Amount": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Claim Max": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Claim Min": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Claim Cooldown": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Pack Price": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Set Coin Flip": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    },
+    "Add Emote Guild": {
+      "Default": [
+        "Set"
+      ],
+      "owo": [
+        "set"
+      ],
+      "Abusive": [
+        "fuck"
+      ],
+      "Leet": [
+        "537"
+      ]
+    }
+  },
+  "Management": {
+    "Command Alias": {
+      "Default": [
+        "{0} has been added to {1}",
+        "Failed to add {0} to {1}",
+        "{0} has been removed from {1}",
+        "Failed to remove {0} from {1}"
+      ],
+      "owo": [
+        "i addwed {0} tuu {1} fur uu :3",
+        "oweee i cudnt add {0} to {1]}",
+        "i remved {0} frm {1}",
+        "ooowwww {0} cudnt be wemovd fwom {1}"
+      ],
+      "Abusive": [
+        "I added fucking {0} to fucking {1}",
+        "{0} couldn't be fucking added to {1}",
+        "I removed fucking {0} from fucking {1}",
+        "{0} couldn't be fucking removed from {1}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 4dd3d 70 {1}",
+        "F41l3d 70 4dd {0} 70 {1}",
+        "{0} h45 b33n r3m0v3d fr0m {1}",
+        "F41l3d 70 r3m0v3 {0} fr0m {1}"
+      ]
+    },
+    "Module Alias": {
+      "Default": [
+        "{0} has been added to {1}",
+        "Failed to add {0} to {1}",
+        "{0} has been removed from {1}",
+        "Failed to remove {0} from {1}"
+      ],
+      "owo": [
+        "i addwed {0} tuu {1} fur uu :3",
+        "oweee i cudnt add {0} to {1]}",
+        "i remved {0} frm {1}",
+        "ooowwww {0} cudnt be wemovd fwom {1}"
+      ],
+      "Abusive": [
+        "I added fucking {0} to fucking {1}",
+        "{0} couldn't be fucking added to {1}",
+        "I removed fucking {0} from fucking {1}",
+        "{0} couldn't be fucking removed from {1}"
+      ],
+      "Leet": [
+        "{0} h45 b33n 4dd3d 70 {1}",
+        "F41l3d 70 4dd {0} 70 {1}",
+        "{0} h45 b33n r3m0v3d fr0m {1}",
+        "F41l3d 70 r3m0v3 {0} fr0m {1}"
+      ]
+    }
+  },
+  "Bot Support": {
+    "Report Bug": {
+      "Default": [
+        "Bug has been reported"
+      ],
+      "owo": [
+        "wepwoted"
+      ],
+      "Abusive": [
+        "Fuck off I'm flawless"
+      ],
+      "Leet": [
+        "Bu6 h45 b33n r3p0r73d"
+      ]
+    },
+    "Feature Request": {
+      "Default": [
+        "Feature has been requested"
+      ],
+      "owo": [
+        "reqwuested"
+      ],
+      "Abusive": [
+        "That request was bad and you should feel bad"
+      ],
+      "Leet": [
+        "F347ur3 h45 b33n r3qu3573d"
+      ]
+    },
+    "Source Code": {}
+  },
+  "Emote Collecting": {
+    "Toggle Emotes": {
+      "Default": [
+        "Emotes have been {0}"
+      ],
+      "owo": [
+        "wemotez haz been {0}"
+      ],
+      "Abusive": [
+        "Fucking {0}"
+      ],
+      "Leet": [
+        "3m0735 h4v3 b33n {0}"
+      ]
+    },
+    "Emote Capacity": {
+      "Default": [
+        "Animated, {0}/{1}. Normal {2}/{3}"
+      ],
+      "owo": [
+        "wanimwated {0}/{1} wormal {2}/{3}"
+      ],
+      "Abusive": [
+        "Anifuckingmated, {0}/{1}. Normal {2}/{3}"
+      ],
+      "Leet": [
+        "4n1m473d, {0}/{1}. N0rm4l {2}/{3}"
+      ]
+    },
+    "Add Emote": {}
+  }
+}

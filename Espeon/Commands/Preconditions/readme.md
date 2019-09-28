@@ -1,1 +1,0 @@
-﻿Ratelimit attribute: https://github.com/Joe4evr/Discord.Addons/blob/master/src/Discord.Addons.Preconditions/Ratelimit/RatelimitAttribute.cs

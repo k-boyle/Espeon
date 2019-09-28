@@ -1,0 +1,365 @@
+{
+  "RequireElevationAttribute": {
+    "Default": [
+      "You need to be at least a moderator of this guild to use this command",
+      "You need to be an admin of this guild to use this command",
+      "Something went horribly wrong"
+    ],
+    "owo": [
+      "ownno >,< u need to be a mod",
+      "ownnooo u need to bwe a daddy",
+      "sumting went hirribly wong"
+    ],
+    "Abusive": [
+      "You need to be a dickhead to use this command",
+      "You need to be a cunt to use this command",
+      "Can't tell what was more horrific, this command or your birth"
+    ],
+    "Leet": [
+      "Y0u n33d 70 b3 47 l3457 4 m0d3r470r 0f 7h15 6u1ld 70 u53 7h15 c0mm4nd",
+      "Y0u n33d 70 b3 4n 4dm1n 0f 7h15 6u1ld 70 u53 7h15 c0mm4nd",
+      "50m37h1n6 w3n7 h0rr1bly wr0n6"
+    ]
+  },
+  "RequireGuildAttribute": {
+    "Default": [
+      "Command cannot be run in this guild"
+    ],
+    "owo": [
+      "ownno dis cwommand cant be wun is dis gwuild"
+    ],
+    "Abusive": [
+      "This command is for intellectuals only"
+    ],
+    "Leet": [
+      "C0mm4nd c4nn07 b3 run 1n 7h15 6u1ld"
+    ]
+  },
+  "RequireGuildOwnerAttribute": {
+    "Default": [
+      "This command can only be executed by the guilds owner"
+    ],
+    "owo": [
+      "owwnnoo dis comwand can only bee exercuted bwy the gwuild owoner"
+    ],
+    "Abusive": [
+      "This command can only be executed by the owner, you're too stupid to be the owner though"
+    ],
+    "Leet": [
+      "7h15 c0mm4nd c4n 0nly b3 3x3cu73d by 7h3 6u1ld5 0wn3r"
+    ]
+  },
+  "RequireHierarchyAttribute": {
+    "Default": [
+      "You don't have hierachy over the guild owner",
+      "I need hierarchy over this user",
+      "You require hierarchy over this user"
+    ],
+    "owo": [
+      "u cant tuch the guild daddy >:(",
+      "im too low fur them >>.<<",
+      "owwwno ur too low furr themm >>.<<"
+    ],
+    "Abusive": [
+      "You don't have hierarchy over the top dog, you cunt",
+      "This dickhead is too fucking high for me",
+      "You don't you hierarchy you fucking peasant"
+    ],
+    "Leet": [
+      "Y0u d0n'7 h4v3 h13r4chy 0v3r 7h3 6u1ld 0wn3r",
+      "1 n33d h13r4rchy 0v3r 7h15 u53r",
+      "Y0u r3qu1r3 h13r4rchy 0v3r 7h15 u53r"
+    ]
+  },
+  "RequireOwnerAttribute": {
+    "Default": [
+      "{0} can only be used by the bot owner",
+      "{0} can only be used by the bot owner"
+    ],
+    "owo": [
+      "only daddy can use {0}",
+      "only daddy can use {0}"
+    ],
+    "Abusive": [
+      "{0} only be used by the one person who's not a sack of shit",
+      "{0} can only be used by the one person who's not a sack of shit"
+    ],
+    "Leet": [
+      "{0} c4n 0nly b3 u53d by 7h3 b07 0wn3r",
+      "{0} c4n 0nly b3 u53d by 7h3 b07 0wn3r"
+    ]
+  },
+  "RequirePermissionsAttribute": {
+    "Default": [
+      "{0} need the following permissions to execute this command\n{1}"
+    ],
+    "owo": [
+      "{0} need these permzz {1}"
+    ],
+    "Abusive": [
+      "{0} need these fucking permissions you useless dickhead\n{1}"
+    ],
+    "Leet": [
+      "{0} n33d 7h3 f0ll0w1n6 p3rm15510n5 70 3x3cu73 7h15 c0mm4nd\n{1}"
+    ]
+  },
+  "RequirePositionHierarchy": {
+    "Default": [
+      "I require hierarchy over this role"
+    ],
+    "owo": [
+      "oww this wole is twoo big 4 mee ><"
+    ],
+    "Abusive": [
+      "This role is too bloody high"
+    ],
+    "Leet": [
+      "1 r3qu1r3 h13r4rchy 0v3r 7h15 r0l3"
+    ]
+  },
+  "RequireRangeAttribute": {
+    "Default": [
+      "Value must be between {0} and {1}"
+    ],
+    "owo": [
+      "oowwww walue mst be bitween {0} and {1}"
+    ],
+    "Abusive": [
+      "Maybe if you'd give me something between {0} and {1} then we could get some shit done"
+    ],
+    "Leet": [
+      "V4lu3 mu57 b3 b37w33n {0} 4nd {1}"
+    ]
+  },
+  "RequireSpecificLengthAttribute": {
+    "Default": [
+      "String length must be between {0} and {1}"
+    ],
+    "owo": [
+      "ownnno urr mesage must be bweteen {0} n {1}"
+    ],
+    "Abusive": [
+      "You can't do anything right, can you? Message length must be between {0} and {1}"
+    ],
+    "Leet": [
+      "57r1n6 l3n67h mu57 b3 b37w33n {0} 4nd {1}"
+    ]
+  },
+  "RequireUnlockedAttribute": {
+    "Default": [
+      "You haven't unlocked this response pack"
+    ],
+    "owo": [
+      "ownnno uu dunt hav dis respwons pack"
+    ],
+    "Abusive": [
+      "Maybe try not being poor and unlocking this response pack"
+    ],
+    "Leet": [
+      "Y0u h4v3n'7 unl0ck3d 7h15 r35p0n53 p4ck"
+    ]
+  },
+  "CandyTypeParser": {
+    "Default": [
+      "Amount specified is not a valid integer",
+      "Amount specified must be a positive integer",
+      "You don't have enough candies"
+    ],
+    "owo": [
+      "awmount spwecifed is not an intwiger",
+      "awmount spwecified must be pwositive",
+      "ownnoo >.< u dont hav enuff cwandies"
+    ],
+    "Abusive": [
+      "I get expecting you to know what a number is is asking a bit much of you, but at least try",
+      "What does the retard test you took and the number you're meant to give me in common? They're both positive",
+      "Stop being fucking poor"
+    ],
+    "Leet": [
+      "4m0un7 5p3c1f13d 15 n07 4 v4l1d 1n7363r",
+      "4m0un7 5p3c1f13d mu57 b3 4 p05171v3 1n7363r",
+      "Y0u d0n'7 h4v3 3n0u6h c4nd135"
+    ]
+  },
+  "CommandsTypeParser": {
+    "Default": [
+      "Failed to find commands matching {0}"
+    ],
+    "owo": [
+      "fwailed to fwind cwommands machin {0}"
+    ],
+    "Abusive": [
+      "What does your penis and commands matching {0} have in common? Neither can be found"
+    ],
+    "Leet": [
+      "F41l3d 70 f1nd c0mm4nd5 m47ch1n6 {0}"
+    ]
+  },
+  "CommandTypeParser": {
+    "Default": [
+      "Multiple or no matching commands"
+    ],
+    "owo": [
+      "multwiple or no mwaching cwommands"
+    ],
+    "Abusive": [
+      "Too many or no commands found, I don't fucking know"
+    ],
+    "Leet": [
+      "Mul71pl3 0r n0 m47ch1n6 c0mm4nd5"
+    ]
+  },
+  "CustomCommandTypeParser": {
+    "Default": [
+      "Failed to find a matching command"
+    ],
+    "owo": [
+      "fwailed to fwind cwommand"
+    ],
+    "Abusive": [
+      "Like the inside of your skull, I couldn't find shit"
+    ],
+    "Leet": [
+      "F41l3d 70 f1nd 4 m47ch1n6 c0mm4nd"
+    ]
+  },
+  "IGuildUserTypeParser": {
+    "Default": [
+      "Multiple users found, try mentioning them",
+      "Failed to find a matching user"
+    ],
+    "owo": [
+      "i fwound twoo many pweopol, twy mentioning them :3",
+      "fwailed to fwind user"
+    ],
+    "Abusive": [
+      "Too many basic bitches called this",
+      "Failed to find the cunt"
+    ],
+    "Leet": [
+      "Mul71pl3 u53r5 f0und, 7ry m3n710n1n6 7h3m",
+      "F41l3d 70 f1nd 4 m47ch1n6 u53r"
+    ]
+  },
+  "ModuleTypeParser": {
+    "Default": [
+      "Failed to find module with name {0}",
+      "You lack the required permissions to view this module"
+    ],
+    "owo": [
+      "fwailed to fwind module wid name {0}",
+      "u wack purrrmissions"
+    ],
+    "Abusive": [
+      "Failed to your brain cells and the module with the name {0}",
+      "You're too stupid to see this module"
+    ],
+    "Leet": [
+      "F41l3d 70 f1nd m0dul3 w17h n4m3 {0}",
+      "Y0u l4ck 7h3 r3qu1r3d p3rm15510n5 70 v13w 7h15 m0dul3"
+    ]
+  },
+  "SocketRoleParser": {
+    "Default": [
+      "No role found matching the input"
+    ],
+    "owo": [
+      "no wole fwound"
+    ],
+    "Abusive": [
+      "No fucking role"
+    ],
+    "Leet": [
+      "N0 r0l3 f0und m47ch1n6 7h3 1npu7"
+    ]
+  },
+  "SocketTextChannelParser": {
+    "Default": [
+      "This command must be used in a guild",
+      "No channel found matching the input"
+    ],
+    "owo": [
+      "dis cwomand must be wused in a gwuild",
+      "no chwannel fwound"
+    ],
+    "Abusive": [
+      "This should never happen",
+      "There's no fucking channel"
+    ],
+    "Leet": [
+      "7h15 c0mm4nd mu57 b3 u53d 1n 4 6u1ld",
+      "N0 ch4nn3l f0und m47ch1n6 7h3 1npu7"
+    ]
+  },
+  "TimeSpanTypeParser": {
+    "Default": [
+      "Failed to parse time span"
+    ],
+    "owo": [
+      "fwailed to parse twime"
+    ],
+    "Abusive": [
+      "Failed to parse the bloody time"
+    ],
+    "Leet": [
+      "F41l3d 70 p4r53 71m3 5p4n"
+    ]
+  },
+  "EmoteTypeParser": {
+    "Default": [
+      "Failed to parse emote"
+    ],
+    "owo": [
+      "fwailed to pwarse wemote"
+    ],
+    "Abusive": [
+      "That emote was garbage, just like you"
+    ],
+    "Leet": [
+      "F41l3d 70 p4r53 3m073"
+    ]
+  },
+  "ResponsePackTypeParser": {
+    "Default": [
+      "Pack must be one of the following: {0}"
+    ],
+    "owo": [
+      "pack mwust be one of the fwolling: {0}"
+    ],
+    "Abusive": [
+      "Pack must be one of the fucking following: {0}"
+    ],
+    "Leet": [
+      "P4ck mu57 b3 0n3 0f 7h3 f0ll0w1n6: {0}"
+    ]
+  },
+  "AliasTypeParser": {
+    "Default": [
+      "Alias must be one of the following: {0}"
+    ],
+    "owo": [
+      "alias mwust be one of the fwolling: {0}"
+    ],
+    "Abusive": [
+      "Alias must be one of the fucking following: {0}"
+    ],
+    "Leet": [
+      "4l145 mu57 b3 0n3 0f 7h3 f0ll0w1n6: {0}"
+    ]
+  },
+  "FaceTypeParser": {
+    "Default": [
+      "Face must be one of the following: {0}"
+    ],
+    "owo": [
+      "face mwust be one of the fwolling: {0}"
+    ],
+    "Abusive": [
+      "Face must be one of the fucking following: {0}"
+    ],
+    "Leet": [
+      "F4c3 mu57 b3 0n3 0f 7h3 f0ll0w1n6: {0}"
+    ]
+  },
+  "EspeonParameterCheckBase": {}
+}
