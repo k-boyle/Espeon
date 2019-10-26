@@ -1,0 +1,21 @@
+﻿using Discord;
+using Espeon.Core.Commands;
+using System.Threading.Tasks;
+
+namespace Espeon.Commands {
+	public class ChannelCriteria : ICriterion<IChannel>, ICriterion<IMessage> {
+		private readonly ulong _channelId;
+
+		public ChannelCriteria(ulong channelId) {
+			this._channelId = channelId;
+		}
+
+		public Task<bool> JudgeAsync(EspeonContext context, IChannel entity) {
+			return Task.FromResult(this._channelId == entity.Id);
+		}
+
+		public Task<bool> JudgeAsync(EspeonContext context, IMessage entity) {
+			return Task.FromResult(this._channelId == entity.Channel.Id);
+		}
+	}
+}
