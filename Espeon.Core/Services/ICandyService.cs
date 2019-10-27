@@ -1,22 +1,17 @@
 ﻿using Discord;
-using Espeon.Core.Commands;
+using Discord.WebSocket;
 using Espeon.Core.Databases.UserStore;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Services {
 	public interface ICandyService {
-		Task UpdateCandiesAsync(EspeonContext context, IUser user, int amount) {
-			return UpdateCandiesAsync(context, context.UserStore, user, amount);
-		}
+		Task UpdateCandiesAsync(UserStore store, SocketSelfUser bot, IUser user, int amount);
 
-		Task UpdateCandiesAsync(EspeonContext context, UserStore store, IUser user, int amount);
+		Task TransferCandiesAsync(UserStore userStore, IUser sender, IUser receiver, int amount);
 
-		Task TransferCandiesAsync(EspeonContext context, IUser sender, IUser receiver, int amount);
+		Task<int> GetCandiesAsync(UserStore userStore, IUser user);
 
-		Task<int> GetCandiesAsync(EspeonContext context, IUser user);
-
-		Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)>
-			TryClaimCandiesAsync(EspeonContext context, IUser toClaim);
+		Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)> TryClaimCandiesAsync(UserStore userStore, IUser toClaim);
 	}
 }

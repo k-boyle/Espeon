@@ -1,14 +1,14 @@
 ﻿using Casino.DependencyInjection;
-using Espeon.Core.Commands;
+using Espeon.Commands;
 using Espeon.Core.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Espeon.Services {
-	public class GamesService : BaseService<InitialiseArgs>, IGamesService {
+	public class GamesService : BaseService<InitialiseArgs>, IGamesService<IGame> {
 		[Inject] private readonly IServiceProvider _services;
-		[Inject] private readonly IInteractiveService _interactive;
+		[Inject] private readonly IInteractiveService<IReactionCallback, EspeonContext> _interactive;
 
 		private readonly ConcurrentDictionary<ulong, IGame> _games;
 
@@ -16,8 +16,8 @@ namespace Espeon.Services {
 			this._games = new ConcurrentDictionary<ulong, IGame>();
 		}
 
-		async Task<bool> IGamesService.TryStartGameAsync(EspeonContext context, IGame game, TimeSpan timeout) {
-			if (this._games.ContainsKey(context.User.Id)) {
+		async Task<bool> IGamesService<IGame>.TryStartGameAsync(ulong userId, IGame game, TimeSpan timeout) {
+			if (this._games.ContainsKey(userId)) {
 				return false;
 			}
 
@@ -26,14 +26,14 @@ namespace Espeon.Services {
 			bool res = await game.StartAsync();
 
 			if (!res) {
-				this._games[context.User.Id] = game;
+				this._games[userId] = game;
 			}
 
 			return res || await this._interactive.TryAddCallbackAsync(game, timeout);
 		}
 
-		async Task<bool> IGamesService.TryLeaveGameAsync(EspeonContext context) {
-			if (!this._games.TryGetValue(context.User.Id, out IGame game)) {
+		async Task<bool> IGamesService<IGame>.TryLeaveGameAsync(ulong userId) {
+			if (!this._games.TryGetValue(userId, out IGame game)) {
 				return false;
 			}
 
@@ -43,7 +43,7 @@ namespace Espeon.Services {
 
 			await game.EndAsync();
 
-			return this._games.TryRemove(context.User.Id, out _);
+			return this._games.TryRemove(userId, out _);
 
 		}
 	}

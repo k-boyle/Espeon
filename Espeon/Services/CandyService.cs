@@ -2,7 +2,6 @@
 using Discord;
 using Discord.WebSocket;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases;
 using Espeon.Core.Databases.UserStore;
 using Espeon.Core.Services;
@@ -44,9 +43,7 @@ namespace Espeon.Services {
 			});
 		}
 
-		async Task ICandyService.UpdateCandiesAsync(EspeonContext context, UserStore store, IUser user, int amount) {
-			SocketSelfUser bot = context.Client.CurrentUser;
-
+		async Task ICandyService.UpdateCandiesAsync(UserStore store, SocketSelfUser bot, IUser user, int amount) {
 			if (amount < 0 && user.Id != bot.Id) {
 				User espeon = await store.GetOrCreateUserAsync(bot);
 
@@ -66,9 +63,9 @@ namespace Espeon.Services {
 			await store.SaveChangesAsync();
 		}
 
-		async Task ICandyService.TransferCandiesAsync(EspeonContext context, IUser sender, IUser receiver, int amount) {
-			User foundSender = await context.UserStore.GetOrCreateUserAsync(sender);
-			User foundReceiver = await context.UserStore.GetOrCreateUserAsync(receiver);
+		async Task ICandyService.TransferCandiesAsync(UserStore userStore, IUser sender, IUser receiver, int amount) {
+			User foundSender = await userStore.GetOrCreateUserAsync(sender);
+			User foundReceiver = await userStore.GetOrCreateUserAsync(receiver);
 
 			foundSender.CandyAmount -= amount;
 			foundReceiver.CandyAmount += amount;
@@ -77,20 +74,20 @@ namespace Espeon.Services {
 				foundReceiver.HighestCandies = foundReceiver.CandyAmount;
 			}
 
-			context.UserStore.Update(foundReceiver);
-			context.UserStore.Update(foundSender);
+			userStore.Update(foundReceiver);
+			userStore.Update(foundSender);
 
-			await context.UserStore.SaveChangesAsync();
+			await userStore.SaveChangesAsync();
 		}
 
-		async Task<int> ICandyService.GetCandiesAsync(EspeonContext context, IUser user) {
-			User foundUser = await context.UserStore.GetOrCreateUserAsync(user);
+		async Task<int> ICandyService.GetCandiesAsync(UserStore userStore, IUser user) {
+			User foundUser = await userStore.GetOrCreateUserAsync(user);
 			return foundUser.CandyAmount;
 		}
 
 		async Task<(bool IsSuccess, int Amount, TimeSpan Cooldown)> ICandyService.TryClaimCandiesAsync(
-			EspeonContext context, IUser toClaim) {
-			User user = await context.UserStore.GetOrCreateUserAsync(toClaim);
+			UserStore userStore, IUser toClaim) {
+			User user = await userStore.GetOrCreateUserAsync(toClaim);
 			TimeSpan difference =
 				DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(user.LastClaimedCandies);
 
@@ -107,9 +104,9 @@ namespace Espeon.Services {
 
 			user.LastClaimedCandies = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-			context.UserStore.Update(user);
+			userStore.Update(user);
 
-			await context.UserStore.SaveChangesAsync();
+			await userStore.SaveChangesAsync();
 
 			return (true, amount, Cooldown);
 		}

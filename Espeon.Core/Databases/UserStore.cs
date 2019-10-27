@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Databases.UserStore {
@@ -95,7 +96,7 @@ namespace Espeon.Core.Databases.UserStore {
 
 		//async needed for the cast
 		public async Task<IReadOnlyCollection<User>> GetAllUsersAsync() {
-			return await Users.ToListAsync();
+			return await AsyncEnumerable.ToListAsync(Users, CancellationToken.None);
 		}
 
 		public async Task RemoveUserAsync(IUser user) {

@@ -3,8 +3,8 @@ using Casino.DependencyInjection;
 using Casino.Qmmands;
 using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases.CommandStore;
 using Espeon.Core.Databases.GuildStore;
 using Espeon.Core.Databases.UserStore;
@@ -29,9 +29,9 @@ namespace Espeon {
 		private async Task MainAsync(CancellationTokenSource cts) {
 			Config config = Config.Create("./config.json");
 
-			Assembly assembly = Assembly.GetEntryAssembly();
-			Type[] types = assembly?.GetTypes()
-				.Where(x => typeof(BaseService<InitialiseArgs>).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
+			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			Type[] types = assemblies.SelectMany(x => x.GetTypes()
+				.Where(y => typeof(BaseService<InitialiseArgs>).IsAssignableFrom(y) && !y.IsAbstract)).ToArray();
 
 			var impls = new List<Type>();
 
@@ -46,12 +46,12 @@ namespace Espeon {
 
 			Dictionary<Type, Type> dict = types.ToDictionary(GetImpl, x => x);
 
-			IServiceProvider services = ConfigureServices(dict, assembly, config, cts);
+			IServiceProvider services = ConfigureServices(dict, config, cts);
 
-			using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
+			await using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
 			{
-				using var guildStore = services.GetService<GuildStore>();
-				using var commandStore = services.GetService<CommandStore>();
+				await using var guildStore = services.GetService<GuildStore>();
+				await using var commandStore = services.GetService<CommandStore>();
 
 				await userStore.Database.MigrateAsync();
 				await guildStore.Database.MigrateAsync();
@@ -75,23 +75,31 @@ namespace Espeon {
 			await Task.Delay(-1, cts.Token);
 		}
 
-		private static IServiceProvider ConfigureServices(IDictionary<Type, Type> types, Assembly assembly,
+		private static IServiceProvider ConfigureServices(IDictionary<Type, Type> types,
 			Config config, CancellationTokenSource cts) {
-			return new ServiceCollection().AddServices(types)
+			return new ServiceCollection()
+				.AddServices(types)
 				.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig {
 					ExclusiveBulkDelete = true,
 					LogLevel = LogSeverity.Verbose,
 					MessageCacheSize = 100
 				})).AddSingleton(new CommandService(new CommandServiceConfiguration {
 					StringComparison = StringComparison.InvariantCultureIgnoreCase,
-					CooldownBucketKeyGenerator = (_, ctx, __) => {
+					CooldownBucketKeyGenerator = (_, ctx) => {
 						var context = (EspeonContext) ctx;
 						return context.User.Id;
 					}
-				}).AddTypeParsers(assembly)).AddSingleton(config).AddSingleton(cts).AddSingleton(new TaskQueue(20))
-				.AddSingleton<Random>().AddConfiguredHttpClient().AddEntityFrameworkNpgsql()
-				.AddDbContext<UserStore>(ServiceLifetime.Transient).AddDbContext<GuildStore>(ServiceLifetime.Transient)
-				.AddDbContext<CommandStore>(ServiceLifetime.Transient).BuildServiceProvider();
+				}).AddTypeParsers(typeof(EspeonContext).Assembly))
+				.AddSingleton(config)
+				.AddSingleton(cts)
+				.AddSingleton(new TaskQueue(20))
+				.AddSingleton<Random>()
+				.AddConfiguredHttpClient()
+				.AddEntityFrameworkNpgsql()
+				.AddDbContext<UserStore>(ServiceLifetime.Transient)
+				.AddDbContext<GuildStore>(ServiceLifetime.Transient)
+				.AddDbContext<CommandStore>(ServiceLifetime.Transient)
+				.BuildServiceProvider();
 		}
 	}
 }

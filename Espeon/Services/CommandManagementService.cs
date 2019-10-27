@@ -1,8 +1,8 @@
 ﻿using Casino.DependencyInjection;
 using Casino.Qmmands;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases;
+using Espeon.Core.Databases.CommandStore;
 using Espeon.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Utilities = Espeon.Commands.Utilities;
 
 namespace Espeon.Services {
 	public class CommandManagementService : BaseService<InitialiseArgs>, ICommandManagementService {
@@ -17,14 +18,14 @@ namespace Espeon.Services {
 
 		public CommandManagementService(IServiceProvider services) : base(services) { }
 
-		async Task<bool> ICommandManagementService.AddAliasAsync(EspeonContext context, Module module, string alias) {
+		async Task<bool> ICommandManagementService.AddAliasAsync(CommandStore commandStore, Module module, string alias) {
 			IReadOnlyList<Command> commands = this._commands.GetAllCommands();
 
 			if (!Utilities.AvailableName(commands, alias)) {
 				return false;
 			}
 
-			ModuleInfo foundModule = await context.CommandStore.Modules.Include(x => x.Commands)
+			ModuleInfo foundModule = await commandStore.Modules.Include(x => x.Commands)
 				.FirstOrDefaultAsync(x => x.Name == module.Name);
 
 			if (foundModule is null) {
@@ -32,16 +33,16 @@ namespace Espeon.Services {
 			}
 
 			(foundModule.Aliases ?? (foundModule.Aliases = new List<string>())).Add(alias);
-			context.CommandStore.Update(foundModule);
+			commandStore.Update(foundModule);
 
-			await context.CommandStore.SaveChangesAsync();
+			await commandStore.SaveChangesAsync();
 
 			module.Modify(OnBuilding(foundModule));
 
 			return true;
 		}
 
-		async Task<bool> ICommandManagementService.AddAliasAsync(EspeonContext context, Module module, string command,
+		async Task<bool> ICommandManagementService.AddAliasAsync(CommandStore commandStore, Module module, string command,
 			string alias) {
 			IReadOnlyList<Command> commands = this._commands.GetAllCommands();
 
@@ -49,7 +50,7 @@ namespace Espeon.Services {
 				return false;
 			}
 
-			ModuleInfo foundModule = await context.CommandStore.Modules.Include(x => x.Commands)
+			ModuleInfo foundModule = await commandStore.Modules.Include(x => x.Commands)
 				.FirstOrDefaultAsync(x => x.Name == module.Name);
 
 			CommandInfo foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == command);
@@ -59,9 +60,9 @@ namespace Espeon.Services {
 			}
 
 			(foundCommand.Aliases ?? (foundCommand.Aliases = new List<string>())).Add(alias);
-			context.CommandStore.Update(foundModule);
+			commandStore.Update(foundModule);
 
-			await context.CommandStore.SaveChangesAsync();
+			await commandStore.SaveChangesAsync();
 
 			module.Modify(OnBuilding(foundModule));
 
@@ -69,26 +70,26 @@ namespace Espeon.Services {
 		}
 
 		async Task<bool> ICommandManagementService.
-			RemoveAliasAsync(EspeonContext context, Module module, string alias) {
-			ModuleInfo foundModule = await context.CommandStore.Modules.FindAsync(module.Name);
+			RemoveAliasAsync(CommandStore commandStore, Module module, string alias) {
+			ModuleInfo foundModule = await commandStore.Modules.FindAsync(module.Name);
 
 			if (foundModule?.Aliases is null || !foundModule.Aliases.Contains(alias)) {
 				return false;
 			}
 
 			foundModule.Aliases.Remove(alias);
-			context.CommandStore.Update(foundModule);
+			commandStore.Update(foundModule);
 
-			await context.CommandStore.SaveChangesAsync();
+			await commandStore.SaveChangesAsync();
 
 			module.Modify(OnBuilding(foundModule));
 
 			return true;
 		}
 
-		async Task<bool> ICommandManagementService.RemoveAliasAsync(EspeonContext context, Module module,
+		async Task<bool> ICommandManagementService.RemoveAliasAsync(CommandStore commandStore, Module module,
 			string command, string alias) {
-			ModuleInfo foundModule = await context.CommandStore.Modules.Include(x => x.Commands)
+			ModuleInfo foundModule = await commandStore.Modules.Include(x => x.Commands)
 				.FirstOrDefaultAsync(x => x.Name == module.Name);
 
 			CommandInfo foundCommand = foundModule?.Commands.SingleOrDefault(x => x.Name == command);
@@ -98,9 +99,9 @@ namespace Espeon.Services {
 			}
 
 			foundCommand.Aliases.Remove(alias);
-			context.CommandStore.Update(foundModule);
+			commandStore.Update(foundModule);
 
-			await context.CommandStore.SaveChangesAsync();
+			await commandStore.SaveChangesAsync();
 
 			module.Modify(OnBuilding(foundModule));
 

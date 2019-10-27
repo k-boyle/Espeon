@@ -1,8 +1,9 @@
 ﻿using Casino.DependencyInjection;
+using Discord;
 using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases;
+using Espeon.Core.Databases.GuildStore;
 using Espeon.Core.Services;
 using Qmmands;
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Utilities = Espeon.Commands.Utilities;
 
 namespace Espeon.Services {
 	public class CustomCommandsService : BaseService<InitialiseArgs>, ICustomCommandsService {
@@ -59,8 +61,7 @@ namespace Espeon.Services {
 			return Task.CompletedTask;
 		}
 
-		private async ValueTask<CommandResult> CommandCallbackAsync(CommandContext originalContext,
-			IServiceProvider services) {
+		private async ValueTask CommandCallbackAsync(CommandContext originalContext) {
 			var context = (EspeonContext) originalContext;
 
 			Guild guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
@@ -69,14 +70,11 @@ namespace Espeon.Services {
 			CustomCommand found = commands?.FirstOrDefault(x =>
 				string.Equals(x.Name, context.Command.Name, StringComparison.InvariantCultureIgnoreCase));
 
-			await this._message.SendAsync(context, x => x.Content = found.Value);
-
-			return null;
+			await this._message.SendAsync(context.Message, x => x.Content = found?.Value);
 		}
 
-		async Task<bool> ICustomCommandsService.
-			TryCreateCommandAsync(EspeonContext context, string name, string value) {
-			if (this._moduleCache.TryGetValue(context.Guild.Id, out Module found)) {
+		async Task<bool> ICustomCommandsService.TryCreateCommandAsync(GuildStore guildStore, IGuild guild, string name, string value) {
+			if (this._moduleCache.TryGetValue(guild.Id, out Module found)) {
 				IReadOnlyList<Command> commands = found.Commands;
 
 				if (!Utilities.AvailableName(commands, name)) {
@@ -96,36 +94,36 @@ namespace Espeon.Services {
 				Value = value
 			};
 
-			Guild guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
-			guild.Commands.Add(newCmd);
-			context.GuildStore.Update(guild);
+			Guild dbGuild = await guildStore.GetOrCreateGuildAsync(guild, x => x.Commands);
+			dbGuild.Commands.Add(newCmd);
+			guildStore.Update(dbGuild);
 
-			await context.GuildStore.SaveChangesAsync();
-			await UpdateCommandsAsync(guild);
+			await guildStore.SaveChangesAsync();
+			await UpdateCommandsAsync(dbGuild);
 
 			return true;
 		}
 
-		async Task ICustomCommandsService.DeleteCommandAsync(EspeonContext context, CustomCommand command) {
-			Guild guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
-			guild.Commands.Remove(command);
-			context.GuildStore.Update(guild);
+		async Task ICustomCommandsService.DeleteCommandAsync(GuildStore guildStore, IGuild guild, CustomCommand command) {
+			Guild dbGuild = await guildStore.GetOrCreateGuildAsync(guild, x => x.Commands);
+			dbGuild.Commands.Remove(command);
+			guildStore.Update(dbGuild);
 
-			await context.GuildStore.SaveChangesAsync();
+			await guildStore.SaveChangesAsync();
 
-			await UpdateCommandsAsync(guild);
+			await UpdateCommandsAsync(dbGuild);
 		}
 
-		Task ICustomCommandsService.ModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue) {
+		Task ICustomCommandsService.ModifyCommandAsync(GuildStore guildStore, CustomCommand command, string newValue) {
 			command.Value = newValue;
-			context.GuildStore.Update(command);
+			guildStore.Update(command);
 
-			return context.GuildStore.SaveChangesAsync();
+			return guildStore.SaveChangesAsync();
 		}
 
-		async Task<ImmutableArray<CustomCommand>> ICustomCommandsService.GetCommandsAsync(EspeonContext context) {
-			Guild guild = await context.GuildStore.GetOrCreateGuildAsync(context.Guild, x => x.Commands);
-			return guild.Commands.ToImmutableArray();
+		async Task<ImmutableArray<CustomCommand>> ICustomCommandsService.GetCommandsAsync(GuildStore guildStore, IGuild guild) {
+			Guild dbGuild = await guildStore.GetOrCreateGuildAsync(guild, x => x.Commands);
+			return dbGuild.Commands.ToImmutableArray();
 		}
 
 		bool ICustomCommandsService.IsCustomCommand(ulong id) {

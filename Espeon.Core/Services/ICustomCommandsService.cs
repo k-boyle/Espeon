@@ -1,14 +1,15 @@
-﻿using Espeon.Core.Commands;
+﻿using Discord;
 using Espeon.Core.Databases;
+using Espeon.Core.Databases.GuildStore;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Services {
 	public interface ICustomCommandsService {
-		Task<bool> TryCreateCommandAsync(EspeonContext context, string name, string value);
-		Task DeleteCommandAsync(EspeonContext context, CustomCommand command);
-		Task ModifyCommandAsync(EspeonContext context, CustomCommand command, string newValue);
-		Task<ImmutableArray<CustomCommand>> GetCommandsAsync(EspeonContext context);
+		Task<bool> TryCreateCommandAsync(GuildStore guildStore, IGuild guild, string name, string value);
+		Task DeleteCommandAsync(GuildStore guildStore, IGuild guild, CustomCommand command);
+		Task ModifyCommandAsync(GuildStore guildStore, CustomCommand command, string newValue);
+		Task<ImmutableArray<CustomCommand>> GetCommandsAsync(GuildStore guildStore, IGuild guild);
 		bool IsCustomCommand(ulong id);
 	}
 }

@@ -3,8 +3,8 @@ using Casino.DependencyInjection;
 using Casino.Linq;
 using Discord;
 using Discord.Rest;
+using Discord.WebSocket;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using Espeon.Entities;
@@ -33,26 +33,27 @@ namespace Espeon.Services {
 		}
 
 		//https://drive.google.com/file/d/1ntt12p1i_2B1h3MXUgtXuL1gi3AUd-jL/view outdated lol but effort to update, still has the right idea
-		async Task<RestUserMessage> IMessageService.SendAsync(EspeonContext context,
+		async Task<RestUserMessage> IMessageService.SendAsync(SocketUserMessage sourceMessage,
 			Action<NewMessageProperties> properties) {
-			(ulong, ulong, ulong) key = (context.Channel.Id, context.User.Id, context.Message.Id);
+			(ulong, ulong, ulong) key = (sourceMessage.Channel.Id, sourceMessage.Author.Id, sourceMessage.Id);
 			NewMessageProperties props = properties.Invoke();
 
 			bool alreadyScheduled =
 				this._messageCache.TryGetValue(key, out ScheduledTask<ConcurrentQueue<CachedMessage>> scheduled);
 
-			if (context.Message.EditedTimestamp.HasValue) {
-				DateTimeOffset timeStamp = context.Message.EditedTimestamp.Value;
+			if (sourceMessage.EditedTimestamp.HasValue) {
+				DateTimeOffset timeStamp = sourceMessage.EditedTimestamp.Value;
 
-				static async Task DeleteMessagesAsync(EspeonContext context, CachedMessage[] cachedMessages) {
-					if (context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages) {
+				static async Task DeleteMessagesAsync(SocketTextChannel channel, SocketGuild guild,
+					CachedMessage[] cachedMessages) {
+					if (guild.CurrentUser.GetPermissions(channel).ManageMessages) {
 						IMessage[] fetchedMessages = await cachedMessages
-							.Select(x => context.Channel.GetMessageAsync(x.ResponseId)).AllAsync();
+							.Select(x => channel.GetMessageAsync(x.ResponseId)).AllAsync();
 
-						await context.Channel.DeleteMessagesAsync(fetchedMessages.OfType<IUserMessage>());
+						await channel.DeleteMessagesAsync(fetchedMessages.OfType<IUserMessage>());
 					} else {
 						for (var i = 0; i < cachedMessages.Length; i++) {
-							IMessage fetched = await context.Channel.GetMessageAsync(cachedMessages[i].ResponseId);
+							IMessage fetched = await channel.GetMessageAsync(cachedMessages[i].ResponseId);
 
 							if (fetched is null) {
 								continue;
@@ -63,25 +64,26 @@ namespace Espeon.Services {
 					}
 				}
 
-				if (this._editCache.TryGetValue(context.Message.Id, out DateTimeOffset editedAt) &&
+				if (this._editCache.TryGetValue(sourceMessage.Id, out DateTimeOffset editedAt) &&
 				    editedAt != timeStamp || alreadyScheduled) {
-					CachedMessage[] fromSource = scheduled.State.ToArray(x => x.ExecutingId == context.Message.Id);
+					CachedMessage[] fromSource = scheduled.State.ToArray(x => x.ExecutingId == sourceMessage.Id);
 
-					await DeleteMessagesAsync(context, fromSource);
+					var asTextChannel = sourceMessage.Channel as SocketTextChannel;
+					await DeleteMessagesAsync(asTextChannel, asTextChannel.Guild, fromSource);
 				}
 
-				this._editCache.AddOrUpdate(context.Message.Id, timeStamp, (_, __) => timeStamp);
+				this._editCache.AddOrUpdate(sourceMessage.Id, timeStamp, (_, __) => timeStamp);
 			}
 
 			bool attachment = props.Stream is null;
 
 			RestUserMessage message = attachment
-				? await context.Channel.SendMessageAsync(props.Content, props.IsTTS, props.Embed)
-				: await context.Channel.SendFileAsync(props.Stream, props.FileName, props.Content, props.IsTTS,
+				? await sourceMessage.Channel.SendMessageAsync(props.Content, props.IsTTS, props.Embed)
+				: await sourceMessage.Channel.SendFileAsync(props.Stream, props.FileName, props.Content, props.IsTTS,
 					props.Embed, isSpoiler: props.IsSpoiler);
 
-			var cached = new CachedMessage(context.Channel.Id, context.Message.Id, context.User.Id, message.Id,
-				attachment, false, message.CreatedAt);
+			var cached = new CachedMessage(sourceMessage.Channel.Id, sourceMessage.Id, sourceMessage.Author.Id,
+				message.Id, attachment, false, message.CreatedAt);
 
 			if (alreadyScheduled) {
 				scheduled.State.Enqueue(cached);
@@ -105,18 +107,18 @@ namespace Espeon.Services {
 			return Task.CompletedTask;
 		}
 
-		async Task IMessageService.DeleteMessagesAsync(EspeonContext context, int amount) {
-			foreach (((ulong channelId, ulong userId, _), ScheduledTask<ConcurrentQueue<CachedMessage>> value) in this
+		async Task IMessageService.DeleteMessagesAsync(SocketTextChannel channel, SocketGuildUser bot, ulong userId, int amount) {
+			foreach (((ulong channelId, ulong userId_, _), ScheduledTask<ConcurrentQueue<CachedMessage>> value) in this
 				._messageCache) {
-				if (!(channelId == context.Channel.Id && userId == context.User.Id)) {
+				if (!(channelId == channel.Id && userId_ == userId)) {
 					continue;
 				}
 
-				bool manageMesssages = context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages;
+				bool manageMesssages = bot.GetPermissions(channel).ManageMessages;
 				var messages = new List<IMessage>();
 
 				for (; amount > 0 && value.State.TryDequeue(out CachedMessage cached);) {
-					IMessage message = await context.Channel.GetMessageAsync(cached.ResponseId);
+					IMessage message = await channel.GetMessageAsync(cached.ResponseId);
 
 					if (message is null) {
 						continue;
@@ -132,7 +134,7 @@ namespace Espeon.Services {
 				}
 
 				if (messages.Count > 0) {
-					await context.Channel.DeleteMessagesAsync(messages);
+					await channel.DeleteMessagesAsync(messages);
 				}
 			}
 		}

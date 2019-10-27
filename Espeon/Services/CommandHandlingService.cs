@@ -2,8 +2,8 @@
 using Casino.Discord;
 using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases;
 using Espeon.Core.Databases.CommandStore;
 using Espeon.Core.Databases.GuildStore;
@@ -15,9 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Module = Qmmands.Module;
+using CommandUtilities = Espeon.Commands.Utilities;
+using CoreUtilities = Espeon.Core.Utilities;
+using QmmandsUtilities = Qmmands.CommandUtilities;
 
 namespace Espeon.Services {
 	public class CommandHandlingService : BaseService<InitialiseArgs>, ICommandHandlingService {
@@ -61,7 +62,7 @@ namespace Espeon.Services {
 			var modulesToCreate = new List<ModuleBuilder>();
 			var commandsToCreate = new List<CommandBuilder>();
 
-			IReadOnlyList<Module> modules = this._commands.AddModules(Assembly.GetEntryAssembly(),
+			IReadOnlyList<Module> modules = this._commands.AddModules(typeof(EspeonContext).Assembly,
 				action: OnModuleBuilding(dbModules, modulesToCreate, commandsToCreate));
 
 			foreach (ModuleBuilder module in modulesToCreate) {
@@ -161,7 +162,7 @@ namespace Espeon.Services {
 
 				if (guild.AutoQuotes) {
 					_ = Task.Run(async () => {
-						Embed embed = await Utilities.QuoteFromStringAsync(this._client, content);
+						Embed embed = await CoreUtilities.QuoteFromStringAsync(this._client, content);
 
 						if (embed is null) {
 							return;
@@ -177,17 +178,18 @@ namespace Espeon.Services {
 			}
 
 
-			if (CommandUtilities.HasAnyPrefix(content, prefixes, StringComparison.CurrentCulture, out string prefix,
+			if (QmmandsUtilities.HasAnyPrefix(content, prefixes, StringComparison.CurrentCulture, out string prefix,
 				    out string output) ||
-			    CommandUtilities.HasAnyPrefix(content, this._botMentions, out prefix, out output)) {
+			    QmmandsUtilities.HasAnyPrefix(content, this._botMentions, out prefix, out output)) {
 				if (string.IsNullOrWhiteSpace(output)) {
 					return;
 				}
 
 				try {
-					EspeonContext commandContext = await EspeonContext.CreateAsync(this._client, message, prefix);
+					EspeonContext commandContext =
+						await EspeonContext.CreateAsync(this._services, this._client, message, prefix);
 
-					IResult result = await this._commands.ExecuteAsync(output, commandContext, this._services);
+					IResult result = await this._commands.ExecuteAsync(output, commandContext);
 
 					bool CheckForCustom(Module module) {
 						return result is ChecksFailedResult && ulong.TryParse(module.Name, out ulong id) &&
@@ -195,8 +197,8 @@ namespace Espeon.Services {
 					}
 
 					if (result is CommandNotFoundResult || CheckForCustom(commandContext.Command.Module)) {
-						commandContext = await EspeonContext.CreateAsync(this._client, message, prefix);
-						result = await this._commands.ExecuteAsync($"help {output}", commandContext, this._services);
+						commandContext = await EspeonContext.CreateAsync(this._services, this._client, message, prefix);
+						result = await this._commands.ExecuteAsync($"help {output}", commandContext);
 					}
 
 					if (!result.IsSuccessful && !(result is ExecutionFailedResult)) {
@@ -231,7 +233,8 @@ namespace Espeon.Services {
 #endif
 			}
 
-			await this._message.SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
+			await this._message.SendAsync(context.Message,
+				x => x.Embed = CommandUtilities.BuildErrorEmbed(args.Result, context));
 		}
 
 		private Task CommandExecutedAsync(CommandExecutedEventArgs args) {

@@ -3,12 +3,11 @@ using Casino.DependencyInjection;
 using Casino.Discord;
 using Discord;
 using Discord.WebSocket;
+using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Commands;
 using Espeon.Core.Databases;
 using Espeon.Core.Databases.UserStore;
 using Espeon.Core.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -47,26 +46,26 @@ namespace Espeon.Services {
 			}
 		}
 
-		async Task<Reminder> IReminderService.
-			CreateReminderAsync(EspeonContext context, string content, TimeSpan when) {
-			Reminder[] reminders = await context.UserStore.Reminders.ToArrayAsync();
-			Reminder[] usersReminders = reminders.Where(x => x.UserId == context.User.Id).ToArray();
+		async Task<Reminder> IReminderService.CreateReminderAsync(UserStore userStore, ulong guildId, IMessage message,
+			string content, TimeSpan when) {
+			Reminder[] reminders = await userStore.Reminders.ToArrayAsync();
+			Reminder[] usersReminders = reminders.Where(x => x.UserId == message.Author.Id).ToArray();
 			int next = usersReminders.Length == 0 ? 0 : usersReminders.Max(x => x.ReminderId) + 1;
 
-			Reminder found = Array.Find(usersReminders, x => x.InvokeId == context.Message.Id);
+			Reminder found = Array.Find(usersReminders, x => x.InvokeId == message.Id);
 
 			ScheduledTask<Reminder> task;
 
 			if (found is null) {
 				var reminder = new Reminder {
-					ChannelId = context.Channel.Id,
-					GuildId = context.Guild.Id,
-					JumpUrl = context.Message.GetJumpUrl(),
+					ChannelId = message.Channel.Id,
+					GuildId = guildId,
+					JumpUrl = message.GetJumpUrl(),
 					TheReminder = content,
-					UserId = context.User.Id,
+					UserId = message.Author.Id,
 					WhenToRemove = DateTimeOffset.UtcNow.Add(when),
 					ReminderId = next,
-					InvokeId = context.Message.Id,
+					InvokeId = message.Id,
 					Id = Guid.NewGuid().ToString(),
 					CreatedAt = DateTimeOffset.UtcNow
 				};
@@ -74,8 +73,8 @@ namespace Espeon.Services {
 				task = this._scheduler.ScheduleTask(reminder, reminder.WhenToRemove, RemoveAsync);
 				this._reminders.TryAdd(reminder.Id, task);
 
-				await context.UserStore.Reminders.AddAsync(reminder);
-				await context.UserStore.SaveChangesAsync();
+				await userStore.Reminders.AddAsync(reminder);
+				await userStore.SaveChangesAsync();
 
 				return reminder;
 			}
@@ -83,8 +82,8 @@ namespace Espeon.Services {
 			found.TheReminder = content;
 			found.WhenToRemove = DateTimeOffset.UtcNow.Add(when);
 
-			context.UserStore.Reminders.Update(found);
-			await context.UserStore.SaveChangesAsync();
+			userStore.Reminders.Update(found);
+			userStore.SaveChangesAsync();
 
 			if (this._reminders.TryGetValue(found.Id, out task)) {
 				task.Change(when, _ => RemoveAsync(found));
@@ -93,19 +92,19 @@ namespace Espeon.Services {
 			return found;
 		}
 
-		async Task IReminderService.CancelReminderAsync(EspeonContext context, Reminder reminder) {
-			context.UserStore.Remove(reminder);
+		async Task IReminderService.CancelReminderAsync(UserStore userStore, Reminder reminder) {
+			userStore.Remove(reminder);
 
 			if (this._reminders.TryGetValue(reminder.Id, out ScheduledTask<Reminder> task)) {
 				task.Cancel();
 			}
 
-			await context.UserStore.SaveChangesAsync();
+			await userStore.SaveChangesAsync();
 		}
 
-		async Task<ImmutableArray<Reminder>> IReminderService.GetRemindersAsync(EspeonContext context) {
-			User user = await context.UserStore.GetOrCreateUserAsync(context.User, x => x.Reminders);
-			return user.Reminders.ToImmutableArray();
+		async Task<ImmutableArray<Reminder>> IReminderService.GetRemindersAsync(UserStore userStore, IUser user) {
+			User dbUser = await userStore.GetOrCreateUserAsync(user, x => x.Reminders);
+			return dbUser.Reminders.ToImmutableArray();
 		}
 
 		private async Task RemoveAsync(Reminder reminder) {

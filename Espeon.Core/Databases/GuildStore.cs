@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Databases.GuildStore {
@@ -137,7 +138,7 @@ namespace Espeon.Core.Databases.GuildStore {
 		public async Task<IReadOnlyCollection<Guild>> GetAllGuildsAsync<TProp>(
 			Expression<Func<Guild, TProp>> expression) {
 			if (expression is null) {
-				return await Guilds.ToListAsync();
+				return await AsyncEnumerable.ToListAsync(Guilds, CancellationToken.None);
 			}
 
 			return await Guilds.Include(expression).ToListAsync();
