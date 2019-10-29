@@ -1,12 +1,10 @@
 ﻿using Casino.DependencyInjection;
-using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.CommandStore;
-using Espeon.Core.Databases.GuildStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.CommandStore;
+using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +20,7 @@ using QmmandsUtilities = Qmmands.CommandUtilities;
 
 namespace Espeon.Services {
 	public class CommandHandlingService : BaseService<InitialiseArgs>, ICommandHandlingService {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly CommandService _commands;
 		[Inject] private readonly ICustomCommandsService _customCommands;
 		[Inject] private readonly IEventsService _events;
@@ -33,20 +31,25 @@ namespace Espeon.Services {
 		private string[] _botMentions;
 
 		public CommandHandlingService(IServiceProvider services) : base(services) {
-			this._client.MessageReceived += async msg => {
-				if (msg is SocketUserMessage message) {
+			this._client.MessageReceived += async args => {
+				if (args.Message is CachedUserMessage message) {
 					await this._events.RegisterEvent(() => HandleMessageAsync(message));
 				}
 			};
 
-			this._client.MessageUpdated += async (cache, after, _) => {
-				IMessage before = await cache.GetOrDownloadAsync();
+			this._client.MessageUpdated += async args => {
+				if (!args.OldMessage.HasValue) {
+					return;
+				}
 
+				IMessage before = args.OldMessage.Value;
+				IMessage after = args.NewMessage;
+				
 				if (before.Content == after.Content) {
 					return;
 				}
 
-				if (after is SocketUserMessage message) {
+				if (after is CachedUserMessage message) {
 					await this._events.RegisterEvent(() => HandleMessageAsync(message));
 				}
 			};
@@ -132,12 +135,12 @@ namespace Espeon.Services {
 			};
 		}
 
-		private async Task HandleMessageAsync(SocketUserMessage message) {
+		private async Task HandleMessageAsync(CachedUserMessage message) {
 			await HandleMessageAsync(message.Author, message.Channel, message.Content, message);
 		}
 
-		private async Task HandleMessageAsync(SocketUser author, ISocketMessageChannel channel, string content,
-			SocketUserMessage message) {
+		private async Task HandleMessageAsync(CachedUser author, IMessageChannel channel, string content,
+			CachedUserMessage message) {
 			if (this._botMentions is null) {
 				this._botMentions = new[] {
 					$"<@!{this._client.CurrentUser.Id}> ",
@@ -149,8 +152,8 @@ namespace Espeon.Services {
 				return;
 			}
 
-			if (!(channel is SocketTextChannel textChannel) || !textChannel.Guild.CurrentUser
-				    .GetPermissions(textChannel).Has(ChannelPermission.SendMessages)) {
+			if (!(channel is CachedTextChannel textChannel) || !textChannel.Guild.CurrentMember
+				    .GetPermissionsFor(textChannel).Has(Permission.SendMessages)) {
 				return;
 			}
 
@@ -162,7 +165,7 @@ namespace Espeon.Services {
 
 				if (guild.AutoQuotes) {
 					_ = Task.Run(async () => {
-						Embed embed = await CoreUtilities.QuoteFromStringAsync(this._client, content);
+						LocalEmbed embed = await CoreUtilities.QuoteFromStringAsync(this._client, content);
 
 						if (embed is null) {
 							return;
@@ -213,8 +216,8 @@ namespace Espeon.Services {
 			}
 		}
 
-		async Task ICommandHandlingService.ExecuteCommandAsync(SocketUser author, ISocketMessageChannel channel,
-			string content, SocketUserMessage message) {
+		async Task ICommandHandlingService.ExecuteCommandAsync(CachedUser author, ITextChannel channel,
+			string content, CachedUserMessage message) {
 			await HandleMessageAsync(author, channel, content, message);
 		}
 
@@ -225,7 +228,7 @@ namespace Espeon.Services {
 				this._logger.Log(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
 #if !DEBUG
-                var c = _client.GetChannel(463299724326469634) as SocketTextChannel;
+                var c = _client.GetChannel(463299724326469634) as CachedTextChannel;
 
                 var ex = failed.Exception.ToString();
 
@@ -242,7 +245,7 @@ namespace Espeon.Services {
 
 			this._logger.Log(Source.Commands, Severity.Verbose,
 				$"Successfully executed {{{context.Command.Name}}} for " +
-				$"{{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
+				$"{{{context.Member.DisplayName}}} in {{{context.Guild.Name}/{context.Channel.Name}}}");
 
 			return Task.CompletedTask;
 		}

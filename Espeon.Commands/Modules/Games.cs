@@ -27,7 +27,7 @@ namespace Espeon.Commands {
 		public async Task StartBlackjackAsync([OverrideTypeParser(typeof(CandyTypeParser))] int bet = 0) {
 			var bj = new Blackjack(Context, Services, bet);
 
-			bool result = await GameService.TryStartGameAsync(User.Id, bj, TimeSpan.FromMinutes(5));
+			bool result = await GameService.TryStartGameAsync(Member.Id, bj, TimeSpan.FromMinutes(5));
 
 			if (!result) {
 				await SendNotOkAsync(0);
@@ -45,9 +45,9 @@ namespace Espeon.Commands {
 
 			return Task.WhenAll(
 				win
-					? SendOkAsync(0, payout, Emotes.Collection["RareCandy"], plural)
-					: SendNotOkAsync(1, payout, Emotes.Collection["RareCandy"], plural),
-				Candy.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, User, (win ? 1 : -1) * payout));
+					? SendOkAsync(0, payout, Emotes["RareCandy"], plural)
+					: SendNotOkAsync(1, payout, Emotes["RareCandy"], plural),
+				Candy.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, Member, (win ? 1 : -1) * payout));
 		}
 	}
 }

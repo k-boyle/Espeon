@@ -1,8 +1,6 @@
-﻿using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Humanizer;
 using Qmmands;
 using System;
@@ -10,7 +8,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PermissionTarget = Espeon.Core.PermissionTarget;
 
 namespace Espeon.Commands {
 	/*
@@ -30,43 +27,44 @@ namespace Espeon.Commands {
 	public class Moderation : EspeonModuleBase {
 		[Command("Kick")]
 		[Name("Kick User")]
-		[RequirePermissions(PermissionTarget.Bot, GuildPermission.KickMembers)]
+		[RequirePermissions(PermissionTarget.Bot, PermissionType.Guild, Permission.KickMembers)]
 		[Description("Kicks a user from the guild")]
-		public Task KickUserAsync([RequireHierarchy] IGuildUser user, [Remainder] string reason = null) {
-			return Task.WhenAll(user.KickAsync(reason), SendOkAsync(0, user.GetDisplayName()));
+		public Task KickUserAsync([RequireHierarchy] IMember user, [Remainder] string reason = null) {
+			return Task.WhenAll(user.KickAsync(RestRequestOptions.FromReason(reason)),
+				SendOkAsync(0, user.DisplayName));
 		}
 
 		[Command("Ban")]
 		[Name("Ban User")]
-		[RequirePermissions(PermissionTarget.Bot, GuildPermission.BanMembers)]
+		[RequirePermissions(PermissionTarget.Bot, PermissionType.Guild, Permission.BanMembers)]
 		[Description("Bans a user from your guild")]
-		public Task BanUserAsync([RequireHierarchy] IGuildUser user, [RequireRange(-1, 7)] int pruneDays = 0,
+		public Task BanUserAsync([RequireHierarchy] IMember user, [RequireRange(-1, 7)] int pruneDays = 0,
 			[Remainder] string reason = null) {
-			return Task.WhenAll(user.BanAsync(pruneDays, reason), SendOkAsync(0, user.GetDisplayName()));
+			return Task.WhenAll(user.BanAsync(reason, pruneDays), SendOkAsync(0, user.DisplayName));
 		}
 
 		[Command("warn")]
 		[Name("Warn User")]
 		[Description("Adds a warning to the specified user")]
-		public async Task WarnUserAsync([RequireHierarchy] IGuildUser targetUser,
+		public async Task WarnUserAsync([RequireHierarchy] IMember targetUser,
 			[RequireSpecificLength(200)] [Remainder] string reason) {
 			Guild currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild, x => x.Warnings);
 
 			int currentCount = currentGuild.Warnings.Count(x => x.TargetUser == targetUser.Id) + 1;
 
 			if (currentCount >= currentGuild.WarningLimit) {
-				await SendNotOkAsync(0, targetUser.GetDisplayName(), currentCount);
+				await SendNotOkAsync(0, targetUser.DisplayName, currentCount);
 			}
 
 			currentGuild.Warnings.Add(new Warning {
 				TargetUser = targetUser.Id,
-				Issuer = Context.User.Id,
+				Issuer = Context.Member.Id,
 				Reason = reason
 			});
 
 			Context.GuildStore.Update(currentGuild);
 
-			await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, targetUser.GetDisplayName()));
+			await Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, targetUser.DisplayName));
 		}
 
 		[Command("revoke")]
@@ -92,7 +90,7 @@ namespace Espeon.Commands {
 		[Command("warnings")]
 		[Name("View Warnings")]
 		[Description("View a users warnings")]
-		public async Task ViewWarningsAsync([Remainder] IGuildUser targetUser) {
+		public async Task ViewWarningsAsync([Remainder] IMember targetUser) {
 			Guild currentGuild = await Context.GuildStore.GetOrCreateGuildAsync(Context.Guild, x => x.Warnings);
 
 			Warning[] foundWarnings = currentGuild.Warnings.Where(x => x.TargetUser == targetUser.Id).ToArray();
@@ -107,10 +105,10 @@ namespace Espeon.Commands {
 			foreach (Warning warning in foundWarnings) {
 				sb.AppendLine($"**Id**: {warning.Id}, ");
 
-				IGuildUser issuer = Context.Guild.GetUser(warning.Issuer) as IGuildUser ??
-				                    await Context.Client.Rest.GetGuildUserAsync(Context.Guild.Id, warning.Issuer);
+				IMember issuer = Context.Guild.GetMember(warning.Issuer) as IMember ??
+				                 await Context.Client.GetMemberAsync(Context.Guild.Id, warning.Issuer);
 
-				sb.Append("**Issuer**: ").Append(issuer?.GetDisplayName() ?? "Not Found").AppendLine(", ");
+				sb.Append("**Issuer**: ").Append(issuer?.DisplayName ?? "Not Found").AppendLine(", ");
 
 				sb.Append("**Issued On**: ").AppendLine(DateTimeOffset.FromUnixTimeMilliseconds(warning.IssuedOn)
 					.Humanize(culture: CultureInfo.InvariantCulture));
@@ -125,57 +123,56 @@ namespace Espeon.Commands {
 
 		[Command("noreactions")]
 		[Name("Revoke Reactions")]
-		[RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageRoles)]
+		[RequirePermissions(PermissionTarget.Bot, PermissionType.Guild, Permission.ManageRoles)]
 		[Description("Adds the no reactions role to the specified user")]
-		public async Task RevokeReactionsAsync([RequireHierarchy] [Remainder] IGuildUser user) {
+		public async Task RevokeReactionsAsync([RequireHierarchy] [Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
-			SocketRole role = Context.Guild.GetRole(currentGuild.NoReactions);
+			CachedRole role = Context.Guild.GetRole(currentGuild.NoReactions);
 
 			if (role is null) {
 				await SendNotOkAsync(0);
 				return;
 			}
 
-			await Task.WhenAll(
-				user.AddRoleAsync(role, new RequestOptions { AuditLogReason = "Reaction rights revoked" }),
+			await Task.WhenAll(user.GrantRoleAsync(role.Id, RestRequestOptions.FromReason("Reaction rights revoked")),
 				SendOkAsync(1));
 		}
 
 		[Command("restorereactions")]
 		[Name("Restore Reactions")]
-		[RequirePermissions(PermissionTarget.Bot, GuildPermission.ManageRoles)]
+		[RequirePermissions(PermissionTarget.Bot, PermissionType.Guild, Permission.ManageRoles)]
 		[Description("Removes the no reactions role from the specified user")]
-		public async Task RestoreReactionsAsync([RequireHierarchy] [Remainder] IGuildUser user) {
+		public async Task RestoreReactionsAsync([RequireHierarchy] [Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
-			SocketRole role = Context.Guild.GetRole(currentGuild.NoReactions);
+			CachedRole role = Context.Guild.GetRole(currentGuild.NoReactions);
 
 			if (role is null) {
 				await SendNotOkAsync(0);
 				return;
 			}
 
-			await Task.WhenAll(
-				user.RemoveRoleAsync(role, new RequestOptions { AuditLogReason = "Reaction rights restored" }),
+			await Task.WhenAll(user.RevokeRoleAsync(role.Id, RestRequestOptions.FromReason("Reaction rights restored")),
 				SendOkAsync(1));
 		}
 
 		[Command("block")]
 		[Name("Block User")]
-		[RequirePermissions(PermissionTarget.Bot, ChannelPermission.ManageChannels)]
+		[RequirePermissions(PermissionTarget.Bot, PermissionType.Channel, Permission.ManageChannels)]
 		[Description("Stops the specified user from talking in this channel")]
-		public Task BlockUserAsync([RequireHierarchy] [Remainder] IGuildUser user) {
-			return Task.WhenAll(
-				Context.Channel.AddPermissionOverwriteAsync(user,
-					new OverwritePermissions(sendMessages: PermValue.Deny),
-					new RequestOptions { AuditLogReason = "User blocked from channel" }), SendOkAsync(0));
+		public async Task BlockUserAsync([RequireHierarchy] [Remainder] IMember user) {
+			await Channel.AddOrModifyOverwriteAsync(
+				new LocalOverwrite(user,
+					new Disqord.OverwritePermissions(ChannelPermissions.None, Permission.SendMessages)),
+				RestRequestOptions.FromReason("User blocked from channel"));
+			await SendOkAsync(0);
 		}
 
 		[Command("blacklist")]
 		[Name("Blacklist User")]
 		[Description("Blacklists a user from using the bot")]
-		public async Task BlacklistAsync([RequireHierarchy] [Remainder] IGuildUser user) {
+		public async Task BlacklistAsync([RequireHierarchy] [Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (currentGuild.RestrictedUsers.Contains(user.Id)) {
@@ -193,7 +190,7 @@ namespace Espeon.Commands {
 		[Command("unblacklist")]
 		[Name("Unblacklist")]
 		[Description("Removes a user from the bots blacklist")]
-		public async Task UnblacklistAsync([RequireHierarchy] [Remainder] IGuildUser user) {
+		public async Task UnblacklistAsync([RequireHierarchy] [Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (!currentGuild.RestrictedUsers.Contains(user.Id)) {

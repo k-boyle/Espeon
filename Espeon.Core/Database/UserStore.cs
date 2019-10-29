@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Espeon.Core.Databases.UserStore {
+namespace Espeon.Core.Database.UserStore {
 	public class UserStore : DbContext {
 		private DbSet<User> Users { get; set; }
 		public DbSet<Reminder> Reminders { get; set; }
@@ -72,7 +72,7 @@ namespace Espeon.Core.Databases.UserStore {
 		}
 
 		public async Task<User> GetOrCreateUserAsync(IUser user) {
-			return await Users.FindAsync(user.Id) ?? await CreateUserAsync<ulong>(user, null);
+			return await Users.FindAsync(user.Id.RawValue) ?? await CreateUserAsync<ulong>(user, null);
 		}
 
 		public async Task<User> GetOrCreateUserAsync<TProp>(IUser user, Expression<Func<User, TProp>> expression) {
@@ -96,7 +96,7 @@ namespace Espeon.Core.Databases.UserStore {
 
 		//async needed for the cast
 		public async Task<IReadOnlyCollection<User>> GetAllUsersAsync() {
-			return await AsyncEnumerable.ToListAsync(Users, CancellationToken.None);
+			return await Users.ToListAsync(CancellationToken.None);
 		}
 
 		public async Task RemoveUserAsync(IUser user) {

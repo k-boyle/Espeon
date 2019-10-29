@@ -1,12 +1,11 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Espeon.Core.Databases.UserStore;
+﻿using Disqord;
+using Espeon.Core.Database.UserStore;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Services {
 	public interface ICandyService {
-		Task UpdateCandiesAsync(UserStore store, SocketSelfUser bot, IUser user, int amount);
+		Task UpdateCandiesAsync(UserStore store, CachedCurrentUser bot, IUser user, int amount);
 
 		Task TransferCandiesAsync(UserStore userStore, IUser sender, IUser receiver, int amount);
 

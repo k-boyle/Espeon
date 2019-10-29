@@ -1,6 +1,4 @@
-﻿using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
 using Humanizer;
 using Qmmands;
@@ -16,11 +14,11 @@ namespace Espeon.Commands {
 					string.Equals(z, name, StringComparison.InvariantCultureIgnoreCase))));
 		}
 
-		public static Embed BuildErrorEmbed(FailedResult result, EspeonContext context) {
-			var builder = new EmbedBuilder {
-				Author = new EmbedAuthorBuilder {
-					IconUrl = context.User.GetAvatarOrDefaultUrl(),
-					Name = context.User.GetDisplayName()
+		public static LocalEmbed BuildErrorEmbed(FailedResult result, EspeonContext context) {
+			var builder = new LocalEmbedBuilder() {
+				Author = new LocalEmbedAuthorBuilder() {
+					IconUrl = context.Member.GetAvatarUrl(),
+					Name = context.Member.DisplayName
 				},
 				Color = new Color(0xff6868)
 			};
@@ -107,12 +105,12 @@ namespace Espeon.Commands {
 		}
 
 		public static readonly IReadOnlyDictionary<Type, string> ExampleUsage = new Dictionary<Type, string> {
-			[typeof(IGuildUser)] = "@user",
+			[typeof(IMember)] = "@user",
 			[typeof(TimeSpan)] = "1day3hrs14mins30s",
 			[typeof(Alias)] = "add/remove",
-			[typeof(SocketRole)] = "@role",
-			[typeof(Emote[])] = "<:espeon:491227561385525248>",
-			[typeof(SocketTextChannel)] = "#channel",
+			[typeof(CachedRole)] = "@role",
+			[typeof(CachedGuildEmoji[])] = "<:espeon:491227561385525248>",
+			[typeof(CachedTextChannel)] = "#channel",
 			[typeof(ResponsePack)] = "owo",
 			[typeof(Face)] = "heads/tails"
 		};

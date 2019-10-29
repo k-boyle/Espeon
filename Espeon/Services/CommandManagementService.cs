@@ -1,8 +1,8 @@
 ﻿using Casino.DependencyInjection;
 using Casino.Qmmands;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.CommandStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.CommandStore;
 using Espeon.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;

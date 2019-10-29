@@ -1,5 +1,4 @@
-﻿using Casino.Discord;
-using Discord;
+﻿using Disqord;
 using Espeon.Core;
 using Humanizer;
 using Microsoft.CodeAnalysis;
@@ -34,10 +33,12 @@ namespace Espeon.Commands {
 		[Command("Message")]
 		[Name("Message Channel")]
 		[Description("Sends a message to the specified channel")]
-		public Task MessageChannelAsync(ulong channelId, [Remainder] string content) {
-			return !(Context.Client.GetChannel(channelId) is IMessageChannel channel)
-				? SendNotOkAsync(0)
-				: channel.SendMessageAsync(content);
+		public async Task MessageChannelAsync(ulong channelId, [Remainder] string content) {
+			if (Client.GetChannel(channelId) is ITextChannel channel) {
+				await channel.SendMessageAsync(content);
+			} else {
+				await SendNotOkAsync(0);
+			}
 		}
 
 		[Command("Eval")]
@@ -73,13 +74,13 @@ namespace Espeon.Commands {
 				.WithReferences(assemblies.Select(x => MetadataReference.CreateFromFile(x.Location)))
 				.AddImports(namespaces);
 
-			var builder = new EmbedBuilder {
+			var builder = new LocalEmbedBuilder {
 				Title = "Evaluating Code...",
 				Color = Core.Utilities.EspeonColor,
 				Description = "Waiting for completion...",
-				Author = new EmbedAuthorBuilder {
-					IconUrl = Context.User.GetAvatarOrDefaultUrl(),
-					Name = Context.User.GetDisplayName()
+				Author = new LocalEmbedAuthorBuilder {
+					IconUrl = Context.Member.GetAvatarUrl(),
+					Name = Context.Member.DisplayName
 				},
 				Timestamp = DateTimeOffset.UtcNow
 			};
@@ -199,7 +200,7 @@ namespace Espeon.Commands {
 
 				string str = ex.ToString();
 
-				builder.AddField("Exception", Format.Sanitize(str.Length >= 600 ? str.Substring(0, 600) : str));
+				builder.AddField("Exception", Markdown.EscapeMarkdown(str.Length >= 600 ? str.Substring(0, 600) : str));
 			} finally {
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
@@ -222,7 +223,7 @@ namespace Espeon.Commands {
 		[Name("Sudo")]
 		[Description("Runs a command as sudo")]
 		public Task SudoAsync([Remainder] string command) {
-			return SendMessageAsync($"{Context.Guild.CurrentUser.Mention} {command}");
+			return SendMessageAsync($"{Context.Guild.CurrentMember.Mention} {command}");
 		}
 
 		[Command("reload")]

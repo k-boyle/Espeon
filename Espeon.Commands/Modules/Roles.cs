@@ -1,7 +1,8 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿
+
+using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Qmmands;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +24,8 @@ namespace Espeon.Commands {
 		[Command("add")]
 		[Name("Add Role")]
 		[Description("Adds a role from the available self assigning roles")]
-		public async Task AddRoleAsync([RequirePositionHierarchy] [Remainder] SocketRole role) {
-			if (Context.User.Roles.Any(x => x.Id == role.Id)) {
+		public async Task AddRoleAsync([RequirePositionHierarchy] [Remainder] CachedRole role) {
+			if (Context.Member.Roles.Any(x => x.Value.Id == role.Id)) {
 				await SendNotOkAsync(0);
 
 				return;
@@ -35,7 +36,7 @@ namespace Espeon.Commands {
 
 			if (roles.Contains(role.Id)) {
 				await Task.WhenAll(
-					Context.User.AddRoleAsync(role, new RequestOptions { AuditLogReason = "Self assigning role" }),
+					Context.Member.GrantRoleAsync(role.Id, RestRequestOptions.FromReason("Self assigning role")),
 					SendOkAsync(1));
 				return;
 			}
@@ -47,7 +48,7 @@ namespace Espeon.Commands {
 		[Name("Add SAR")]
 		[Description("Adds a new role to the available self assigning roles")]
 		[RequireElevation(ElevationLevel.Mod)]
-		public async Task AddSelfRoleAsync([RequirePositionHierarchy] [Remainder] SocketRole role) {
+		public async Task AddSelfRoleAsync([RequirePositionHierarchy] [Remainder] CachedRole role) {
 			Guild currentGuild = Context.CurrentGuild;
 			ICollection<ulong> roles = currentGuild.SelfAssigningRoles;
 
@@ -66,8 +67,8 @@ namespace Espeon.Commands {
 		[Command("remove")]
 		[Name("Remove Role")]
 		[Description("Removes one of your roles if that role is in the self assigning roles collection")]
-		public async Task RemoveRoleAsync([RequirePositionHierarchy] [Remainder] SocketRole role) {
-			if (!Context.User.Roles.Any(x => x.Id == role.Id)) {
+		public async Task RemoveRoleAsync([RequirePositionHierarchy] [Remainder] CachedRole role) {
+			if (Context.Member.Roles.All(x => x.Value.Id != role.Id)) {
 				await SendNotOkAsync(0);
 				return;
 			}
@@ -81,14 +82,14 @@ namespace Espeon.Commands {
 			}
 
 			await Task.WhenAll(
-				Context.User.RemoveRoleAsync(role, new RequestOptions { AuditLogReason = "Self assigning role" }),
+				Context.Member.RevokeRoleAsync(role.Id, RestRequestOptions.FromReason("Self assigning role")),
 				SendOkAsync(2));
 		}
 
 		[Command("removeself")]
 		[Name("Remove SAR")]
 		[Description("Removes a role from the available self assinging roles")]
-		public async Task RemoveSelfAssigningRoleAsync([Remainder] SocketRole role) {
+		public async Task RemoveSelfAssigningRoleAsync([Remainder] CachedRole role) {
 			Guild currentGuild = Context.CurrentGuild;
 			ICollection<ulong> roles = currentGuild.SelfAssigningRoles;
 
@@ -109,7 +110,7 @@ namespace Espeon.Commands {
 		[Description("Gets all of the available self assigning roles")]
 		public async Task ListRolesAsync() {
 			Guild currentGuild = Context.CurrentGuild;
-			SocketRole[] roles = currentGuild.SelfAssigningRoles.Select(x => Context.Guild.GetRole(x))
+			CachedRole[] roles = currentGuild.SelfAssigningRoles.Select(x => Context.Guild.GetRole(x))
 				.Where(x => !(x is null)).ToArray();
 
 			await SendOkAsync(0, roles.Length > 0 ? string.Join('\n', roles.Select(x => x.Mention)) : "None");

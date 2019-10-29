@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Espeon.Core.Databases {
+namespace Espeon.Core.Database {
 	public class DelayedCommand {
 		public string Id { get; set; }
 

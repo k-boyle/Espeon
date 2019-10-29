@@ -1,79 +1,79 @@
 ﻿using Casino.DependencyInjection;
-using Discord.WebSocket;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.GuildStore;
-using Espeon.Core.Databases.UserStore;
+using Disqord;
+using Disqord.Events;
+using Espeon.Core.Database;
+using Espeon.Core.Database.GuildStore;
+using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Services {
 	public class PurgingService : BaseService<InitialiseArgs>, IPurgingService {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly IEventsService _events;
 		[Inject] private readonly IServiceProvider _services;
 
 		public PurgingService(IServiceProvider services) : base(services) {
-			this._client.LeftGuild += guild => this._events.RegisterEvent(() => LeftGuildAsync(guild));
-			this._client.UserLeft += user => this._events.RegisterEvent(() => UserLeftAsync(user));
-			this._client.ChannelDestroyed +=
-				channel => this._events.RegisterEvent(() => ChannelDestroyedAsync(channel));
-			this._client.RoleDeleted += role => this._events.RegisterEvent(() => RoleDeletedAsync(role));
-			this._client.RoleUpdated += (before, after) =>
-				this._events.RegisterEvent(() => RoleUpdatedAsync(before, after));
+			this._client.LeftGuild += args => this._events.RegisterEvent(() => LeftGuildAsync(args));
+			this._client.MemberLeft += args => this._events.RegisterEvent(() => UserLeftAsync(args));
+			this._client.ChannelDeleted += args => this._events.RegisterEvent(() => ChannelDestroyedAsync(args));
+			this._client.RoleDeleted += args => this._events.RegisterEvent(() => RoleDeletedAsync(args));
+			this._client.RoleUpdated += args => this._events.RegisterEvent(() => RoleUpdatedAsync(args));
 		}
 
-		private async Task LeftGuildAsync(SocketGuild guild) {
-			using var guildStore = this._services.GetService<GuildStore>();
-			await guildStore.RemoveGuildAsync(guild);
+		private async Task LeftGuildAsync(LeftGuildEventArgs args) {
+			await using var guildStore = this._services.GetService<GuildStore>();
+			await guildStore.RemoveGuildAsync(args.Guild);
 			await guildStore.SaveChangesAsync();
 		}
 
-		private async Task UserLeftAsync(SocketGuildUser user) {
-			using var guildStore = this._services.GetService<GuildStore>();
-			Guild guild = await guildStore.GetOrCreateGuildAsync(user.Guild, x => x.Warnings);
+		private async Task UserLeftAsync(MemberLeftEventArgs args) {
+			await using var guildStore = this._services.GetService<GuildStore>();
+			Guild guild = await guildStore.GetOrCreateGuildAsync(args.Guild, x => x.Warnings);
 
-			bool removed = guild.Admins.Remove(user.Id) || guild.Moderators.Remove(user.Id) ||
-			               guild.RestrictedUsers.Remove(user.Id) ||
-			               guild.Warnings.RemoveAll(x => x.TargetUser == user.Id) > 0;
+			bool removed = guild.Admins.Remove(args.User.Id) || guild.Moderators.Remove(args.User.Id) ||
+			               guild.RestrictedUsers.Remove(args.User.Id) ||
+			               guild.Warnings.RemoveAll(x => x.TargetUser == args.User.Id) > 0;
 
 			if (removed) {
 				guildStore.Update(guild);
 				await guildStore.SaveChangesAsync();
 			}
 
-			if (user.MutualGuilds.Count == 1) {
-				using var userStore = this._services.GetService<UserStore>();
+			if (this._client.Guilds.Count(x => x.Value.Members.Any(y => y.Value.Id == args.User.Id)) == 1) {
+				await using var userStore = this._services.GetService<UserStore>();
 
-				await userStore.RemoveUserAsync(user);
-				userStore.Update(user);
+				await userStore.RemoveUserAsync(args.User);
+				userStore.Update(args);
 
 				await userStore.SaveChangesAsync();
 			}
 		}
 
-		private async Task ChannelDestroyedAsync(SocketChannel channel) {
-			if (!(channel is SocketTextChannel textChannel)) {
+		private async Task ChannelDestroyedAsync(ChannelDeletedEventArgs args) {
+			if (!(args.Channel is CachedTextChannel textChannel)) {
 				return;
 			}
 
-			using var guildStore = this._services.GetService<GuildStore>();
+			await using var guildStore = this._services.GetService<GuildStore>();
 			Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
 
-			bool removed = guild.RestrictedChannels.Remove(channel.Id);
+			bool removed = guild.RestrictedChannels.Remove(args.Channel.Id);
 
 			if (removed) {
 				await guildStore.SaveChangesAsync();
 			}
 		}
 
-		private async Task RoleDeletedAsync(SocketRole role) {
-			using var guildStore = this._services.GetService<GuildStore>();
+		private async Task RoleDeletedAsync(RoleDeletedEventArgs args) {
+			await using var guildStore = this._services.GetService<GuildStore>();
 
-			Guild guild = await guildStore.GetOrCreateGuildAsync(role.Guild);
+			Guild guild = await guildStore.GetOrCreateGuildAsync(args.Role.Guild);
 
-			bool removed = guild.SelfAssigningRoles.Remove(role.Id);
+			bool removed = guild.SelfAssigningRoles.Remove(args.Role.Id);
 
 			if (removed) {
 				guildStore.Update(guild);
@@ -81,22 +81,22 @@ namespace Espeon.Services {
 			}
 		}
 
-		private async Task RoleUpdatedAsync(SocketRole before, SocketRole after) {
-			using var guildStore = this._services.GetService<GuildStore>();
-			Guild guild = await guildStore.GetOrCreateGuildAsync(before.Guild);
-			ulong id = before.Id;
+		private async Task RoleUpdatedAsync(RoleUpdatedEventArgs args) {
+			await using var guildStore = this._services.GetService<GuildStore>();
+			Guild guild = await guildStore.GetOrCreateGuildAsync(args.OldRole.Guild);
+			ulong id = args.OldRole.Id;
 
 			if (id != guild.DefaultRoleId && !guild.SelfAssigningRoles.Contains(id) && id != guild.NoReactions) {
 				return;
 			}
-
-			if (after is null || before.Position == after.Position) {
+			
+			if (args.NewRole is null || args.OldRole.Position == args.NewRole.Position) {
 				return;
 			}
 
-			SocketGuildUser currentUser = before.Guild.CurrentUser;
+			CachedMember currentUser = args.OldRole.Guild.CurrentMember;
 
-			if (after.Position <= currentUser.Hierarchy) {
+			if (args.NewRole.Position <= currentUser.Hierarchy) {
 				return;
 			}
 

@@ -1,6 +1,6 @@
-﻿using Discord;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.GuildStore;
+﻿using Disqord;
+using Espeon.Core.Database;
+using Espeon.Core.Database.GuildStore;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 

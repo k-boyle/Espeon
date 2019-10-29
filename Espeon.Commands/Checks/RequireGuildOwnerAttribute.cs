@@ -1,4 +1,4 @@
-﻿using Espeon.Core.Databases;
+﻿using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -14,7 +14,7 @@ namespace Espeon.Commands {
 				return CheckResult.Successful;
 			}
 
-			if (context.User.Id == context.Guild.OwnerId) {
+			if (context.Member.Id == context.Guild.OwnerId) {
 				return CheckResult.Successful;
 			}
 

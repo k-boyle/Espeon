@@ -1,5 +1,5 @@
-﻿using Discord.Rest;
-using Espeon.Core.Databases;
+﻿using Disqord.Rest;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -11,9 +11,9 @@ namespace Espeon.Commands {
 		public override async ValueTask<CheckResult> CheckAsync(EspeonContext context, IServiceProvider provider) {
 			var response = provider.GetService<IResponseService>();
 
-			RestApplication app = await context.Client.GetApplicationInfoAsync();
+			RestApplication app = await context.Client.CurrentApplication.GetOrDownloadAsync();
 
-			if (app.Owner.Id == context.User.Id || context.Client.CurrentUser.Id == context.User.Id) {
+			if (app.Owner.Id == context.Member.Id || context.Client.CurrentUser.Id == context.Member.Id) {
 				return CheckResult.Successful;
 			}
 

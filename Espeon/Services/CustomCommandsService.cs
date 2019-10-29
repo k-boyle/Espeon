@@ -1,9 +1,9 @@
 ﻿using Casino.DependencyInjection;
-using Discord;
+using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.GuildStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
 using Qmmands;
 using System;

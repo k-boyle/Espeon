@@ -1,6 +1,6 @@
-﻿using Casino.Discord;
-using Discord;
-using Espeon.Core.Databases;
+﻿using Disqord;
+using Espeon.Core;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Humanizer;
 using Qmmands;
@@ -28,24 +28,24 @@ namespace Espeon.Commands {
 		public IEmoteService Emotes { get; set; }
 		public Random Random { get; set; }
 
-		public Emote RareCandy => Emotes.Collection["RareCandy"];
+		public CachedGuildEmoji RareCandy => Emotes["RareCandy"];
 
 		[Command("Candies")]
 		[Name("View Candies")]
 		[Description("See how many rare candies you, or the specified user has")]
-		public async Task ViewCandiesAsync([Remainder] IGuildUser user = null) {
-			user ??= User;
+		public async Task ViewCandiesAsync([Remainder] IMember user = null) {
+			user ??= Member;
 
 			int amount = await CandyService.GetCandiesAsync(Context.UserStore, user);
 
-			await SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies");
+			await SendOkAsync(0, user.DisplayName, amount, RareCandy, amount == 1 ? "y" : "ies");
 		}
 
 		[Command("Claim")]
 		[Name("Claim Candies")]
 		[Description("Claim your free candies")]
 		public async Task ClaimCandiesAsync() {
-			(bool isSuccess, int amount, TimeSpan cooldown) = await CandyService.TryClaimCandiesAsync(Context.UserStore, User);
+			(bool isSuccess, int amount, TimeSpan cooldown) = await CandyService.TryClaimCandiesAsync(Context.UserStore, Member);
 
 			if (isSuccess) {
 				await SendOkAsync(0, amount, RareCandy, amount == 1 ? "y" : "ies");
@@ -68,11 +68,11 @@ namespace Espeon.Commands {
 		[Name("Treat")]
 		[RequireOwner]
 		[Description("Generate free candies for the specified user")]
-		public Task TreatUserAsync(int amount, [Remainder] IGuildUser user = null) {
-			user??=User;
+		public Task TreatUserAsync(int amount, [Remainder] IMember user = null) {
+			user??=Member;
 
 			return Task.WhenAll(CandyService.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, user, amount),
-				SendOkAsync(0, user.GetDisplayName(), amount, RareCandy, amount == 1 ? "y" : "ies"));
+				SendOkAsync(0, user.DisplayName, amount, RareCandy, amount == 1 ? "y" : "ies"));
 		}
 
 		[Command("Leaderboard")]
@@ -89,7 +89,7 @@ namespace Espeon.Commands {
 					break;
 				}
 
-				IUser found = await Guild.GetOrFetchUserAsync(user.Id) ?? await Client.GetOrFetchUserAsync(user.Id);
+				IUser found = await Guild.GetOrFetchMemberAsync(user.Id) as IUser ?? await Client.GetOrFetchUserAsync(user.Id);
 
 				if (found is null) {
 					continue;
@@ -102,11 +102,11 @@ namespace Espeon.Commands {
 			var i = 1;
 
 			foreach ((IUser found, User user) in foundUsers) {
-				if (found is IGuildUser guildUser) {
-					sb.Append(i++).Append(": ").Append(guildUser.GetDisplayName()).Append(" - ")
+				if (found is IMember guildMember) {
+					sb.Append(i++).Append(": ").Append(guildMember.DisplayName).Append(" - ")
 						.Append(user.CandyAmount).AppendLine();
 				} else {
-					sb.Append(i++).Append(": ").Append(found.Username).Append(" - ").Append(user.CandyAmount)
+					sb.Append(i++).Append(": ").Append(found.Name).Append(" - ").Append(user.CandyAmount)
 						.AppendLine();
 				}
 			}
@@ -117,11 +117,11 @@ namespace Espeon.Commands {
 		[Command("Gift")]
 		[Name("Gift Candies")]
 		[Description("Gift candies to another user")]
-		public Task GiftCandiesAsync(IGuildUser user,
+		public Task GiftCandiesAsync(IMember user,
 			[OverrideTypeParser(typeof(CandyTypeParser))] [RequireRange(0)] int amount) {
-			return user.Id == User.Id
+			return user.Id == Member.Id
 				? SendNotOkAsync(0)
-				: Task.WhenAll(CandyService.TransferCandiesAsync(Context.UserStore, User, user, amount), SendOkAsync(1));
+				: Task.WhenAll(CandyService.TransferCandiesAsync(Context.UserStore, Member, user, amount), SendOkAsync(1));
 		}
 
 		[Command("Steal")]
@@ -139,13 +139,13 @@ namespace Espeon.Commands {
 			float chance = (float) amount / espeonCandies * 0.2f;
 
 			if (chance < Random.NextDouble()) {
-				await CandyService.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, User, -amount);
+				await CandyService.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, Member, -amount);
 
 				await SendNotOkAsync(1);
 				return;
 			}
 
-			await CandyService.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, User, espeonCandies);
+			await CandyService.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, Member, espeonCandies);
 
 			espeon.CandyAmount = 0;
 

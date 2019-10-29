@@ -1,9 +1,8 @@
 ﻿using Casino.DependencyInjection;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.UserStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services {
 	public class CandyService : BaseService<InitialiseArgs>, ICandyService {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly Config _config;
 		[Inject] private readonly IEventsService _events;
 		[Inject] private readonly Random _random;
@@ -19,8 +18,8 @@ namespace Espeon.Services {
 		private TimeSpan Cooldown => TimeSpan.FromHours(this._config.ClaimCooldown);
 
 		public CandyService(IServiceProvider services) : base(services) {
-			this._client.MessageReceived += msg => this._events.RegisterEvent(async () => {
-				if (msg.Channel is IDMChannel) {
+			this._client.MessageReceived += args => this._events.RegisterEvent(async () => {
+				if (args.Message.Channel is IDmChannel) {
 					return;
 				}
 
@@ -28,9 +27,9 @@ namespace Espeon.Services {
 					return;
 				}
 
-				using var userStore = services.GetService<UserStore>();
+				await using var userStore = services.GetService<UserStore>();
 
-				User user = await userStore.GetOrCreateUserAsync(msg.Author);
+				User user = await userStore.GetOrCreateUserAsync(args.Message.Author);
 				user.CandyAmount += this._config.RandomCandyAmount;
 
 				if (user.HighestCandies > user.CandyAmount) {
@@ -43,7 +42,7 @@ namespace Espeon.Services {
 			});
 		}
 
-		async Task ICandyService.UpdateCandiesAsync(UserStore store, SocketSelfUser bot, IUser user, int amount) {
+		async Task ICandyService.UpdateCandiesAsync(UserStore store, CachedCurrentUser bot, IUser user, int amount) {
 			if (amount < 0 && user.Id != bot.Id) {
 				User espeon = await store.GetOrCreateUserAsync(bot);
 

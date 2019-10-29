@@ -1,8 +1,6 @@
-﻿using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
@@ -25,7 +23,7 @@ namespace Espeon.Commands {
 		[Name("Enable Starboard")]
 		[RequireElevation(ElevationLevel.Admin)]
 		[Description("Enables starboard settings the specified channel as the star channel")]
-		public async Task EnableStarboardAsync([Remainder] SocketTextChannel channel) {
+		public async Task EnableStarboardAsync([Remainder] CachedTextChannel channel) {
 			Guild guild = Context.CurrentGuild;
 			guild.StarboardChannelId = channel.Id;
 			Context.GuildStore.Update(guild);
@@ -70,15 +68,15 @@ namespace Espeon.Commands {
 
 			StarredMessage randomStar = guild.StarredMessages[Random.Next(guild.StarredMessages.Count)];
 
-			IUser user = await Context.Guild.GetOrFetchUserAsync(randomStar.AuthorId) ??
+			IUser user = await Context.Guild.GetOrFetchMemberAsync(randomStar.AuthorId) ??
 			             await Context.Client.GetOrFetchUserAsync(randomStar.AuthorId);
 
 			string jump = Core.Utilities.BuildJumpUrl(Context.Guild.Id, randomStar.ChannelId, randomStar.Id);
 
-			Embed starMessage = Core.Utilities.BuildStarMessage(user, randomStar.Content, jump, randomStar.ImageUrl);
+			LocalEmbed starMessage = Core.Utilities.BuildStarMessage(user, randomStar.Content, jump, randomStar.ImageUrl);
 
 			string m = string.Concat($"{Core.Utilities.Star}", $"**{randomStar.ReactionUsers.Count}** - ",
-				$"{(user as IGuildUser)?.GetDisplayName() ?? user.Username} in <#", $"{randomStar.ChannelId}>");
+				$"{(user as IMember)?.DisplayName ?? user.Name} in <#", $"{randomStar.ChannelId}>");
 
 			await SendMessageAsync(m, starMessage);
 		}

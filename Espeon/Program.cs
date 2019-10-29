@@ -1,13 +1,12 @@
 ﻿using Casino.Common;
 using Casino.DependencyInjection;
 using Casino.Qmmands;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Databases.CommandStore;
-using Espeon.Core.Databases.GuildStore;
-using Espeon.Core.Databases.UserStore;
+using Espeon.Core.Database.CommandStore;
+using Espeon.Core.Database.GuildStore;
+using Espeon.Core.Database.UserStore;
 using Espeon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,10 +22,10 @@ namespace Espeon {
 	internal class Program {
 		private static void Main() {
 			using var cts = new CancellationTokenSource();
-			new Program().MainAsync(cts).GetAwaiter().GetResult();
+			MainAsync(cts).GetAwaiter().GetResult();
 		}
 
-		private async Task MainAsync(CancellationTokenSource cts) {
+		private static async Task MainAsync(CancellationTokenSource cts) {
 			Config config = Config.Create("./config.json");
 
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -79,15 +78,14 @@ namespace Espeon {
 			Config config, CancellationTokenSource cts) {
 			return new ServiceCollection()
 				.AddServices(types)
-				.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig {
-					ExclusiveBulkDelete = true,
-					LogLevel = LogSeverity.Verbose,
-					MessageCacheSize = 100
-				})).AddSingleton(new CommandService(new CommandServiceConfiguration {
+				.AddSingleton(new DiscordClient(TokenType.Bot, config.DiscordToken, new DiscordClientConfiguration() {
+						MessageCacheSize = 100
+				}))
+				.AddSingleton(new CommandService(new CommandServiceConfiguration {
 					StringComparison = StringComparison.InvariantCultureIgnoreCase,
 					CooldownBucketKeyGenerator = (_, ctx) => {
 						var context = (EspeonContext) ctx;
-						return context.User.Id;
+						return context.Member.Id;
 					}
 				}).AddTypeParsers(typeof(EspeonContext).Assembly))
 				.AddSingleton(config)

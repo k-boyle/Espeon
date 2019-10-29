@@ -1,8 +1,7 @@
-﻿using Discord;
-using System.Collections.Generic;
+﻿using Disqord;
 
 namespace Espeon.Core.Services {
 	public interface IEmoteService {
-		IDictionary<string, Emote> Collection { get; }
+		CachedGuildEmoji this[string index] { get; }
 	}
 }

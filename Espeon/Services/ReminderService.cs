@@ -1,27 +1,26 @@
 using Casino.Common;
 using Casino.DependencyInjection;
-using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.UserStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Reminder = Espeon.Core.Databases.Reminder;
+using Reminder = Espeon.Core.Database.Reminder;
 
 namespace Espeon.Services {
 	public class ReminderService : BaseService<InitialiseArgs>, IReminderService {
 		[Inject] private readonly ILogService _logger;
 		[Inject] private readonly TaskQueue _scheduler;
 		[Inject] private readonly IServiceProvider _services;
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 
 		private readonly ConcurrentDictionary<string, ScheduledTask<Reminder>> _reminders;
 
@@ -46,7 +45,7 @@ namespace Espeon.Services {
 			}
 		}
 
-		async Task<Reminder> IReminderService.CreateReminderAsync(UserStore userStore, ulong guildId, IMessage message,
+		async Task<Reminder> IReminderService.CreateReminderAsync(UserStore userStore, ulong guildId, IUserMessage message,
 			string content, TimeSpan when) {
 			Reminder[] reminders = await userStore.Reminders.ToArrayAsync();
 			Reminder[] usersReminders = reminders.Where(x => x.UserId == message.Author.Id).ToArray();
@@ -58,9 +57,9 @@ namespace Espeon.Services {
 
 			if (found is null) {
 				var reminder = new Reminder {
-					ChannelId = message.Channel.Id,
+					ChannelId = message.ChannelId,
 					GuildId = guildId,
-					JumpUrl = message.GetJumpUrl(),
+					JumpUrl = await message.GetJumpUrlAsync(),
 					TheReminder = content,
 					UserId = message.Author.Id,
 					WhenToRemove = DateTimeOffset.UtcNow.Add(when),
@@ -83,7 +82,7 @@ namespace Espeon.Services {
 			found.WhenToRemove = DateTimeOffset.UtcNow.Add(when);
 
 			userStore.Reminders.Update(found);
-			userStore.SaveChangesAsync();
+			await userStore.SaveChangesAsync();
 
 			if (this._reminders.TryGetValue(found.Id, out task)) {
 				task.Change(when, _ => RemoveAsync(found));
@@ -112,27 +111,27 @@ namespace Espeon.Services {
 				return;
 			}
 
-			if (!(this._client.GetChannel(reminder.ChannelId) is SocketTextChannel channel)) {
+			if (!(this._client.GetChannel(reminder.ChannelId) is CachedTextChannel channel)) {
 				return;
 			}
 
-			if (!(guild.GetUser(reminder.UserId) is IGuildUser user)) {
+			if (!(guild.GetMember(reminder.UserId) is IMember user)) {
 				return;
 			}
 
-			Embed embed = ResponseBuilder.Reminder(user, ReminderString(reminder.TheReminder, reminder.JumpUrl),
+			LocalEmbed embed = ResponseBuilder.Reminder(user, ReminderString(reminder.TheReminder, reminder.JumpUrl),
 				DateTimeOffset.UtcNow - reminder.CreatedAt);
 
 			await channel.SendMessageAsync(user.Mention, embed: embed);
 
-			using var ctx = this._services.GetService<UserStore>();
+			await using var ctx = this._services.GetService<UserStore>();
 
 			ctx.Reminders.Remove(reminder);
 
 			await ctx.SaveChangesAsync();
 
 			this._logger.Log(Source.Reminders, Severity.Verbose,
-				$"Sent reminder for {{{user.GetDisplayName()}}} in {{{guild.Name}}}/{{{channel.Name}}}");
+				$"Sent reminder for {{{user.DisplayName}}} in {{{guild.Name}}}/{{{channel.Name}}}");
 		}
 
 		private static string ReminderString(string reminder, string jumpUrl) {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Espeon.Core.Databases.CommandStore {
+namespace Espeon.Core.Database.CommandStore {
 	public class CommandStore : DbContext {
 		public DbSet<ModuleInfo> Modules { get; set; }
 

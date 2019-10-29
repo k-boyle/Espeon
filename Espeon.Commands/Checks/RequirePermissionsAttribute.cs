@@ -1,62 +1,37 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
+using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using PermissionTarget = Espeon.Core.PermissionTarget;
 
 namespace Espeon.Commands {
 	public class RequirePermissionsAttribute : EspeonCheckBase {
 		private readonly PermissionTarget _target;
-		private readonly GuildPermission[] _guildPerms;
-		private readonly ChannelPermission[] _channelPerms;
+		private readonly PermissionType _type;
+		private readonly Permission _permissions;
 
-		public RequirePermissionsAttribute(PermissionTarget target, params GuildPermission[] guildPerms) {
+		public RequirePermissionsAttribute(PermissionTarget target, PermissionType type, Permission permissions) {
 			this._target = target;
-			this._guildPerms = guildPerms;
-			this._channelPerms = new ChannelPermission[0];
-		}
-
-		public RequirePermissionsAttribute(PermissionTarget target, params ChannelPermission[] channelPerms) {
-			this._target = target;
-			this._channelPerms = channelPerms;
-			this._guildPerms = new GuildPermission[0];
+			this._type = type;
+			this._permissions = permissions;
 		}
 
 		public override ValueTask<CheckResult> CheckAsync(EspeonContext context, IServiceProvider provider) {
 
-			SocketGuildUser user = this._target switch {
-				PermissionTarget.User => context.User,
-				PermissionTarget.Bot  => context.Guild.CurrentUser,
+			CachedMember user = this._target switch {
+				PermissionTarget.User => context.Member,
+				PermissionTarget.Bot  => context.Guild.CurrentMember,
 				_                     => null
 			};
 
-			GuildPermission[] failedGuildPerms =
-				this._guildPerms.Where(guildPerm => !user.GuildPermissions.Has(guildPerm)).ToArray();
-
-			ChannelPermissions channelPerms = user.GetPermissions(context.Channel);
-
-			ChannelPermission[] failedChannelPerms =
-				this._channelPerms.Where(channelPerm => !channelPerms.Has(channelPerm)).ToArray();
-
-			if (failedGuildPerms.Length == 0 && failedChannelPerms.Length == 0) {
+			if (this._type == PermissionType.Guild && user.Permissions.Has(this._permissions) ||
+			    this._type == PermissionType.Channel &&
+			    user.GetPermissionsFor(context.Channel).Has(this._permissions)) {
 				return CheckResult.Successful;
-			}
-
-			var sb = new StringBuilder();
-
-			foreach (GuildPermission guildPerm in failedGuildPerms) {
-				sb.AppendLine(guildPerm);
-			}
-
-			foreach (ChannelPermission channelPerm in failedChannelPerms) {
-				sb.AppendLine(channelPerm);
 			}
 
 			User u = context.Invoker;
@@ -64,7 +39,8 @@ namespace Espeon.Commands {
 
 			string target = this._target == PermissionTarget.User ? "You" : "I";
 
-			return CheckResult.Unsuccessful(response.GetResponse(this, u.ResponsePack, 0, target, sb));
+			return CheckResult.Unsuccessful(response.GetResponse(this, u.ResponsePack, 0, target,
+				this._permissions.Humanize()));
 		}
 	}
 }

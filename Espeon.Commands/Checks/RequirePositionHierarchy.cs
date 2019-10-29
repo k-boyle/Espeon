@@ -1,5 +1,5 @@
-﻿using Discord.WebSocket;
-using Espeon.Core.Databases;
+﻿using Disqord;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -10,10 +10,10 @@ namespace Espeon.Commands {
 	public class RequirePositionHierarchy : EspeonParameterCheckBase {
 		public override ValueTask<CheckResult> CheckAsync(object argument, EspeonContext context,
 			IServiceProvider provider) {
-			var role = (SocketRole) argument;
+			var role = (CachedRole) argument;
 			var response = provider.GetService<IResponseService>();
 
-			if (role.Position <= context.Guild.CurrentUser.Hierarchy) {
+			if (role.Position <= context.Guild.CurrentMember.Hierarchy) {
 				return CheckResult.Successful;
 			}
 

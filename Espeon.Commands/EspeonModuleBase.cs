@@ -1,6 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Espeon.Core.Databases;
+﻿using Disqord;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Qmmands;
 using System;
@@ -14,16 +13,16 @@ namespace Espeon.Commands {
 		public IResponseService Responses { get; set; }
 		public IServiceProvider Services { get; set; }
 
-		protected SocketTextChannel Channel => Context.Channel;
-		protected SocketGuildUser User => Context.User;
-		protected SocketGuild Guild => Context.Guild;
-		protected DiscordSocketClient Client => Context.Client;
+		protected CachedTextChannel Channel => Context.Channel;
+		protected CachedMember Member => Context.Member;
+		protected CachedGuild Guild => Context.Guild;
+		protected DiscordClient Client => Context.Client;
 
-		protected Task<IUserMessage> SendMessageAsync(Embed embed) {
+		protected Task<IUserMessage> SendMessageAsync(LocalEmbed embed) {
 			return SendMessageAsync(string.Empty, embed);
 		}
 
-		protected async Task<IUserMessage> SendMessageAsync(string content, Embed embed = null) {
+		protected async Task<IUserMessage> SendMessageAsync(string content, LocalEmbed embed = null) {
 			return await Message.SendAsync(Context.Message, x => {
 				x.Content = content;
 				x.Embed = embed;
@@ -31,7 +30,7 @@ namespace Espeon.Commands {
 		}
 
 		protected async Task<IUserMessage> SendFileAsync(Stream stream, string fileName, string content = null,
-			Embed embed = null) {
+			LocalEmbed embed = null) {
 			return await Message.SendAsync(Context.Message, x => {
 				x.Content = content;
 				x.Embed = embed;
@@ -46,7 +45,7 @@ namespace Espeon.Commands {
 
 			string resp = Responses.GetResponse(cmd.Module.Name, cmd.Name, user.ResponsePack, index, args);
 
-			Embed response = ResponseBuilder.Message(Context, resp);
+			LocalEmbed response = ResponseBuilder.Message(Context, resp);
 			return await SendMessageAsync(response);
 		}
 
@@ -56,11 +55,11 @@ namespace Espeon.Commands {
 
 			string resp = Responses.GetResponse(cmd.Module.Name, cmd.Name, user.ResponsePack, index, args);
 
-			Embed response = ResponseBuilder.Message(Context, resp, false);
+			LocalEmbed response = ResponseBuilder.Message(Context, resp, false);
 			return await SendMessageAsync(response);
 		}
 
-		protected Task<SocketUserMessage> NextMessageAsync(ICriterion<SocketUserMessage> criterion,
+		protected Task<CachedUserMessage> NextMessageAsync(ICriterion<CachedUserMessage> criterion,
 			TimeSpan? timeout = null) {
 			return Interactive.NextMessageAsync(Context, msg => criterion.JudgeAsync(Context, msg), timeout);
 		}

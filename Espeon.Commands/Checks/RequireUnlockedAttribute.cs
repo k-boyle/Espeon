@@ -1,5 +1,5 @@
 ﻿using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;

@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Espeon.Core.Databases.GuildStore {
+namespace Espeon.Core.Database.GuildStore {
 	public class GuildStore : DbContext {
 		private DbSet<Guild> Guilds { get; set; }
 
@@ -100,7 +100,7 @@ namespace Espeon.Core.Databases.GuildStore {
 
 		public async Task<Guild> GetOrCreateGuildAsync(IGuild guild) {
 			//kinda hacky?
-			return await Guilds.FindAsync(guild.Id) ?? await CreateGuildAsync<ulong>(guild, null);
+			return await Guilds.FindAsync(guild.Id.RawValue) ?? await CreateGuildAsync<ulong>(guild, null);
 		}
 
 		public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression) {
@@ -138,7 +138,7 @@ namespace Espeon.Core.Databases.GuildStore {
 		public async Task<IReadOnlyCollection<Guild>> GetAllGuildsAsync<TProp>(
 			Expression<Func<Guild, TProp>> expression) {
 			if (expression is null) {
-				return await AsyncEnumerable.ToListAsync(Guilds, CancellationToken.None);
+				return await Guilds.ToListAsync(CancellationToken.None);
 			}
 
 			return await Guilds.Include(expression).ToListAsync();

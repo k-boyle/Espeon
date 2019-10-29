@@ -1,7 +1,8 @@
 ﻿using Casino.Common;
 using Casino.DependencyInjection;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
+using Disqord.Events;
+using Disqord.Rest;
 using Espeon.Core;
 using Espeon.Core.Services;
 using System;
@@ -15,13 +16,13 @@ namespace Espeon.Services {
 		private const string RegexString = @"(?:https://(?:canary.)?discordapp.com/channels/[\d]+/[\d]+/[\d]+)";
 
 		private static readonly Regex Regex = new Regex(RegexString, RegexOptions.Compiled);
-		private static readonly Emoji QuoteEmote = new Emoji("🗨");
+		private static readonly LocalEmoji QuoteEmote = new LocalEmoji("🗨");
 		private static readonly TimeSpan MessageLifeTime = TimeSpan.FromMinutes(10);
 
 		private readonly ConcurrentDictionary<ulong, ulong> _lastJumpUrlQuotes;
 		private readonly ConcurrentQueue<ulong> _quoteReactions;
 
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly IEventsService _events;
 		[Inject] private readonly TaskQueue _scheduler;
 
@@ -29,19 +30,19 @@ namespace Espeon.Services {
 			this._lastJumpUrlQuotes = new ConcurrentDictionary<ulong, ulong>(2, 10);
 			this._quoteReactions = new ConcurrentQueue<ulong>();
 
-			this._client.MessageReceived += msg => this._events.RegisterEvent(() => {
-				if (msg.Channel is IDMChannel) {
+			this._client.MessageReceived += args => this._events.RegisterEvent(() => {
+				if (args.Message.Channel is IDmChannel) {
 					return Task.CompletedTask;
 				}
 
-				CacheJumpUrl(msg);
+				CacheJumpUrl(args.Message);
 				return Task.CompletedTask;
 			});
 
 			this._client.ReactionAdded += HandleReactionAsync;
 		}
 
-		private void CacheJumpUrl(SocketMessage message) {
+		private void CacheJumpUrl(CachedMessage message) {
 			Match match = Regex.Match(message.Content);
 
 			if (match.Success) {
@@ -49,28 +50,27 @@ namespace Espeon.Services {
 			}
 		}
 
-		private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel,
-			SocketReaction reaction) {
-			if (!reaction.Emote.Equals(QuoteEmote) || this._quoteReactions.Any(x => x == cache.Id) ||
-			    channel is IDMChannel) {
+		private async Task HandleReactionAsync(ReactionAddedEventArgs args) {
+			if (!args.Emoji.Equals(QuoteEmote) || this._quoteReactions.Any(x => x == args.Message.Id) ||
+			    args.Channel is IDmChannel) {
 				return;
 			}
 
-			IUserMessage message = await cache.GetOrDownloadAsync();
+			IMessage message = await args.Message.GetOrDownloadAsync<IMessage, CachedMessage, RestMessage>();
 
 			if (message is null) {
 				return;
 			}
 
-			Embed embed = await Utilities.QuoteFromStringAsync(this._client, message.Content);
+			LocalEmbed embed = await Utilities.QuoteFromStringAsync(this._client, message.Content);
 
 			if (embed is null) {
 				return;
 			}
 
-			await message.Channel.SendMessageAsync(string.Empty, embed: embed);
+			await ((IMessageChannel) this._client.GetChannel(message.ChannelId)).SendMessageAsync(string.Empty, embed: embed);
 
-			this._quoteReactions.Enqueue(cache.Id);
+			this._quoteReactions.Enqueue(args.Message.Id);
 
 			this._scheduler.ScheduleTask(this._quoteReactions, MessageLifeTime, state => {
 				state.TryDequeue(out _);

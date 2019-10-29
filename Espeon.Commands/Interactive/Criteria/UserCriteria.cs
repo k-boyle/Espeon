@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands {

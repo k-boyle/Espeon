@@ -1,5 +1,5 @@
 ﻿using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Qmmands;
 using System.Threading.Tasks;
@@ -38,7 +38,7 @@ namespace Espeon.Commands {
 				return;
 			}
 
-			await Candy.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, Context.User, -Config.PackPrice);
+			await Candy.UpdateCandiesAsync(Context.UserStore, Client.CurrentUser, Context.Member, -Config.PackPrice);
 
 			user.ResponsePacks.Add(pack);
 			Context.UserStore.Update(user);

@@ -1,12 +1,14 @@
-﻿using Discord.Rest;
-using Discord.WebSocket;
+﻿
+
+using Disqord;
+using Disqord.Rest;
 using Espeon.Core.Entities;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Core.Services {
 	public interface IMessageService {
-		Task<RestUserMessage> SendAsync(SocketUserMessage message, Action<NewMessageProperties> properties);
-		Task DeleteMessagesAsync(SocketTextChannel channel, SocketGuildUser bot, ulong userId, int amount);
+		Task<RestUserMessage> SendAsync(CachedUserMessage message, Action<NewMessageProperties> properties);
+		Task DeleteMessagesAsync(CachedTextChannel channel, CachedMember bot, ulong userId, int amount);
 	}
 }

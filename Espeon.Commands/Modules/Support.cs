@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿
+using Disqord;
 using Espeon.Core;
 using Qmmands;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace Espeon.Commands {
 		public async Task ReportBugAsync([RequireSpecificLength(1000)] [Remainder] string bug) {
 			var channel = Context.Client.GetChannel(463299724326469634) as IMessageChannel;
 
-			await channel.SendMessageAsync($"{Context.Guild.Id}/{Context.Channel.Id}/{Context.User.Id}\n{bug}");
+			await channel.SendMessageAsync($"{Context.Guild.Id}/{Context.Channel.Id}/{Context.Member.Id}\n{bug}");
 
 			await SendOkAsync(0);
 		}
@@ -32,7 +33,7 @@ namespace Espeon.Commands {
 		public async Task FeatureRequestAsync([RequireSpecificLength(1000)] [Remainder] string feature) {
 			var channel = Context.Client.GetChannel(463300066740797463) as IMessageChannel;
 
-			await channel.SendMessageAsync($"{Context.Guild.Id}/{Context.Channel.Id}/{Context.User.Id}\n{feature}");
+			await channel.SendMessageAsync($"{Context.Guild.Id}/{Context.Channel.Id}/{Context.Member.Id}\n{feature}");
 
 			await SendOkAsync(0);
 		}

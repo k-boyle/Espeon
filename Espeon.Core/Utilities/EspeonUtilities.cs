@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 
 namespace Espeon.Core {
 	public static partial class Utilities {

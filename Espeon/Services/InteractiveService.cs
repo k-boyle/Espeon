@@ -1,8 +1,10 @@
 ﻿using Casino.Common;
 using Casino.DependencyInjection;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
+using Disqord.Events;
+using Disqord.Rest;
 using Espeon.Commands;
+using Espeon.Core;
 using Espeon.Core.Services;
 using Espeon.Services;
 using System;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 namespace Espeon {
 	public class InteractiveService : BaseService<InitialiseArgs>,
 	                                  IInteractiveService<IReactionCallback, EspeonContext> {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly TaskQueue _scheduler;
 
 		private readonly ConcurrentDictionary<ulong, CallbackData> _reactionCallbacks;
@@ -29,13 +31,13 @@ namespace Espeon {
 			return Task.CompletedTask;
 		}
 
-		async Task<SocketUserMessage> IInteractiveService<IReactionCallback, EspeonContext>.NextMessageAsync(
-			EspeonContext context, Func<SocketUserMessage, ValueTask<bool>> predicate, TimeSpan? timeout) {
+		async Task<CachedUserMessage> IInteractiveService<IReactionCallback, EspeonContext>.NextMessageAsync(
+			EspeonContext context, Func<CachedUserMessage, ValueTask<bool>> predicate, TimeSpan? timeout) {
 			timeout ??= DefaultTimeout;
 
-			var taskCompletionSource = new TaskCompletionSource<SocketUserMessage>();
+			var taskCompletionSource = new TaskCompletionSource<CachedUserMessage>();
 
-			async Task MessageReceivedAsync(SocketUserMessage message) {
+			async Task MessageReceivedAsync(CachedUserMessage message) {
 				bool result = await predicate.Invoke(message);
 
 				if (result) {
@@ -43,13 +45,13 @@ namespace Espeon {
 				}
 			}
 
-			Task HandleMessageAsync(SocketMessage msg) {
-				return msg is SocketUserMessage message ? MessageReceivedAsync(message) : Task.CompletedTask;
+			Task HandleMessageAsync(MessageReceivedEventArgs args) {
+				return args.Message is CachedUserMessage message ? MessageReceivedAsync(message) : Task.CompletedTask;
 			}
 
 			this._client.MessageReceived += HandleMessageAsync;
 
-			Task<SocketUserMessage> resultTask = taskCompletionSource.Task;
+			Task<CachedUserMessage> resultTask = taskCompletionSource.Task;
 			Task delay = Task.Delay(timeout.Value);
 
 			Task taskResult = await Task.WhenAny(resultTask, delay);
@@ -78,7 +80,7 @@ namespace Espeon {
 		private async Task<bool> InternalAddCallbackAsync(IReactionCallback callback, TimeSpan timeout) {
 			IUserMessage message = callback.Message;
 
-			foreach (IEmote emote in callback.Reactions) {
+			foreach (IEmoji emote in callback.Reactions) {
 				await message.AddReactionAsync(emote);
 			}
 
@@ -99,9 +101,9 @@ namespace Espeon {
 			return this._reactionCallbacks.TryRemove(callback.Message.Id, out _);
 		}
 
-		private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> cachedMessage,
-			ISocketMessageChannel channel, SocketReaction reaction) {
-			IUserMessage message = await cachedMessage.GetOrDownloadAsync();
+		private async Task HandleReactionAsync(ReactionAddedEventArgs args) {
+			IMessage message =
+				await args.Message.GetOrDownloadAsync<IMessage, CachedMessage, RestMessage>();
 
 			if (message is null) {
 				return;
@@ -112,22 +114,22 @@ namespace Espeon {
 			}
 
 			IReactionCallback callback = callbackData.Callback;
-			ICriterion<SocketReaction> criterion = callback.Criterion;
-			bool result = await criterion.JudgeAsync(callback.Context, reaction);
+			ICriterion<ReactionAddedEventArgs> criterion = callback.Criterion;
+			bool result = await criterion.JudgeAsync(callback.Context, args);
 
 			if (!result) {
 				return;
 			}
 
 			if (callback.RunOnGatewayThread) {
-				await HandleReactionAsync(callbackData, reaction);
+				await HandleReactionAsync(callbackData, args);
 			} else {
-				_ = HandleReactionAsync(callbackData, reaction);
+				_ = HandleReactionAsync(callbackData, args);
 			}
 		}
 
-		private async Task HandleReactionAsync(CallbackData data, SocketReaction reaction) {
-			bool result = await data.Callback.HandleCallbackAsync(reaction);
+		private async Task HandleReactionAsync(CallbackData data, ReactionAddedEventArgs args) {
+			bool result = await data.Callback.HandleCallbackAsync(args);
 
 			if (!result) {
 				data.Task.Change(data.Timeout);
@@ -137,8 +139,8 @@ namespace Espeon {
 			}
 		}
 
-		private Task HandleDeletedAsync(Cacheable<IMessage, ulong> cache, ISocketMessageChannel channel) {
-			if (this._reactionCallbacks.TryRemove(cache.Id, out CallbackData data)) {
+		private Task HandleDeletedAsync(MessageDeletedEventArgs args) {
+			if (this._reactionCallbacks.TryRemove(args.Message.Id, out CallbackData data)) {
 				data.Task.Cancel();
 			}
 

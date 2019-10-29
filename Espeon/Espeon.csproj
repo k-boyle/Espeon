@@ -11,9 +11,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20191025.3" />
-        <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190722.9" />
-        <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20191025.3" />
         <PackageReference Include="Humanizer.Core" Version="2.6.2" />
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.3.0-beta1-final" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.0-beta1-final" />
@@ -45,6 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Disqord\src\Disqord\Disqord.csproj" />
         <ProjectReference Include="..\Espeon.Commands\Espeon.Commands.csproj" />
         <ProjectReference Include="..\Espeon.Core\Espeon.Core.csproj" />
     </ItemGroup>

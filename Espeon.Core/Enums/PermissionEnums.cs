@@ -9,4 +9,9 @@
 		User,
 		Bot
 	}
+	
+	public enum PermissionType {
+		Guild,
+		Channel
+	}
 }

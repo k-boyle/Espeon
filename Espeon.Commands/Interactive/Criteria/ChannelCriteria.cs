@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 using System.Threading.Tasks;
 
 namespace Espeon.Commands {
@@ -14,7 +14,7 @@ namespace Espeon.Commands {
 		}
 
 		public ValueTask<bool> JudgeAsync(EspeonContext context, IMessage entity) {
-			return new ValueTask<bool>(this._channelId == entity.Channel.Id);
+			return new ValueTask<bool>(this._channelId == entity.ChannelId);
 		}
 	}
 }

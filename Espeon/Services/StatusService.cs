@@ -1,6 +1,5 @@
 ﻿using Casino.DependencyInjection;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Core.Services;
 using Qmmands;
 using System;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 namespace Espeon.Services {
 	public class StatusService : BaseService<InitialiseArgs>, IStatusService {
 		[Inject] private readonly CommandService _commands;
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly Random _random;
 
 		private static readonly TimeSpan Delay = TimeSpan.FromMinutes(1);
@@ -23,7 +22,7 @@ namespace Espeon.Services {
 			while (true) {
 				(ActivityType, string)[] statuses = {
 					(ActivityType.Watching, "you"),
-					(ActivityType.Playing, $"with {this._client.Guilds.Sum(x => x.MemberCount)} people"),
+					(ActivityType.Playing, $"with {this._client.Guilds.Sum(x => x.Value.MemberCount)} people"),
 					(ActivityType.Listening, "Pokemon opening theme"),
 					(ActivityType.Watching, $"over {this._commands.GetAllCommands().Count} commands")
 				};
@@ -36,7 +35,7 @@ namespace Espeon.Services {
 
 				(ActivityType activityType, string str) = statuses[next];
 
-				await this._client.SetGameAsync(str, "", activityType);
+				await this._client.SetPresenceAsync(new LocalActivity(str, activityType));
 
 				last = next;
 				await Task.Delay(Delay);

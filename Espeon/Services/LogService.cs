@@ -1,15 +1,15 @@
 ﻿using Casino.DependencyInjection;
-using Discord;
-using Discord.WebSocket;
+using Disqord;
 using Espeon.Core;
 using Espeon.Core.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using IMessageChannel = Discord.IMessageChannel;
 
 namespace Espeon.Services {
 	public class LogService : BaseService<InitialiseArgs>, ILogService {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 
 		private readonly object _lock;
 
@@ -19,9 +19,9 @@ namespace Espeon.Services {
 		public LogService(IServiceProvider services) : base(services) {
 			this._lock = new object();
 
-			this._client.JoinedGuild += guild => BotLogAsync($"Joined: {guild.Name} with {guild.MemberCount} members");
+			this._client.JoinedGuild += args => BotLogAsync($"Joined: {args.Guild.Name} with {args.Guild.MemberCount} members");
 
-			this._client.LeftGuild += guild => BotLogAsync($"Left: {guild.Name}");
+			this._client.LeftGuild += args => BotLogAsync($"Left: {args.Guild.Name}");
 		}
 
 		void ILogService.Log(Source source, Severity severity, string message, Exception ex) {

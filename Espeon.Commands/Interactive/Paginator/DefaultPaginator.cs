@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Disqord.Events;
 using Espeon.Core.Services;
 
 namespace Espeon.Commands {
@@ -7,11 +7,11 @@ namespace Espeon.Commands {
 		public override IInteractiveService<IReactionCallback, EspeonContext> Interactive { get; }
 		public override IMessageService MessageService { get; }
 		public override PaginatorOptions Options { get; }
-		public override ICriterion<SocketReaction> Criterion { get; }
+		public override ICriterion<ReactionAddedEventArgs> Criterion { get; }
 
 		public DefaultPaginator(EspeonContext context,
 			IInteractiveService<IReactionCallback, EspeonContext> interactive, IMessageService messageService,
-			PaginatorOptions options, ICriterion<SocketReaction> criterion) {
+			PaginatorOptions options, ICriterion<ReactionAddedEventArgs> criterion) {
 			Context = context;
 			Interactive = interactive;
 			MessageService = messageService;

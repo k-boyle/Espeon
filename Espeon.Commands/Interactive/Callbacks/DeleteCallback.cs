@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
+using Disqord.Events;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +11,11 @@ namespace Espeon.Commands {
 		public bool RunOnGatewayThread => true;
 
 		public IUserMessage Message { get; }
-		public ICriterion<SocketReaction> Criterion { get; }
+		public ICriterion<ReactionAddedEventArgs> Criterion { get; }
 
-		private readonly IEmote _deleteEmote;
+		private readonly IEmoji _deleteEmote;
 
-		public IEnumerable<IEmote> Reactions =>
+		public IEnumerable<IEmoji> Reactions =>
 			new[] {
 				this._deleteEmote
 			};
@@ -24,12 +24,12 @@ namespace Espeon.Commands {
 
 		private readonly SemaphoreSlim _deleteSemaphore;
 
-		public DeleteCallback(EspeonContext context, IUserMessage message, IEmote deleteEmote,
-			ICriterion<SocketReaction> criterion = null) {
+		public DeleteCallback(EspeonContext context, IUserMessage message, IEmoji deleteEmote,
+			ICriterion<ReactionAddedEventArgs> criterion = null) {
 			Context = context;
 			Message = message;
 
-			Criterion = criterion ?? new ReactionFromSourceUser(context.User.Id);
+			Criterion = criterion ?? new ReactionFromSourceUser(context.Member.Id);
 
 			this._deleteEmote = deleteEmote;
 
@@ -44,10 +44,10 @@ namespace Espeon.Commands {
 			return this._isDeleted ? Task.CompletedTask : Message.DeleteAsync();
 		}
 
-		public async Task<bool> HandleCallbackAsync(SocketReaction reaction) {
+		public async Task<bool> HandleCallbackAsync(ReactionAddedEventArgs args) {
 			await this._deleteSemaphore.WaitAsync();
 
-			if (!reaction.Emote.Equals(this._deleteEmote)) {
+			if (!args.Emoji.Equals(this._deleteEmote)) {
 				this._deleteSemaphore.Release();
 				return false;
 			}

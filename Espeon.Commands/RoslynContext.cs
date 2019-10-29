@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Disqord;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,11 +1,10 @@
 ﻿using Casino.DependencyInjection;
-using Casino.Discord;
-using Discord;
-using Discord.Rest;
-using Discord.WebSocket;
+using Disqord;
+using Disqord.Events;
+using Disqord.Rest;
 using Espeon.Core;
-using Espeon.Core.Databases;
-using Espeon.Core.Databases.GuildStore;
+using Espeon.Core.Database;
+using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,48 +14,47 @@ using System.Threading.Tasks;
 
 namespace Espeon.Services {
 	public class StarboardService : BaseService<InitialiseArgs>, IStarboardService {
-		[Inject] private readonly DiscordSocketClient _client;
+		[Inject] private readonly DiscordClient _client;
 		[Inject] private readonly IEventsService _events;
 		[Inject] private readonly IServiceProvider _services;
 		[Inject] private readonly ILogService _logger;
 
-		private static Emoji Star => Utilities.Star;
+		private static LocalEmoji Star => Utilities.Star;
 
 		public StarboardService(IServiceProvider services) : base(services) {
-			this._client.ReactionAdded += (cache, channel, reaction) =>
-				this._events.RegisterEvent(() => ReactionAddedAsync(cache, channel, reaction));
+			this._client.ReactionAdded += args =>
+				this._events.RegisterEvent(() => ReactionAddedAsync(args));
 
-			this._client.ReactionRemoved += (cache, channel, reaction) =>
-				this._events.RegisterEvent(() => ReactionRemovedAsync(cache, channel, reaction));
+			this._client.ReactionRemoved += args =>
+				this._events.RegisterEvent(() => ReactionRemovedAsync(args));
 		}
 
-		private async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel channel,
-			SocketReaction reaction) {
-			if (!(channel is SocketTextChannel textChannel)) {
+		private async Task ReactionAddedAsync(ReactionAddedEventArgs args) {
+			if (!(args.Channel is CachedTextChannel textChannel)) {
 				return;
 			}
 
-			if (!reaction.Emote.Equals(Star)) {
+			if (!args.Emoji.Equals(Star)) {
 				return;
 			}
 
-			IUserMessage message = await msg.GetOrDownloadAsync();
+			IMessage message = await args.Message.GetOrDownloadAsync<IMessage, CachedMessage, RestMessage>();
 
-			if (reaction.UserId == message.Author.Id) {
+			if (args.User.Id == message.Author.Id) {
 				return;
 			}
 
 			try {
-				using var guildStore = this._services.GetService<GuildStore>();
+				await using var guildStore = this._services.GetService<GuildStore>();
 				Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild, x => x.StarredMessages);
 
-				if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is SocketTextChannel starChannel)) {
+				if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is { } starChannel)) {
 					return;
 				}
 
-				int count = message.Reactions[Star].ReactionCount;
+				int count = message.Reactions[Star].Count;
 
-				IEnumerable<IUser> flat = await message.GetReactionUsersAsync(Star, count).FlattenAsync();
+				IEnumerable<IUser> flat = await message.GetReactionsAsync(Star, count);
 				IUser[] users = flat.Where(x => x.Id != message.Author.Id).ToArray();
 
 				count = users.Length;
@@ -69,30 +67,30 @@ namespace Espeon.Services {
 					guild.StarredMessages.FirstOrDefault(x => x.Id == message.Id || x.StarboardMessageId == message.Id);
 
 				string m =
-					$"{Star} **{count}** - {(message.Author as IGuildUser).GetDisplayName()} in <#{message.Channel.Id}>";
+					$"{Star} **{count}** - {(message.Author as IMember)?.DisplayName} in <#{message.ChannelId}>";
 
 				if (foundMessage is null) {
-					Embed embed = Utilities.BuildStarMessage(message);
+					LocalEmbed embed = await Utilities.BuildStarMessageAsync(message);
 
 					RestUserMessage newStar = await starChannel.SendMessageAsync(m, embed: embed);
 
 					var toAdd = new StarredMessage {
 						AuthorId = message.Author.Id,
-						ChannelId = message.Channel.Id,
+						ChannelId = message.ChannelId,
 						Id = message.Id,
 						StarboardMessageId = newStar.Id,
-						ReactionUsers = users.Select(x => x.Id).ToList(),
-						ImageUrl = embed.Image?.Url,
+						ReactionUsers = users.Select(x => x.Id.RawValue).ToList(),
+						ImageUrl = embed.ImageUrl,
 						Content = message.Content
 					};
 
 					guild.StarredMessages.Add(toAdd);
 				} else {
-					if (foundMessage.ReactionUsers.Contains(reaction.UserId)) {
+					if (foundMessage.ReactionUsers.Contains(args.User.Id)) {
 						return;
 					}
 
-					foundMessage.ReactionUsers.Add(reaction.UserId);
+					foundMessage.ReactionUsers.Add(args.User.Id);
 
 					if (await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) is IUserMessage
 						fetchedMessage) {
@@ -108,38 +106,37 @@ namespace Espeon.Services {
 			}
 		}
 
-		private async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> msg, ISocketMessageChannel channel,
-			SocketReaction reaction) {
-			if (!(channel is SocketTextChannel textChannel)) {
+		private async Task ReactionRemovedAsync(ReactionRemovedEventArgs args) {
+			if (!(args.Channel is CachedTextChannel textChannel)) {
 				return;
 			}
 
-			if (!reaction.Emote.Equals(Star)) {
+			if (!args.Emoji.Equals(Star)) {
 				return;
 			}
 
 			try {
-				using var guildStore = this._services.GetService<GuildStore>();
+				await using var guildStore = this._services.GetService<GuildStore>();
 				Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild, x => x.StarredMessages);
 
 				if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is { } starChannel)) {
 					return;
 				}
 
-				IUserMessage message = await msg.GetOrDownloadAsync();
+				IMessage msg = await args.Message.GetOrDownloadAsync<IMessage, CachedMessage, RestMessage>();
 
 				StarredMessage foundMessage =
-					guild.StarredMessages.Find(x => x.Id == message.Id || x.StarboardMessageId == message.Id);
+					guild.StarredMessages.Find(x => x.Id == msg.Id || x.StarboardMessageId == msg.Id);
 
 				if (foundMessage is null) {
 					return;
 				}
 
-				if (!foundMessage.ReactionUsers.Remove(reaction.UserId)) {
+				if (!foundMessage.ReactionUsers.Remove(args.User.Id)) {
 					return;
 				}
 
-				int count = message.Reactions.ContainsKey(Star) ? message.Reactions[Star].ReactionCount : 0;
+				int count = msg.Reactions.ContainsKey(Star) ? msg.Reactions[Star].Count : 0;
 
 				var starMessage = await starChannel.GetMessageAsync(foundMessage.StarboardMessageId) as IUserMessage;
 
@@ -149,7 +146,7 @@ namespace Espeon.Services {
 					guild.StarredMessages.Remove(foundMessage);
 				} else {
 					string m =
-						$"{Star} **{count}** - {(message.Author as IGuildUser)?.GetDisplayName()} in <#{message.Channel.Id}>";
+						$"{Star} **{count}** - {(msg.Author as IMember)?.DisplayName} in <#{msg.ChannelId}>";
 
 					await starMessage.ModifyAsync(x => x.Content = m);
 				}

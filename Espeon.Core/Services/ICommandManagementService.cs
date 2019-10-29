@@ -1,4 +1,4 @@
-﻿using Espeon.Core.Databases.CommandStore;
+﻿using Espeon.Core.Database.CommandStore;
 using Qmmands;
 using System.Threading.Tasks;
 

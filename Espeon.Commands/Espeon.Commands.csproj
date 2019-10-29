@@ -5,8 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20191025.3" />
-      <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20191025.3" />
       <PackageReference Include="Qmmands" Version="3.0.0-nightly-00221" />
     </ItemGroup>
 

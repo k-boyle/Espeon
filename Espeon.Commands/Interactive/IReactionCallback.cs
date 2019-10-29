@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
+using Disqord.Events;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,11 +10,11 @@ namespace Espeon.Commands {
 		bool RunOnGatewayThread { get; }
 
 		IUserMessage Message { get; }
-		IEnumerable<IEmote> Reactions { get; }
-		ICriterion<SocketReaction> Criterion { get; }
+		IEnumerable<IEmoji> Reactions { get; }
+		ICriterion<ReactionAddedEventArgs> Criterion { get; }
 
 		Task InitialiseAsync();
 		Task HandleTimeoutAsync();
-		Task<bool> HandleCallbackAsync(SocketReaction reaction);
+		Task<bool> HandleCallbackAsync(ReactionAddedEventArgs reaction);
 	}
 }

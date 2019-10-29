@@ -1,24 +1,24 @@
-﻿using Casino.Discord;
-using Discord;
+﻿using Disqord;
+using System.Threading.Tasks;
 
 namespace Espeon.Core {
 	public static partial class Utilities {
-		public static Embed BuildStarMessage(IMessage message) {
-			string imageUrl = GetImageUrl(message);
+		public static async Task<LocalEmbed> BuildStarMessageAsync(IMessage message) {
+			string imageUrl = message is IUserMessage msg ? GetImageUrl(msg) : "";
 
-			return BuildStarMessage(message.Author, message.Content, message.GetJumpUrl(), imageUrl);
+			return BuildStarMessage(message.Author, message.Content, await message.GetJumpUrlAsync(), imageUrl);
 		}
 
-		public static Embed BuildStarMessage(IUser user, string content, string jumpUrl, string imageUrl = null) {
-			EmbedBuilder builder =
-				new EmbedBuilder {
-					Author = new EmbedAuthorBuilder {
-						Name = (user as IGuildUser)?.GetDisplayName() ?? user.Username,
-						IconUrl = user.GetAvatarOrDefaultUrl()
+		public static LocalEmbed BuildStarMessage(IUser user, string content, string jumpUrl, string imageUrl = null) {
+			LocalEmbedBuilder builder =
+				new LocalEmbedBuilder {
+					Author = new LocalEmbedAuthorBuilder() {
+						Name = (user as IMember)?.DisplayName ?? user.Name,
+						IconUrl = user.GetAvatarUrl()
 					},
 					Description = content,
 					Color = Color.Gold
-				}.AddField("\u200b", Format.Url("Original Message", jumpUrl));
+				}.AddField("\u200b", Markdown.MaskedUrl("Original Message", jumpUrl));
 
 			if (!string.IsNullOrEmpty(imageUrl)) {
 				builder.WithImageUrl(imageUrl);
@@ -32,6 +32,6 @@ namespace Espeon.Core {
 			return $"{baseUrl}/{guildId}/{channelId}/{messageId}";
 		}
 
-		public static readonly Emoji Star = new Emoji("⭐");
+		public static readonly LocalEmoji Star = new LocalEmoji("⭐");
 	}
 }

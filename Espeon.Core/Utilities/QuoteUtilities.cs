@@ -1,44 +1,41 @@
-﻿using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
+using Disqord.Rest;
 using Humanizer;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Core {
 	public static partial class Utilities {
-		public static Task<Embed> QuoteFromStringAsync(DiscordSocketClient client, string content) {
+		public static Task<LocalEmbed> QuoteFromStringAsync(DiscordClient client, string content) {
 			string[] split = content.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
 			if (split.Length != 6 || !ulong.TryParse(split[4], out ulong id) ||
-			    !(client.GetChannel(id) is ITextChannel channel) || !ulong.TryParse(split[5], out id)) {
-				return Task.FromResult<Embed>(null);
+			    !(client.GetChannel(id) is CachedTextChannel channel) || !ulong.TryParse(split[5], out id)) {
+				return Task.FromResult<LocalEmbed>(null);
 			}
 
 			return QuoteFromMessageIdAsync(channel, id);
 		}
 
-		public static async Task<Embed> QuoteFromMessageIdAsync(ITextChannel channel, ulong id) {
-			IMessage message = await channel.GetMessageAsync(id);
-
-			if (message is null) {
+		public static async Task<LocalEmbed> QuoteFromMessageIdAsync(CachedTextChannel channel, ulong id) {
+			if (!(await channel.GetMessageAsync(id) is RestUserMessage message)) {
 				return null;
 			}
 
 			string imageUrl = GetImageUrl(message);
 
-			EmbedBuilder builder = BaseEmbed(message.Author, imageUrl, message.Content).AddField("\u200b",
-				$"Sent {message.CreatedAt.Humanize()} " + $"in {channel.Guild.Name} / <#{message.Channel.Id}> / " +
-				$"{Format.Url($"{message.Id}", message.GetJumpUrl())}");
+			LocalEmbedBuilder builder = BaseEmbed(message.Author, imageUrl, message.Content).AddField("\u200b",
+				$"Sent {message.Id.CreatedAt.Humanize()} " + $"in {channel.Guild.Name} / <#{channel.Id}> / " +
+				Markdown.MaskedUrl(message.Id.ToString(), await message.GetJumpUrlAsync()));
 
 			return builder.Build();
 		}
 
-		private static EmbedBuilder BaseEmbed(IUser author, string imageUrl, string content) {
-			return new EmbedBuilder {
-				Author = new EmbedAuthorBuilder {
-					IconUrl = author.GetAvatarOrDefaultUrl(),
-					Name = (author as IGuildUser)?.GetDisplayName() ?? author.Username
+		private static LocalEmbedBuilder BaseEmbed(IUser author, string imageUrl, string content) {
+			return new LocalEmbedBuilder {
+				Author = new LocalEmbedAuthorBuilder() {
+					IconUrl = author.GetAvatarUrl(),
+					Name = (author as IMember)?.DisplayName ?? author.Name
 				},
 				ImageUrl = imageUrl,
 				Description = content,

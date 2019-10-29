@@ -1,8 +1,7 @@
 ﻿using Casino.DependencyInjection;
-using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
-using Espeon.Core.Databases.UserStore;
+using Disqord;
+using Disqord.Events;
+using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -20,13 +19,13 @@ namespace Espeon.Commands {
 		public EspeonContext Context { get; }
 		public IUserMessage Message { get; private set; }
 
-		public IEnumerable<IEmote> Reactions =>
+		public IEnumerable<IEmoji> Reactions =>
 			new[] {
 				this._hit,
 				this._stop
 			};
 
-		public ICriterion<SocketReaction> Criterion { get; }
+		public ICriterion<ReactionAddedEventArgs> Criterion { get; }
 
 		[Inject] private readonly ICandyService _candy;
 		[Inject] private readonly IEmoteService _emotes;
@@ -34,7 +33,7 @@ namespace Espeon.Commands {
 		[Inject] private readonly IMessageService _message;
 		[Inject] private readonly IServiceProvider _services;
 
-		private Emote RareCandy => this._emotes.Collection["RareCandy"];
+		private CachedGuildEmoji RareCandy => this._emotes["RareCandy"];
 
 		private readonly IReadOnlyDictionary<string, int> _cards = new Dictionary<string, int> {
 			{ "ace", 11 },
@@ -63,15 +62,15 @@ namespace Espeon.Commands {
 		private List<(string suit, string card, int value)> _playerCards;
 		private List<(string suit, string card, int value)> _dealerCards;
 
-		private readonly Emoji _hit = new Emoji("➕");
-		private readonly Emoji _stop = new Emoji("❌");
+		private readonly LocalEmoji _hit = new LocalEmoji("➕");
+		private readonly LocalEmoji _stop = new LocalEmoji("❌");
 
 		private readonly int _bet;
 		private readonly bool _manageMessages;
 
 		public Blackjack(EspeonContext context, IServiceProvider services, int bet) {
 			Context = context;
-			Criterion = new ReactionFromSourceUser(context.User.Id);
+			Criterion = new ReactionFromSourceUser(context.Member.Id);
 
 			this._deck = new Queue<(string, string, int)>(
 				(from suit in this._suits from card in this._cards select (suit, card.Key, card.Value)).OrderBy(_ =>
@@ -80,7 +79,7 @@ namespace Espeon.Commands {
 			this._dealerCards = new List<(string suit, string card, int value)>();
 
 			this._bet = bet;
-			this._manageMessages = Context.Guild.CurrentUser.GetPermissions(Context.Channel).ManageMessages;
+			this._manageMessages = Context.Guild.CurrentMember.GetPermissionsFor(Context.Channel).ManageMessages;
 		}
 
 		async Task<bool> IGame.StartAsync() {
@@ -167,15 +166,15 @@ namespace Espeon.Commands {
 					}
 				}
 
-				var builder = new EmbedBuilder {
+				var builder = new LocalEmbedBuilder() {
 					Title = "Blackjack Result!",
-					Fields = GetEmbedFields(),
 					Description = description,
 					Color = color
 				};
+				builder.Fields.AddRange(GetEmbedFields());
 
 				using var store = this._services.GetService<UserStore>();
-				await this._candy.UpdateCandiesAsync(Context.UserStore, Context.Client.CurrentUser, Context.User, amount);
+				await this._candy.UpdateCandiesAsync(Context.UserStore, Context.Client.CurrentUser, Context.Member, amount);
 				await Message.ModifyAsync(x => x.Embed = builder.Build());
 			} catch (Exception e) {
 				Console.WriteLine(e);
@@ -188,25 +187,25 @@ namespace Espeon.Commands {
 		}
 
 		Task IReactionCallback.HandleTimeoutAsync() {
-			return this._games.TryLeaveGameAsync(Context.User.Id);
+			return this._games.TryLeaveGameAsync(Context.Member.Id);
 		}
 
-		async Task<bool> IReactionCallback.HandleCallbackAsync(SocketReaction reaction) {
+		async Task<bool> IReactionCallback.HandleCallbackAsync(ReactionAddedEventArgs args) {
 			try {
-				IEmote emote = reaction.Emote;
+				IEmoji emoji = args.Emoji;
 
-				if (emote.Equals(this._hit)) {
+				if (emoji.Equals(this._hit)) {
 					this._playerCards.Add(this._deck.Dequeue());
 					int playerTotal = CalculateTotal(ref this._playerCards);
 
 					if (playerTotal >= 21) {
-						await this._games.TryLeaveGameAsync(Context.User.Id);
+						await this._games.TryLeaveGameAsync(Context.Member.Id);
 						return true;
 					}
 				}
 
-				if (emote.Equals(this._stop)) {
-					await this._games.TryLeaveGameAsync(Context.User.Id);
+				if (emoji.Equals(this._stop)) {
+					await this._games.TryLeaveGameAsync(Context.Member.Id);
 					return true;
 				}
 
@@ -215,10 +214,8 @@ namespace Espeon.Commands {
 				if (!this._manageMessages) {
 					return false;
 				}
-
-				IUser user = reaction.User.GetValueOrDefault() ??
-				             await Context.Client.Rest.GetUserAsync(reaction.UserId);
-				await Message.RemoveReactionAsync(emote, user);
+				
+				await Message.RemoveMemberReactionAsync(args.User.Id, emoji);
 			} catch (Exception e) {
 				Console.WriteLine(e);
 			}
@@ -226,26 +223,26 @@ namespace Espeon.Commands {
 			return false;
 		}
 
-		private Embed BuildEmbed() {
-			var builder = new EmbedBuilder {
+		private LocalEmbed BuildEmbed() {
+			var builder = new LocalEmbedBuilder {
 				Title = "Blackjack",
 				Description = $"You have bet {this._bet}{RareCandy} candies\n" +
 				              $"A game of blackjack. Click {this._hit} to hit or {this._stop} to stay\n",
-				Color = Color.Default,
-				Fields = GetEmbedFields()
+				Color = Color.Black
 			};
+			builder.Fields.AddRange(GetEmbedFields());
 
 			return builder.Build();
 		}
 
-		private List<EmbedFieldBuilder> GetEmbedFields() {
-			var fields = new List<EmbedFieldBuilder> {
-				new EmbedFieldBuilder {
-					Name = $"{Context.User.GetDisplayName()}'s cards",
+		private List<LocalEmbedFieldBuilder> GetEmbedFields() {
+			var fields = new List<LocalEmbedFieldBuilder> {
+				new LocalEmbedFieldBuilder {
+					Name = $"{Context.Member.DisplayName}'s cards",
 					Value = $"{GetCards(this._playerCards)}\n" +
 					        $"For a total of: {CalculateTotal(ref this._playerCards)}"
 				},
-				new EmbedFieldBuilder {
+				new LocalEmbedFieldBuilder {
 					Name = $"Espeon.Core's cards",
 					Value = $"{GetCards(this._dealerCards)}\n" +
 					        $"For a total of: {CalculateTotal(ref this._dealerCards)}"

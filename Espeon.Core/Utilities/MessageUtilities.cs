@@ -1,14 +1,14 @@
-﻿using Discord;
+﻿using Disqord;
 using System;
 using System.Linq;
 
 namespace Espeon.Core {
 	public static partial class Utilities {
-		public static string GetImageUrl(IMessage message) {
+		public static string GetImageUrl(IUserMessage message) {
 			var imageUrl = "";
 
 			if (message.Embeds.FirstOrDefault() is { } embed) {
-				if (embed.Type == EmbedType.Image || embed.Type == EmbedType.Gifv) {
+				if (embed.Type == "image" || embed.Type == "gifv") {
 					imageUrl = embed.Url;
 				}
 			}

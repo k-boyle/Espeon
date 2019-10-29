@@ -6,9 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20191025.3" />
-    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190722.9" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20191025.3" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.3.0-beta1-final" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.0-beta1-final" />
@@ -22,6 +19,11 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     <PackageReference Include="Qmmands" Version="3.0.0-nightly-00221" />
     <PackageReference Include="TheCasino.Common" Version="1.2.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Disqord\src\Disqord.Rest\Disqord.Rest.csproj" />
+    <ProjectReference Include="..\..\Disqord\src\Disqord\Disqord.csproj" />
   </ItemGroup>
 
 </Project>

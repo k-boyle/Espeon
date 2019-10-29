@@ -1,6 +1,7 @@
-﻿using Discord;
+﻿using Disqord;
 using Qmmands;
 using System.Collections.Generic;
+using static Disqord.Discord;
 
 namespace Espeon.Core {
 	public static partial class Extensions {
@@ -21,8 +22,8 @@ namespace Espeon.Core {
 			if (content.Length < endPos + 2 || content[endPos + 1] != ' ') {
 				return false;
 			}
-
-			if (!MentionUtils.TryParseUser(content.Substring(0, endPos + 1), out ulong userId)) {
+			
+			if (!TryParseUserMention(content.Substring(0, endPos + 1), out Snowflake userId)) {
 				return false;
 			}
 

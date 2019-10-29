@@ -1,5 +1,5 @@
 ﻿using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -28,11 +28,11 @@ namespace Espeon.Commands {
 			ResponsePack p = context.Invoker.ResponsePack;
 
 			return this._level switch {
-				ElevationLevel.Mod => (currentGuild.Moderators.Contains(context.User.Id) ||
-				                       currentGuild.Admins.Contains(context.User.Id)
+				ElevationLevel.Mod => (currentGuild.Moderators.Contains(context.Member.Id) ||
+				                       currentGuild.Admins.Contains(context.Member.Id)
 					? CheckResult.Successful
 					: CheckResult.Unsuccessful(response.GetResponse(this, p, 0))),
-				ElevationLevel.Admin => (currentGuild.Admins.Contains(context.User.Id)
+				ElevationLevel.Admin => (currentGuild.Admins.Contains(context.Member.Id)
 					? CheckResult.Successful
 					: CheckResult.Unsuccessful(response.GetResponse(this, p, 1))),
 				_ => CheckResult.Unsuccessful(response.GetResponse(this, p, 2))

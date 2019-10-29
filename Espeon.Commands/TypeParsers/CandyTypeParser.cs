@@ -13,7 +13,7 @@ namespace Espeon.Commands {
 		public override async ValueTask<TypeParserResult<int>> ParseAsync(Parameter param, string value,
 			EspeonContext context, IServiceProvider provider) {
 			var candy = provider.GetService<ICandyService>();
-			int userAmount = await candy.GetCandiesAsync(context.UserStore, context.User);
+			int userAmount = await candy.GetCandiesAsync(context.UserStore, context.Member);
 
 			var nones = new[] {
 				"NaN",

@@ -1,13 +1,14 @@
-﻿using Discord;
+﻿using Disqord;
 using Espeon.Core.Services;
 using Humanizer;
+using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using DR = Espeon.Core.Databases.Reminder;
+using DR = Espeon.Core.Database.Reminder;
 
 namespace Espeon.Commands {
 	[Name("Reminders")]
@@ -29,7 +30,7 @@ namespace Espeon.Commands {
 		[Name("List Reminders")]
 		[Description("Lists all of your currently available reminders")]
 		public async Task ListRemindersAsync() {
-			ImmutableArray<DR> reminders = await ReminderService.GetRemindersAsync(Context.UserStore, User);
+			ImmutableArray<DR> reminders = await ReminderService.GetRemindersAsync(Context.UserStore, Member);
 
 			if (reminders.Length == 0) {
 				await SendOkAsync(0);
@@ -62,10 +63,10 @@ namespace Espeon.Commands {
 
 			var index = 0;
 			PaginatorOptions pOptions =
-				PaginatorOptions.Default(responses.ToDictionary(_ => index++, x => (x, (Embed) null)));
+				PaginatorOptions.Default(responses.ToDictionary(_ => index++, x => (x, (LocalEmbed) null)));
 
 			await TryAddCallbackAsync(new DefaultPaginator(Context, Interactive, Message, pOptions,
-				new ReactionFromSourceUser(Context.User.Id)));
+				new ReactionFromSourceUser(Context.Member.Id)));
 		}
 
 		[Command("Cancel")]
@@ -73,7 +74,7 @@ namespace Espeon.Commands {
 		[Description("Cancel the specified reminder")]
 		public async Task CancelReminderAsync(int reminderId) {
 			DR found = await Context.UserStore.Reminders.FirstOrDefaultAsync(x =>
-				x.UserId == Context.User.Id && x.ReminderId == reminderId);
+				x.UserId == Context.Member.Id && x.ReminderId == reminderId);
 
 			if (found is null) {
 				await SendNotOkAsync(0, reminderId);

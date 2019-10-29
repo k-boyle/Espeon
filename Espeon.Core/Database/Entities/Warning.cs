@@ -1,4 +1,4 @@
-﻿namespace Espeon.Core.Databases {
+﻿namespace Espeon.Core.Database {
 	public class Warning {
 		public Guild Guild { get; set; }
 		public ulong GuildId { get; set; }

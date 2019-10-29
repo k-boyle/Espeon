@@ -1,8 +1,6 @@
-﻿using Casino.Discord;
-using Discord;
-using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Qmmands;
 using System.Threading.Tasks;
 
@@ -58,9 +56,9 @@ namespace Espeon.Commands {
 		[Command("restrict")]
 		[Name("Restrict Channel")]
 		[Description("Restrict the bots access to a channel")]
-		public Task RestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null) {
+		public Task RestrictChannelAccessAsync([Remainder] CachedTextChannel channel = null) {
 			Guild currentGuild = Context.CurrentGuild;
-			channel??=Context.Channel;
+			channel ??= Context.Channel;
 
 			if (currentGuild.RestrictedChannels.Contains(channel.Id)) {
 				return SendNotOkAsync(0);
@@ -76,7 +74,7 @@ namespace Espeon.Commands {
 		[Command("unrestrict")]
 		[Name("Unrestrict Channel")]
 		[Description("Unrestrict the bots access to a channel")]
-		public Task UnrestrictChannelAccessAsync([Remainder] SocketTextChannel channel = null) {
+		public Task UnrestrictChannelAccessAsync([Remainder] CachedTextChannel channel = null) {
 			Guild currentGuild = Context.CurrentGuild;
 			channel??=Context.Channel;
 
@@ -94,11 +92,11 @@ namespace Espeon.Commands {
 		[Name("Admin User")]
 		[RequireGuildOwner]
 		[Description("Promote a user to bot admin")]
-		public Task AdminUserAsync([Remainder] IGuildUser user) {
+		public Task AdminUserAsync([Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (currentGuild.Admins.Contains(user.Id)) {
-				return SendNotOkAsync(1, user.GetDisplayName());
+				return SendNotOkAsync(1, user.DisplayName);
 			}
 
 			currentGuild.Admins.Add(user.Id);
@@ -108,34 +106,34 @@ namespace Espeon.Commands {
 			}
 
 			Context.GuildStore.Update(currentGuild);
-			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
+			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.DisplayName));
 		}
 
 		[Command("mod")]
 		[Name("Moderate User")]
 		[Description("Promote a user to bot moderator")]
-		public Task ModUserAsync([Remainder] IGuildUser user) {
+		public Task ModUserAsync([Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (currentGuild.Moderators.Contains(user.Id)) {
-				return SendNotOkAsync(2, user.GetDisplayName());
+				return SendNotOkAsync(2, user.DisplayName);
 			}
 
 			if (currentGuild.Admins.Contains(user.Id)) {
-				return SendOkAsync(0, user.GetDisplayName());
+				return SendOkAsync(0, user.DisplayName);
 			}
 
 			currentGuild.Moderators.Add(user.Id);
 
 			Context.GuildStore.Update(currentGuild);
-			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
+			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.DisplayName));
 		}
 
 		[Command("deadmin")]
 		[Name("Demote Admin")]
 		[RequireGuildOwner]
 		[Description("Demote a user from bot admin")]
-		public Task DemoteAdminAsync([Remainder] IGuildUser user) {
+		public Task DemoteAdminAsync([Remainder] IMember user) {
 			if (user.Id == Context.Guild.OwnerId) {
 				return SendNotOkAsync(0);
 			}
@@ -143,36 +141,36 @@ namespace Espeon.Commands {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (!currentGuild.Admins.Contains(user.Id)) {
-				return SendNotOkAsync(2, user.GetDisplayName());
+				return SendNotOkAsync(2, user.DisplayName);
 			}
 
 			currentGuild.Admins.Remove(user.Id);
 			Context.GuildStore.Update(currentGuild);
 
-			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.GetDisplayName()));
+			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(1, user.DisplayName));
 		}
 
 		[Command("demod")]
 		[Name("Demote Moderator")]
 		[RequireGuildOwner]
 		[Description("Demote a user from bot moderator")]
-		public Task DemoteModeratorAsync([Remainder] IGuildUser user) {
+		public Task DemoteModeratorAsync([Remainder] IMember user) {
 			Guild currentGuild = Context.CurrentGuild;
 
 			if (!currentGuild.Moderators.Contains(user.Id)) {
-				return SendNotOkAsync(1, user.GetDisplayName());
+				return SendNotOkAsync(1, user.DisplayName);
 			}
 
 			currentGuild.Moderators.Remove(user.Id);
 			Context.GuildStore.Update(currentGuild);
 
-			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.GetDisplayName()));
+			return Task.WhenAll(Context.GuildStore.SaveChangesAsync(), SendOkAsync(0, user.DisplayName));
 		}
 
 		[Command("welcomechannel")]
 		[Name("Set Welcome Channel")]
 		[Description("Set the default channel for welcoming new members")]
-		public Task SetWelcomeChannelAsync([Remainder] SocketTextChannel channel = null) {
+		public Task SetWelcomeChannelAsync([Remainder] CachedTextChannel channel = null) {
 			Guild currentGuild = Context.CurrentGuild;
 			currentGuild.WelcomeChannelId = channel?.Id ?? 0;
 			Context.GuildStore.Update(currentGuild);
@@ -195,7 +193,7 @@ namespace Espeon.Commands {
 		[Command("defaultrole")]
 		[Name("Set Default Role")]
 		[Description("Set the role to be added to new members")]
-		public Task SetDefaultRoleAsync([Remainder] [RequirePositionHierarchy] SocketRole role = null) {
+		public Task SetDefaultRoleAsync([Remainder] [RequirePositionHierarchy] CachedRole role = null) {
 			Guild currentGuild = Context.CurrentGuild;
 			currentGuild.DefaultRoleId = role?.Id ?? 0;
 			Context.GuildStore.Update(currentGuild);
@@ -217,7 +215,7 @@ namespace Espeon.Commands {
 		[Command("noreactionrole")]
 		[Name("Set No Reactions Role")]
 		[Description("Set the role that stops people from reacting")]
-		public Task SetNoReactionsRole([Remainder] [RequirePositionHierarchy] SocketRole role = null) {
+		public Task SetNoReactionsRole([Remainder] [RequirePositionHierarchy] CachedRole role = null) {
 			Guild currentGuild = Context.CurrentGuild;
 			currentGuild.NoReactions = role?.Id ?? 0;
 			Context.GuildStore.Update(currentGuild);

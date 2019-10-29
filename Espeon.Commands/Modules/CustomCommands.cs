@@ -1,6 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Disqord;
 using Espeon.Core;
-using Espeon.Core.Databases;
+using Espeon.Core.Database;
 using Espeon.Core.Services;
 using Qmmands;
 using System;
@@ -22,8 +22,8 @@ namespace Espeon.Commands {
 			if (name == "") {
 				await SendOkAsync(0);
 
-				SocketUserMessage reply = await NextMessageAsync(new MultiCriteria<SocketUserMessage>(
-					new UserCriteria(User.Id), new ChannelCriteria(Channel.Id)));
+				CachedUserMessage reply = await NextMessageAsync(new MultiCriteria<CachedUserMessage>(
+					new UserCriteria(Member.Id.RawValue), new ChannelCriteria(Channel.Id.RawValue)));
 
 				if (string.Equals(reply.Content, "cancel", StringComparison.InvariantCultureIgnoreCase)) {
 					return;
@@ -35,8 +35,8 @@ namespace Espeon.Commands {
 			if (value == "") {
 				await SendOkAsync(1);
 
-				SocketUserMessage reply = await NextMessageAsync(
-					new MultiCriteria<SocketUserMessage>(new UserCriteria(User.Id), new ChannelCriteria(Channel.Id)));
+				CachedUserMessage reply = await NextMessageAsync(
+					new MultiCriteria<CachedUserMessage>(new UserCriteria(Member.Id), new ChannelCriteria(Channel.Id)));
 
 				if (string.Equals(reply.Content, "cancel", StringComparison.InvariantCultureIgnoreCase)) {
 					return;
@@ -71,8 +71,8 @@ namespace Espeon.Commands {
 			if (newValue == "") {
 				await SendOkAsync(0);
 
-				SocketUserMessage reply = await NextMessageAsync(
-					new MultiCriteria<SocketUserMessage>(new UserCriteria(User.Id), new ChannelCriteria(Channel.Id)));
+				CachedUserMessage reply = await NextMessageAsync(
+					new MultiCriteria<CachedUserMessage>(new UserCriteria(Member.Id), new ChannelCriteria(Channel.Id)));
 
 				if (string.Equals(reply.Content, "cancel", StringComparison.InvariantCultureIgnoreCase)) {
 					return;

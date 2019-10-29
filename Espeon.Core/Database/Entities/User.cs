@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Espeon.Core.Databases {
+namespace Espeon.Core.Database {
 	public class User {
 		public ulong Id { get; set; }
 

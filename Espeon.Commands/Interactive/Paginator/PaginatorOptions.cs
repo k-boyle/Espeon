@@ -1,30 +1,30 @@
-﻿using Discord;
+﻿using Disqord;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Espeon.Commands {
 	public class PaginatorOptions {
-		public Dictionary<IEmote, Control> Controls { get; set; }
-		public Dictionary<int, (string Content, Embed Embed)> Pages { get; set; }
+		public Dictionary<IEmoji, Control> Controls { get; set; }
+		public Dictionary<int, (string Content, LocalEmbed Embed)> Pages { get; set; }
 
-		public PaginatorOptions() : this(new Dictionary<IEmote, Control>(), new Dictionary<int, (string, Embed)>()) { }
+		public PaginatorOptions() : this(new Dictionary<IEmoji, Control>(), new Dictionary<int, (string, LocalEmbed)>()) { }
 
-		public PaginatorOptions(Dictionary<IEmote, Control> controls, Dictionary<int, (string, Embed)> pages) {
+		public PaginatorOptions(Dictionary<IEmoji, Control> controls, Dictionary<int, (string, LocalEmbed)> pages) {
 			Controls = controls;
 			Pages = pages.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
 		}
 
-		public static PaginatorOptions Default(Dictionary<int, (string, Embed)> pages) {
+		public static PaginatorOptions Default(Dictionary<int, (string, LocalEmbed)> pages) {
 			return new PaginatorOptions {
 				Pages = pages,
-				Controls = new Dictionary<IEmote, Control> {
-					[new Emoji("⏮")] = Control.First,
-					[new Emoji("◀")] = Control.Previous,
-					[new Emoji("▶")] = Control.Next,
-					[new Emoji("⏭")] = Control.Last,
-					[new Emoji("🚮")] = Control.Delete,
-					[new Emoji("🔢")] = Control.Skip,
-					[new Emoji("ℹ")] = Control.Info
+				Controls = new Dictionary<IEmoji, Control> {
+					[new LocalEmoji("⏮")] = Control.First,
+					[new LocalEmoji("◀")] = Control.Previous,
+					[new LocalEmoji("▶")] = Control.Next,
+					[new LocalEmoji("⏭")] = Control.Last,
+					[new LocalEmoji("🚮")] = Control.Delete,
+					[new LocalEmoji("🔢")] = Control.Skip,
+					[new LocalEmoji("ℹ")] = Control.Info
 				}
 			};
 		}

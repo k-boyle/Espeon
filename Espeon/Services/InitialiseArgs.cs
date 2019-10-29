@@ -1,6 +1,6 @@
-﻿using Espeon.Core.Databases.CommandStore;
-using Espeon.Core.Databases.GuildStore;
-using Espeon.Core.Databases.UserStore;
+﻿using Espeon.Core.Database.CommandStore;
+using Espeon.Core.Database.GuildStore;
+using Espeon.Core.Database.UserStore;
 
 namespace Espeon.Services {
 	public struct InitialiseArgs {
