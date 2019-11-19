@@ -232,7 +232,7 @@ namespace Espeon.Services {
 
                 var ex = failed.Exception.ToString();
 
-                await c.SendMessageAsync(Markdown.EscapeMarkdown(ex.Length > 1000 ? ex.Substring(0, 1000) : ex));
+                await c.SendMessageAsync(Markdown.Escape(ex.Length > 1000 ? ex.Substring(0, 1000) : ex));
 #endif
 			}
 
