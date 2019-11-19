@@ -1,5 +1,5 @@
-﻿using Casino.DependencyInjection;
-using Espeon.Core.Services;
+﻿using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using System;
 
 namespace Espeon.Services {

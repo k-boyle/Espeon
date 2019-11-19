@@ -1,6 +1,4 @@
-﻿using Casino.Common;
-using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Disqord.Events;
 using Espeon.Core;
 using Espeon.Core.Database;
@@ -8,6 +6,8 @@ using Espeon.Core.Database.CommandStore;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Kommon.Common;
+using Kommon.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace Espeon {
 
 			await this._commands.SetupCommandsAsync(commandStore);
 
-			await this._client.ConnectAsync();
+			await this._client.RunAsync();
 
 			await this._tcs.Task;
 		}
@@ -60,7 +60,7 @@ namespace Espeon {
 			this._client.Ready += ReadyAsync;
 
 			this._client.MemberJoined += eventArgs => this._events.RegisterEvent(async () => {
-				await using var guildStore = this._services.GetService<GuildStore>();
+				using var guildStore = this._services.GetService<GuildStore>();
 				CachedMember member = eventArgs.Member;
 				CachedGuild guild = member.Guild;
 
@@ -95,9 +95,9 @@ namespace Espeon {
 
 				CachedTextChannel channel =
 					guild.TextChannels.FirstOrDefault(x =>
-							channelNames.Any(y => 
-								x.Value.Name.Contains(y, StringComparison.InvariantCultureIgnoreCase))).Value 
-				 ?? guild.TextChannels.FirstOrDefault(x =>
+							channelNames.Any(y =>
+								x.Value.Name.Contains(y, StringComparison.InvariantCultureIgnoreCase)))
+						.Value ?? guild.TextChannels.FirstOrDefault(x =>
 						guild.CurrentMember.GetPermissionsFor(x.Value).ViewChannel &&
 						guild.CurrentMember.GetPermissionsFor(x.Value).SendMessages).Value;
 
@@ -109,14 +109,14 @@ namespace Espeon {
 					Title = "",
 					Color = Utilities.EspeonColor,
 					ThumbnailUrl = guild.CurrentMember.DisplayName,
-					Description =
-						$"Hello! I am Espeon.Core{this._services.GetService<IEmoteService>()["Espeon"]} " +
-						"and I have just been added to your guild!\n" + "Type es/help to see all my available commands!"
+					Description = $"Hello! I am Espeon.Core{this._services.GetService<IEmoteService>()["Espeon"]} " +
+					              "and I have just been added to your guild!\n" +
+					              "Type es/help to see all my available commands!"
 				}.Build());
 			});
 
 			this._client.Logger.MessageLogged += (obj, eventArgs) => this._events.RegisterEvent(() => {
-				logger.Log(Source.Discord, (Severity) (int) eventArgs.Severity, eventArgs.Message, eventArgs.Exception);
+				logger.Log(Source.Disqord, (Severity) (5 - eventArgs.Severity), eventArgs.Message, eventArgs.Exception);
 				return Task.CompletedTask;
 			});
 

@@ -1,11 +1,10 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Core;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using IMessageChannel = Discord.IMessageChannel;
 
 namespace Espeon.Services {
 	public class LogService : BaseService<InitialiseArgs>, ILogService {
@@ -25,6 +24,10 @@ namespace Espeon.Services {
 		}
 
 		void ILogService.Log(Source source, Severity severity, string message, Exception ex) {
+			if (message.Contains("Dispatch")) {
+				return;
+			}
+			
 			lock (this._lock) {
 				DateTimeOffset time = DateTimeOffset.UtcNow;
 				Console.Write($"{FormatTime(time)} ");

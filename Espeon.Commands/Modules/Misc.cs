@@ -1,9 +1,9 @@
-﻿using Casino.Common;
-using Disqord;
+﻿using Disqord;
 using Disqord.Rest;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Services;
+using Kommon.Common;
 using Microsoft.Extensions.DependencyInjection;
 using MoreLinq;
 using Newtonsoft.Json.Linq;
@@ -181,10 +181,10 @@ namespace Espeon.Commands {
 				.AddField("Modules",
 					string.Join(", ",
 						canExecute.Select(x =>
-							$"`{Markdown.EscapeMarkdown(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")))
+							$"`{Markdown.Escape(ulong.TryParse(x.Name, out _) ? Context.Guild.Name : x.Name)}`")))
 				.WithFooter($"To view help with a specific module invoke {prefix}help Module").WithDescription(
 					$"Hello, my name is Espeon.Core{Emotes["Espeon"]}! " +
-					$"You can invoke my commands either by mentioning me or using the `{Markdown.EscapeMarkdown(prefix)}` prefix!");
+					$"You can invoke my commands either by mentioning me or using the `{Markdown.Escape(prefix)}` prefix!");
 
 			IUserMessage message = await SendMessageAsync(builder.Build());
 
@@ -215,8 +215,7 @@ namespace Espeon.Commands {
 				.AddField(ulong.TryParse(module.Name, out _) ? Guild.Name : module.Name ?? "\u200b",
 					module.Description ?? "\u200b")
 				.AddField("Commands",
-					string.Join(", ",
-						canExecute.Select(x => $"`{Markdown.EscapeMarkdown(x.FullAliases.First().ToLower())}`")))
+					string.Join(", ", canExecute.Select(x => $"`{Markdown.Escape(x.FullAliases.First().ToLower())}`")))
 				.WithFooter($"To view help with a specific command invoke {prefix}help Command Name");
 
 			IUserMessage message = await SendMessageAsync(builder.Build());
@@ -329,7 +328,7 @@ namespace Espeon.Commands {
 			if (mods.Length == 0) {
 				await SendOkAsync(0);
 			} else {
-				await SendOkAsync(1, string.Join(", ", mods.Select(x => $"{Markdown.EscapeMarkdown(x.DisplayName)}")));
+				await SendOkAsync(1, string.Join(", ", mods.Select(x => $"{Markdown.Escape(x.DisplayName)}")));
 			}
 		}
 
@@ -349,7 +348,7 @@ namespace Espeon.Commands {
 				//should never happen but sure
 				await SendOkAsync(0);
 			} else {
-				await SendOkAsync(1, string.Join(", ", admins.Select(x => $"{Markdown.EscapeMarkdown(x.DisplayName)}")));
+				await SendOkAsync(1, string.Join(", ", admins.Select(x => $"{Markdown.Escape(x.DisplayName)}")));
 			}
 		}
 
@@ -358,17 +357,16 @@ namespace Espeon.Commands {
 		[RequirePermissions(PermissionTarget.Bot, PermissionType.Guild, Permission.ManageEmojis)]
 		[RequirePermissions(PermissionTarget.User, PermissionType.Guild, Permission.ManageEmojis)]
 		[Description("Adds the specified emote(s) to your guild")]
-		public async Task StealEmoteAsync(params CachedGuildEmoji[] emojis) {
-			int animatedCount = Guild.Emojis.Count(x => x.IsAnimated);
-			int normalCount = Guild.Emojis.Count(x => !x.IsAnimated);
+		public async Task StealEmoteAsync(params LocalCustomEmoji[] emojis) {
+			int animatedCount = Guild.Emojis.Count(x => x.Value.IsAnimated);
+			int normalCount = Guild.Emojis.Count(x => !x.Value.IsAnimated);
 
-			var failed = new List<CachedGuildEmoji>();
+			var failed = new List<LocalCustomEmoji>();
 			HttpClient client = ClientFactory.CreateClient();
-			Stream stream;
 
 			var added = 0;
 
-			foreach (CachedGuildEmoji emoji in emojis) {
+			foreach (LocalCustomEmoji emoji in emojis) {
 				if (emoji.IsAnimated && animatedCount >= 50) {
 					failed.Add(emoji);
 					continue;
@@ -379,12 +377,12 @@ namespace Espeon.Commands {
 					continue;
 				}
 
-				stream = await client.GetStreamAsync(emoji.GetUrl());
+				Stream stream = await client.GetStreamAsync(emoji.GetUrl());
 				await Guild.CreateEmojiAsync(emoji.Name, new LocalAttachment(stream, emoji.Name),
 					options: RestRequestOptions.FromReason("Emote stolen"));
 
-				animatedCount = Guild.Emojis.Count(x => x.IsAnimated);
-				normalCount = Guild.Emojis.Count(x => !x.IsAnimated);
+				animatedCount = Guild.Emojis.Count(x => x.Value.IsAnimated);
+				normalCount = Guild.Emojis.Count(x => !x.Value.IsAnimated);
 
 				added++;
 
@@ -479,7 +477,7 @@ namespace Espeon.Commands {
 				"channel" => id == 0 ? Channel : Client.GetChannel(id),
 				"role"    => Guild.GetRole(id),
 				"guild"   => id == 0 ? Guild : Client.GetGuild(id),
-				"message" => id == 0 ? Context.Message as IMessage: await Context.Channel.GetMessageAsync(id),
+				"message" => id == 0 ? Context.Message as IMessage : await Context.Channel.GetMessageAsync(id),
 				_         => null
 			};
 
@@ -509,10 +507,10 @@ namespace Espeon.Commands {
 
 			MockWebhook foundWebhook = guild.Webhooks.Find(x => x.ChannelId == Context.Channel.Id);
 			IReadOnlyCollection<RestWebhook> webhooks = await Channel.GetWebhooksAsync();
-			RestWebhook wh = webhooks.FirstOrDefault(x => x.Id == foundWebhook.Id);
-			
+			RestWebhook wh = webhooks.FirstOrDefault(x => x.Id == foundWebhook?.Id);
+
 			if (wh is null) {
-				guild.Webhooks.RemoveAll(x => x.Id == foundWebhook.Id);
+				guild.Webhooks?.RemoveAll(x => x?.Id == foundWebhook?.Id);
 
 				Context.GuildStore.Update(guild);
 				await Context.GuildStore.SaveChangesAsync();
@@ -522,7 +520,7 @@ namespace Espeon.Commands {
 			}
 
 			if (foundWebhook is null) {
-				wh = await Context.Channel.CreateWebhookAsync("Espeon.Core Webhook");
+				wh = await Context.Channel.CreateWebhookAsync("Espeon Webhook");
 
 				foundWebhook = new MockWebhook {
 					Guild = guild,
@@ -548,8 +546,9 @@ namespace Espeon.Commands {
 					: x.ToString().ToLower()));
 			}
 
-			await whc.ExecuteAsync(Mockify(message.Content), name: (message.Author as IMember)?.DisplayName,
-				avatarUrl: message.Author.GetAvatarUrl());
+			await whc.ExecuteAsync(Mockify(message.Content),
+				name: (await Guild.GetOrFetchMemberAsync(message.Author.Id))?.DisplayName,
+				avatarUrl: message.Author.GetAvatarUrl(), wait: true);
 		}
 
 		[Command("delayed")]

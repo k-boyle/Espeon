@@ -1,6 +1,6 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace Espeon.Services {
 			foreach ((string key, JToken value) in emotesObject) {
 				this._collection.Add(key,
 					new Lazy<CachedGuildEmoji>(this._client.Guilds.SelectMany(x => x.Value.Emojis)
-						.FirstOrDefault(y => y.ToString() == value.ToString())));
+						.FirstOrDefault(y => y.ToString() == value.ToString()).Value));
 			}
 
 			return Task.CompletedTask;

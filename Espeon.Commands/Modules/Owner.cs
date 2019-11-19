@@ -52,12 +52,11 @@ namespace Espeon.Commands {
 				.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location));
 
 			var usings = new[] {
-				"Casino.Common",
-				"Casino.Qmmands",
-				"Casino.DependencyInjection",
-				"Casino.Discord",
-				"Discord",
-				"Discord.WebSocket",
+				"Kommon.Common",
+				"Kommon.Qmmands",
+				"Kommon.DependencyInjection",
+				"Disqord",
+				"Disqord.Rest",
 				"Microsoft.Extensions.DependencyInjection",
 				"System",
 				"System.Collections.Generic",
@@ -123,7 +122,7 @@ namespace Espeon.Commands {
 				ScriptState<object> result = await script.RunAsync(context);
 
 				sw.Stop();
-				builder.WithColor(Color.Green);
+				builder.WithColor(Color.LightGreen);
 
 				builder.WithDescription($"Code compiled in {compilationTime}ms and ran in {sw.ElapsedMilliseconds}ms");
 				builder.WithTitle("Code Evaluated");
@@ -200,7 +199,7 @@ namespace Espeon.Commands {
 
 				string str = ex.ToString();
 
-				builder.AddField("Exception", Markdown.EscapeMarkdown(str.Length >= 600 ? str.Substring(0, 600) : str));
+				builder.AddField("Exception", Markdown.Escape(str.Length >= 600 ? str.Substring(0, 600) : str));
 			} finally {
 				GC.Collect();
 				GC.WaitForPendingFinalizers();

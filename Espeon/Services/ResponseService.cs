@@ -1,8 +1,8 @@
-﻿using Casino.DependencyInjection;
-using Casino.Qmmands;
-using Espeon.Commands;
+﻿using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
+using Kommon.Qmmands;
 using Newtonsoft.Json;
 using Qmmands;
 using System;

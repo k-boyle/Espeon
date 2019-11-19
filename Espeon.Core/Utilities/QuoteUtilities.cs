@@ -26,7 +26,7 @@ namespace Espeon.Core {
 
 			LocalEmbedBuilder builder = BaseEmbed(message.Author, imageUrl, message.Content).AddField("\u200b",
 				$"Sent {message.Id.CreatedAt.Humanize()} " + $"in {channel.Guild.Name} / <#{channel.Id}> / " +
-				Markdown.MaskedUrl(message.Id.ToString(), await message.GetJumpUrlAsync()));
+				Markdown.Link(message.Id.ToString(), await message.GetJumpUrlAsync()));
 
 			return builder.Build();
 		}

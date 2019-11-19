@@ -11,19 +11,20 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Dynamitey" Version="2.0.10.189" />
         <PackageReference Include="Humanizer.Core" Version="2.6.2" />
+        <PackageReference Include="Kommon" Version="0.0.2" />
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.3.0-beta1-final" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.0-beta1-final" />
         <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.3.0-beta1-final" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview7.19362.4" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
         <PackageReference Include="Qmmands" Version="3.0.0-nightly-00221" />
-        <PackageReference Include="TheCasino.Common" Version="1.2.8" />
     </ItemGroup>
 
     <ItemGroup>

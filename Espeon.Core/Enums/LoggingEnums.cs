@@ -1,7 +1,7 @@
 ﻿namespace Espeon.Core {
 	public enum Source {
 		Commands,
-		Discord,
+		Disqord,
 		Events,
 		Reminders,
 		Scheduler,

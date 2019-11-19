@@ -1,8 +1,8 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Disqord.Events;
 using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -102,7 +102,7 @@ namespace Espeon.Commands {
 		async Task IGame.EndAsync() {
 			try {
 				if (this._manageMessages) {
-					await Message.RemoveAllReactionsAsync();
+					await Message.ClearReactionsAsync();
 				}
 
 				int playerTotal = CalculateTotal(ref this._playerCards);
@@ -139,7 +139,7 @@ namespace Espeon.Commands {
 
 						description =
 							$"I struck out! You win {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
-						color = Color.Green;
+						color = Color.LightGreen;
 					} else if (dealerTotal == playerTotal) {
 						//draw
 
@@ -162,7 +162,7 @@ namespace Espeon.Commands {
 
 						description =
 							$"You have the higher score! You win {Math.Abs(amount)}{RareCandy} cand{(amount == 1 ? "y" : "ies")}!";
-						color = Color.Green;
+						color = Color.LightGreen;
 					}
 				}
 
@@ -171,10 +171,13 @@ namespace Espeon.Commands {
 					Description = description,
 					Color = color
 				};
-				builder.Fields.AddRange(GetEmbedFields());
+
+				foreach (var field in GetEmbedFields()) {
+					builder.Fields.Add(field);
+				}
 
 				using var store = this._services.GetService<UserStore>();
-				await this._candy.UpdateCandiesAsync(Context.UserStore, Context.Client.CurrentUser, Context.Member, amount);
+				await this._candy.UpdateCandiesAsync(store, Context.Client.CurrentUser, Context.Member, amount);
 				await Message.ModifyAsync(x => x.Embed = builder.Build());
 			} catch (Exception e) {
 				Console.WriteLine(e);
@@ -230,7 +233,10 @@ namespace Espeon.Commands {
 				              $"A game of blackjack. Click {this._hit} to hit or {this._stop} to stay\n",
 				Color = Color.Black
 			};
-			builder.Fields.AddRange(GetEmbedFields());
+
+			foreach (var field in GetEmbedFields()) {
+				builder.Fields.Add(field);
+			}
 
 			return builder.Build();
 		}
@@ -243,7 +249,7 @@ namespace Espeon.Commands {
 					        $"For a total of: {CalculateTotal(ref this._playerCards)}"
 				},
 				new LocalEmbedFieldBuilder {
-					Name = $"Espeon.Core's cards",
+					Name = $"Espeon's cards",
 					Value = $"{GetCards(this._dealerCards)}\n" +
 					        $"For a total of: {CalculateTotal(ref this._dealerCards)}"
 				}

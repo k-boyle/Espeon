@@ -1,11 +1,11 @@
-﻿using Casino.Common;
-using Casino.DependencyInjection;
-using Casino.Linq;
-using Disqord;
+﻿using Disqord;
 using Disqord.Rest;
 using Espeon.Core;
 using Espeon.Core.Entities;
 using Espeon.Core.Services;
+using Kommon.Common;
+using Kommon.DependencyInjection;
+using Kommon.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

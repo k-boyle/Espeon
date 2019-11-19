@@ -1,6 +1,6 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Qmmands;
 using System;
 using System.Linq;

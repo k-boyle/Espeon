@@ -1,11 +1,11 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Disqord.Events;
 using Disqord.Rest;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -45,7 +45,7 @@ namespace Espeon.Services {
 			}
 
 			try {
-				await using var guildStore = this._services.GetService<GuildStore>();
+				using var guildStore = this._services.GetService<GuildStore>();
 				Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild, x => x.StarredMessages);
 
 				if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is { } starChannel)) {
@@ -116,7 +116,7 @@ namespace Espeon.Services {
 			}
 
 			try {
-				await using var guildStore = this._services.GetService<GuildStore>();
+				using var guildStore = this._services.GetService<GuildStore>();
 				Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild, x => x.StarredMessages);
 
 				if (!(textChannel.Guild.GetTextChannel(guild.StarboardChannelId) is { } starChannel)) {

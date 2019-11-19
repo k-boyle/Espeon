@@ -1,10 +1,10 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;

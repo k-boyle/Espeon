@@ -104,7 +104,7 @@ namespace Espeon.Core.Database.GuildStore {
 		}
 
 		public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression) {
-			return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id) ??
+			return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.Id == guild.Id.RawValue) ??
 			       await CreateGuildAsync(guild, expression);
 		}
 

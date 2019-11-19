@@ -1,10 +1,10 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Disqord.Events;
 using Espeon.Core.Database;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -18,20 +18,20 @@ namespace Espeon.Services {
 
 		public PurgingService(IServiceProvider services) : base(services) {
 			this._client.LeftGuild += args => this._events.RegisterEvent(() => LeftGuildAsync(args));
-			this._client.MemberLeft += args => this._events.RegisterEvent(() => UserLeftAsync(args));
+			this._client.MemberLeft += args => this._events.RegisterEvent(() => MemberLeftAsync(args));
 			this._client.ChannelDeleted += args => this._events.RegisterEvent(() => ChannelDestroyedAsync(args));
 			this._client.RoleDeleted += args => this._events.RegisterEvent(() => RoleDeletedAsync(args));
 			this._client.RoleUpdated += args => this._events.RegisterEvent(() => RoleUpdatedAsync(args));
 		}
 
 		private async Task LeftGuildAsync(LeftGuildEventArgs args) {
-			await using var guildStore = this._services.GetService<GuildStore>();
+			using var guildStore = this._services.GetService<GuildStore>();
 			await guildStore.RemoveGuildAsync(args.Guild);
 			await guildStore.SaveChangesAsync();
 		}
 
-		private async Task UserLeftAsync(MemberLeftEventArgs args) {
-			await using var guildStore = this._services.GetService<GuildStore>();
+		private async Task MemberLeftAsync(MemberLeftEventArgs args) {
+			using var guildStore = this._services.GetService<GuildStore>();
 			Guild guild = await guildStore.GetOrCreateGuildAsync(args.Guild, x => x.Warnings);
 
 			bool removed = guild.Admins.Remove(args.User.Id) || guild.Moderators.Remove(args.User.Id) ||
@@ -44,7 +44,7 @@ namespace Espeon.Services {
 			}
 
 			if (this._client.Guilds.Count(x => x.Value.Members.Any(y => y.Value.Id == args.User.Id)) == 1) {
-				await using var userStore = this._services.GetService<UserStore>();
+				using var userStore = this._services.GetService<UserStore>();
 
 				await userStore.RemoveUserAsync(args.User);
 				userStore.Update(args);
@@ -58,7 +58,7 @@ namespace Espeon.Services {
 				return;
 			}
 
-			await using var guildStore = this._services.GetService<GuildStore>();
+			using var guildStore = this._services.GetService<GuildStore>();
 			Guild guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
 
 			bool removed = guild.RestrictedChannels.Remove(args.Channel.Id);
@@ -69,7 +69,7 @@ namespace Espeon.Services {
 		}
 
 		private async Task RoleDeletedAsync(RoleDeletedEventArgs args) {
-			await using var guildStore = this._services.GetService<GuildStore>();
+			using var guildStore = this._services.GetService<GuildStore>();
 
 			Guild guild = await guildStore.GetOrCreateGuildAsync(args.Role.Guild);
 
@@ -82,7 +82,7 @@ namespace Espeon.Services {
 		}
 
 		private async Task RoleUpdatedAsync(RoleUpdatedEventArgs args) {
-			await using var guildStore = this._services.GetService<GuildStore>();
+			using var guildStore = this._services.GetService<GuildStore>();
 			Guild guild = await guildStore.GetOrCreateGuildAsync(args.OldRole.Guild);
 			ulong id = args.OldRole.Id;
 

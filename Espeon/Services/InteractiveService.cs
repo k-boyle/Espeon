@@ -1,12 +1,12 @@
-﻿using Casino.Common;
-using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Disqord.Events;
 using Disqord.Rest;
 using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Services;
 using Espeon.Services;
+using Kommon.Common;
+using Kommon.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;

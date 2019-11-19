@@ -1,13 +1,13 @@
-﻿using Casino.Common;
-using Casino.DependencyInjection;
-using Casino.Qmmands;
-using Disqord;
+﻿using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Database.CommandStore;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Database.UserStore;
 using Espeon.Services;
+using Kommon.Common;
+using Kommon.DependencyInjection;
+using Kommon.Qmmands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -47,10 +47,10 @@ namespace Espeon {
 
 			IServiceProvider services = ConfigureServices(dict, config, cts);
 
-			await using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
+			using (var userStore = services.GetService<UserStore>()) //provides a scope for the variables
 			{
-				await using var guildStore = services.GetService<GuildStore>();
-				await using var commandStore = services.GetService<CommandStore>();
+				using var guildStore = services.GetService<GuildStore>();
+				using var commandStore = services.GetService<CommandStore>();
 
 				await userStore.Database.MigrateAsync();
 				await guildStore.Database.MigrateAsync();
@@ -79,7 +79,8 @@ namespace Espeon {
 			return new ServiceCollection()
 				.AddServices(types)
 				.AddSingleton(new DiscordClient(TokenType.Bot, config.DiscordToken, new DiscordClientConfiguration() {
-						MessageCacheSize = 100
+						MessageCache = new DefaultMessageCache(20),
+						// GuildSubscriptions = false
 				}))
 				.AddSingleton(new CommandService(new CommandServiceConfiguration {
 					StringComparison = StringComparison.InvariantCultureIgnoreCase,

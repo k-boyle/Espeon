@@ -1,11 +1,11 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Database.CommandStore;
 using Espeon.Core.Database.GuildStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
@@ -148,7 +148,7 @@ namespace Espeon.Services {
 				};
 			}
 
-			if (author.IsBot && author.Id != this._client.CurrentUser.Id) {
+			if (author is null || author.IsBot && author.Id != this._client.CurrentUser.Id) {
 				return;
 			}
 
@@ -216,8 +216,8 @@ namespace Espeon.Services {
 			}
 		}
 
-		async Task ICommandHandlingService.ExecuteCommandAsync(CachedUser author, ITextChannel channel,
-			string content, CachedUserMessage message) {
+		async Task ICommandHandlingService.ExecuteCommandAsync(CachedUser author, ITextChannel channel, string content,
+			CachedUserMessage message) {
 			await HandleMessageAsync(author, channel, content, message);
 		}
 
@@ -228,11 +228,11 @@ namespace Espeon.Services {
 				this._logger.Log(Source.Commands, Severity.Error, string.Empty, failed.Exception);
 
 #if !DEBUG
-                var c = _client.GetChannel(463299724326469634) as CachedTextChannel;
+                var c = this._client.GetChannel(463299724326469634) as CachedTextChannel;
 
                 var ex = failed.Exception.ToString();
 
-                await c.SendMessageAsync(Format.Sanitize(ex.Length > 1000 ? ex.Substring(0, 1000) : ex));
+                await c.SendMessageAsync(Markdown.EscapeMarkdown(ex.Length > 1000 ? ex.Substring(0, 1000) : ex));
 #endif
 			}
 

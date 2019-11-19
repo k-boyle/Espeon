@@ -18,7 +18,7 @@ namespace Espeon.Core {
 					},
 					Description = content,
 					Color = Color.Gold
-				}.AddField("\u200b", Markdown.MaskedUrl("Original Message", jumpUrl));
+				}.AddField("\u200b", Markdown.Link("Original Message", jumpUrl));
 
 			if (!string.IsNullOrEmpty(imageUrl)) {
 				builder.WithImageUrl(imageUrl);

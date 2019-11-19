@@ -1,9 +1,9 @@
-﻿using Casino.DependencyInjection;
-using Disqord;
+﻿using Disqord;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Kommon.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ namespace Espeon.Services {
 					return;
 				}
 
-				await using var userStore = services.GetService<UserStore>();
+				using var userStore = services.GetService<UserStore>();
 
 				User user = await userStore.GetOrCreateUserAsync(args.Message.Author);
 				user.CandyAmount += this._config.RandomCandyAmount;

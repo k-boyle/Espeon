@@ -1,11 +1,11 @@
-using Casino.Common;
-using Casino.DependencyInjection;
 using Disqord;
 using Espeon.Commands;
 using Espeon.Core;
 using Espeon.Core.Database;
 using Espeon.Core.Database.UserStore;
 using Espeon.Core.Services;
+using Kommon.Common;
+using Kommon.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -124,7 +124,7 @@ namespace Espeon.Services {
 
 			await channel.SendMessageAsync(user.Mention, embed: embed);
 
-			await using var ctx = this._services.GetService<UserStore>();
+			using var ctx = this._services.GetService<UserStore>();
 
 			ctx.Reminders.Remove(reminder);
 
