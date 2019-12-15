@@ -367,18 +367,20 @@ namespace Espeon.Commands {
 			var added = 0;
 
 			foreach (LocalCustomEmoji emoji in emojis) {
-				if (emoji.IsAnimated && animatedCount >= 50) {
-					failed.Add(emoji);
-					continue;
-				}
-
-				if (!emoji.IsAnimated && normalCount >= 50) {
-					failed.Add(emoji);
-					continue;
-				}
+				// if (emoji.IsAnimated && animatedCount >= 50) {
+				// 	failed.Add(emoji);
+				// 	continue;
+				// }
+				//
+				// if (!emoji.IsAnimated && normalCount >= 50) {
+				// 	failed.Add(emoji);
+				// 	continue;
+				// }
 
 				Stream stream = await client.GetStreamAsync(emoji.GetUrl());
-				await Guild.CreateEmojiAsync(emoji.Name, new LocalAttachment(stream, emoji.Name),
+				var mStream = new MemoryStream();
+				await stream.CopyToAsync(mStream);
+				await Guild.CreateEmojiAsync(new LocalAttachment(mStream, emoji.Name),
 					options: RestRequestOptions.FromReason("Emote stolen"));
 
 				animatedCount = Guild.Emojis.Count(x => x.Value.IsAnimated);
@@ -473,7 +475,7 @@ namespace Espeon.Commands {
 			object toInspect = target switch {
 				"user" => id == 0
 					? Member
-					: await Guild.GetOrFetchMemberAsync(id) ?? await Client.GetOrFetchUserAsync(id),
+					: await Guild.GetOrFetchMemberAsync(id) ?? await Client.GetOrFetchUserAsync(id) as object,
 				"channel" => id == 0 ? Channel : Client.GetChannel(id),
 				"role"    => Guild.GetRole(id),
 				"guild"   => id == 0 ? Guild : Client.GetGuild(id),
@@ -554,8 +556,8 @@ namespace Espeon.Commands {
 		[Command("delayed")]
 		[Name("Delayed Execution")]
 		public Task DelayedExecutionAsync(TimeSpan executeIn, [Remainder] string command) {
-			Scheduler.ScheduleTask(executeIn,
-				() => CommandHanlder.ExecuteCommandAsync(Member, Channel, Context.PrefixUsed + command,
+			Scheduler.ScheduleTask(command, executeIn,
+				c => CommandHanlder.ExecuteCommandAsync(Member, Channel, Context.PrefixUsed + c,
 					Context.Message));
 
 			return SendOkAsync(0);
