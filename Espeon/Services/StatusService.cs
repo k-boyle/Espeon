@@ -14,30 +14,24 @@ namespace Espeon.Services {
 
 		private static readonly TimeSpan Delay = TimeSpan.FromMinutes(1);
 
-		public StatusService(IServiceProvider services) : base(services) { }
+		private readonly Func<(ActivityType, string)>[] _statuses;
+
+		public StatusService(IServiceProvider services) : base(services) {
+			this._statuses = new Func<(ActivityType, string)>[] {
+				() => (ActivityType.Watching, "you"),
+				() => (ActivityType.Playing, $"with {this._client.Guilds.Sum(x => x.Value.MemberCount)} people"),
+				() => (ActivityType.Listening, "Pokemon opening theme"),
+				() => (ActivityType.Watching, $"over {this._commands.GetAllCommands().Count} commands")
+			};
+		}
 
 		async Task IStatusService.RunStatusesAsync() {
-			int last = -1;
-
 			while (true) {
-				(ActivityType, string)[] statuses = {
-					(ActivityType.Watching, "you"),
-					(ActivityType.Playing, $"with {this._client.Guilds.Sum(x => x.Value.MemberCount)} people"),
-					(ActivityType.Listening, "Pokemon opening theme"),
-					(ActivityType.Watching, $"over {this._commands.GetAllCommands().Count} commands")
-				};
-
-				int next;
-
-				do {
-					next = this._random.Next(statuses.Length);
-				} while (next == last);
-
-				(ActivityType activityType, string str) = statuses[next];
-
+				int next = this._random.Next(this._statuses.Length);
+				(ActivityType activityType, string str) = this._statuses[next]();
+				
 				await this._client.SetPresenceAsync(new LocalActivity(str, activityType));
 
-				last = next;
 				await Task.Delay(Delay);
 			}
 		}
