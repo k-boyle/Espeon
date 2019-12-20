@@ -358,46 +358,22 @@ namespace Espeon.Commands {
 		[RequirePermissions(PermissionTarget.User, PermissionType.Guild, Permission.ManageEmojis)]
 		[Description("Adds the specified emote(s) to your guild")]
 		public async Task StealEmoteAsync(params LocalCustomEmoji[] emojis) {
-			int animatedCount = Guild.Emojis.Count(x => x.Value.IsAnimated);
-			int normalCount = Guild.Emojis.Count(x => !x.Value.IsAnimated);
-
-			var failed = new List<LocalCustomEmoji>();
 			HttpClient client = ClientFactory.CreateClient();
 
 			var added = 0;
 
 			foreach (LocalCustomEmoji emoji in emojis) {
-				// if (emoji.IsAnimated && animatedCount >= 50) {
-				// 	failed.Add(emoji);
-				// 	continue;
-				// }
-				//
-				// if (!emoji.IsAnimated && normalCount >= 50) {
-				// 	failed.Add(emoji);
-				// 	continue;
-				// }
-
 				Stream stream = await client.GetStreamAsync(emoji.GetUrl());
 				var mStream = new MemoryStream();
 				await stream.CopyToAsync(mStream);
-				await Guild.CreateEmojiAsync(new LocalAttachment(mStream, emoji.Name),
+				await Guild.CreateEmojiAsync(mStream, emoji.Name,
 					options: RestRequestOptions.FromReason("Emote stolen"));
-
-				animatedCount = Guild.Emojis.Count(x => x.Value.IsAnimated);
-				normalCount = Guild.Emojis.Count(x => !x.Value.IsAnimated);
-
 				added++;
 
 				stream.Dispose();
 			}
 
-			if (failed.Count < emojis.Length) {
-				await SendOkAsync(0, added);
-			}
-
-			if (failed.Count > 0) {
-				await SendNotOkAsync(1, string.Join(", ", failed.Select(x => x.Name)));
-			}
+			await SendOkAsync(0, added);
 		}
 
 		[Command("Quote")]
@@ -557,8 +533,7 @@ namespace Espeon.Commands {
 		[Name("Delayed Execution")]
 		public Task DelayedExecutionAsync(TimeSpan executeIn, [Remainder] string command) {
 			Scheduler.ScheduleTask(command, executeIn,
-				c => CommandHanlder.ExecuteCommandAsync(Member, Channel, Context.PrefixUsed + c,
-					Context.Message));
+				c => CommandHanlder.ExecuteCommandAsync(Member, Channel, Context.PrefixUsed + c, Context.Message));
 
 			return SendOkAsync(0);
 		}
