@@ -1,12 +1,12 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace Espeon
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
+        //TODO config from args
+        static async Task Main(string[] args) {
+            var config = await Config.FromJsonFileAsync("./config.json");
         }
     }
 }
