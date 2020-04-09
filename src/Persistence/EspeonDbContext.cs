@@ -1,5 +1,6 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace Espeon.Persistence {
@@ -21,8 +22,31 @@ namespace Espeon.Persistence {
         }
 
         public async Task PersistGuildAsync(IGuild guild) {
-            await GuildPrefixes.AddAsync(new GuildPrefixes(guild.Id));
+            Console.WriteLine("here");
+            if (await GuildPrefixes.FindAsync(guild.Id.RawValue) is null) {
+                Console.WriteLine("here2");
+                await GuildPrefixes.AddAsync(new GuildPrefixes(guild.Id));
+            }
+            Console.WriteLine("here3");
+            
             await SaveChangesAsync();
+        }
+        
+        public async Task RemoveGuildAsync(IGuild guild) {
+            var prefixes = await GuildPrefixes.FindAsync(guild.Id.RawValue);
+            GuildPrefixes.Remove(prefixes);
+            
+            await SaveChangesAsync();
+        }
+        
+        public async Task UpdateAsync<T>(T newData) where T : class {
+            switch (newData) {
+                case GuildPrefixes prefixes:
+                    GuildPrefixes.Update(prefixes);
+                    break;
+            }
+            
+            await  SaveChangesAsync();
         }
     }
 }
