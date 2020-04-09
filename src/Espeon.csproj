@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00051" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0-preview.2.20159.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.0-preview2" />
   </ItemGroup>
 
   <ItemGroup>
