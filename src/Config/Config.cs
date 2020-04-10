@@ -6,6 +6,7 @@ namespace Espeon {
     //TODO don't use the third world serialiser that requires mutable models
     public class Config {
         public DiscordConfig Discord { get; set; }
+        public PostgresConfig Postgres { get; set; }
 
         private Config() { }
 
@@ -18,6 +19,10 @@ namespace Espeon {
             public string Token { get; set; }
             
             private DiscordConfig() {}
+        }
+        
+        public class PostgresConfig {
+            public string ConnectionString { get; set; }
         }
     }
 }

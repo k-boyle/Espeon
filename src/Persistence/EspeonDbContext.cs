@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace Espeon.Persistence {
     public class EspeonDbContext : DbContext {
+        private readonly Config _config;
         private const string MentionPrefixLiteral = "<mention>";
+        
+        public EspeonDbContext(Config config) {
+            this._config = config;
+        }
         
         private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
-            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Port=5432;Database=Espeon;Username=postgres;Password=casino");
+            => optionsBuilder.UseNpgsql(this._config.Postgres.ConnectionString);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<GuildPrefixes>(model => {
