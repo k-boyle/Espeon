@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Espeon.Persistence {
+namespace Espeon {
     public class EspeonDbContext : DbContext {
         private readonly Config _config;
         private readonly ILogger _logger;

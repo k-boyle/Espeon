@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Espeon.Persistence {
+namespace Espeon {
     [Table("prefixes")]
     public class GuildPrefixes {
         [Key]

@@ -1,14 +1,12 @@
 ﻿using Disqord;
 using Disqord.Bot;
 using Disqord.Events;
-using Espeon.Logging;
-using Espeon.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Espeon.DisqordImplementations {
+namespace Espeon {
     public class EspeonBot : DiscordBot {
         private readonly ILogger _logger;
 

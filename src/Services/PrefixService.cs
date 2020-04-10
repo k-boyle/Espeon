@@ -1,6 +1,5 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
-using Espeon.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -8,7 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.Services {
+namespace Espeon {
     public class PrefixService {
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;

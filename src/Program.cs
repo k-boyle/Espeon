@@ -1,8 +1,4 @@
 ﻿using Disqord;
-using Espeon.DisqordImplementations;
-using Espeon.Logging;
-using Espeon.Persistence;
-using Espeon.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 

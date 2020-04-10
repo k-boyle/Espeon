@@ -1,11 +1,10 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
-using Espeon.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Espeon.DisqordImplementations {
+namespace Espeon {
     public class EspeonPrefixProvider : IPrefixProvider {
         private readonly PrefixService _prefixService;
         

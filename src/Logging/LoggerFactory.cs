@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace Espeon.Logging {
+namespace Espeon {
     public static class LoggerFactory {
         private const string LoggingTemplate = "{Timestamp:dd-MM-yyyy HH:mm:ss} [{Level,-11}] ({SourceContext,15}) {Message}{NewLine}{Exception}";
         
