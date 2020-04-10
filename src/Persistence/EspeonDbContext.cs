@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,12 @@ using System.Threading.Tasks;
 namespace Espeon.Persistence {
     public class EspeonDbContext : DbContext {
         private readonly Config _config;
+        private readonly ILogger _logger;
         private const string MentionPrefixLiteral = "<mention>";
         
-        public EspeonDbContext(Config config) {
+        public EspeonDbContext(Config config, ILogger logger) {
             this._config = config;
+            this._logger = logger.ForContext("SourceContext", GetType().Name);
         }
         
         private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
@@ -31,10 +34,12 @@ namespace Espeon.Persistence {
         }
 
         public async Task<GuildPrefixes> GetPrefixesAsync(IGuild guild) {
+            this._logger.Debug("Loading prefixes for guild {Guild}", guild.Name);
             return await GuildPrefixes.SingleOrDefaultAsync(prefix => prefix.GuildId == guild.Id);
         }
 
         public async Task PersistGuildAsync(IGuild guild) {
+            this._logger.Debug("Persisting {Guild}", guild.Name);
             if (await GuildPrefixes.FindAsync(guild.Id.RawValue) != null) {
                 return;
             }
@@ -44,6 +49,7 @@ namespace Espeon.Persistence {
         }
         
         public async Task RemoveGuildAsync(IGuild guild) {
+            this._logger.Debug("Removing {Guild}", guild.Name);
             var prefixes = await GuildPrefixes.FindAsync(guild.Id.RawValue);
             GuildPrefixes.Remove(prefixes);
             
@@ -51,6 +57,7 @@ namespace Espeon.Persistence {
         }
         
         public async Task UpdateAsync<T>(T newData) where T : class {
+            this._logger.Debug("Updating {@Data}", newData);
             switch (newData) {
                 case GuildPrefixes prefixes:
                     GuildPrefixes.Update(prefixes);

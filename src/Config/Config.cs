@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using Serilog;
+using Serilog.Events;
+using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -7,12 +10,15 @@ namespace Espeon {
     public class Config {
         public DiscordConfig Discord { get; set; }
         public PostgresConfig Postgres { get; set; }
+        public LoggingConfig Logging { get; set; }
 
         private Config() { }
 
         public static async Task<Config> FromJsonFileAsync(string fileDir) {
             await using var json = File.OpenRead(fileDir);
-            return await JsonSerializer.DeserializeAsync<Config>(json);
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter());
+            return await JsonSerializer.DeserializeAsync<Config>(json, options);
         }
         
         public class DiscordConfig {
@@ -25,6 +31,16 @@ namespace Espeon {
             public string ConnectionString { get; set; }
             
             private PostgresConfig() {}
+        }
+        
+        public class LoggingConfig {
+            public bool WriteToFile { get; set; }
+            public bool WriteToConsole { get; set; }
+            public string Path { get; set; }
+            public LogEventLevel Level { get; set; }
+            public RollingInterval RollingInterval { get; set; }
+            
+            private LoggingConfig() {}
         }
     }
 }

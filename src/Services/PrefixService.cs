@@ -2,6 +2,7 @@
 using Disqord.Bot.Prefixes;
 using Espeon.Persistence;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,10 +11,12 @@ using System.Threading.Tasks;
 namespace Espeon.Services {
     public class PrefixService {
         private readonly IServiceProvider _services;
+        private readonly ILogger _logger;
         private readonly ConcurrentDictionary<ulong, GuildPrefixes> _guildPrefixes;
 
-        public PrefixService(IServiceProvider services) {
+        public PrefixService(IServiceProvider services, ILogger logger) {
             this._services = services;
+            this._logger = logger.ForContext("SourceContext", GetType().Name);
             this._guildPrefixes = new ConcurrentDictionary<ulong, GuildPrefixes>();
         }
         
@@ -24,11 +27,13 @@ namespace Espeon.Services {
         }
         
         private async Task<IEnumerable<IPrefix>> GetPrefixesFromDbAsync(IGuild guild) {
+            this._logger.Information("Loading prefixes for db for {Guild}", guild.Name);
             await using var context = this._services.GetService<EspeonDbContext>();
             return (this._guildPrefixes[guild.Id] = await context.GetPrefixesAsync(guild)).Values;
         }
 
         public ValueTask<bool> TryAddPrefixAsync(IGuild guild, IPrefix prefix) {
+            this._logger.Information("Adding prefix {Prefix} to {Guild}", prefix, guild.Name);
             var modified = false;
             var prefixes = this._guildPrefixes.AddOrUpdate(
                 guild.Id,
@@ -44,6 +49,7 @@ namespace Espeon.Services {
         }
 
         public ValueTask<bool> TryRemovePrefixAsync(IGuild guild, IPrefix prefix) {
+            this._logger.Information("Removing prefix {Prefix} to {Guild}", prefix, guild.Name);
             var modified = false;
             var prefixes = this._guildPrefixes.AddOrUpdate(
                 guild.Id,
