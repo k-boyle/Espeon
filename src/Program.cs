@@ -20,9 +20,8 @@ namespace Espeon {
                     return new EspeonBot(config.Discord.Token, prefixProvider, botConfig);
                 })
                 .AddSingleton(config)
-                .AddTransient<EspeonDbContext>()
                 .AddSingleton<PrefixService>()
-                .AddSingleton<EspeonPrefixProvider>()
+                .AddTransient<EspeonDbContext>()
                 .BuildServiceProvider();
             await using var espeon = services.GetService<EspeonBot>();
             await espeon.RunAsync();
