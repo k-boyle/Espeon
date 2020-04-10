@@ -18,7 +18,7 @@ namespace Espeon.DisqordImplementations {
                 return this._prefixService.GetPrefixesAsync(channel.Guild);
             }
             
-            throw new InvalidOperationException("Bot should not be listening to dm's");
+            throw new InvalidOperationException("Bot should not be listening to dms");
         }
     }
 }

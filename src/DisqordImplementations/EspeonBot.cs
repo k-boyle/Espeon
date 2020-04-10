@@ -5,6 +5,7 @@ using Espeon.Logging;
 using Espeon.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Espeon.DisqordImplementations {
@@ -41,6 +42,23 @@ namespace Espeon.DisqordImplementations {
             this._logger.Information("Left {Guild}", e.Guild.Name);
             await using var context = this.GetService<EspeonDbContext>();
             await context.RemoveGuildAsync(e.Guild);
+        }
+
+        protected override async ValueTask<bool> CheckMessageAsync(CachedUserMessage message) {
+            if (message.Author.IsBot) {
+                return false;
+            }
+            
+            if (!(message.Channel is IPrivateChannel)) {
+                var member = message.Author as CachedMember;
+                Debug.Assert(member != null);
+                this._logger.Debug("Received message in {Guild} from {Author}", member.Guild.Name, member.DisplayName);
+                return true;
+            }
+
+            this._logger.Debug("Received dm from {Author}", message.Author.Name);
+            await message.Channel.SendMessageAsync("My programmer is too lazy to make me work in dms");
+            return false;
         }
     }
 }
