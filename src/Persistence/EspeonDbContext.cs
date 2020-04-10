@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,10 +35,11 @@ namespace Espeon.Persistence {
         }
 
         public async Task PersistGuildAsync(IGuild guild) {
-            if (await GuildPrefixes.FindAsync(guild.Id.RawValue) is null) {
-                await GuildPrefixes.AddAsync(new GuildPrefixes(guild.Id));
+            if (await GuildPrefixes.FindAsync(guild.Id.RawValue) != null) {
+                return;
             }
             
+            await GuildPrefixes.AddAsync(new GuildPrefixes(guild.Id));
             await SaveChangesAsync();
         }
         
@@ -59,7 +61,7 @@ namespace Espeon.Persistence {
         }
         
         private IPrefix ParseStringAsPrefix(string value) {
-            return string.Equals(value, MentionPrefixLiteral) 
+            return string.Equals(value, MentionPrefixLiteral, StringComparison.OrdinalIgnoreCase) 
                 ? MentionPrefix.Instance as IPrefix
                 : new StringPrefix(value);
         }
