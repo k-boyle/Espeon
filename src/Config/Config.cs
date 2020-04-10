@@ -23,6 +23,8 @@ namespace Espeon {
         
         public class PostgresConfig {
             public string ConnectionString { get; set; }
+            
+            private PostgresConfig() {}
         }
     }
 }
