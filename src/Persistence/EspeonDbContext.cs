@@ -1,9 +1,14 @@
 ﻿using Disqord;
+using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espeon.Persistence {
     public class EspeonDbContext : DbContext {
+        private const string MentionPrefixLiteral = "<mention>";
+        
         private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
@@ -13,6 +18,9 @@ namespace Espeon.Persistence {
             modelBuilder.Entity<GuildPrefixes>(model => {
                 model.HasIndex(prefixes => prefixes.GuildId).IsUnique();
                 model.Property(prefixes => prefixes.GuildId).ValueGeneratedNever();
+                model.Property(prefixes => prefixes.Values).HasConversion(
+                    prefixes => prefixes.Select(x => x.ToString()).ToArray(),
+                    arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
             });
         }
 
@@ -42,7 +50,13 @@ namespace Espeon.Persistence {
                     break;
             }
             
-            await  SaveChangesAsync();
+            await SaveChangesAsync();
+        }
+        
+        private IPrefix ParseStringAsPrefix(string value) {
+            return string.Equals(value, MentionPrefixLiteral) 
+                ? MentionPrefix.Instance as IPrefix
+                : new StringPrefix(value);
         }
     }
 }

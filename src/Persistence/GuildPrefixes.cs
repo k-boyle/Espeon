@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Disqord.Bot.Prefixes;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Espeon.Persistence {
@@ -10,12 +12,13 @@ namespace Espeon.Persistence {
         
         [Required]
         [Column("prefixes")]
-        public string[] Prefixes { get; set; }
+        public HashSet<IPrefix> Values { get; set; }
 
         public GuildPrefixes(ulong guildId) {
             GuildId = guildId;
-            Prefixes = new[] {
-                "es/"
+            Values = new HashSet<IPrefix> {
+                new StringPrefix("es/"),
+                MentionPrefix.Instance
             };
         }
     }
