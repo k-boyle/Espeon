@@ -1,14 +1,12 @@
 ﻿using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Prefixes;
-using Disqord.Events;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Espeon {
-    public class EspeonBot : DiscordBot {
+    public partial class EspeonBot : DiscordBot {
         private readonly ILogger _logger;
 
         public EspeonBot(ILogger logger, string token, EspeonPrefixProvider prefixProvider, DiscordBotConfiguration configuration)
@@ -20,27 +18,6 @@ namespace Espeon {
             Logger.MessageLogged += (sender, log) => {
                 this._logger.Write(LoggingHelper.From(log.Severity), log.Exception, log.Message);
             };
-        }
-        
-        private async Task OnReadyAsync(ReadyEventArgs e) {
-            await using var context = this.GetService<EspeonDbContext>();
-            foreach (var guild in e.Client.Guilds.Values) {
-                this._logger.Information("Persisting {GuildName}", guild.Name);
-                await context.PersistGuildAsync(guild);
-            }
-            this._logger.Information("Espeon is ready!");
-        }
-
-        private async Task OnGuildJoined(JoinedGuildEventArgs e) {
-            this._logger.Information("Joined {Guild} with {Members} members", e.Guild.Name, e.Guild.MemberCount);
-            await using var context = this.GetService<EspeonDbContext>();
-            await context.PersistGuildAsync(e.Guild);
-        }
-
-        private async Task OnGuildLeft(LeftGuildEventArgs e) {
-            this._logger.Information("Left {Guild}", e.Guild.Name);
-            await using var context = this.GetService<EspeonDbContext>();
-            await context.RemoveGuildAsync(e.Guild);
         }
 
         protected override async ValueTask<bool> CheckMessageAsync(CachedUserMessage message) {
