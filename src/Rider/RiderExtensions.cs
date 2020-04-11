@@ -2,6 +2,7 @@
 using Serilog;
 
 namespace Espeon {
+    //TODO extract this to a different project
     public static class RiderExtensions {
         [SourceTemplate]
         public static void slog(this ILogger logger) {
