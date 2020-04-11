@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Espeon {
     public class EspeonDbContext : DbContext {
+#if DEBUG        
+        private readonly DbContextOptions _options;
+#endif        
         private readonly Config _config;
         private readonly ILogger _logger;
         private const string MentionPrefixLiteral = "<mention>";
@@ -17,11 +20,25 @@ namespace Espeon {
             this._config = config;
             this._logger = logger.ForContext("SourceContext", GetType().Name);
         }
+
+#if DEBUG
+        public EspeonDbContext(DbContextOptions options) : base(options) {
+            this._options = options;
+        }
+#endif
         
         private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
+        private DbSet<UserLocalisation> UserLocalisations { get; set; }
         
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
-            => optionsBuilder.UseNpgsql(this._config.Postgres.ConnectionString);
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+#if DEBUG            
+            if (this._options != null) {
+                return;
+            }
+#endif
+            
+            optionsBuilder.UseNpgsql(this._config.Postgres.ConnectionString);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<GuildPrefixes>(model => {
@@ -30,6 +47,15 @@ namespace Espeon {
                 model.Property(prefixes => prefixes.Values).HasConversion(
                     prefixes => prefixes.Select(x => x.ToString()).ToArray(),
                     arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
+            });
+
+            modelBuilder.Entity<UserLocalisation>(model => {
+                model.HasKey(localisation => new { localisation.GuildId, localisation.UserId });
+                model.Property(localisation => localisation.GuildId).ValueGeneratedNever();
+                model.Property(locatisation => locatisation.UserId).ValueGeneratedNever();
+                model.Property(localisation => localisation.Value).HasConversion(
+                    value => (int) value,
+                    value => (Localisation) value);
             });
         }
 
