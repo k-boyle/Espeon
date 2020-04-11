@@ -1,4 +1,5 @@
 ﻿using Disqord;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
@@ -23,6 +24,9 @@ namespace Espeon {
                 .AddSingleton<PrefixService>()
                 .AddTransient<EspeonDbContext>()
                 .BuildServiceProvider();
+            await using (var context = services.GetService<EspeonDbContext>()) {
+                await context.Database.MigrateAsync();
+            }
             await using var espeon = services.GetService<EspeonBot>();
             await espeon.RunAsync();
         }
