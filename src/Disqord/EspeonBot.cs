@@ -1,5 +1,6 @@
 ﻿using Disqord;
 using Disqord.Bot;
+using Disqord.Bot.Prefixes;
 using Disqord.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -57,6 +58,10 @@ namespace Espeon {
             this._logger.Debug("Received dm from {Author}", message.Author.Name);
             await message.Channel.SendMessageAsync("My programmer is too lazy to make me work in dms");
             return false;
+        }
+
+        protected override ValueTask<DiscordCommandContext> GetCommandContextAsync(CachedUserMessage message, IPrefix prefix) {
+            return new ValueTask<DiscordCommandContext>(new EspeonCommandContext(this, prefix, message));
         }
     }
 }

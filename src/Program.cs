@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -28,6 +29,7 @@ namespace Espeon {
                 await context.Database.MigrateAsync();
             }
             await using var espeon = services.GetService<EspeonBot>();
+            espeon.AddModules(Assembly.GetEntryAssembly());
             await espeon.RunAsync();
         }
     }
