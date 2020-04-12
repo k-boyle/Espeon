@@ -10,7 +10,7 @@ namespace Espeon {
         static async Task Main(string[] args) {
             var config = await Config.FromJsonFileAsync("./config.json");
             var logger = LoggerFactory.Create(config);
-            logger.Information("Starting Espeon...");
+            logger.ForContext("SourceContext", typeof(Program).Name).Information("Starting Espeon...");
             
             var services = new ServiceCollection()
                 .AddSingleton(provider => {

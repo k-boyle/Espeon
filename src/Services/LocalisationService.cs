@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -26,6 +27,7 @@ namespace Espeon {
 
         public async Task InitialiseAsync() {
             var config = this._services.GetService<Config>();
+            var sw = Stopwatch.StartNew();
             this._logger.Information("Loading all localisation strings");
             
             if (config.Localisation?.Path is null) {
@@ -52,7 +54,8 @@ namespace Espeon {
 
                 this._responses[fileName] = responsesForFile;
             }
-            this._logger.Information("All localisation strings loaded");
+            sw.Stop();
+            this._logger.Information("All localisation strings loaded in {Time}ms", sw.ElapsedMilliseconds);
         }
         
         public ValueTask<string> GetResponseAsync(IGuild guild, IUser user, string key) {
