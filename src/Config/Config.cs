@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Serilog.Events;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,6 +12,7 @@ namespace Espeon {
         public DiscordConfig Discord { get; set; }
         public PostgresConfig Postgres { get; set; }
         public LoggingConfig Logging { get; set; }
+        public LocalisationConfig Localisation { get; set; }
 
         private Config() { }
 
@@ -41,6 +43,13 @@ namespace Espeon {
             public RollingInterval RollingInterval { get; set; }
             
             private LoggingConfig() {}
+        }
+        
+        public class LocalisationConfig {
+            public string Path { get; set; }
+            public HashSet<string> ExcludedFiles { get; set; }
+            
+            private LocalisationConfig() {}
         }
     }
 }

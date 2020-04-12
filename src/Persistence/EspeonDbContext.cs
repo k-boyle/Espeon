@@ -1,4 +1,4 @@
-using Disqord;
+﻿using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -78,8 +78,21 @@ namespace Espeon {
             this._logger.Debug("Removing {Guild}", guild.Name);
             var prefixes = await GuildPrefixes.FindAsync(guild.Id.RawValue);
             GuildPrefixes.Remove(prefixes);
-            
             await SaveChangesAsync();
+        }
+        
+        public async Task<UserLocalisation> GetLocalisationAsync(IGuild guild, IUser user) {
+            this._logger.Debug("Loading localisation for user {User}", user.Id);
+            return await UserLocalisations.FindAsync(guild.Id.RawValue, user.Id.RawValue)
+                 ?? await NewUserLocalisationAsync(guild, user);
+        }
+        
+        private async Task<UserLocalisation> NewUserLocalisationAsync(IGuild guild, IUser user) {
+            this._logger.Debug("Creating new user localisation for {User}", user.Id);
+            var localisation = new UserLocalisation(guild.Id, user.Id);
+            await UserLocalisations.AddAsync(localisation);
+            await SaveChangesAsync();
+            return localisation;
         }
         
         public async Task UpdateAsync<T>(T newData) where T : class {
@@ -87,6 +100,10 @@ namespace Espeon {
             switch (newData) {
                 case GuildPrefixes prefixes:
                     GuildPrefixes.Update(prefixes);
+                    break;
+                
+                case UserLocalisation localisation:
+                    UserLocalisations.Update(localisation);
                     break;
             }
             

@@ -23,12 +23,14 @@ namespace Espeon {
                 .AddSingleton(logger)
                 .AddSingleton(config)
                 .AddSingleton<PrefixService>()
+                .AddSingleton<LocalisationService>()
                 .AddTransient<EspeonDbContext>()
                 .BuildServiceProvider();
             await using (var context = services.GetService<EspeonDbContext>()) {
                 await context.Database.MigrateAsync();
             }
             await using var espeon = services.GetService<EspeonBot>();
+            await services.GetService<LocalisationService>().InitialiseAsync();
             espeon.AddModules(Assembly.GetEntryAssembly());
             await espeon.RunAsync();
         }
