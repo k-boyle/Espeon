@@ -33,30 +33,24 @@ namespace Espeon {
 
         public ValueTask<bool> TryAddPrefixAsync(IGuild guild, IPrefix prefix) {
             this._logger.Information("Adding prefix {Prefix} to {Guild}", prefix, guild.Name);
-            var modified = false;
-            var prefixes = this._guildPrefixes.AddOrUpdate(
-                guild.Id,
-                id => throw new KeyNotFoundException($"{guild.Id.ToString()} was not found in prefix cache, this shouldn't happen"),
-                (id, prefixes) => {
-                    modified = prefixes.Values.Add(prefix);
-                    return prefixes;
-                });
-            
-            return modified
-                ? new ValueTask<bool>(PersistAsync(prefixes))
-                : new ValueTask<bool>(false);
+            return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Add(prefix));
         }
 
         public ValueTask<bool> TryRemovePrefixAsync(IGuild guild, IPrefix prefix) {
             this._logger.Information("Removing prefix {Prefix} to {Guild}", prefix, guild.Name);
+            return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Remove(prefix));
+        }
+        
+        private ValueTask<bool> TryModifyAsync(IGuild guild, IPrefix prefix, Func<GuildPrefixes, IPrefix, bool> modifyFunc) {
             var modified = false;
             var prefixes = this._guildPrefixes.AddOrUpdate(
                 guild.Id,
-                id => throw new KeyNotFoundException($"{guild.Id.ToString()} was not found in prefix cache, this shouldn't happen"),
-                (id, prefixes) => {
-                    modified = prefixes.Values.Remove(prefix);
+                (id, func) => throw new KeyNotFoundException($"{guild.Id.ToString()} was not found in prefix cache, this shouldn't happen"),
+                (id, prefixes, func) => {
+                    modified = func(prefixes, prefix);
                     return prefixes;
-                });
+                },
+                modifyFunc);
             
             return modified
                 ? new ValueTask<bool>(PersistAsync(prefixes))
