@@ -5,11 +5,9 @@ using System;
 
 namespace Espeon {
     public class EspeonCommandContext : DiscordCommandContext {
-        public EspeonBot Bot { get; }
-        public CachedMember Member { get; }
-        public CachedGuild Guild { get; }
-        public CachedTextChannel Channel { get; }
-        public CachedMessage Message { get; }
+        public new EspeonBot Bot { get; }
+        public new CachedMember Member { get; }
+        public new CachedTextChannel Channel { get; }
 
         public EspeonCommandContext(EspeonBot bot, IPrefix prefix, CachedUserMessage message) 
                 : base(bot, prefix, message) {
@@ -18,9 +16,7 @@ namespace Espeon {
             }
             Bot = bot;
             Member = member;
-            Guild = member.Guild;
             Channel = channel;
-            Message = message;
         }
     }
 }
