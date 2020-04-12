@@ -1,5 +1,5 @@
 ﻿namespace Espeon {
-    public enum LocalisationKey {
+    public enum LocalisationStringKey {
         PING_COMMAND
     }
 }

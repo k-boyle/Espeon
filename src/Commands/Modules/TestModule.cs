@@ -1,6 +1,6 @@
 ﻿using Qmmands;
 using System.Threading.Tasks;
-using static Espeon.LocalisationKey;
+using static Espeon.LocalisationStringKey;
 
 namespace Espeon {
     public class TestModule : EspeonCommandModule {

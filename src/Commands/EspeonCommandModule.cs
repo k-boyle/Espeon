@@ -6,8 +6,8 @@ namespace Espeon {
     public abstract class EspeonCommandModule : DiscordModuleBase<EspeonCommandContext> {
         public LocalisationService LocalisationService { get; set; }
         
-        protected async Task<RestUserMessage> SendLocalisedMessageAsync(LocalisationKey key) {
-            var localisedString = await LocalisationService.GetResponseAsync(Context.Guild, Context.User, key);
+        protected async Task<RestUserMessage> SendLocalisedMessageAsync(LocalisationStringKey stringKey) {
+            var localisedString = await LocalisationService.GetResponseAsync(Context.Guild, Context.User, stringKey);
             return await Context.Channel.SendMessageAsync(localisedString);
         }
     }

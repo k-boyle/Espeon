@@ -12,14 +12,13 @@ namespace Espeon {
     public class LocalisationService : IInitialisableService {
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
-        private readonly ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationKey, string>> _responses;
-
+        private readonly ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>> _responses;
         private readonly ConcurrentDictionary<(ulong, ulong), Localisation> _userLocalisationCache;
 
-        public LocalisationService(IServiceProvider services) {
+        public LocalisationService(IServiceProvider services, ILogger logger) {
             this._services = services;
-            this._logger = services.GetService<ILogger>().ForContext("SourceContext", typeof(LocalisationService).Name);
-            this._responses = new ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationKey, string>>();
+            this._logger = logger.ForContext("SourceContext", typeof(LocalisationService).Name);
+            this._responses = new ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>>();
             this._userLocalisationCache = new ConcurrentDictionary<(ulong, ulong), Localisation>();
         }
 
@@ -43,7 +42,7 @@ namespace Espeon {
                     continue;
                 }
                 
-                var responsesForFile = new ConcurrentDictionary<LocalisationKey, string>();
+                var responsesForFile = new ConcurrentDictionary<LocalisationStringKey, string>();
                 var lines = await File.ReadAllLinesAsync(fullPath);
                 foreach (var line in lines) {
                     var split = line.Split('=', StringSplitOptions.RemoveEmptyEntries);
@@ -51,7 +50,7 @@ namespace Espeon {
                         throw new InvalidOperationException("Localisation string must have format \"key=value\"");
                     }
 
-                    if (!Enum.TryParse<LocalisationKey>(split[0], out var key)) {
+                    if (!Enum.TryParse<LocalisationStringKey>(split[0], out var key)) {
                         throw new InvalidOperationException($"{split[0]} was not recognised as a valid localisation key");
                     }
                     responsesForFile[key] = split[1];
@@ -63,23 +62,23 @@ namespace Espeon {
             this._logger.Information("All localisation strings loaded in {Time}ms", sw.ElapsedMilliseconds);
         }
         
-        public ValueTask<string> GetResponseAsync(IGuild guild, IUser user, LocalisationKey key) {
-            this._logger.Debug("Getting response string {Key} for {User}", key, user.Id);
+        public ValueTask<string> GetResponseAsync(IGuild guild, IUser user, LocalisationStringKey stringKey) {
+            this._logger.Debug("Getting response string {Key} for {User}", stringKey, user.Id);
             return this._userLocalisationCache.TryGetValue((guild.Id, user.Id), out var localisation)
-                ? new ValueTask<string>(GetResponse(localisation, key))
-                : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, key));
+                ? new ValueTask<string>(GetResponse(localisation, stringKey))
+                : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, stringKey));
         }
         
-        private async Task<string> GetUserLocalisationFromDbAsync(IGuild guild, IUser user, LocalisationKey key) {
-            this._logger.Debug("Getting response string {Key} for {User} from database", key, user.Id);
+        private async Task<string> GetUserLocalisationFromDbAsync(IGuild guild, IUser user, LocalisationStringKey stringKey) {
+            this._logger.Debug("Getting response string {Key} for {User} from database", stringKey, user.Id);
             await using var context = this._services.GetService<EspeonDbContext>();
             var localisation = await context.GetLocalisationAsync(guild, user);
             this._userLocalisationCache[(guild.Id, user.Id)] = localisation.Value;
-            return GetResponse(localisation.Value, key);
+            return GetResponse(localisation.Value, stringKey);
         }
         
-        private string GetResponse(Localisation localisation, LocalisationKey key) {
-            return this._responses[localisation].GetValueOrDefault(key, this._responses[Localisation.Default][key]);
+        private string GetResponse(Localisation localisation, LocalisationStringKey stringKey) {
+            return this._responses[localisation].GetValueOrDefault(stringKey, this._responses[Localisation.Default][stringKey]);
         }
     }
 }
