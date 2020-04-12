@@ -15,7 +15,7 @@ namespace Espeon {
 
         public PrefixService(IServiceProvider services, ILogger logger) {
             this._services = services;
-            this._logger = logger.ForContext("SourceContext", GetType().Name);
+            this._logger = logger.ForContext("SourceContext", typeof(PrefixService).Name);
             this._guildPrefixes = new ConcurrentDictionary<ulong, GuildPrefixes>();
         }
         

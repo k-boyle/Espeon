@@ -11,7 +11,7 @@ namespace Espeon {
 
         public EspeonBot(ILogger logger, string token, EspeonPrefixProvider prefixProvider, DiscordBotConfiguration configuration)
                 : base(TokenType.Bot, token, prefixProvider, configuration) {
-            this._logger = logger.ForContext("SourceContext", GetType().Name);
+            this._logger = logger.ForContext("SourceContext", typeof(EspeonBot).Name);
             Ready += OnReadyAsync;
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;

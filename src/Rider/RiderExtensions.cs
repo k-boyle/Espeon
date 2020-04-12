@@ -5,8 +5,9 @@ namespace Espeon {
     //TODO extract this to a different project
     public static class RiderExtensions {
         [SourceTemplate]
+        [Macro(Target = "clazz", Expression = "typeName()")]
         public static void slog(this ILogger logger) {
-            //$ this._logger = logger.ForContext("SourceContext", GetType().Name);
+            //$ this._logger = logger.ForContext("SourceContext", typeof(clazz).Name);
         }
         
         [SourceTemplate]

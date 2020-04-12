@@ -1,4 +1,4 @@
-﻿using Disqord;
+using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -18,7 +18,7 @@ namespace Espeon {
         
         public EspeonDbContext(Config config, ILogger logger) {
             this._config = config;
-            this._logger = logger.ForContext("SourceContext", GetType().Name);
+            this._logger = logger.ForContext("SourceContext", typeof(EspeonDbContext).Name);
         }
 
 #if DEBUG
