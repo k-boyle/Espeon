@@ -3,15 +3,17 @@ using System;
 using Espeon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Espeon.Migrations
 {
     [DbContext(typeof(EspeonDbContext))]
-    partial class EspeonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200413121322_reminders-initial")]
+    partial class remindersinitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

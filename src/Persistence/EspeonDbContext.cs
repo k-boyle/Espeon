@@ -16,6 +16,10 @@ namespace Espeon {
         private readonly ILogger _logger;
         private const string MentionPrefixLiteral = "<mention>";
         
+        private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
+        private DbSet<UserLocalisation> UserLocalisations { get; set; }
+        private DbSet<UserReminder> UserReminders { get; set; }
+        
         public EspeonDbContext(Config config, ILogger logger) {
             this._config = config;
             this._logger = logger.ForContext("SourceContext", typeof(EspeonDbContext).Name);
@@ -26,10 +30,7 @@ namespace Espeon {
             this._options = options;
         }
 #endif
-        
-        private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
-        private DbSet<UserLocalisation> UserLocalisations { get; set; }
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
 #if DEBUG            
             if (this._options != null) {
@@ -41,22 +42,42 @@ namespace Espeon {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            modelBuilder.Entity<GuildPrefixes>(model => {
-                model.HasIndex(prefixes => prefixes.GuildId).IsUnique();
-                model.Property(prefixes => prefixes.GuildId).ValueGeneratedNever();
-                model.Property(prefixes => prefixes.Values).HasConversion(
-                    prefixes => prefixes.Select(x => x.ToString()).ToArray(),
-                    arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
-            });
+            modelBuilder.Entity<GuildPrefixes>(
+                model => {
+                    model.HasIndex(prefixes => prefixes.GuildId).IsUnique();
+                    model.Property(prefixes => prefixes.GuildId).ValueGeneratedNever();
+                    model.Property(prefixes => prefixes.Values).HasConversion(
+                        prefixes => prefixes.Select(x => x.ToString()).ToArray(),
+                        arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
+                });
 
-            modelBuilder.Entity<UserLocalisation>(model => {
-                model.HasKey(localisation => new { localisation.GuildId, localisation.UserId });
-                model.Property(localisation => localisation.GuildId).ValueGeneratedNever();
-                model.Property(locatisation => locatisation.UserId).ValueGeneratedNever();
-                model.Property(localisation => localisation.Value).HasConversion(
-                    value => (int) value,
-                    value => (Localisation) value);
-            });
+            modelBuilder.Entity<UserLocalisation>(
+                model => {
+                    model.HasKey(
+                        localisation => new {
+                            localisation.GuildId,
+                            localisation.UserId
+                        });
+                    model.Property(localisation => localisation.GuildId).ValueGeneratedNever();
+                    model.Property(locatisation => locatisation.UserId).ValueGeneratedNever();
+                    model.Property(localisation => localisation.Value).HasConversion(
+                        value => (int) value,
+                        value => (Localisation) value);
+                });
+
+            modelBuilder.Entity<UserReminder>(
+                model => {
+                    model.HasKey(remidner => remidner.Id);
+                    model.Property(reminder => reminder.Id).ValueGeneratedOnAdd();
+                    model.Property(reminder => reminder.Value).ValueGeneratedNever();
+                    model.Property(reminder => reminder.ChannelId).ValueGeneratedNever();
+                    model.Property(reminder => reminder.TriggerAt).ValueGeneratedNever();
+                    model.Property(reminder => reminder.UserId).ValueGeneratedNever();
+                    model.Property(reminder => reminder.ReminderMessageId).ValueGeneratedNever();
+                    model.Property(reminder => reminder.TriggerAt).HasConversion(
+                        dateTime => dateTime.ToUnixTimeMilliseconds(),
+                        unixTime => DateTimeOffset.FromUnixTimeMilliseconds(unixTime));
+                });
         }
 
         public async Task<GuildPrefixes> GetPrefixesAsync(IGuild guild) {
@@ -95,6 +116,14 @@ namespace Espeon {
             return localisation;
         }
         
+        public async Task<IEnumerable<UserReminder>> GetRemindersAsync() {
+            return await UserReminders.ToListAsync();
+        }
+        
+        public async Task<IEnumerable<UserReminder>> GetRemindersAsync(Func<ulong, ulong, bool> predicate) {
+            return await UserReminders.Where(reminder => predicate(reminder.UserId, reminder.ChannelId)).ToListAsync();
+        }
+        
         public async Task UpdateAsync<T>(T newData) where T : class {
             this._logger.Debug("Updating {@Data}", newData);
             switch (newData) {
@@ -104,6 +133,10 @@ namespace Espeon {
                 
                 case UserLocalisation localisation:
                     UserLocalisations.Update(localisation);
+                    break;
+                
+                case UserReminder reminder:
+                    UserReminders.Update(reminder);
                     break;
             }
             
