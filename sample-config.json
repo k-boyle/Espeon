@@ -11,5 +11,8 @@
     "Path": "./logs/",
     "Level": "Information",
     "RollingInterval": "Day" 
+  },
+  "Localisation": {
+    "Path": "./Localisation/"
   }
 }
