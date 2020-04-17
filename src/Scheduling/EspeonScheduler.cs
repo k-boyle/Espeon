@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,13 +6,13 @@ namespace Espeon {
     public class EspeonScheduler {
         private static readonly TimeSpan MaxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
         
-        private readonly SortedSet<IScheduledTask> _tasks;
+        private readonly BinaryHeap<IScheduledTask> _tasks;
         private readonly object _lock = new object();
 
         private CancellationTokenSource _cts;
 
         public EspeonScheduler() {
-            this._tasks = new SortedSet<IScheduledTask>(ScheduledTaskComparer.Instance);
+            this._tasks = BinaryHeap<IScheduledTask>.CreateMinHeap();
             this._cts = new CancellationTokenSource();
             _ = TaskLoopAsync();
         }
@@ -24,17 +22,17 @@ namespace Espeon {
         private async Task TaskLoopAsync() {
             while (true) {
                 try {
-                    IScheduledTask next;
+                    bool wait;
                     lock (this._lock) {
-                        next = this._tasks.Min;
+                        wait = this._tasks.IsEmpty;
                     }
                     
-                    if (next is null) {
+                    if (wait) {
                         await Task.Delay(-1, this._cts.Token);
                     }
                     
                     TimeSpan executeIn;
-                    Debug.Assert(next != null);
+                    var next = this._tasks.Root;
                     while ((executeIn = next.ExecuteAt - DateTimeOffset.Now) > MaxDelay) {
                         await Task.Delay(MaxDelay, this._cts.Token);
                     }
@@ -48,7 +46,9 @@ namespace Espeon {
                     } catch (Exception ex) {
                         OnError?.Invoke(ex);
                     } finally {
-                        this._tasks.Remove(next);
+                        lock (this._lock) {
+                            this._tasks.TryRemoveRoot(out _);
+                        }
                     }
                 } catch (TaskCanceledException) {
                     this._cts.Dispose();
@@ -60,11 +60,11 @@ namespace Espeon {
         public ScheduledTask<T> DoAt<T>(DateTimeOffset executeAt, T state, Func<T, Task> callback) {
             var newTask = new ScheduledTask<T>(executeAt, state, callback);
             lock (this._lock) {
-                if (newTask.ExecuteAt < this._tasks.Min?.ExecuteAt) {
-                    this._tasks.Add(newTask);
+                if (newTask.ExecuteAt < this._tasks.Root?.ExecuteAt) {
+                    this._tasks.Insert(newTask);
                     this._cts.Cancel(true);
                 } else {
-                    this._tasks.Add(newTask);
+                    this._tasks.Insert(newTask);
                 }
 
                 return newTask;
@@ -74,11 +74,11 @@ namespace Espeon {
         public ScheduledTask<T> DoIn<T>(TimeSpan executeIn, T state, Func<T, Task> callback) {
             var newTask = new ScheduledTask<T>(DateTimeOffset.Now + executeIn, state, callback);
             lock (this._lock) {
-                if (newTask.ExecuteAt < this._tasks.Min?.ExecuteAt) {
-                    this._tasks.Add(newTask);
+                if (newTask.ExecuteAt < this._tasks.Root?.ExecuteAt) {
+                    this._tasks.Insert(newTask);
                     this._cts.Cancel(true);
                 } else {
-                    this._tasks.Add(newTask);
+                    this._tasks.Insert(newTask);
                 }
 
                 return newTask;
