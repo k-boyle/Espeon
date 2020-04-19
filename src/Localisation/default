@@ -1,1 +1,4 @@
 ﻿PING_COMMAND=pong
+REMINDER_CREATED=Reminder created
+REMINDER_PARSER_NO_TIMESPAN=A timespan needs to be specified when creating a reminder
+REMINDER_PARSER_IN_THE_PAST=Timespan must be in the future

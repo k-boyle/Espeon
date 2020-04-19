@@ -60,7 +60,7 @@ namespace Espeon {
         public ScheduledTask<T> DoAt<T>(DateTimeOffset executeAt, T state, Func<T, Task> callback) {
             var newTask = new ScheduledTask<T>(executeAt, state, callback);
             lock (this._lock) {
-                if (newTask.ExecuteAt < this._tasks.Root?.ExecuteAt) {
+                if (this._tasks.Root is null || newTask.ExecuteAt < this._tasks.Root.ExecuteAt) {
                     this._tasks.Insert(newTask);
                     this._cts.Cancel(true);
                 } else {
@@ -74,7 +74,7 @@ namespace Espeon {
         public ScheduledTask<T> DoIn<T>(TimeSpan executeIn, T state, Func<T, Task> callback) {
             var newTask = new ScheduledTask<T>(DateTimeOffset.Now + executeIn, state, callback);
             lock (this._lock) {
-                if (newTask.ExecuteAt < this._tasks.Root?.ExecuteAt) {
+                if (this._tasks.Root is null || newTask.ExecuteAt < this._tasks.Root.ExecuteAt) {
                     this._tasks.Insert(newTask);
                     this._cts.Cancel(true);
                 } else {

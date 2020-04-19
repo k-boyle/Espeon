@@ -1,6 +1,8 @@
-﻿using Disqord;
+using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Prefixes;
+using Microsoft.Extensions.DependencyInjection;
+using Qmmands;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -13,11 +15,15 @@ namespace Espeon {
                 : base(TokenType.Bot, token, prefixProvider, configuration) {
             this._logger = logger.ForContext("SourceContext", typeof(EspeonBot).Name);
             Ready += OnReadyAsync;
+            Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;
             Logger.MessageLogged += (sender, log) => {
                 this._logger.Write(LoggingHelper.From(log.Severity), log.Exception, log.Message);
             };
+            this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
+            
+            AddTypeParser(new UserReminderTypeParser());
         }
 
         protected override async ValueTask<bool> CheckMessageAsync(CachedUserMessage message) {

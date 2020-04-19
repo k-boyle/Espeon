@@ -34,7 +34,9 @@ namespace Espeon {
                 .AddSingleton(logger)
                 .AddSingleton(config)
                 .AddSingleton<PrefixService>()
+                .AddSingleton<EspeonScheduler>()
                 .AddInitialisableSingleton<LocalisationService>()
+                .AddOnReadySingleton<ReminderService>()
                 .AddTransient<EspeonDbContext>()
                 .BuildServiceProvider();
         }

@@ -1,5 +1,6 @@
-﻿using Disqord.Events;
+using Disqord.Events;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -11,6 +12,14 @@ namespace Espeon {
                 await context.PersistGuildAsync(guild);
             }
             this._logger.Information("Espeon is ready!");
+        }
+
+        private async Task OnFirstReadyAsync(ReadyEventArgs e) {
+            Ready -= OnFirstReadyAsync;
+            await using var context = this.GetService<EspeonDbContext>();
+            foreach (var service in this.GetServices<IOnReadyService>()) {
+                await service.OnReadyAsync(context);
+            }
         }
 
         private async Task OnGuildJoined(JoinedGuildEventArgs e) {
