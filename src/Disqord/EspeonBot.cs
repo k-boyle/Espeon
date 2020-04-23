@@ -1,4 +1,4 @@
-using Disqord;
+﻿using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Prefixes;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,9 +18,7 @@ namespace Espeon {
             Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;
-            Logger.MessageLogged += (sender, log) => {
-                this._logger.Write(LoggingHelper.From(log.Severity), log.Exception, log.Message);
-            };
+            Logger.MessageLogged += OnDisqordLog;
             this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
             
             AddTypeParser(new UserReminderTypeParser());
@@ -45,6 +43,14 @@ namespace Espeon {
 
         protected override ValueTask<DiscordCommandContext> GetCommandContextAsync(CachedUserMessage message, IPrefix prefix) {
             return new ValueTask<DiscordCommandContext>(new EspeonCommandContext(this, prefix, message));
+        }
+
+        protected override ValueTask AfterExecutedAsync(IResult result, DiscordCommandContext context) {
+            if (result is FailedResult f) {
+                this._logger.Information(f.Reason);
+            }
+            
+            return new ValueTask();
         }
     }
 }

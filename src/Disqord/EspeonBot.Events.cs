@@ -1,4 +1,5 @@
-using Disqord.Events;
+﻿using Disqord.Events;
+using Disqord.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -32,6 +33,14 @@ namespace Espeon {
             this._logger.Information("Left {Guild}", e.Guild.Name);
             await using var context = this.GetService<EspeonDbContext>();
             await context.RemoveGuildAsync(e.Guild);
+        }
+        
+        private void OnDisqordLog(object sender, MessageLoggedEventArgs e) {
+            this._logger.Write(LoggingHelper.From(e.Severity), e.Exception, e.Message);
+        }
+        
+        private void OnSchedulerError(Exception ex) {
+            this._logger.Error("Error occured inside of the scheduler", ex);
         }
     }
 }
