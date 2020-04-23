@@ -16,9 +16,9 @@ V4 branch is a WIP, look at v3 for older (questionable) source
     "Level": "Information",
     "RollingInterval": "Day" 
   },
-     "Localisation": {
-       "Path": "./Localisation/"
-     }
+  "Localisation": {
+    "Path": "./Localisation/"
+  }
 }
 ```
 
