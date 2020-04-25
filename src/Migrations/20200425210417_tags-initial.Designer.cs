@@ -3,15 +3,17 @@ using System;
 using Espeon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Espeon.Migrations
 {
     [DbContext(typeof(EspeonDbContext))]
-    partial class EspeonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200425210417_tags-initial")]
+    partial class tagsinitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,7 +133,7 @@ namespace Espeon.Migrations
                     b.HasBaseType("Espeon.Tag");
 
                     b.Property<decimal>("CreatorId")
-                        .HasColumnName("creator_id")
+                        .HasColumnName("created_id")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("GuildId")

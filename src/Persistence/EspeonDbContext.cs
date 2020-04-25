@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,8 @@ namespace Espeon {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            var dtoConverter = new DateTimeOffsetToBinaryConverter();
+            
             modelBuilder.Entity<GuildPrefixes>(
                 model => {
                     model.HasIndex(prefixes => prefixes.GuildId).IsUnique();
@@ -61,23 +64,38 @@ namespace Espeon {
                         });
                     model.Property(localisation => localisation.GuildId).ValueGeneratedNever();
                     model.Property(locatisation => locatisation.UserId).ValueGeneratedNever();
-                    model.Property(localisation => localisation.Value).HasConversion(
-                        value => (int) value,
-                        value => (Localisation) value);
+                    model.Property(localisation => localisation.Value)
+                        .HasConversion(new EnumToNumberConverter<Localisation, int>());
                 });
 
             modelBuilder.Entity<UserReminder>(
                 model => {
-                    model.HasKey(remidner => remidner.Id);
+                    model.HasKey(reminder => reminder.Id);
                     model.Property(reminder => reminder.Id).ValueGeneratedOnAdd();
                     model.Property(reminder => reminder.Value).ValueGeneratedNever();
                     model.Property(reminder => reminder.ChannelId).ValueGeneratedNever();
                     model.Property(reminder => reminder.TriggerAt).ValueGeneratedNever();
                     model.Property(reminder => reminder.UserId).ValueGeneratedNever();
                     model.Property(reminder => reminder.ReminderMessageId).ValueGeneratedNever();
-                    model.Property(reminder => reminder.TriggerAt).HasConversion(
-                        dateTime => dateTime.ToUnixTimeMilliseconds(),
-                        unixTime => DateTimeOffset.FromUnixTimeMilliseconds(unixTime));
+                    model.Property(reminder => reminder.TriggerAt).HasConversion(dtoConverter);
+                });
+
+            modelBuilder.Entity<Tag>(
+                model => {
+                    model.HasKey(tag => tag.Id);
+                    model.Property(tag => tag.Id).ValueGeneratedOnAdd();
+                    model.Property(tag => tag.Key).ValueGeneratedNever();
+                    model.Property(tag => tag.Uses).ValueGeneratedNever();
+                    model.Property(tag => tag.Value).ValueGeneratedNever();
+                    model.Property(tag => tag.CreateAt).ValueGeneratedNever();
+                    model.Property(tag => tag.CreateAt).HasConversion(dtoConverter);
+                });
+
+            modelBuilder.Entity<GuildTag>(
+                model => {
+                    model.Property(tag => tag.CreatorId).ValueGeneratedNever();
+                    model.Property(tag => tag.GuildId).ValueGeneratedNever();
+                    model.Property(tag => tag.OwnerId).ValueGeneratedNever();
                 });
         }
 
