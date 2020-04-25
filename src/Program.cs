@@ -12,15 +12,17 @@ namespace Espeon {
         static async Task Main(string[] args) {
             var config = await Config.FromJsonFileAsync("./config.json");
             var logger = LoggerFactory.Create(config);
-            logger.ForContext("SourceContext", typeof(Program).Name).Information("Starting Espeon...");
+            var programLogger = logger.ForContext("SourceContext", typeof(Program).Name);
+            programLogger.Information("Starting Espeon...");
             
             var services = CreateServiceProvider(logger, config);
             
             await using (var context = services.GetService<EspeonDbContext>()) {
+                programLogger.Information("Migrating database...");
                 await context.Database.MigrateAsync();
             }
 
-            await InitialiseServicesAsync(services);
+            await InitialiseServicesAsync(programLogger, services);
             await RunEspeonAsync(services);
         }
 
@@ -41,13 +43,14 @@ namespace Espeon {
                 .BuildServiceProvider();
         }
 
-        private static async Task InitialiseServicesAsync(IServiceProvider services) {
+        private static async Task InitialiseServicesAsync(ILogger logger, IServiceProvider services) {
             foreach (var service in services.GetServices<IInitialisableService>()) {
+                logger.Information("Initialising {Service}", service.GetType().Name);
                 await service.InitialiseAsync();
             }
         }
         
-        private static async Task RunEspeonAsync(ServiceProvider services) {
+        private static async Task RunEspeonAsync(IServiceProvider services) {
             await using var espeon = services.GetService<EspeonBot>();
             espeon.AddModules(Assembly.GetEntryAssembly());
             await espeon.RunAsync();
