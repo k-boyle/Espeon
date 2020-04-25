@@ -29,7 +29,12 @@ namespace Espeon {
         [Column("reminder_string")]
         public string Value { get; set; }
 
-        public UserReminder(ulong channelId, ulong userId, ulong reminderMessageId, DateTimeOffset triggerAt, string value) {
+        public UserReminder(
+                ulong channelId,
+                ulong userId,
+                ulong reminderMessageId,
+                DateTimeOffset triggerAt,
+                string value) {
             ChannelId = channelId;
             UserId = userId;
             ReminderMessageId = reminderMessageId;
