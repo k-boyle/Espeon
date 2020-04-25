@@ -33,6 +33,12 @@ namespace Espeon {
                     var botConfig = new DiscordBotConfiguration { ProviderFactory = _ => provider };
                     return new EspeonBot(logger, config.Discord.Token, prefixProvider, botConfig); 
                 })
+                .AddSingleton(provider => {
+                    var config = provider.GetService<Config>();
+                    return new DbContextOptionsBuilder()
+                        .UseNpgsql(config.Postgres.ConnectionString)
+                        .Options;
+                })
                 .AddSingleton(logger)
                 .AddSingleton(config)
                 .AddSingleton<PrefixService>()

@@ -1,46 +1,27 @@
-﻿using Disqord;
-using Disqord.Bot.Prefixes;
+﻿using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Espeon {
     public partial class EspeonDbContext : DbContext {
-#if DEBUG        
-        private readonly DbContextOptions _options;
-#endif        
-        private readonly Config _config;
-        private readonly ILogger _logger;
         private const string MentionPrefixLiteral = "<mention>";
         
+        private readonly ILogger _logger;
+
         private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
         private DbSet<UserLocalisation> UserLocalisations { get; set; }
         private DbSet<UserReminder> UserReminders { get; set; }
         private DbSet<Tag> Tags { get; set; }
-        
-        public EspeonDbContext(Config config, ILogger logger) {
-            this._config = config;
+
+        public EspeonDbContext(DbContextOptions options, ILogger logger) : base(options) {
             this._logger = logger.ForContext("SourceContext", typeof(EspeonDbContext).Name);
         }
-
-#if DEBUG
-        public EspeonDbContext(DbContextOptions options) : base(options) {
-            this._options = options;
-        }
-#endif
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-#if DEBUG            
-            if (this._options != null) {
-                return;
-            }
-#endif
-            
-            optionsBuilder.UseNpgsql(this._config.Postgres.ConnectionString);
+        
+        internal EspeonDbContext(DbContextOptions options) : base(options) {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -99,7 +80,7 @@ namespace Espeon {
                 });
         }
 
-        private IPrefix ParseStringAsPrefix(string value) {
+        private static IPrefix ParseStringAsPrefix(string value) {
             return string.Equals(value, MentionPrefixLiteral, StringComparison.OrdinalIgnoreCase) 
                 ? MentionPrefix.Instance as IPrefix
                 : new StringPrefix(value);
