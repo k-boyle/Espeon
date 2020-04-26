@@ -3,15 +3,17 @@ using System;
 using Espeon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Espeon.Migrations
 {
     [DbContext(typeof(EspeonDbContext))]
-    partial class EspeonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200426181046_tags-added-guild-tags")]
+    partial class tagsaddedguildtags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,8 +150,7 @@ namespace Espeon.Migrations
                         .HasColumnName("creator_id")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<decimal>("GuildId")
-                        .HasColumnName("guild_id")
+                    b.Property<decimal?>("GuildId")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("OwnerId")
@@ -167,9 +168,7 @@ namespace Espeon.Migrations
                 {
                     b.HasOne("Espeon.GuildTags", "GuildTags")
                         .WithMany("Values")
-                        .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GuildId");
                 });
 #pragma warning restore 612, 618
         }

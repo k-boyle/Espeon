@@ -16,6 +16,7 @@ namespace Espeon {
         private DbSet<UserLocalisation> UserLocalisations { get; set; }
         private DbSet<UserReminder> UserReminders { get; set; }
         private DbSet<Tag> Tags { get; set; }
+        private DbSet<GuildTags> GuildTags { get; set; }
 
         public EspeonDbContext(DbContextOptions options, ILogger logger) : base(options) {
             this._logger = logger.ForContext("SourceContext", typeof(EspeonDbContext).Name);
@@ -72,10 +73,18 @@ namespace Espeon {
                     model.Property(tag => tag.CreateAt).HasConversion(dtoConverter);
                 });
 
+            modelBuilder.Entity<GuildTags>(
+                model => {
+                    model.HasIndex(tags => tags.GuildId).IsUnique();
+                    model.Property(tags => tags.GuildId).ValueGeneratedNever();
+                    model.HasMany(tags => tags.Values).WithOne(tag => tag.GuildTags).OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity<GuildTag>(
                 model => {
-                    model.Property(tag => tag.CreatorId).ValueGeneratedNever();
+                    model.HasOne(tag => tag.GuildTags).WithMany(tags => tags.Values).HasForeignKey(tag => tag.GuildId);
                     model.Property(tag => tag.GuildId).ValueGeneratedNever();
+                    model.Property(tag => tag.CreatorId).ValueGeneratedNever();
                     model.Property(tag => tag.OwnerId).ValueGeneratedNever();
                 });
         }

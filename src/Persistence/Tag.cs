@@ -24,9 +24,9 @@ namespace Espeon {
         [Column("uses")]
         public int Uses { get; set; }
 
-        protected Tag(string value, string key) {
-            Value = value;
+        protected Tag(string key, string value) {
             Key = key;
+            Value = value;
             CreateAt = DateTimeOffset.Now;
         }
     }
