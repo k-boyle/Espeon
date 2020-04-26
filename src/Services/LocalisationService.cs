@@ -61,24 +61,36 @@ namespace Espeon {
             sw.Stop();
             this._logger.Information("All localisation strings loaded in {Time}ms", sw.ElapsedMilliseconds);
         }
-        
-        public ValueTask<string> GetResponseAsync(IGuild guild, IUser user, LocalisationStringKey stringKey) {
+
+        public ValueTask<string> GetResponseAsync(
+                IGuild guild,
+                IUser user,
+                LocalisationStringKey stringKey,
+                params object[] args) {
             this._logger.Debug("Getting response string {Key} for {User}", stringKey, user.Id);
             return this._userLocalisationCache.TryGetValue((guild.Id, user.Id), out var localisation)
-                ? new ValueTask<string>(GetResponse(localisation, stringKey))
-                : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, stringKey));
+                ? new ValueTask<string>(GetResponse(localisation, stringKey, args))
+                : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, stringKey, args));
         }
         
-        private async Task<string> GetUserLocalisationFromDbAsync(IGuild guild, IUser user, LocalisationStringKey stringKey) {
+        private async Task<string> GetUserLocalisationFromDbAsync(
+                IGuild guild,
+                IUser user,
+                LocalisationStringKey stringKey,
+                object[] args) {
             this._logger.Debug("Getting response string {Key} for {User} from database", stringKey, user.Id);
             await using var context = this._services.GetService<EspeonDbContext>();
             var localisation = await context.GetLocalisationAsync(guild, user);
             this._userLocalisationCache[(guild.Id, user.Id)] = localisation.Value;
-            return GetResponse(localisation.Value, stringKey);
+            return GetResponse(localisation.Value, stringKey, args);
         }
         
-        private string GetResponse(Localisation localisation, LocalisationStringKey stringKey) {
-            return this._responses[localisation].GetValueOrDefault(stringKey, this._responses[Localisation.Default][stringKey]);
+        private string GetResponse(Localisation localisation, LocalisationStringKey stringKey, object[] args) {
+            var unformattedString = this._responses[localisation].GetValueOrDefault(stringKey,
+                this._responses[Localisation.Default][stringKey]);
+            return args.Length > 0
+                ? string.Format(unformattedString, args)
+                : unformattedString;
         }
     }
 }
