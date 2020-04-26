@@ -12,7 +12,7 @@ namespace Espeon {
         [Command("", "create")]
         public async Task CreateReminderAsync([Remainder] UserReminder reminder) {
             await ReminderService.CreateReminderAsync(reminder);
-            await SendLocalisedMessageAsync(REMINDER_CREATED);
+            await ReplyAsync(REMINDER_CREATED);
         }
     }
 }
