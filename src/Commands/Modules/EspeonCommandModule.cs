@@ -7,7 +7,7 @@ namespace Espeon {
     public abstract class EspeonCommandModule : DiscordModuleBase<EspeonCommandContext> {
         public LocalisationService LocalisationService { get; set; }
         
-        protected async Task<RestUserMessage> SendLocalisedMessageAsync(
+        protected async Task<RestUserMessage> ReplyAsync(
                 LocalisationStringKey stringKey,
                 LocalMentions mentions = null,
                 params object[] args) {
