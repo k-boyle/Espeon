@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Espeon {
     public partial class EspeonDbContext {
+        public async Task<GuildTag> GetTagAsync(IGuild guild, string name) {
+            return await GetTagAsync(guild,tag => tag.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+        }
+        
         public async Task<GuildTag> GetTagAsync(IGuild guild, Predicate<GuildTag> predicate) {
             var tags = await GuildTags.Include(tags => tags.Values)
                 .FirstOrDefaultAsync(tags => tags.GuildId == guild.Id.RawValue);

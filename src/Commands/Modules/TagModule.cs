@@ -12,8 +12,7 @@ namespace Espeon {
         [Name("Use Tag")]
         [Command]
         public async Task ExecuteTagAsync([Example("espeon")][Remainder] string name) {
-            var tag = await DbContext.GetTagAsync(Context.Guild,
-                tag => tag.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            var tag = await DbContext.GetTagAsync(Context.Guild, name);
             if (tag is null) {
                 await ReplyAsync(GUILDTAG_DOESNT_EXIST, args: name);
                 return;
