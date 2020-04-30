@@ -12,6 +12,7 @@ namespace Espeon {
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
 
+        //TODO config from args
         private static async Task Main(string[] args) {
             var config = await Config.FromJsonFileAsync("./config.json");
             var logger = LoggerFactory.Create(config);
@@ -36,8 +37,6 @@ namespace Espeon {
             await InitialiseServicesAsync();
             await RunEspeonAsync();
         }
-
-        //TODO config from args
 
         private static ServiceProvider CreateServiceProvider(ILogger logger, Config config) {
            return new ServiceCollection()
