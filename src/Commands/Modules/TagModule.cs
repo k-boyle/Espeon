@@ -28,8 +28,7 @@ namespace Espeon {
         public async Task CreateTagAsync(
                 [Example("espeon")] string name,
                 [Example("is really cool")][Remainder] string value) {
-            var tag = await DbContext.GetTagAsync(Context.Guild,
-                tag => tag.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            var tag = await DbContext.GetTagAsync(Context.Guild, name);
             
             if (tag != null) {
                 await ReplyAsync(GUILDTAG_ALREADY_EXISTS, args: name);
