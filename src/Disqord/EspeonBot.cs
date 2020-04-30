@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -24,6 +25,7 @@ namespace Espeon {
             this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
             
             AddTypeParser(new UserReminderTypeParser());
+            AddModules(Assembly.GetEntryAssembly());
         }
 
         protected override async ValueTask<bool> CheckMessageAsync(CachedUserMessage message) {

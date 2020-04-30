@@ -1,5 +1,6 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -7,25 +8,36 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Espeon {
-    class Program {
-        //TODO config from args
-        static async Task Main(string[] args) {
+    internal class Program {
+        private readonly IServiceProvider _services;
+        private readonly ILogger _logger;
+
+        private static async Task Main(string[] args) {
             var config = await Config.FromJsonFileAsync("./config.json");
             var logger = LoggerFactory.Create(config);
-            var programLogger = logger.ForContext("SourceContext", typeof(Program).Name);
-            programLogger.Information("Starting Espeon...");
-            
             var services = CreateServiceProvider(logger, config);
-            
-            using (var scope = services.CreateScope()) {
+            var program = new Program(logger, services);
+            await program.StartAsync();
+        }
+
+        private Program(ILogger logger, IServiceProvider services) {
+            this._services = services;
+            this._logger = logger.ForContext("SourceContext", typeof(Program).Name);
+        }
+
+        private async Task StartAsync() {
+            this._logger.Information("Starting Espeon...");
+            using (var scope = this._services.CreateScope()) {
                 await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
-                programLogger.Information("Migrating database...");
+                this._logger.Information("Migrating database...");
                 await context.Database.MigrateAsync();
             }
 
-            await InitialiseServicesAsync(programLogger, services);
-            await RunEspeonAsync(services);
+            await InitialiseServicesAsync();
+            await RunEspeonAsync();
         }
+
+        //TODO config from args
 
         private static ServiceProvider CreateServiceProvider(ILogger logger, Config config) {
            return new ServiceCollection()
@@ -46,16 +58,15 @@ namespace Espeon {
                 .BuildServiceProvider();
         }
 
-        private static async Task InitialiseServicesAsync(ILogger logger, IServiceProvider services) {
-            foreach (var service in services.GetServices<IInitialisableService>()) {
-                logger.Information("Initialising {Service}", service.GetType().Name);
+        private async Task InitialiseServicesAsync() {
+            foreach (var service in this._services.GetServices<IInitialisableService>()) {
+                this._logger.Information("Initialising {Service}", service.GetType().Name);
                 await service.InitialiseAsync();
             }
         }
         
-        private static async Task RunEspeonAsync(IServiceProvider services) {
-            await using var espeon = services.GetService<EspeonBot>();
-            espeon.AddModules(Assembly.GetEntryAssembly());
+        private async Task RunEspeonAsync() {
+            await using var espeon = this._services.GetService<EspeonBot>();
             await espeon.RunAsync();
         }
     }
