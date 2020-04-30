@@ -50,14 +50,19 @@ namespace Espeon {
 
         private Task OnCommandExecuted(CommandExecutedEventArgs e) {
             var context = (EspeonCommandContext) e.Context;
+            this._logger.Information(
+                "Executed {Command} for {User} in {Guild}/{Channel}",
+                context.Command.Name,
+                context.Member.DisplayName,
+                context.Guild.Name,
+                context.Channel.Name);
             context.ServiceScope.Dispose();
             return Task.CompletedTask;
         }
 
-        private Task OnCommandExecutionFailed(CommandExecutionFailedEventArgs e) {
+        private async Task OnCommandExecutionFailed(CommandExecutionFailedEventArgs e) {
             var context = (EspeonCommandContext) e.Context;
-            context.ServiceScope.Dispose();
-            return Task.CompletedTask;
+            await ExecutionFailedAsync(context, e.Result);
         }
     }
 }

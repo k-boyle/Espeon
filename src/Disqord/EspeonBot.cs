@@ -50,14 +50,23 @@ namespace Espeon {
             return new ValueTask<DiscordCommandContext>(new EspeonCommandContext(scope, this, prefix, message));
         }
 
-        protected override ValueTask AfterExecutedAsync(IResult result, DiscordCommandContext c) {
-            if (result is FailedResult f) {
-                this._logger.Information(f.Reason);
+        protected override async ValueTask AfterExecutedAsync(IResult result, DiscordCommandContext context) {
+            if (result is FailedResult failedResult && !(result is ExecutionFailedResult)) {
+                await ExecutionFailedAsync((EspeonCommandContext) context, failedResult);
             }
-            
-            var context = (EspeonCommandContext) c;
+        }
+        
+        private async Task ExecutionFailedAsync(EspeonCommandContext context, FailedResult result) {
+            this._logger.Information(
+                "Execution failed of {Command} for {User} in {Guild}/{Channel}",
+                context.Command?.Name,
+                context.Member.DisplayName,
+                context.Guild.Name,
+                context.Channel.Name,
+                result.Reason);
+            //temp
+            await context.Channel.SendMessageAsync(result.Reason);
             context.ServiceScope.Dispose();
-            return new ValueTask();
         }
     }
 }
