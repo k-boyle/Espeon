@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace Espeon {
     internal class Program {
+        private const string DefaultConfigDir = "./config.json";
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
 
-        //TODO config from args
         private static async Task Main(string[] args) {
-            var config = await Config.FromJsonFileAsync("./config.json");
+            var configDir = args.Length > 0 ? args[0] : DefaultConfigDir;
+            var config = await Config.FromJsonFileAsync(configDir);
             var logger = LoggerFactory.Create(config);
             var services = CreateServiceProvider(logger, config);
             var program = new Program(logger, services);

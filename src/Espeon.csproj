@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <None Update="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Localisation\owo">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
