@@ -19,6 +19,8 @@ namespace Espeon {
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;
             Logger.MessageLogged += OnDisqordLog;
+            CommandExecuted += OnCommandExecuted;
+            CommandExecutionFailed += OnCommandExecutionFailed;
             this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
             
             AddTypeParser(new UserReminderTypeParser());
@@ -42,14 +44,17 @@ namespace Espeon {
         }
 
         protected override ValueTask<DiscordCommandContext> GetCommandContextAsync(CachedUserMessage message, IPrefix prefix) {
-            return new ValueTask<DiscordCommandContext>(new EspeonCommandContext(this, prefix, message));
+            var scope = this.CreateScope();
+            return new ValueTask<DiscordCommandContext>(new EspeonCommandContext(scope, this, prefix, message));
         }
 
-        protected override ValueTask AfterExecutedAsync(IResult result, DiscordCommandContext context) {
+        protected override ValueTask AfterExecutedAsync(IResult result, DiscordCommandContext c) {
             if (result is FailedResult f) {
                 this._logger.Information(f.Reason);
             }
             
+            var context = (EspeonCommandContext) c;
+            context.ServiceScope.Dispose();
             return new ValueTask();
         }
     }

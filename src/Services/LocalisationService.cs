@@ -79,7 +79,8 @@ namespace Espeon {
                 LocalisationStringKey stringKey,
                 object[] args) {
             this._logger.Debug("Getting response string {Key} for {User} from database", stringKey, user.Id);
-            await using var context = this._services.GetService<EspeonDbContext>();
+            using var scope = this._services.CreateScope();
+            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             var localisation = await context.GetLocalisationAsync(guild, user);
             this._userLocalisationCache[(guild.Id, user.Id)] = localisation.Value;
             return GetResponse(localisation.Value, stringKey, args);

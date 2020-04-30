@@ -17,7 +17,8 @@ namespace Espeon {
             
             var services = CreateServiceProvider(logger, config);
             
-            await using (var context = services.GetService<EspeonDbContext>()) {
+            using (var scope = services.CreateScope()) {
+                await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
                 programLogger.Information("Migrating database...");
                 await context.Database.MigrateAsync();
             }
@@ -29,15 +30,11 @@ namespace Espeon {
         private static ServiceProvider CreateServiceProvider(ILogger logger, Config config) {
            return new ServiceCollection()
                 .AddSingleton(provider => {
+                    var logger = provider.GetService<ILogger>();
+                    var config = provider.GetService<Config>();
                     var prefixProvider = new EspeonPrefixProvider(provider.GetService<PrefixService>());
                     var botConfig = new DiscordBotConfiguration { ProviderFactory = _ => provider };
                     return new EspeonBot(logger, config.Discord.Token, prefixProvider, botConfig); 
-                })
-                .AddSingleton(provider => {
-                    var config = provider.GetService<Config>();
-                    return new DbContextOptionsBuilder()
-                        .UseNpgsql(config.Postgres.ConnectionString)
-                        .Options;
                 })
                 .AddSingleton(logger)
                 .AddSingleton(config)
@@ -45,7 +42,7 @@ namespace Espeon {
                 .AddSingleton<EspeonScheduler>()
                 .AddInitialisableSingleton<LocalisationService>()
                 .AddOnReadySingleton<ReminderService>()
-                .AddTransient<EspeonDbContext>()
+                .AddDbContext<EspeonDbContext>(options => options.UseNpgsql(config.Postgres.ConnectionString))
                 .BuildServiceProvider();
         }
 

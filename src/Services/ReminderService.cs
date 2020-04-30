@@ -30,7 +30,8 @@ namespace Espeon {
                 } else {
                     this._logger.Debug("Scheduling reminder for {User} at {At}", reminder.UserId, reminder.TriggerAt);
                     this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => { 
-                        await using var context = state._services.GetService<EspeonDbContext>();
+                        using var scope = this._services.CreateScope();
+                        await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
                         await OnReminderAync(context, state.reminder, false);
                     });
                 }
@@ -39,10 +40,12 @@ namespace Espeon {
         
         public async Task CreateReminderAsync(UserReminder reminder) {
             this._logger.Debug("Creating reminder for {User}", reminder.UserId);
-            await using var context = this._services.GetService<EspeonDbContext>();
+            using var scope = this._services.CreateScope();
+            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             await context.PersistReminderAsync(reminder);
             this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => {
-                await using var context = state._services.GetService<EspeonDbContext>();
+                using var scope = state._services.CreateScope();
+                await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
                 await OnReminderAync(context, state.reminder, false);
             });
         }
