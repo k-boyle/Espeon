@@ -29,11 +29,15 @@ namespace Espeon {
                     await OnReminderAync(context, reminder, true);
                 } else {
                     this._logger.Debug("Scheduling reminder for {user} at {at}", reminder.UserId, reminder.TriggerAt);
-                    this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => { 
-                        using var scope = this._services.CreateScope();
-                        await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
-                        await OnReminderAync(context, state.reminder, false);
-                    });
+                    this._scheduler.DoAt(
+                        string.Concat("reminder-", reminder.UserId.ToString(), "-", reminder.Id),
+                        reminder.TriggerAt,
+                        (reminder, this._services),
+                        async state => {
+                            using var scope = this._services.CreateScope();
+                            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+                            await OnReminderAync(context, state.reminder, false);
+                        });
                 }
             }
         }
@@ -43,11 +47,15 @@ namespace Espeon {
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             await context.PersistAsync(reminder);
-            this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => {
-                using var scope = state._services.CreateScope();
-                await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
-                await OnReminderAync(context, state.reminder, false);
-            });
+            this._scheduler.DoAt(
+                string.Concat("reminder-", reminder.UserId.ToString(), "-", reminder.Id),
+                reminder.TriggerAt,
+                (reminder, this._services),
+                async state => {
+                    using var scope = state._services.CreateScope();
+                    await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+                    await OnReminderAync(context, state.reminder, false);
+                });
         }
         
         private async Task OnReminderAync(EspeonDbContext context, UserReminder reminder, bool late) {

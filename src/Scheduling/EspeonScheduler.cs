@@ -14,7 +14,7 @@ namespace Espeon {
         private CancellationTokenSource _cts;
 
         public EspeonScheduler(ILogger logger) {
-            this._logger = logger;
+            this._logger = logger.ForContext("SourceContext", nameof(EspeonScheduler));
             this._tasks = BinaryHeap<IScheduledTask>.CreateMinHeap();
             this._cts = new CancellationTokenSource();
             _ = TaskLoopAsync();
