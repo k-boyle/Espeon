@@ -17,7 +17,7 @@ namespace Espeon {
             this._services = services;
             this._scheduler = scheduler;
             this._espeon = espeon;
-            this._logger = logger.ForContext("SourceContext", typeof(ReminderService).Name);
+            this._logger = logger.ForContext("SourceContext", nameof(ReminderService));
         }
 
         public async Task OnReadyAsync(EspeonDbContext context) {

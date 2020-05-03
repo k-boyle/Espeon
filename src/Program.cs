@@ -24,7 +24,7 @@ namespace Espeon {
 
         private Program(ILogger logger, IServiceProvider services) {
             this._services = services;
-            this._logger = logger.ForContext("SourceContext", typeof(Program).Name);
+            this._logger = logger.ForContext("SourceContext", nameof(Program));
         }
 
         private async Task StartAsync() {

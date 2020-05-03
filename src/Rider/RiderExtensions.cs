@@ -7,7 +7,7 @@ namespace Espeon {
         [SourceTemplate]
         [Macro(Target = "clazz", Expression = "typeName()")]
         public static void slog(this ILogger logger) {
-            //$ this._logger = logger.ForContext("SourceContext", typeof(clazz).Name);
+            //$ this._logger = logger.ForContext("SourceContext", nameof(clazz));
         }
         
         [SourceTemplate]

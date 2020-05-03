@@ -19,7 +19,7 @@ namespace Espeon {
         private DbSet<GuildTags> GuildTags { get; set; }
 
         public EspeonDbContext(DbContextOptions options, ILogger logger) : base(options) {
-            this._logger = logger.ForContext("SourceContext", typeof(EspeonDbContext).Name);
+            this._logger = logger.ForContext("SourceContext", nameof(EspeonDbContext));
         }
         
         internal EspeonDbContext(DbContextOptions options) : base(options) {

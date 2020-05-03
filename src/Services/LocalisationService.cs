@@ -17,7 +17,7 @@ namespace Espeon {
 
         public LocalisationService(IServiceProvider services, ILogger logger) {
             this._services = services;
-            this._logger = logger.ForContext("SourceContext", typeof(LocalisationService).Name);
+            this._logger = logger.ForContext("SourceContext", nameof(LocalisationService));
             this._responses = new ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>>();
             this._userLocalisationCache = new ConcurrentDictionary<(ulong, ulong), Localisation>();
         }
