@@ -4,6 +4,7 @@ using Disqord.Bot.Prefixes;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -58,7 +59,8 @@ namespace Espeon {
         
         private async Task ExecutionFailedAsync(EspeonCommandContext context, FailedResult result) {
             this._logger.Information(
-                "Execution failed of {Command} for {User} in {Guild}/{Channel}",
+                (result as ExecutionFailedResult)?.Exception,
+                "Execution failed of {Command} for {User} in {Guild}/{Channel} because of {Reason}",
                 context.Command?.Name,
                 context.Member.DisplayName,
                 context.Guild.Name,
