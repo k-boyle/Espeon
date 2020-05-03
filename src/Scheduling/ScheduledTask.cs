@@ -14,7 +14,7 @@ namespace Espeon {
             : this(null, executeAt, state, callback) { }
         
         public ScheduledTask(string name, DateTimeOffset executeAt, T state, Func<T, Task> callback) {
-            Name = name ?? string.Concat("Task: ", _taskCounter++);
+            Name = name ?? string.Concat("Task: ", _taskCounter++.ToString());
             ExecuteAt = executeAt;
             State = state;
             Callback = () => callback(state);
