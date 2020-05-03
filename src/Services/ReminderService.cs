@@ -42,7 +42,7 @@ namespace Espeon {
             this._logger.Debug("Creating reminder for {User}", reminder.UserId);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
-            await context.PersistReminderAsync(reminder);
+            await context.PersistAsync(reminder);
             this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => {
                 using var scope = state._services.CreateScope();
                 await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
@@ -66,7 +66,7 @@ namespace Espeon {
 ;                await channel.SendMessageAsync($"<@{reminder.UserId}>", embed: embed);
             }
 
-            await context.RemoveReminderAync(reminder);
+            await context.RemoveAsync(reminder);
         }
     }
 }

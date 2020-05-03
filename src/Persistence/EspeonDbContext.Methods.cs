@@ -42,16 +42,84 @@ namespace Espeon {
                 case UserReminder reminder:
                     UserReminders.Update(reminder);
                     break;
-                
-                case Tag tag:
-                    Tags.Update(tag);
-                    break;
-                
+
                 case GuildTags tags:
                     GuildTags.Update(tags);
                     break;
+
+                case Tag tag:
+                    Tags.Update(tag);
+                    break;
             }
             
+            await SaveChangesAsync();
+        }
+        
+        public async Task PersistAsync<T>(T data) where T : class {
+            this._logger.Debug("Persisting {Data}", data);
+            switch (data) {
+                case GuildPrefixes prefixes:
+                    await GuildPrefixes.AddAsync(prefixes);
+                    break;
+                
+                case UserLocalisation localisation:
+                    await UserLocalisations.AddAsync(localisation);
+                    break;
+                
+                case UserReminder reminder:
+                    await UserReminders.AddAsync(reminder);
+                    break;
+
+                case GuildTags tags:
+                    await GuildTags.AddAsync(tags);
+                    break;
+                
+                case GuildTag tag: {
+                    var tags = await GuildTags.FindAsync(tag.GuildId);
+                    tags.Values.Add(tag);
+                    GuildTags.Update(tags);
+                    break;
+                }
+                
+                case Tag tag:
+                    await Tags.AddAsync(tag);
+                    break;
+            }
+
+            await SaveChangesAsync();
+        }
+        
+        public async Task RemoveAsync<T>(T data) where T : class {
+            this._logger.Debug("Removing {Data}", data);
+            switch (data) {
+                case GuildPrefixes prefixes:
+                    GuildPrefixes.Remove(prefixes);
+                    break;
+                
+                case UserLocalisation localisation:
+                    UserLocalisations.Remove(localisation);
+                    break;
+                
+                case UserReminder reminder:
+                    UserReminders.Remove(reminder);
+                    break;
+
+                case GuildTags tags:
+                    GuildTags.Remove(tags);
+                    break;
+                
+                case GuildTag tag: {
+                    var tags = await GuildTags.FindAsync(tag.GuildId);
+                    tags.Values.Remove(tag);
+                    GuildTags.Update(tags);
+                    break;
+                }
+                
+                case Tag tag:
+                    Tags.Remove(tag);
+                    break;
+            }
+
             await SaveChangesAsync();
         }
     }

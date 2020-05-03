@@ -12,8 +12,7 @@ namespace Espeon {
         private async Task<UserLocalisation> NewUserLocalisationAsync(IGuild guild, IUser user) {
             this._logger.Debug("Creating new user localisation for {User}", user.Id);
             var localisation = new UserLocalisation(guild.Id, user.Id);
-            await UserLocalisations.AddAsync(localisation);
-            await SaveChangesAsync();
+            await PersistAsync(localisation);
             return localisation;
         }
     }
