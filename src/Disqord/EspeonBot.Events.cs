@@ -2,7 +2,6 @@
 using Disqord.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
-using Qmmands.Delegates;
 using System;
 using System.Threading.Tasks;
 

@@ -1,10 +1,8 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Espeon {

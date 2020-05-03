@@ -1,5 +1,4 @@
 ﻿using Disqord;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Espeon {
