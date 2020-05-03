@@ -6,5 +6,6 @@ namespace Espeon {
         public DateTimeOffset ExecuteAt { get; }
         public Func<Task> Callback { get; }
         public string Name { get; }
+        public bool IsCancelled { get; }
     }
 }

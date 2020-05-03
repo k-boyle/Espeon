@@ -2,13 +2,14 @@
 using System.Threading.Tasks;
 
 namespace Espeon {
-    public readonly struct ScheduledTask<T> : IScheduledTask {
+    public struct ScheduledTask<T> : IScheduledTask {
         private static int _taskCounter;
         
         public DateTimeOffset ExecuteAt { get; }
         public T State { get; }
         public Func<Task> Callback { get; }
         public string Name { get; }
+        public bool IsCancelled { get; private set; }
 
         public ScheduledTask(DateTimeOffset executeAt, T state, Func<T, Task> callback)
             : this(null, executeAt, state, callback) { }
@@ -18,8 +19,13 @@ namespace Espeon {
             ExecuteAt = executeAt;
             State = state;
             Callback = () => callback(state);
+            IsCancelled = false;
         }
 
+        public void Cancel() {
+            IsCancelled = true;
+        }
+        
         public int CompareTo(IScheduledTask other) {
             return ExecuteAt.CompareTo(other.ExecuteAt);
         }

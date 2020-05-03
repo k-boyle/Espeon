@@ -36,7 +36,7 @@ namespace Espeon {
                     
                     TimeSpan executeIn;
                     var next = this._tasks.Root;
-                    this._logger.Verbose("Waiting for {@task} in {duration}", next.Name, next.ExecuteAt);
+                    this._logger.Verbose("Waiting for {task} in {duration}", next.Name, next.ExecuteAt);
                     while ((executeIn = next.ExecuteAt - DateTimeOffset.Now) > MaxDelay) {
                         await Task.Delay(MaxDelay, this._cts.Token);
                     }
@@ -46,8 +46,12 @@ namespace Espeon {
                     }
                     
                     try {
-                        this._logger.Verbose("Executing {@task}", next.Name);
-                        await next.Callback();
+                        if (!next.IsCancelled) {
+                            this._logger.Verbose("Executing {task}", next.Name);
+                            await next.Callback();
+                        } else {
+                            this._logger.Debug("{task} was cancelled", next.Name);
+                        }
                     } catch (Exception ex) {
                         OnError?.Invoke(ex);
                     } finally {
