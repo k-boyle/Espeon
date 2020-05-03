@@ -2,6 +2,9 @@
 REMINDER_CREATED=Reminder created
 REMINDER_PARSER_NO_TIMESPAN=A timespan needs to be specified when creating a reminder
 REMINDER_PARSER_IN_THE_PAST=Timespan must be in the future
-GUILDTAG_ALREADY_EXISTS={0} already exists for this guild
-GUILDTAG_CREATED={0} has been created
-GUILDTAG_DOESNT_EXIST={0} does not exist
+GUILDTAG_ALREADY_EXISTS="{0}" already exists for this guild
+TAG_CREATED={0} has been created
+TAG_DOESNT_EXIST="{0}" does not exist
+TAG_RESERVED_WORD="{0}" is a reserved word, cannot create a tag using it,
+MUST_OWN_TAG=You must own this tag to remove it, currently, {0} owns it
+TAG_DELETED="{0}" has been deleted
