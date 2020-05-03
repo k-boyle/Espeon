@@ -67,7 +67,7 @@ namespace Espeon {
                 IUser user,
                 LocalisationStringKey stringKey,
                 params object[] args) {
-            this._logger.Debug("Getting response string {Key} for {User}", stringKey, user.Id);
+            this._logger.Debug("Getting response string {key} for {user}", stringKey, user.Id);
             return this._userLocalisationCache.TryGetValue((guild.Id, user.Id), out var localisation)
                 ? new ValueTask<string>(GetResponse(localisation, stringKey, args))
                 : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, stringKey, args));
@@ -78,7 +78,7 @@ namespace Espeon {
                 IUser user,
                 LocalisationStringKey stringKey,
                 object[] args) {
-            this._logger.Debug("Getting response string {Key} for {User} from database", stringKey, user.Id);
+            this._logger.Debug("Getting response string {key} for {user} from database", stringKey, user.Id);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             var localisation = await context.GetLocalisationAsync(guild, user);

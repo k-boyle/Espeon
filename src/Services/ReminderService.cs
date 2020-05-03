@@ -25,10 +25,10 @@ namespace Espeon {
             var reminders = await context.GetRemindersAsync();
             foreach (var reminder in reminders) {
                 if (reminder.TriggerAt < DateTimeOffset.Now) {
-                    this._logger.Debug("Sending missed reminder for {User}", reminder.UserId);
+                    this._logger.Debug("Sending missed reminder for {user}", reminder.UserId);
                     await OnReminderAync(context, reminder, true);
                 } else {
-                    this._logger.Debug("Scheduling reminder for {User} at {At}", reminder.UserId, reminder.TriggerAt);
+                    this._logger.Debug("Scheduling reminder for {user} at {at}", reminder.UserId, reminder.TriggerAt);
                     this._scheduler.DoAt(reminder.TriggerAt, (reminder, this._services), async state => { 
                         using var scope = this._services.CreateScope();
                         await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
@@ -39,7 +39,7 @@ namespace Espeon {
         }
         
         public async Task CreateReminderAsync(UserReminder reminder) {
-            this._logger.Debug("Creating reminder for {User}", reminder.UserId);
+            this._logger.Debug("Creating reminder for {user}", reminder.UserId);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             await context.PersistAsync(reminder);
@@ -53,7 +53,7 @@ namespace Espeon {
         private async Task OnReminderAync(EspeonDbContext context, UserReminder reminder, bool late) {
             if (this._espeon.GetChannel(reminder.ChannelId) is CachedTextChannel channel
                     && channel.Guild.GetMember(reminder.UserId) is { }) {
-                this._logger.Debug("Sending reminder for {User}", reminder.UserId);
+                this._logger.Debug("Sending reminder for {user}", reminder.UserId);
                 var originalMessage = await channel.GetMessageAsync(reminder.ReminderMessageId);
                 var embed = new LocalEmbedBuilder()
                     .WithColor(Constants.EspeonColour)

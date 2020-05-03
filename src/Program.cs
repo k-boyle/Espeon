@@ -60,7 +60,7 @@ namespace Espeon {
 
         private async Task InitialiseServicesAsync() {
             foreach (var service in this._services.GetServices<IInitialisableService>()) {
-                this._logger.Information("Initialising {Service}", service.GetType().Name);
+                this._logger.Information("Initialising {service}", service.GetType().Name);
                 await service.InitialiseAsync();
             }
         }

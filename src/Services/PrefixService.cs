@@ -26,19 +26,19 @@ namespace Espeon {
         }
         
         private async Task<IEnumerable<IPrefix>> GetPrefixesFromDbAsync(IGuild guild) {
-            this._logger.Information("Loading prefixes from db for {Guild}", guild.Name);
+            this._logger.Information("Loading prefixes from db for {guild}", guild.Name);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             return (this._guildPrefixes[guild.Id] = await context.GetPrefixesAsync(guild)).Values;
         }
 
         public ValueTask<bool> TryAddPrefixAsync(IGuild guild, IPrefix prefix) {
-            this._logger.Information("Adding prefix {Prefix} to {Guild}", prefix, guild.Name);
+            this._logger.Information("Adding prefix {prefix} to {guild}", prefix, guild.Name);
             return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Add(prefix));
         }
 
         public ValueTask<bool> TryRemovePrefixAsync(IGuild guild, IPrefix prefix) {
-            this._logger.Information("Removing prefix {Prefix} to {Guild}", prefix, guild.Name);
+            this._logger.Information("Removing prefix {prefix} to {guild}", prefix, guild.Name);
             return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Remove(prefix));
         }
         

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Espeon {
     public partial class EspeonDbContext {
         public async Task<GuildTag> GetTagAsync(IGuild guild, string name) {
-            this._logger.Debug("Getting {Tag} for {Guild}", name, guild.Name);
+            this._logger.Debug("Getting {tag} for {guild}", name, guild.Name);
             return await GetTagAsync(guild,tag => tag.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
         }
 
@@ -19,7 +19,7 @@ namespace Espeon {
         }
 
         public async Task<Tag> GetTagAsync<T>(string name) where T : Tag {
-            this._logger.Debug("Getting {Tag}", name);
+            this._logger.Debug("Getting {tag}", name);
             return await Tags.FirstOrDefaultAsync(tag => tag is T && tag.Key == name);
         }
 

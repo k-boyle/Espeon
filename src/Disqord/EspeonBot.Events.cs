@@ -12,7 +12,7 @@ namespace Espeon {
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             foreach (var guild in e.Client.Guilds.Values) {
-                this._logger.Information("Persisting {GuildName}", guild.Name);
+                this._logger.Information("Persisting {guildName}", guild.Name);
                 await context.PersistGuildAsync(guild);
             }
             this._logger.Information("Espeon is ready!");
@@ -23,7 +23,7 @@ namespace Espeon {
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             foreach (var service in this.GetServices<IOnReadyService>()) {
-                this._logger.Information("Readying {Service}", service.GetType().Name);
+                this._logger.Information("Readying {service}", service.GetType().Name);
                 await service.OnReadyAsync(context);
             }
 
@@ -33,7 +33,7 @@ namespace Espeon {
                 moduleBuilder.WithName("All Global Tags").WithDescription("All the global tags");
 
                 foreach (var tag in tags) {
-                    this._logger.Debug("Adding global tag {Name}", tag.Key);
+                    this._logger.Debug("Adding global tag {name}", tag.Key);
                     moduleBuilder.AddCommand(
                         context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
                         commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
@@ -43,14 +43,14 @@ namespace Espeon {
         }
 
         private async Task OnGuildJoined(JoinedGuildEventArgs e) {
-            this._logger.Information("Joined {Guild} with {Members} members", e.Guild.Name, e.Guild.MemberCount);
+            this._logger.Information("Joined {guild} with {members} members", e.Guild.Name, e.Guild.MemberCount);
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             await context.PersistGuildAsync(e.Guild);
         }
 
         private async Task OnGuildLeft(LeftGuildEventArgs e) {
-            this._logger.Information("Left {Guild}", e.Guild.Name);
+            this._logger.Information("Left {guild}", e.Guild.Name);
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             await context.RemoveGuildAsync(e.Guild);
@@ -67,7 +67,7 @@ namespace Espeon {
         private Task OnCommandExecuted(CommandExecutedEventArgs e) {
             var context = (EspeonCommandContext) e.Context;
             this._logger.Information(
-                "Executed {Command} for {User} in {Guild}/{Channel}",
+                "Executed {command} for {user} in {guild}/{channel}",
                 context.Command.Name,
                 context.Member.DisplayName,
                 context.Guild.Name,

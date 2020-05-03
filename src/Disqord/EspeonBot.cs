@@ -60,7 +60,7 @@ namespace Espeon {
         private async Task ExecutionFailedAsync(EspeonCommandContext context, FailedResult result) {
             this._logger.Information(
                 (result as ExecutionFailedResult)?.Exception,
-                "Execution failed of {Command} for {User} in {Guild}/{Channel} because of {Reason}",
+                "Execution failed of {command} for {user} in {guild}/{channel} because of {reason}",
                 context.Command?.Name,
                 context.Member.DisplayName,
                 context.Guild.Name,
