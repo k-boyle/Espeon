@@ -2,6 +2,7 @@
 using Disqord.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
+using Qmmands.Delegates;
 using System;
 using System.Threading.Tasks;
 
@@ -22,8 +23,23 @@ namespace Espeon {
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             foreach (var service in this.GetServices<IOnReadyService>()) {
+                this._logger.Information("Readying {Service}", service.GetType().Name);
                 await service.OnReadyAsync(context);
             }
+
+            this._logger.Information("Adding global tags");
+            var tags = await context.GetTagsAsync<GlobalTag>();
+            AddModule(moduleBuilder => {
+                moduleBuilder.WithName("All Global Tags").WithDescription("All the global tags");
+
+                foreach (var tag in tags) {
+                    this._logger.Debug("Adding global tag {Name}", tag.Key);
+                    moduleBuilder.AddCommand(
+                        context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
+                        commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
+                }
+                this._logger.Debug("Created global tag module");
+            });
         }
 
         private async Task OnGuildJoined(JoinedGuildEventArgs e) {

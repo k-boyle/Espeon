@@ -87,6 +87,9 @@ namespace Espeon {
                     model.Property(tag => tag.CreatorId).ValueGeneratedNever();
                     model.Property(tag => tag.OwnerId).ValueGeneratedNever();
                 });
+
+            //ef core won't properly discriminate subclasses without this existing
+            modelBuilder.Entity<GlobalTag>(model => { });
         }
 
         private static IPrefix ParseStringAsPrefix(string value) {
