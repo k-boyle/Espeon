@@ -14,5 +14,9 @@ namespace Espeon {
             var localisedString = await LocalisationService.GetResponseAsync(Context.Guild, Context.User, stringKey, args);
             return await Context.Channel.SendMessageAsync(localisedString, mentions: mentions ?? LocalMentions.None);
         }
+        
+        protected async Task<RestUserMessage> ReplyAsync(LocalisationStringKey stringKey, params object[] args) {
+            return await ReplyAsync(stringKey, LocalMentions.None, args);
+        }
     }
 }
