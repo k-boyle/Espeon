@@ -25,6 +25,7 @@ namespace Espeon {
             this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
             
             AddTypeParser(new UserReminderTypeParser());
+            AddTypeParser(new IMessageTypeParser());
             AddModules(Assembly.GetEntryAssembly());
         }
 
@@ -65,8 +66,15 @@ namespace Espeon {
                 context.Guild.Name,
                 context.Channel.Name,
                 result.Reason);
-            //temp
-            await context.Channel.SendMessageAsync(result.Reason);
+
+            if (result is IEspeonTypeParseFailedResult parseFailedResult) {
+                var localisationService = context.ServiceProvider.GetService<LocalisationService>();
+                var response = await localisationService.GetResponseAsync(context.Member, parseFailedResult.Key);
+                await context.Channel.SendMessageAsync(response);
+            } else {
+                //temp
+                await context.Channel.SendMessageAsync(result.Reason);
+            }
             context.ServiceScope.Dispose();
         }
     }

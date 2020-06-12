@@ -107,11 +107,11 @@ namespace Espeon {
 
                     foreach (var command in tagModule.Commands) {
                         moduleBuilder.AddCommand(
-                            context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
+                            context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
                             commandBuilder => commandBuilder.WithName(command.Name).Aliases.UnionWith(command.Aliases));
                     }
                     moduleBuilder.AddCommand(
-                        context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
+                        context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
                         commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
                 });
 
@@ -139,7 +139,7 @@ namespace Espeon {
 
                     foreach (var command in tagModule.Commands.Where(command => command.Name != tag.Key)) {
                         moduleBuilder.AddCommand(
-                            context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
+                            context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
                             commandBuilder => commandBuilder.WithName(command.Name).Aliases.UnionWith(command.Aliases));
                     }
                 });

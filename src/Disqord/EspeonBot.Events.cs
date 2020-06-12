@@ -1,5 +1,6 @@
 ﻿using Disqord.Events;
 using Disqord.Logging;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using System;
@@ -19,6 +20,9 @@ namespace Espeon {
 
         private async Task OnFirstReadyAsync(ReadyEventArgs e) {
             Ready -= OnFirstReadyAsync;
+            CSharpScript.Create("").Compile();
+            this._logger.Information("Roslyn initialised");
+            
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
             foreach (var service in this.GetServices<IOnReadyService>()) {
@@ -34,7 +38,7 @@ namespace Espeon {
                 foreach (var tag in tags) {
                     this._logger.Debug("Adding global tag {name}", tag.Key);
                     moduleBuilder.AddCommand(
-                        context => CommandHelpers.GlobalTagCallback((EspeonCommandContext) context),
+                        context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
                         commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
                 }
                 this._logger.Debug("Created global tag module");

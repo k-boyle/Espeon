@@ -9,6 +9,8 @@
         TAG_DOESNT_EXIST,
         TAG_RESERVED_WORD,
         MUST_OWN_TAG,
-        TAG_DELETED
+        TAG_DELETED,
+        MESSAGE_DOES_NOT_EXIST,
+        INVALID_MESSAGE_ID_PATH
     }
 }

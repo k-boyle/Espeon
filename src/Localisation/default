@@ -8,3 +8,5 @@ TAG_DOESNT_EXIST="{0}" does not exist
 TAG_RESERVED_WORD="{0}" is a reserved word, cannot create a tag using it,
 MUST_OWN_TAG=You must own this tag to remove it, currently, {0} owns it
 TAG_DELETED="{0}" has been deleted
+MESSAGE_DOES_NOT_EXIST=A message with id {0} does not exist in this channel
+INVALID_MESSAGE_ID_PATH=Could not find message given input

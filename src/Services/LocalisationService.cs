@@ -62,27 +62,19 @@ namespace Espeon {
             this._logger.Information("All localisation strings loaded in {Time}ms", sw.ElapsedMilliseconds);
         }
 
-        public ValueTask<string> GetResponseAsync(
-                IGuild guild,
-                IUser user,
-                LocalisationStringKey stringKey,
-                params object[] args) {
-            this._logger.Debug("Getting response string {key} for {user}", stringKey, user.Id);
-            return this._userLocalisationCache.TryGetValue((guild.Id, user.Id), out var localisation)
+        public ValueTask<string> GetResponseAsync(CachedMember member, LocalisationStringKey stringKey, params object[] args) {
+            this._logger.Debug("Getting response string {key} for {user}", stringKey, member.Id);
+            return this._userLocalisationCache.TryGetValue((member.Guild.Id, member.Id), out var localisation)
                 ? new ValueTask<string>(GetResponse(localisation, stringKey, args))
-                : new ValueTask<string>(GetUserLocalisationFromDbAsync(guild, user, stringKey, args));
+                : new ValueTask<string>(GetUserLocalisationFromDbAsync(member, stringKey, args));
         }
         
-        private async Task<string> GetUserLocalisationFromDbAsync(
-                IGuild guild,
-                IUser user,
-                LocalisationStringKey stringKey,
-                object[] args) {
-            this._logger.Debug("Getting response string {key} for {user} from database", stringKey, user.Id);
+        private async Task<string> GetUserLocalisationFromDbAsync(CachedMember member, LocalisationStringKey stringKey, object[] args) {
+            this._logger.Debug("Getting response string {key} for {user} from database", stringKey, member.Id);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
-            var localisation = await context.GetLocalisationAsync(guild, user);
-            this._userLocalisationCache[(guild.Id, user.Id)] = localisation.Value;
+            var localisation = await context.GetLocalisationAsync(member);
+            this._userLocalisationCache[(member.Guild.Id, member.Id)] = localisation.Value;
             return GetResponse(localisation.Value, stringKey, args);
         }
         
@@ -90,7 +82,7 @@ namespace Espeon {
             var unformattedString = this._responses[localisation].GetValueOrDefault(stringKey,
                 this._responses[Localisation.Default][stringKey]);
             return args.Length > 0
-                ? string.Format(unformattedString, args)
+                ? string.Format(unformattedString!, args)
                 : unformattedString;
         }
     }
