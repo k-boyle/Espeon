@@ -267,3 +267,5 @@ __pycache__/
 *.pyc
 *.db
 */.idea
+
+.ionide
