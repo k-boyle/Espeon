@@ -1,4 +1,5 @@
-﻿using Disqord;
+﻿using System.Text.RegularExpressions;
+using Disqord;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -14,12 +15,14 @@ namespace Espeon {
         private readonly ILogger _logger;
         private readonly ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>> _responses;
         private readonly ConcurrentDictionary<(ulong, ulong), Localisation> _userLocalisationCache;
+        private readonly ConcurrentDictionary<string, LocalisationStringKey> _localisationCache;
 
         public LocalisationService(IServiceProvider services, ILogger logger) {
             this._services = services;
             this._logger = logger.ForContext("SourceContext", nameof(LocalisationService));
             this._responses = new ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>>();
             this._userLocalisationCache = new ConcurrentDictionary<(ulong, ulong), Localisation>();
+            this._localisationCache = new ConcurrentDictionary<string, LocalisationStringKey>();
         }
 
         public async Task InitialiseAsync() {
@@ -31,17 +34,20 @@ namespace Espeon {
                 throw new InvalidOperationException("Localisation config must be defined");
             }
             
+            var exclusionRegex = new Regex(config.Localisation.ExclusionRegex, RegexOptions.Compiled);
             var fullPathFiles = Directory.GetFiles(config.Localisation.Path);
             foreach (var fullPath in fullPathFiles) {
                 var fileName = Path.GetFileName(fullPath);
+                
+                if (config.Localisation.ExcludedFiles?.Contains(fileName) == true
+                        || exclusionRegex.IsMatch(fileName)) {
+                    continue;
+                }
+
                 if (!Enum.TryParse<Localisation>(fileName, true, out var localisation)) {
                     throw new InvalidOperationException($"{fileName} was not recognised as a valid localisation");
                 }
-                
-                if (config.Localisation.ExcludedFiles?.Contains(fileName) == true) {
-                    continue;
-                }
-                
+
                 var responsesForFile = new ConcurrentDictionary<LocalisationStringKey, string>();
                 var lines = await File.ReadAllLinesAsync(fullPath);
                 foreach (var line in lines) {
@@ -84,6 +90,10 @@ namespace Espeon {
             return args.Length > 0
                 ? string.Format(unformattedString!, args)
                 : unformattedString;
+        }
+
+        public LocalisationStringKey GetKey(string str) {
+            return _localisationCache.GetOrAdd(str, key => Enum.Parse<LocalisationStringKey>(key));
         }
     }
 }

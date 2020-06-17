@@ -48,6 +48,7 @@ namespace Espeon {
         public class LocalisationConfig {
             public string Path { get; set; }
             public HashSet<string> ExcludedFiles { get; set; }
+            public string ExclusionRegex { get; set; }
             
             private LocalisationConfig() {}
         }

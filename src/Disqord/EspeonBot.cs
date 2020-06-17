@@ -11,10 +11,12 @@ using System.Threading.Tasks;
 namespace Espeon {
     public partial class EspeonBot : DiscordBot {
         private readonly ILogger _logger;
+        private readonly LocalisationService _localisationService;
 
         public EspeonBot(ILogger logger, string token, EspeonPrefixProvider prefixProvider, DiscordBotConfiguration configuration)
                 : base(TokenType.Bot, token, prefixProvider, configuration) {
             this._logger = logger.ForContext("SourceContext", nameof(EspeonBot));
+            this._localisationService = this.GetService<LocalisationService>();
             Ready += OnReadyAsync;
             Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
@@ -67,12 +69,11 @@ namespace Espeon {
                 context.Channel.Name,
                 result.Reason);
 
-            if (result is IEspeonTypeParseFailedResult parseFailedResult) {
-                var localisationService = context.ServiceProvider.GetService<LocalisationService>();
-                var response = await localisationService.GetResponseAsync(context.Member, parseFailedResult.Key);
+            if (result is TypeParseFailedResult parseFailedResult) {
+                var localisationKey = _localisationService.GetKey(parseFailedResult.Reason);
+                var response = await _localisationService.GetResponseAsync(context.Member, localisationKey);
                 await context.Channel.SendMessageAsync(response);
-            } else {
-                //temp
+            } else if (!(result is CommandNotFoundResult)) {
                 await context.Channel.SendMessageAsync(result.Reason);
             }
             context.ServiceScope.Dispose();

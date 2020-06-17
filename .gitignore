@@ -269,3 +269,5 @@ __pycache__/
 */.idea
 
 .ionide
+
+logs/
