@@ -34,13 +34,15 @@ namespace Espeon {
                 throw new InvalidOperationException("Localisation config must be defined");
             }
             
-            var exclusionRegex = new Regex(config.Localisation.ExclusionRegex, RegexOptions.Compiled);
+            var exclusionRegex = config.Localisation.ExclusionRegex != null
+                ? new Regex(config.Localisation.ExclusionRegex, RegexOptions.Compiled)
+                : null;
             var fullPathFiles = Directory.GetFiles(config.Localisation.Path);
             foreach (var fullPath in fullPathFiles) {
                 var fileName = Path.GetFileName(fullPath);
                 
                 if (config.Localisation.ExcludedFiles?.Contains(fileName) == true
-                        || exclusionRegex.IsMatch(fileName)) {
+                        || exclusionRegex?.IsMatch(fileName) == true) {
                     continue;
                 }
 
