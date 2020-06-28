@@ -59,10 +59,6 @@ namespace Espeon {
             await context.RemoveGuildAsync(e.Guild);
         }
         
-        private void OnDisqordLog(object sender, MessageLoggedEventArgs e) {
-            this._logger.Write(LoggingHelper.From(e.Severity), e.Exception, e.Message);
-        }
-        
         private void OnSchedulerError(Exception ex) {
             this._logger.Error("Error occured inside of the scheduler", ex);
         }

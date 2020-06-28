@@ -21,7 +21,6 @@ namespace Espeon {
             Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;
-            Logger.MessageLogged += OnDisqordLog;
             CommandExecuted += OnCommandExecuted;
             CommandExecutionFailed += OnCommandExecutionFailed;
             this.GetService<EspeonScheduler>().OnError += OnSchedulerError;

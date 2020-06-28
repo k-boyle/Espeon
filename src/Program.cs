@@ -43,7 +43,10 @@ namespace Espeon {
                     var logger = provider.GetService<ILogger>();
                     var config = provider.GetService<Config>();
                     var prefixProvider = new EspeonPrefixProvider(provider.GetService<PrefixService>());
-                    var botConfig = new DiscordBotConfiguration { ProviderFactory = _ => provider };
+                    var botConfig = new DiscordBotConfiguration {
+                        ProviderFactory = _ => provider,
+                        Logger = new Optional<Disqord.Logging.ILogger>(LoggerFactory.CreateAdaptedLogger(logger))
+                    };
                     return new EspeonBot(logger, config.Discord.Token, prefixProvider, botConfig); 
                 })
                 .AddSingleton(logger)
