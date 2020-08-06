@@ -55,7 +55,9 @@ namespace Espeon {
                 .AddSingleton<EspeonScheduler>()
                 .AddInitialisableSingleton<LocalisationService>()
                 .AddOnReadySingleton<ReminderService>()
-                .AddDbContext<EspeonDbContext>(options => options.UseNpgsql(config.Postgres.ConnectionString))
+                .AddDbContext<EspeonDbContext>(
+                    (provider, options) => options.UseNpgsql(provider.GetService<Config>().Postgres.ConnectionString),
+                    optionsLifetime: ServiceLifetime.Singleton)
                 .BuildServiceProvider();
         }
 

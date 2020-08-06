@@ -40,7 +40,7 @@ namespace Espeon {
                 Description = message.Content,
                 Author = new LocalEmbedAuthorBuilder {
                     IconUrl = author.GetAvatarUrl(),
-                    Name = Context.Guild.Members[author.Id] is { } member ? member.DisplayName : author.Name,
+                    Name = Context.Guild.Members.TryGetValue(author.Id, out var member) ? member.DisplayName : author.Name,
                     Url = message.GetJumpUrl(Context.Bot.GetChannel(message.ChannelId) is CachedTextChannel channel ? channel.Guild : null)
                 },
                 Timestamp = message.CreatedAt,
@@ -50,6 +50,11 @@ namespace Espeon {
             };
 
             await ReplyAsync(embed: builder.Build());
+        }
+        
+        [Command("<a:pepohyperwhatif:715291110297043005>")]
+        public async Task PepoWhatIfAsync() {
+            await ReplyAsync("<a:pepohyperwhatif:715291110297043005>");
         }
     }
 }
