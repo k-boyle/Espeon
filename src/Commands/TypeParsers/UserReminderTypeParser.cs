@@ -7,7 +7,7 @@ using static Espeon.LocalisationStringKey;
 namespace Espeon {
     //TODO natural language parsing
     public class UserReminderTypeParser : EspeonTypeParser<UserReminder> {
-        private const string Regex = @"(\d+)\s?(w(?:eeks|eek?)?|d(?:ays|ay?)?|h(?:ours|rs|r?)|m(?:inutes|ins|in?)?|s(?:econds|econd|ecs|ec?)?)";
+        private const string Regex = @"(\d+)\s?(y(?:r|rs|ear|ears)?|w(?:eeks|eek?)?|d(?:ays|ay?)?|h(?:ours|rs|r?)|m(?:inutes|ins|in?)?|s(?:econds|econd|ecs|ec?)?)";
 
         private static readonly Regex TimeSpanRegex = new Regex(Regex, RegexOptions.Compiled);
 
