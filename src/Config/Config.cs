@@ -14,7 +14,7 @@ namespace Espeon {
         public LoggingConfig Logging { get; set; }
         public LocalisationConfig Localisation { get; set; }
 
-        private Config() { }
+        private Config() {}
 
         public static async Task<Config> FromJsonFileAsync(string fileDir) {
             await using var json = File.OpenRead(fileDir);

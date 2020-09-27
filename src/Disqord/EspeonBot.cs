@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Disqord.Bot;
 using Disqord.Bot.Prefixes;
+using Disqord.Extensions.Interactivity;
 using Microsoft.Extensions.DependencyInjection;
 using Qmmands;
 using Serilog;
@@ -28,6 +29,7 @@ namespace Espeon {
             AddTypeParser(new UserReminderTypeParser());
             AddTypeParser(new IMessageTypeParser());
             AddModules(Assembly.GetEntryAssembly());
+            AddExtensionAsync(new InteractivityExtension());
         }
 
         protected override async ValueTask<bool> CheckMessageAsync(CachedUserMessage message) {
@@ -69,8 +71,8 @@ namespace Espeon {
                 result.Reason);
 
             if (result is TypeParseFailedResult parseFailedResult) {
-                var localisationKey = _localisationService.GetKey(parseFailedResult.Reason);
-                var response = await _localisationService.GetResponseAsync(context.Member, localisationKey);
+                var localisationKey = this._localisationService.GetKey(parseFailedResult.Reason);
+                var response = await this._localisationService.GetResponseAsync(context.Member, localisationKey);
                 await context.Channel.SendMessageAsync(response);
             } else if (!(result is CommandNotFoundResult)) {
                 await context.Channel.SendMessageAsync(result.Reason);

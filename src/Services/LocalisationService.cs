@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Disqord;
+﻿using Disqord;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -95,7 +95,7 @@ namespace Espeon {
         }
 
         public LocalisationStringKey GetKey(string str) {
-            return _localisationCache.GetOrAdd(str, key => Enum.Parse<LocalisationStringKey>(key));
+            return this._localisationCache.GetOrAdd(str, Enum.Parse<LocalisationStringKey>);
         }
     }
 }

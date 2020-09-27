@@ -1,13 +1,19 @@
 ﻿using Disqord;
+using Disqord.Bot;
 using Disqord.Rest;
 using Qmmands;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using static Espeon.LocalisationStringKey;
 
 namespace Espeon {
     [Name("Misc Commands")]
     [Description("Commands that doesn't really fit into a specific category")]
     public class MiscModule : EspeonCommandModule {
+        public HttpClient Client { get; set; }
+        
         [Name("Mock")]
         [Description("Mocks a user")]
         [Command("mock", "m")]
@@ -24,9 +30,16 @@ namespace Espeon {
                 });
             }
 
+            if (string.IsNullOrWhiteSpace(message.Content)) {
+                await ReplyAsync(MESSAGE_HAS_EMPTY_CONTENT);
+                return;
+            }
+            
             await webhookClient.ExecuteAsync(
                 Mock(message.Content),
-                name: Context.Guild.Members[message.Author.Id].DisplayName,
+                name: Context.Guild.Members.TryGetValue(message.Author.Id, out var member)
+                    ? member.DisplayName
+                    : message.Author.Name,
                 avatarUrl: message.Author.GetAvatarUrl());
         }
         
@@ -55,6 +68,18 @@ namespace Espeon {
         [Command("<a:pepohyperwhatif:715291110297043005>")]
         public async Task PepoWhatIfAsync() {
             await ReplyAsync("<a:pepohyperwhatif:715291110297043005>");
+        }
+        
+        [Command("emote")]
+        [RequireBotGuildPermissions(Permission.ManageEmojis)]
+        [RequireMemberGuildPermissions(Permission.ManageEmojis)]
+        public async Task StealEmoteAsync(LocalCustomEmoji emoji, string name = null) {
+            await using var httpStream = await Client.GetStreamAsync(emoji.GetUrl());
+            await using var memStream = new MemoryStream();
+            await httpStream.CopyToAsync(memStream);
+            memStream.Position = 0;
+            var created = await Context.Guild.CreateEmojiAsync(memStream, name ?? emoji.Name);
+            await ReplyAsync(created.ToString());
         }
     }
 }

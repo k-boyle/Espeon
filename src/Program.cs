@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -12,12 +13,20 @@ namespace Espeon {
         private readonly ILogger _logger;
 
         private static async Task Main(string[] args) {
+            WriteEspeonAscii();
+            
             var configDir = args.Length > 0 ? args[0] : DefaultConfigDir;
             var config = await Config.FromJsonFileAsync(configDir);
             var logger = LoggerFactory.Create(config);
             var services = CreateServiceProvider(logger, config);
             var program = new Program(logger, services);
             await program.StartAsync();
+        }
+
+        private static void WriteEspeonAscii() {
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine(Constants.EspeonAscii);
+            Console.ForegroundColor = default;
         }
 
         private Program(ILogger logger, IServiceProvider services) {
@@ -53,6 +62,7 @@ namespace Espeon {
                 .AddSingleton(config)
                 .AddSingleton<PrefixService>()
                 .AddSingleton<EspeonScheduler>()
+                .AddSingleton<HttpClient>()
                 .AddInitialisableSingleton<LocalisationService>()
                 .AddOnReadySingleton<ReminderService>()
                 .AddDbContext<EspeonDbContext>(

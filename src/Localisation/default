@@ -10,3 +10,4 @@ MUST_OWN_TAG=You must own this tag to remove it, currently, {0} owns it
 TAG_DELETED="{0}" has been deleted
 MESSAGE_DOES_NOT_EXIST=A message with id {0} does not exist in this channel
 INVALID_MESSAGE_ID_PATH=Could not find message given input
+MESSAGE_HAS_EMPTY_CONTENT=Message content was empty and I cba to write code to properly account for embeds so suck it
