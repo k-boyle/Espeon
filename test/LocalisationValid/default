@@ -1,2 +1,2 @@
 ﻿PING_COMMAND=pong
-REMINDER_CREATED=Reminder created
+REMINDER_CREATED={0}

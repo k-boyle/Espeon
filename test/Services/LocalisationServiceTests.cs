@@ -165,13 +165,53 @@ namespace Espeon.Test {
         }
         
         [Test]
+        public async Task TestGetResponseTooManyArgs() {
+            var validLocalisationConfig = new Config {
+                Localisation = new Config.LocalisationConfig {
+                    Path = "./LocalisationValid"
+                }
+            };
+            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            await service.InitialiseAsync();
+
+            Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, "1", "2"));
+        }
+        
+        [Test]
+        public async Task TestGetResponseTooFewArgs() {
+            var validLocalisationConfig = new Config {
+                Localisation = new Config.LocalisationConfig {
+                    Path = "./LocalisationValid"
+                }
+            };
+            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            await service.InitialiseAsync();
+
+            Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED));
+        }
+        
+        [Test]
+        public async Task TestGetResponseFormatsAsync() {
+            const string espeon = "espeon";
+            
+            var validLocalisationConfig = new Config {
+                Localisation = new Config.LocalisationConfig {
+                    Path = "./LocalisationValid"
+                }
+            };
+            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            await service.InitialiseAsync();
+
+            var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, espeon);
+            Assert.AreEqual(espeon, response);
+        }
+        
+        [Test]
         public void TestGetKeyThrowsOnInvalidKey() {
             var service = new LocalisationService(this._provider, null, this._logger);
             Assert.Throws<ArgumentException>(() => service.GetKey("invalid"));
         }
-        
-        
-        
+
         [Test]
         public void TestGetKeyThrows() {
             var service = new LocalisationService(this._provider, null, this._logger);
