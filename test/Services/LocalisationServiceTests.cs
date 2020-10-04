@@ -11,6 +11,7 @@ namespace Espeon.Test {
     public class LocalisationServiceTests {
         private static readonly Snowflake Member1Id = 0L;
         private static readonly Snowflake Member2Id = 1L;
+        private static readonly Snowflake Member3Id = 2L;
         private static readonly Snowflake GuildId = 0L;
         
         private ILogger _logger;
@@ -28,6 +29,9 @@ namespace Espeon.Test {
             await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
 
             await context.UserLocalisations.AddAsync(new UserLocalisation(Member1Id, GuildId));
+            await context.UserLocalisations.AddAsync(new UserLocalisation(Member3Id, GuildId) {
+                Value = Localisation.Owo
+            });
             await context.SaveChangesAsync();
         }
         
@@ -204,6 +208,20 @@ namespace Espeon.Test {
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, espeon);
             Assert.AreEqual(espeon, response);
+        }
+        
+        [Test]
+        public async Task TestGetResponseFallbacksAsync() {
+            var validLocalisationConfig = new Config {
+                Localisation = new Config.LocalisationConfig {
+                    Path = "./LocalisationValid"
+                }
+            };
+            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            await service.InitialiseAsync();
+
+            var response = await service.GetResponseAsync(Member3Id, GuildId, LocalisationStringKey.PING_COMMAND);
+            Assert.AreEqual("pong", response);
         }
         
         [Test]
