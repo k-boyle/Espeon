@@ -12,11 +12,11 @@ namespace Espeon {
         
         private readonly ILogger _logger;
 
-        private DbSet<GuildPrefixes> GuildPrefixes { get; set; }
-        private DbSet<UserLocalisation> UserLocalisations { get; set; }
-        private DbSet<UserReminder> UserReminders { get; set; }
-        private DbSet<Tag> Tags { get; set; }
-        private DbSet<GuildTags> GuildTags { get; set; }
+        public DbSet<GuildPrefixes> GuildPrefixes { get; set; }
+        public DbSet<UserLocalisation> UserLocalisations { get; set; }
+        public DbSet<UserReminder> UserReminders { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<GuildTags> GuildTags { get; set; }
 
         public EspeonDbContext(DbContextOptions options, ILogger logger) : base(options) {
             this._logger = logger.ForContext("SourceContext", nameof(EspeonDbContext));
@@ -32,9 +32,13 @@ namespace Espeon {
                 model => {
                     model.HasIndex(prefixes => prefixes.GuildId).IsUnique();
                     model.Property(prefixes => prefixes.GuildId).ValueGeneratedNever();
-                    model.Property(prefixes => prefixes.Values).HasConversion(
-                        prefixes => prefixes.Select(x => x.ToString()).ToArray(),
-                        arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
+                    if (Database.IsNpgsql()) {
+                        model.Property(prefixes => prefixes.Values).HasConversion(
+                            prefixes => prefixes.Select(x => x.ToString()).ToArray(),
+                            arr => new HashSet<IPrefix>(arr.Select(ParseStringAsPrefix)));
+                    } else {
+                        model.Ignore(prefixes => prefixes.Values);
+                    }
                 });
 
             modelBuilder.Entity<UserLocalisation>(
