@@ -19,6 +19,15 @@ namespace Espeon {
             this._guildPrefixes = new ConcurrentDictionary<ulong, GuildPrefixes>();
         }
         
+        public PrefixService(
+                IServiceProvider services,
+                ILogger logger,
+                ConcurrentDictionary<ulong, GuildPrefixes> prefixCache) {
+            this._services = services;
+            this._logger = logger.ForContext("SourceContext", nameof(PrefixService));
+            this._guildPrefixes = prefixCache;
+        }
+        
         public ValueTask<IEnumerable<IPrefix>> GetPrefixesAsync(IGuild guild) {
             return this._guildPrefixes.TryGetValue(guild.Id, out var prefixes) 
                 ? new ValueTask<IEnumerable<IPrefix>>(prefixes.Values)

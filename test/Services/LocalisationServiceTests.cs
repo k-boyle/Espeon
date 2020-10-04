@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class LocalisationServiceTests {
+        private static readonly ILogger Logger = TestLoggerFactory.Create();
+        
         private static readonly Snowflake Member1Id = 0L;
         private static readonly Snowflake Member2Id = 1L;
         private static readonly Snowflake Member3Id = 2L;
         private static readonly Snowflake GuildId = 0L;
-        
-        private ILogger _logger;
+
         private IServiceProvider _provider;
-        
+
         [SetUp]
         public async Task BeforeEachAsync() {
-            this._logger = TestLoggerFactory.Create();
             this._provider = new ServiceCollection()
-                .AddSingleton(this._logger)
+                .AddSingleton(Logger)
                 .AddDbContext<EspeonDbContext>(builder => builder.UseInMemoryDatabase("espeon"))
                 .BuildServiceProvider();
             
@@ -45,7 +45,7 @@ namespace Espeon.Test {
         [Test]
         public void TestInitialiseThrowsOnNullLocalisation() {
             var nullLocalisationConfig = new Config { Localisation = null };
-            var service = new LocalisationService(this._provider, nullLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, nullLocalisationConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
 
@@ -56,7 +56,7 @@ namespace Espeon.Test {
                     Path = null
                 }
             };
-            var service = new LocalisationService(this._provider, nullLocalisationPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, nullLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
         
@@ -69,7 +69,7 @@ namespace Espeon.Test {
                     Path = string.Empty
                 }
             };
-            var service = new LocalisationService(this._provider, emptyLocalisationPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, emptyLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
         
@@ -80,7 +80,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationInvalidFileName"
                 }
             };
-            var service = new LocalisationService(this._provider, invalidLocalisationPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, invalidLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
         
@@ -94,7 +94,7 @@ namespace Espeon.Test {
                     }
                 }
             };
-            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, Logger);
             Assert.DoesNotThrowAsync(service.InitialiseAsync);
         }
         
@@ -106,7 +106,7 @@ namespace Espeon.Test {
                     ExclusionRegex = "invalid"
                 }
             };
-            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, Logger);
             Assert.DoesNotThrowAsync(service.InitialiseAsync);
         }
         
@@ -117,7 +117,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationInvalidLocalisationString"
                 }
             };
-            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
         
@@ -130,7 +130,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationInvalidLocalisationStringKey"
                 }
             };
-            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, this._logger);
+            var service = new LocalisationService(this._provider, localisationExlusionPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(service.InitialiseAsync);
         }
         
@@ -141,7 +141,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -155,7 +155,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             var response = await service.GetResponseAsync(Member2Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -175,7 +175,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, "1", "2"));
@@ -188,7 +188,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED));
@@ -203,7 +203,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, espeon);
@@ -217,7 +217,7 @@ namespace Espeon.Test {
                     Path = "./LocalisationValid"
                 }
             };
-            var service = new LocalisationService(this._provider, validLocalisationConfig, this._logger);
+            var service = new LocalisationService(this._provider, validLocalisationConfig, Logger);
             await service.InitialiseAsync();
 
             var response = await service.GetResponseAsync(Member3Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -226,13 +226,13 @@ namespace Espeon.Test {
         
         [Test]
         public void TestGetKeyThrowsOnInvalidKey() {
-            var service = new LocalisationService(this._provider, null, this._logger);
+            var service = new LocalisationService(this._provider, null, Logger);
             Assert.Throws<ArgumentException>(() => service.GetKey("invalid"));
         }
 
         [Test]
         public void TestGetKeyThrows() {
-            var service = new LocalisationService(this._provider, null, this._logger);
+            var service = new LocalisationService(this._provider, null, Logger);
             Assert.DoesNotThrow(() => service.GetKey(LocalisationStringKey.PING_COMMAND.ToString()));
         }
     }
