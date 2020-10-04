@@ -14,43 +14,33 @@ namespace Espeon {
         public LoggingConfig Logging { get; set; }
         public LocalisationConfig Localisation { get; set; }
 
-        private Config() {}
-
         public static async Task<Config> FromJsonFileAsync(string fileDir) {
             await using var json = File.OpenRead(fileDir);
             var options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter());
             return await JsonSerializer.DeserializeAsync<Config>(json, options);
         }
-        
+
         public class DiscordConfig {
             public string Token { get; set; }
-            
-            private DiscordConfig() {}
         }
-        
+
         public class PostgresConfig {
             public string ConnectionString { get; set; }
-            
-            private PostgresConfig() {}
         }
-        
+
         public class LoggingConfig {
             public bool WriteToFile { get; set; }
             public bool WriteToConsole { get; set; }
             public string Path { get; set; }
             public LogEventLevel Level { get; set; }
             public RollingInterval RollingInterval { get; set; }
-            
-            private LoggingConfig() {}
         }
-        
+
         public class LocalisationConfig {
             public string Path { get; set; }
             public HashSet<string> ExcludedFiles { get; set; }
             public string ExclusionRegex { get; set; }
-            
-            private LocalisationConfig() {}
         }
     }
 }
