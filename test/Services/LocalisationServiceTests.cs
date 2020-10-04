@@ -177,10 +177,5 @@ namespace Espeon.Test {
             var service = new LocalisationService(this._provider, null, this._logger);
             Assert.DoesNotThrow(() => service.GetKey(LocalisationStringKey.PING_COMMAND.ToString()));
         }
-        
-        [Test]
-        public void FailFast() {
-            Assert.True(false);
-        }
     }
 }
