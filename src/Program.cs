@@ -63,6 +63,7 @@ namespace Espeon {
                 .AddSingleton<PrefixService>()
                 .AddSingleton<EspeonScheduler>()
                 .AddSingleton<HttpClient>()
+                .AddSingleton<ILocalisationProvider, PropertyBasedLocalisationProvider>()
                 .AddInitialisableSingleton<LocalisationService>()
                 .AddOnReadySingleton<ReminderService>()
                 .AddDbContext<EspeonDbContext>(
