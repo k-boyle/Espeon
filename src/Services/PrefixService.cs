@@ -37,7 +37,7 @@ namespace Espeon {
         private async Task<IEnumerable<IPrefix>> GetPrefixesFromDbAsync(IGuild guild) {
             this._logger.Information("Loading prefixes from db for {guild}", guild.Name);
             using var scope = this._services.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             return (this._guildPrefixes[guild.Id] = await context.GetPrefixesAsync(guild)).Values;
         }
 
@@ -69,7 +69,7 @@ namespace Espeon {
         
         private async Task<bool> PersistAsync(GuildPrefixes prefixes) {
             using var scope = this._services.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             await context.UpdateAsync(prefixes);
             return true;
         }

@@ -17,14 +17,14 @@ namespace Espeon {
         public EspeonBot(ILogger logger, string token, EspeonPrefixProvider prefixProvider, DiscordBotConfiguration configuration)
                 : base(TokenType.Bot, token, prefixProvider, configuration) {
             this._logger = logger.ForContext("SourceContext", nameof(EspeonBot));
-            this._localisationService = this.GetService<LocalisationService>();
+            this._localisationService = this.GetRequiredService<LocalisationService>();
             Ready += OnReadyAsync;
             Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
             LeftGuild += OnGuildLeft;
             CommandExecuted += OnCommandExecuted;
             CommandExecutionFailed += OnCommandExecutionFailed;
-            this.GetService<EspeonScheduler>().OnError += OnSchedulerError;
+            this.GetRequiredService<EspeonScheduler>().OnError += OnSchedulerError;
             
             AddTypeParser(new UserReminderTypeParser());
             AddTypeParser(new IMessageTypeParser());

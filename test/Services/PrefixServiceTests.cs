@@ -27,7 +27,7 @@ namespace Espeon.Test {
                 .BuildServiceProvider();
             
             using var scope = this._provider.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
 
             await context.GuildPrefixes.AddAsync(this._guildPrefixes);
             await context.SaveChangesAsync();
@@ -36,7 +36,7 @@ namespace Espeon.Test {
         [TearDown]
         public async Task TearDownAsync() {
             using var scope = this._provider.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             await context.Database.EnsureDeletedAsync();
         }
         
