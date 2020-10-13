@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore ./src
     - name: Build
-      run: dotnet build ./src --configuration Release --no-restore
+      run: dotnet build ./src --configuration release --no-restore
     - name: Test
       run: dotnet test ./test --verbosity normal
 
@@ -56,5 +56,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"k-boyle_Espeon" /o:"k-boyle" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build ./src
+          dotnet build ./src --configuration release
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
