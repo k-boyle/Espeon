@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "prHourlyLimit": 0,
+  "branchPrefix": "v4-renovate/"
+}
