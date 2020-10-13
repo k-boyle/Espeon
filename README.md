@@ -1,5 +1,5 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=k-boyle_Espeon&metric=alert_status)](https://sonarcloud.io/dashboard?id=k-boyle_Espeon)
-
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=k-boyle_Espeon&metric=ncloc)](https://sonarcloud.io/dashboard?id=k-boyle_Espeon) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=k-boyle_Espeon&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=k-boyle_Espeon)
+ 
 V4 branch is a WIP, look at v3 for older (questionable) source
 
 **Example Config**
