@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Espeon.Test {
@@ -27,7 +28,7 @@ namespace Espeon.Test {
                 .BuildServiceProvider();
             
             using var scope = this._provider.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
 
             await context.UserLocalisations.AddAsync(new UserLocalisation(Member1Id, GuildId));
             await context.UserLocalisations.AddAsync(new UserLocalisation(Member3Id, GuildId) {
@@ -39,14 +40,14 @@ namespace Espeon.Test {
         [TearDown]
         public async Task TearDownAsync() {
             using var scope = this._provider.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             await context.Database.EnsureDeletedAsync();
         }
         
         [Test]
         public async Task TestGetResponseForLocalisationInDbAsync() {
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.PING_COMMAND);
             Assert.False(string.IsNullOrWhiteSpace(response));
@@ -55,13 +56,13 @@ namespace Espeon.Test {
         [Test]
         public async Task TestGetResponseForLocalisationNotInDbAsync() {
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member2Id, GuildId, LocalisationStringKey.PING_COMMAND);
             Assert.False(string.IsNullOrWhiteSpace(response));
 
             using var scope = this._provider.CreateScope();
-            await using var context = scope.ServiceProvider.GetService<EspeonDbContext>();
+            await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
 
             var localisation = await context.UserLocalisations.FindAsync(GuildId.RawValue, Member2Id.RawValue);
             Assert.NotNull(localisation);
@@ -70,7 +71,7 @@ namespace Espeon.Test {
         [Test]
         public async Task TestGetResponseTooManyArgs() {
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, "1", "2"));
         }
@@ -78,7 +79,7 @@ namespace Espeon.Test {
         [Test]
         public async Task TestGetResponseTooFewArgs() {
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED));
         }
@@ -87,7 +88,7 @@ namespace Espeon.Test {
         public async Task TestGetResponseFormatsAsync() {
             const string espeon = "espeon";
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, espeon);
             Assert.AreEqual(espeon, response);
@@ -96,7 +97,7 @@ namespace Espeon.Test {
         [Test]
         public async Task TestGetResponseFallbacksAsync() {
             var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
-            await service.InitialiseAsync();
+            await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member3Id, GuildId, LocalisationStringKey.PING_COMMAND);
             Assert.AreEqual("pong", response);
