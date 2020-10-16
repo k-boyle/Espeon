@@ -3,6 +3,7 @@ using Disqord.Bot;
 using Disqord.Bot.Prefixes;
 using Disqord.Extensions.Interactivity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Qmmands;
 using Serilog;
 using System.Diagnostics;
@@ -14,8 +15,12 @@ namespace Espeon {
         private readonly ILogger _logger;
         private readonly LocalisationService _localisationService;
 
-        public EspeonBot(ILogger logger, string token, EspeonPrefixProvider prefixProvider, DiscordBotConfiguration configuration)
-                : base(TokenType.Bot, token, prefixProvider, configuration) {
+        public EspeonBot(
+                ILogger logger,
+                IOptions<Discord> discordOptions,
+                EspeonPrefixProvider prefixProvider,
+                DiscordBotConfiguration configuration)
+                    : base(TokenType.Bot, discordOptions.Value.Token, prefixProvider, configuration) {
             this._logger = logger.ForContext("SourceContext", nameof(EspeonBot));
             this._localisationService = this.GetRequiredService<LocalisationService>();
             Ready += OnReadyAsync;

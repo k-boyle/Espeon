@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,12 +15,17 @@ namespace Espeon {
             this._logger = logger.ForContext("SourceContext", nameof(EspeonService));
         }
 
-        public Task StartAsync(CancellationToken cancellationToken) {
+        public async Task StartAsync(CancellationToken cancellationToken) {
             this._logger.Information("Starting Espeon...");
+            using var scope = this._espeon.CreateScope();
+            await using (var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>()) {
+                this._logger.Information("Migrating database...");
+                await context.Database.MigrateAsync(cancellationToken: cancellationToken);
+            } 
+            
             _ = this._espeon.RunAsync();
             _ = this._espeon.WaitForReadyAsync()
                 .ContinueWith(_ => this._logger.Information("Espeon ready"), cancellationToken);
-            return Task.CompletedTask;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken) {

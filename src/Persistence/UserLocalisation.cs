@@ -12,12 +12,12 @@ namespace Espeon {
 
         [Required]
         [Column("localisation")]
-        public Localisation Value { get; set; }
+        public Language Value { get; set; }
 
         public UserLocalisation(ulong guildId, ulong userId) {
             GuildId = guildId;
             UserId = userId;
-            Value = Localisation.Default;
+            Value = Language.Default;
         }
     }
 }

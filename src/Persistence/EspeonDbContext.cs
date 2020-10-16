@@ -51,7 +51,7 @@ namespace Espeon {
                     model.Property(localisation => localisation.GuildId).ValueGeneratedNever();
                     model.Property(localisation => localisation.UserId).ValueGeneratedNever();
                     model.Property(localisation => localisation.Value)
-                        .HasConversion(new EnumToNumberConverter<Localisation, int>());
+                        .HasConversion(new EnumToNumberConverter<Language, int>());
                 });
 
             modelBuilder.Entity<UserReminder>(

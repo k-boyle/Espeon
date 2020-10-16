@@ -3,6 +3,6 @@ using System.Threading.Tasks;
 
 namespace Espeon {
     public interface ILocalisationProvider {
-        ValueTask<IDictionary<Localisation, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync();
+        ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync();
     }
 }

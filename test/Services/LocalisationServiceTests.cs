@@ -32,7 +32,7 @@ namespace Espeon.Test {
 
             await context.UserLocalisations.AddAsync(new UserLocalisation(Member1Id, GuildId));
             await context.UserLocalisations.AddAsync(new UserLocalisation(Member3Id, GuildId) {
-                Value = Localisation.Owo
+                Value = Language.Owo
             });
             await context.SaveChangesAsync();
         }
@@ -116,10 +116,10 @@ namespace Espeon.Test {
         }
         
         private class TestLocalisationProvider : ILocalisationProvider {
-            public ValueTask<IDictionary<Localisation, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
-                return new ValueTask<IDictionary<Localisation, IDictionary<LocalisationStringKey, string>>>(
-                    new Dictionary<Localisation, IDictionary<LocalisationStringKey, string>> {
-                        [Localisation.Default] = new Dictionary<LocalisationStringKey, string> {
+            public ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
+                return new ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>>(
+                    new Dictionary<Language, IDictionary<LocalisationStringKey, string>> {
+                        [Language.Default] = new Dictionary<LocalisationStringKey, string> {
                             [LocalisationStringKey.PING_COMMAND] ="pong",
                             [LocalisationStringKey.REMINDER_CREATED] = "{0}"
                         }

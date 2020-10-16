@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Options;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,37 +9,38 @@ using System.Threading.Tasks;
 
 namespace Espeon {
     public class PropertyBasedLocalisationProvider : ILocalisationProvider {
-        private readonly Config _config;
+        private readonly IOptions<Localisation> _localisationOptions;
         private readonly ILogger _logger;
 
-        public PropertyBasedLocalisationProvider(Config config, ILogger logger) {
-            this._config = config;
+        public PropertyBasedLocalisationProvider(IOptions<Localisation> localisationOptions, ILogger logger) {
+            this._localisationOptions = localisationOptions;
             this._logger = logger.ForContext("SourceContext", nameof(PropertyBasedLocalisationProvider));
         }
 
-        public async ValueTask<IDictionary<Localisation, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
+        public async ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
             this._logger.Debug("Reading localisation strings from property files");
+            var config = this._localisationOptions.Value;
             
-            var responses = new Dictionary<Localisation, IDictionary<LocalisationStringKey, string>>();
+            var responses = new Dictionary<Language, IDictionary<LocalisationStringKey, string>>();
             
-            if (string.IsNullOrWhiteSpace(this._config.Localisation?.Path)) {
-                throw new InvalidOperationException("Localisation config must be defined");
+            if (string.IsNullOrWhiteSpace(config.Path)) {
+                throw new InvalidOperationException("Language config must be defined");
             }
             
-            var exclusionRegex = this._config.Localisation.ExclusionRegex != null
-                ? new Regex(this._config.Localisation.ExclusionRegex, RegexOptions.Compiled)
+            var exclusionRegex = config.ExclusionRegex != null
+                ? new Regex(config.ExclusionRegex, RegexOptions.Compiled)
                 : null;
-            var fullPathFiles = Directory.GetFiles(this._config.Localisation.Path);
+            var fullPathFiles = Directory.GetFiles(config.Path);
             foreach (var fullPath in fullPathFiles) {
                 var fileName = Path.GetFileName(fullPath);
                 this._logger.Debug("Reading property file {fileName}", fileName);
                 
-                if (this._config.Localisation.ExcludedFiles?.Contains(fileName) == true
+                if (config.ExcludedFiles?.Contains(fileName) == true
                  || exclusionRegex?.IsMatch(fileName) == true) {
                     continue;
                 }
 
-                if (!Enum.TryParse<Localisation>(fileName, true, out var localisation)) {
+                if (!Enum.TryParse<Language>(fileName, true, out var language)) {
                     throw new InvalidOperationException($"{fileName} was not recognised as a valid localisation");
                 }
 
@@ -49,7 +51,7 @@ namespace Espeon {
                     
                     var split = line.Split('=', StringSplitOptions.RemoveEmptyEntries);
                     if (split.Length != 2) {
-                        throw new InvalidOperationException("Localisation string must have format \"key=value\"");
+                        throw new InvalidOperationException("Language string must have format \"key=value\"");
                     }
 
                     if (!Enum.TryParse<LocalisationStringKey>(split[0], out var key)) {
@@ -58,7 +60,7 @@ namespace Espeon {
                     responsesForFile[key] = split[1];
                 }
 
-                responses[localisation] = responsesForFile;
+                responses[language] = responsesForFile;
             }
 
             return responses;
