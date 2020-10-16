@@ -1,8 +1,10 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using ILogger = Serilog.ILogger;
@@ -19,48 +21,56 @@ namespace Espeon {
 
         private static async Task Main(string[] args) {
             WriteEspeonAscii();
-            var configDir = args.Length > 0 ? args[0] : DefaultConfigDir;
-            var config = await Config.FromJsonFileAsync(configDir);
-            var logger = LoggerFactory.Create(config);
             // todo refactor to use mslogging and msconfig
-            var host = CreateHostBuilder(args, logger, config).Build();
+            var host = CreateHostBuilder(args).Build();
             using var scope = host.Services.CreateScope();
-            await using (var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>()) {
-                logger.ForContext("SourceContext", nameof(Program)).Information("Migrating database...");
-                await context.Database.MigrateAsync();
-            } 
             await host.RunAsync();
         }
         
-        private static IHostBuilder CreateHostBuilder(string[] args, ILogger logger, Config config) {
+        private static IHostBuilder CreateHostBuilder(string[] args) {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(builder => {
                     builder.AddFilter(level => false);
                 })
-                .ConfigureServices(serviceCollection => {
-                    serviceCollection.AddSingleton(provider => {
-                            var logger = provider.GetRequiredService<ILogger>();
-                            var config = provider.GetRequiredService<Config>();
-                            var prefixProvider = new EspeonPrefixProvider(provider.GetRequiredService<PrefixService>());
-                            var botConfig = new DiscordBotConfiguration {
-                                ProviderFactory = _ => provider,
-                                Logger = new Optional<Disqord.Logging.ILogger>(
-                                    LoggerFactory.CreateAdaptedLogger(logger))
-                            };
-                            return new EspeonBot(logger, config.Discord.Token, prefixProvider, botConfig);
-                        })
-                        .AddSingleton(logger)
-                        .AddSingleton(config)
+                .ConfigureAppConfiguration(configurationBuilder => {
+                    var configDir = configurationBuilder.Build()["config"] ?? DefaultConfigDir;
+                    configurationBuilder.AddJsonFile(configDir);
+                })
+                .ConfigureServices((hostContext, serviceCollection) => {
+                    var configuration = hostContext.Configuration;
+                    serviceCollection.AddSingleton(Espeon)
+                        .AddSingleton(Logger)
                         .AddSingleton<PrefixService>()
                         .AddSingleton<EspeonScheduler>()
                         .AddSingleton<ILocalisationProvider, PropertyBasedLocalisationProvider>()
                         .AddHostedService<EspeonService>()
-                        .AddTHostedService<LocalisationService>()
-                        .AddTHostedService<ReminderService>()
-                        .AddDbContext<EspeonDbContext>(
-                            (provider, options) => options.UseNpgsql(provider.GetRequiredService<Config>().Postgres.ConnectionString),
-                            optionsLifetime: ServiceLifetime.Singleton);
+                        .AddFetchableHostedService<LocalisationService>()
+                        .AddFetchableHostedService<ReminderService>()
+                        .AddDbContext<EspeonDbContext>(UseNpgsql, optionsLifetime: ServiceLifetime.Singleton)
+                        .ConfigureSection<Discord>(configuration)
+                        .ConfigureSection<Localisation>(configuration)
+                        .ConfigureSection<Logging>(configuration)
+                        .ConfigureSection<Postgres>(configuration);
                 });
+        }
+
+        private static EspeonBot Espeon(IServiceProvider provider) {
+            var logger = provider.GetRequiredService<ILogger>();
+            var prefixProvider = new EspeonPrefixProvider(provider.GetRequiredService<PrefixService>());
+            var botConfig = new DiscordBotConfiguration {
+                ProviderFactory = _ => provider,
+                Logger = new Optional<Disqord.Logging.ILogger>(LoggerFactory.CreateAdaptedLogger(logger))
+            };
+            return new EspeonBot(logger, provider.GetRequiredService<IOptions<Discord>>(), prefixProvider, botConfig);
+        }
+
+        private static ILogger Logger(IServiceProvider provider) {
+            var loggingOptions = provider.GetRequiredService<IOptions<Logging>>();
+            return LoggerFactory.Create(loggingOptions);
+        }
+
+        private static void UseNpgsql(IServiceProvider provider, DbContextOptionsBuilder options) {
+            options.UseNpgsql(provider.GetRequiredService<IOptions<Postgres>>().Value.ConnectionString);
         }
     }
 }

@@ -14,28 +14,28 @@ namespace Espeon {
         private readonly IServiceProvider _services;
         private readonly ILocalisationProvider _localisationProvider;
         private readonly ILogger _logger;
-        private readonly ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>> _localisations;
-        private readonly ConcurrentDictionary<(ulong, ulong), Localisation> _userLocalisationCache;
+        private readonly ConcurrentDictionary<Language, ConcurrentDictionary<LocalisationStringKey, string>> _localisations;
+        private readonly ConcurrentDictionary<(ulong, ulong), Language> _userLanguageCache;
         private readonly ConcurrentDictionary<string, LocalisationStringKey> _localisationCache;
 
         public LocalisationService(IServiceProvider services, ILocalisationProvider localisationProvider, ILogger logger) {
             this._services = services;
             this._localisationProvider = localisationProvider;
             this._logger = logger.ForContext("SourceContext", nameof(LocalisationService));
-            this._localisations = new ConcurrentDictionary<Localisation, ConcurrentDictionary<LocalisationStringKey, string>>();
-            this._userLocalisationCache = new ConcurrentDictionary<(ulong, ulong), Localisation>();
+            this._localisations = new ConcurrentDictionary<Language, ConcurrentDictionary<LocalisationStringKey, string>>();
+            this._userLanguageCache = new ConcurrentDictionary<(ulong, ulong), Language>();
             this._localisationCache = new ConcurrentDictionary<string, LocalisationStringKey>();
         }
 
         public async Task StartAsync(CancellationToken cancellationToken) {
             var sw = Stopwatch.StartNew();
-            this._logger.Information("Loading all localisation strings");
+            this._logger.Information("Loading all language strings");
             var localisations = await this._localisationProvider.GetLocalisationsAsync();
-            foreach (var (localisationKey, localisationsStrings) in localisations) {
-                this._localisations[localisationKey] = new ConcurrentDictionary<LocalisationStringKey, string>(localisationsStrings);
+            foreach (var (language, localisationsStrings) in localisations) {
+                this._localisations[language] = new ConcurrentDictionary<LocalisationStringKey, string>(localisationsStrings);
             }
             sw.Stop();
-            this._logger.Information("All localisation strings loaded in {Time}ms", sw.ElapsedMilliseconds);
+            this._logger.Information("All language strings loaded in {Time}ms", sw.ElapsedMilliseconds);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
@@ -48,12 +48,12 @@ namespace Espeon {
                 LocalisationStringKey stringKey,
                 params object[] args) {
             this._logger.Debug("Getting response string {key} for {user}", stringKey, memberId);
-            return this._userLocalisationCache.TryGetValue((guildId, memberId), out var localisation)
-                ? new ValueTask<string>(GetResponse(localisation, stringKey, args))
-                : new ValueTask<string>(GetUserLocalisationFromDbAsync(memberId, guildId, stringKey, args));
+            return this._userLanguageCache.TryGetValue((guildId, memberId), out var language)
+                ? new ValueTask<string>(GetResponse(language, stringKey, args))
+                : new ValueTask<string>(GetUserLanguageFromDbAsync(memberId, guildId, stringKey, args));
         }
 
-        private async Task<string> GetUserLocalisationFromDbAsync(
+        private async Task<string> GetUserLanguageFromDbAsync(
                 Snowflake memberId,
                 Snowflake guildId,
                 LocalisationStringKey stringKey,
@@ -62,13 +62,13 @@ namespace Espeon {
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             var localisation = await context.GetLocalisationAsync(memberId, guildId);
-            this._userLocalisationCache[(guildId, memberId)] = localisation.Value;
+            this._userLanguageCache[(guildId, memberId)] = localisation.Value;
             return GetResponse(localisation.Value, stringKey, args);
         }
 
-        private string GetResponse(Localisation localisation, LocalisationStringKey stringKey, object[] args) {
-            var unformattedString = this._localisations[localisation].GetValueOrDefault(stringKey,
-                this._localisations[Localisation.Default][stringKey]);
+        private string GetResponse(Language language, LocalisationStringKey stringKey, object[] args) {
+            var unformattedString = this._localisations[language].GetValueOrDefault(stringKey,
+                this._localisations[Language.Default][stringKey]);
             return args.Length > 0
                 ? string.Format(unformattedString!, args)
                 : unformattedString;

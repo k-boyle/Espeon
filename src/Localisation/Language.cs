@@ -1,5 +1,5 @@
 ﻿namespace Espeon {
-    public enum Localisation {
+    public enum Language {
         Default,
         Owo
     }
