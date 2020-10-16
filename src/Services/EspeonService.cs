@@ -23,8 +23,8 @@ namespace Espeon {
                 await context.Database.MigrateAsync(cancellationToken: cancellationToken);
             } 
             
-            _ = this._espeon.RunAsync();
-            _ = this._espeon.WaitForReadyAsync()
+            _ = this._espeon.RunAsync()
+                .ContinueWith(_ => this._espeon.WaitForReadyAsync(), cancellationToken)
                 .ContinueWith(_ => this._logger.Information("Espeon ready"), cancellationToken);
         }
 
