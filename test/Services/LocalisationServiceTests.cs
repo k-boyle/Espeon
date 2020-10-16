@@ -115,6 +115,12 @@ namespace Espeon.Test {
             Assert.DoesNotThrow(() => service.GetKey(LocalisationStringKey.PING_COMMAND.ToString()));
         }
         
+        [Test]
+        public async Task TestStopAsync() {
+            var service = new LocalisationService(this._provider, null, this._logger);
+            await service.StopAsync(CancellationToken.None);
+        }
+        
         private class TestLocalisationProvider : ILocalisationProvider {
             public ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
                 return new ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>>(

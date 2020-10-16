@@ -8,12 +8,6 @@ using System.Threading.Tasks;
 namespace Espeon.Test {
     public class PropertyBasedLocalisationProviderTests {
         private readonly ILogger _logger = TestLoggerFactory.Create();
-
-        [Test]
-        public void TestGetLocalisationThrowsOnNullConfig() {
-            var provider = new PropertyBasedLocalisationProvider(null, this._logger);
-            Assert.ThrowsAsync<NullReferenceException>(async () => await provider.GetLocalisationsAsync());
-        }
         
         [Test]
         public void TestInitialiseThrowsOnNullLocalisationPath() {
