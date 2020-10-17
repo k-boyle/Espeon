@@ -25,6 +25,7 @@ namespace Espeon.Test {
         public async Task BeforeEachAsync() {
             this._provider = new ServiceCollection()
                 .AddSingleton(Logger)
+                .AddSingleton<ILogger<EspeonDbContext>, NullLogger<EspeonDbContext>>()
                 .AddDbContext<EspeonDbContext>(builder => builder.UseInMemoryDatabase("espeon"))
                 .BuildServiceProvider();
             

@@ -24,6 +24,7 @@ namespace Espeon.Test {
             this._guildPrefixes = new GuildPrefixes(GuildId);
             this._provider = new ServiceCollection()
                 .AddSingleton(Logger)
+                .AddSingleton<ILogger<EspeonDbContext>, NullLogger<EspeonDbContext>>()
                 .AddDbContext<EspeonDbContext>(builder => builder.UseInMemoryDatabase("espeon"))
                 .BuildServiceProvider();
             
