@@ -15,29 +15,48 @@ namespace Espeon {
                 this._logger.LogInformation("Persisting {guildName}", guild.Name);
                 await context.PersistGuildAsync(guild);
             }
+            
+            this._logger.LogInformation("Espeon ready");
         }
 
-        private async Task OnFirstReadyAsync(ReadyEventArgs e) {
+        private async Task OnFirstReadyAsync(ReadyEventArgs args) {
             Ready -= OnFirstReadyAsync;
             CSharpScript.Create("").Compile();
-            this._logger.LogInformation("Roslyn initialised");
+            this._logger.LogDebug("Roslyn initialised");
             
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
 
+            await OnReadyServicesAsync(context);
+            await CreateGlobalTagsAsync(context);
+
+            this._logger.LogInformation("Espeon on first ready executed");
+        }
+
+        private async Task OnReadyServicesAsync(EspeonDbContext context) {
+            var onReadyServices = this.GetServices<IOnReadyService>();
+
+            foreach (var service in onReadyServices) {
+                await service.OnReadyAsync(context);
+            }
+        }
+
+        private async Task CreateGlobalTagsAsync(EspeonDbContext context) {
             this._logger.LogInformation("Adding global tags");
             var tags = await context.GetTagsAsync<GlobalTag>();
             AddModule(moduleBuilder => {
-                moduleBuilder.WithName("All Global Tags").WithDescription("All the global tags");
+                    moduleBuilder.WithName("All Global Tags")
+                        .WithDescription("All the global tags");
 
-                foreach (var tag in tags) {
-                    this._logger.LogDebug("Adding global tag {name}", tag.Key);
-                    moduleBuilder.AddCommand(
-                        context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
-                        commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
-                }
-                this._logger.LogDebug("Created global tag module");
-            });
+                    foreach (var tag in tags) {
+                        this._logger.LogDebug("Adding global tag {name}", tag.Key);
+                        moduleBuilder.AddCommand(
+                            context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
+                            commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
+                    }
+
+                    this._logger.LogDebug("Created global tag module");
+                });
         }
 
         private async Task OnGuildJoined(JoinedGuildEventArgs e) {

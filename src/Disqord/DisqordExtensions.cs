@@ -1,6 +1,4 @@
 ﻿using Disqord;
-using Disqord.Bot;
-using Disqord.Events;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -17,18 +15,6 @@ namespace Espeon {
             return channel.GetMessage(messageId) is { } message
                 ? new ValueTask<IMessage>(message)
                 : new ValueTask<IMessage>(GetMessageAsync(channel, messageId));
-        }
-        
-        public static async Task WaitForReadyAsync(this DiscordBot bot) {
-            var tcs = new TaskCompletionSource<bool>();
-            Task OnReadyAsync(ReadyEventArgs _) {
-                tcs.SetResult(true);
-                return Task.CompletedTask;
-            }
-
-            bot.Ready += OnReadyAsync;
-            await tcs.Task;
-            bot.Ready -= OnReadyAsync;
         }
     }
 }

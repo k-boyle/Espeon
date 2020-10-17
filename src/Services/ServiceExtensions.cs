@@ -13,5 +13,10 @@ namespace Espeon {
         public static IServiceCollection ConfigureSection<T>(this IServiceCollection collection, IConfiguration configuration) where T : class {
             return collection.Configure<T>(configuration.GetSection(typeof(T).Name));
         }
+        
+        public static IServiceCollection AddOnReadyService<T>(this IServiceCollection collection) where T : class, IOnReadyService {
+            return collection.AddSingleton<IOnReadyService, T>()
+                .AddSingleton<T>();
+        }
     }
 }

@@ -21,11 +21,9 @@ namespace Espeon {
             await using (var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>()) {
                 this._logger.LogInformation("Migrating database...");
                 await context.Database.MigrateAsync(cancellationToken: cancellationToken);
-            } 
-            
-            _ = this._espeon.RunAsync(cancellationToken)
-                .ContinueWith(_ => this._espeon.WaitForReadyAsync(), cancellationToken)
-                .ContinueWith(_ => this._logger.LogInformation("Espeon ready"), cancellationToken);
+            }
+
+            _ = this._espeon.RunAsync(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken) {
