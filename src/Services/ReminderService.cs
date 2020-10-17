@@ -1,36 +1,40 @@
 ﻿using Disqord;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
 namespace Espeon {
-    public class ReminderService : IOnReadyService {
+    public class ReminderService : IOnReadyService<ReminderService> {
         private const string ZeroWidthCharacter = "\u200b";
 
         public IServiceProvider Provider { get; }
-        public ILogger Logger { get; }
+        public ILogger<ReminderService> Logger { get; }
 
         private readonly EspeonScheduler _scheduler;
         private readonly EspeonBot _espeon;
 
-        public ReminderService(IServiceProvider services, EspeonScheduler scheduler, EspeonBot espeon, ILogger logger) {
+        public ReminderService(
+                IServiceProvider services,
+                EspeonScheduler scheduler,
+                EspeonBot espeon,
+                ILogger<ReminderService> logger) {
             Provider = services;
-            Logger = logger.ForContext("SourceContext", nameof(ReminderService));
+            Logger = logger;
 
             this._scheduler = scheduler;
             this._espeon = espeon;
         }
 
         public async Task OnReadyAsync(EspeonDbContext context) {
-            Logger.Information("Loading all reminders");
+            Logger.LogInformation("Loading all reminders");
             var reminders = await context.GetRemindersAsync();
             foreach (var reminder in reminders) {
                 if (reminder.TriggerAt < DateTimeOffset.Now) {
-                    Logger.Debug("Sending missed reminder {reminder} for {user}", reminder.Id, reminder.UserId);
+                    Logger.LogDebug("Sending missed reminder {reminder} for {user}", reminder.Id, reminder.UserId);
                     await OnReminderAync(context, reminder, true);
                 } else {
-                    Logger.Debug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
+                    Logger.LogDebug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
                     this._scheduler.DoAt(
                         string.Concat("reminder-", reminder.UserId.ToString(), "-", reminder.Id),
                         reminder.TriggerAt,
@@ -45,7 +49,7 @@ namespace Espeon {
         }
         
         public async Task CreateReminderAsync(UserReminder reminder) {
-            Logger.Debug("Creating reminder for {user}", reminder.UserId);
+            Logger.LogDebug("Creating reminder for {user}", reminder.UserId);
             using var scope = Provider.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             await context.PersistAsync(reminder);
@@ -63,7 +67,7 @@ namespace Espeon {
         private async Task OnReminderAync(EspeonDbContext context, UserReminder reminder, bool late) {
             if (this._espeon.GetChannel(reminder.ChannelId) is CachedTextChannel channel
                     && channel.Guild.GetMember(reminder.UserId) is { }) {
-                Logger.Debug("Sending reminder for {user}", reminder.UserId);
+                Logger.LogDebug("Sending reminder for {user}", reminder.UserId);
                 var originalMessage = await channel.GetMessageAsync(reminder.ReminderMessageId);
                 var embed = new LocalEmbedBuilder()
                     .WithColor(Constants.EspeonColour)

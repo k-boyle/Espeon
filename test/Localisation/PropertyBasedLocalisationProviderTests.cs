@@ -1,20 +1,21 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class PropertyBasedLocalisationProviderTests {
-        private readonly ILogger _logger = TestLoggerFactory.Create();
-        
+        private static readonly ILogger<PropertyBasedLocalisationProvider> Logger = new NullLogger<PropertyBasedLocalisationProvider>();
+
         [Test]
         public void TestInitialiseThrowsOnNullLocalisationPath() {
             var nullLocalisationPathConfig = Options.Create(new Localisation {
                 Path = null
             });
-            var provider = new PropertyBasedLocalisationProvider(nullLocalisationPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(nullLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -23,7 +24,7 @@ namespace Espeon.Test {
             var emptyLocalisationPathConfig = Options.Create(new Localisation {
                Path = string.Empty
             });
-            var provider = new PropertyBasedLocalisationProvider(emptyLocalisationPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(emptyLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -32,7 +33,7 @@ namespace Espeon.Test {
             var invalidLocalisationPathConfig = Options.Create(new Localisation {
                 Path = "./LocalisationInvalidFileName"
             });
-            var provider = new PropertyBasedLocalisationProvider(invalidLocalisationPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(invalidLocalisationPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -44,7 +45,7 @@ namespace Espeon.Test {
                     "invalid"
                 }
             });
-            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, Logger);
             Assert.DoesNotThrowAsync(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -54,7 +55,7 @@ namespace Espeon.Test {
                 Path = "./LocalisationInvalidFileName",
                 ExclusionRegex = "invalid"
             });
-            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, Logger);
             Assert.DoesNotThrowAsync(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -63,7 +64,7 @@ namespace Espeon.Test {
             var localisationExlusionPathConfig = Options.Create(new Localisation {
                 Path = "./LocalisationInvalidLocalisationString"
             });
-            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -72,7 +73,7 @@ namespace Espeon.Test {
             var localisationExlusionPathConfig = Options.Create(new Localisation {
                     Path = "./LocalisationInvalidLocalisationStringKey"
             });
-            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(localisationExlusionPathConfig, Logger);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await provider.GetLocalisationsAsync());
         }
         
@@ -81,7 +82,7 @@ namespace Espeon.Test {
             var validLocalisationConfig = Options.Create(new Localisation {
                     Path = "./LocalisationValid"
             });
-            var provider = new PropertyBasedLocalisationProvider(validLocalisationConfig, this._logger);
+            var provider = new PropertyBasedLocalisationProvider(validLocalisationConfig, Logger);
             var result = await provider.GetLocalisationsAsync();
             var expected = new Dictionary<Language, Dictionary<LocalisationStringKey, string>> {
                 [Language.Default] = new Dictionary<LocalisationStringKey, string> {

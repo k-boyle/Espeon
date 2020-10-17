@@ -1,7 +1,7 @@
 ﻿using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace Espeon {
     public partial class EspeonDbContext : DbContext {
         private const string MentionPrefixLiteral = "<mention>";
         
-        private readonly ILogger _logger;
+        private readonly ILogger<EspeonDbContext> _logger;
 
         public DbSet<GuildPrefixes> GuildPrefixes { get; set; }
         public DbSet<UserLocalisation> UserLocalisations { get; set; }
@@ -18,8 +18,8 @@ namespace Espeon {
         public DbSet<Tag> Tags { get; set; }
         public DbSet<GuildTags> GuildTags { get; set; }
 
-        public EspeonDbContext(DbContextOptions options, ILogger logger) : base(options) {
-            this._logger = logger.ForContext("SourceContext", nameof(EspeonDbContext));
+        public EspeonDbContext(DbContextOptions options, ILogger<EspeonDbContext> logger) : base(options) {
+            this._logger = logger;
         }
         
         internal EspeonDbContext(DbContextOptions options) : base(options) {

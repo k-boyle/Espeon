@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Serilog;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,14 +12,16 @@ namespace Espeon {
         private readonly HashSet<string> _excludedFiles;
         private readonly Regex _exclusionRegex;
         private readonly string _localisationPath;
-        private readonly ILogger _logger;
+        private readonly ILogger<PropertyBasedLocalisationProvider> _logger;
 
-        public PropertyBasedLocalisationProvider(IOptions<Localisation> localisationOptions, ILogger logger) {
+        public PropertyBasedLocalisationProvider(
+                IOptions<Localisation> localisationOptions,
+                ILogger<PropertyBasedLocalisationProvider> logger) {
             var config = localisationOptions.Value;
             this._excludedFiles = config.ExcludedFiles;
             this._exclusionRegex = GetExclusionRegex(config);
             this._localisationPath = config.Path;
-            this._logger = logger.ForContext("SourceContext", nameof(PropertyBasedLocalisationProvider));
+            this._logger = logger;
         }
 
         private static Regex GetExclusionRegex(Localisation config) {
@@ -29,7 +31,7 @@ namespace Espeon {
         }
 
         public async ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
-            this._logger.Debug("Reading localisation strings from property files");
+            this._logger.LogDebug("Reading localisation strings from property files");
             var responses = new Dictionary<Language, IDictionary<LocalisationStringKey, string>>();
             
             if (string.IsNullOrWhiteSpace(this._localisationPath)) {
@@ -39,7 +41,7 @@ namespace Espeon {
             var fullPathFiles = Directory.GetFiles(this._localisationPath);
             foreach (var fullPath in fullPathFiles) {
                 var fileName = Path.GetFileName(fullPath);
-                this._logger.Debug("Reading property file {fileName}", fileName);
+                this._logger.LogDebug("Reading property file {fileName}", fileName);
                 
                 if (!IsLanguageFile(fileName, out var language)) {
                     continue;
@@ -77,7 +79,7 @@ namespace Espeon {
         }
 
         private string[] ParseLine(string line, out LocalisationStringKey key) {
-            this._logger.Debug("Parsing line {line}", line);
+            this._logger.LogDebug("Parsing line {line}", line);
 
             var split = line.Split('=', StringSplitOptions.RemoveEmptyEntries);
             if (split.Length != 2) {

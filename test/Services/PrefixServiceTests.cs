@@ -2,15 +2,16 @@
 using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class PrefixServiceTests {
-        private static readonly ILogger Logger = TestLoggerFactory.Create();
+        private static readonly ILogger<PrefixService> Logger = new NullLogger<PrefixService>();
         
         private static readonly Snowflake GuildId = 0L;
         private static readonly TestGuild Guild = new TestGuild("PrefixServiceTests", GuildId);
@@ -23,6 +24,7 @@ namespace Espeon.Test {
             this._guildPrefixes = new GuildPrefixes(GuildId);
             this._provider = new ServiceCollection()
                 .AddSingleton(Logger)
+                .AddSingleton<ILogger<EspeonDbContext>, NullLogger<EspeonDbContext>>()
                 .AddDbContext<EspeonDbContext>(builder => builder.UseInMemoryDatabase("espeon"))
                 .BuildServiceProvider();
             
