@@ -11,12 +11,40 @@ V4 branch is a WIP, look at v3 for older (questionable) source
   "Postgres": {
     "ConnectionString": "Host=127.0.0.1;Port=5432;Database=Espeon;Username=postgres;Password=casino"
   },
-  "Logging": {
-    "WriteToFile": true,
-    "WriteToConsole": true,
-    "Path": "./logs/",
-    "Level": "Information",
-    "RollingInterval": "Day" 
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File",
+      "Serilog.Extensions.Logging",
+      "Espeon"
+    ],
+    "Enrich": [
+      "WithClassName"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft.EntityFrameworkCore": "Warning",
+        "Microsoft.Extensions.Hosting": "Information"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "theme": "Espeon.EspeonLoggingConsoleTheme::Instance, Espeon",
+          "outputTemplate": "{Timestamp: HH:mm:ss} | {Level,-15} | {ClassName} | {Message}{NewLine}{Exception}"
+        }
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "./logs/log-.txt",
+          "rollingInterval": "Day",
+          "outputTemplate": "{Timestamp:dd-MM-yyyy HH:mm:ss} | {Level} | {SourceContext} | {Message}{NewLine}{Exception}"
+        }
+      }
+    ]
   },
   "Localisation": {
     "Path": "./Localisation/"
