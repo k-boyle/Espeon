@@ -1,8 +1,9 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class LocalisationServiceTests {
+        private static readonly ILogger<LocalisationService> Logger = new NullLogger<LocalisationService>();
+        
         private static readonly Snowflake Member1Id = 0L;
         private static readonly Snowflake Member2Id = 1L;
         private static readonly Snowflake Member3Id = 2L;
         private static readonly Snowflake GuildId = 0L;
         private static readonly ILocalisationProvider LocalisationProvider = new TestLocalisationProvider();
         
-        private ILogger _logger;
         private IServiceProvider _provider;
         
         [SetUp]
         public async Task BeforeEachAsync() {
-            this._logger = TestLoggerFactory.Create();
             this._provider = new ServiceCollection()
-                .AddSingleton(this._logger)
+                .AddSingleton(Logger)
                 .AddDbContext<EspeonDbContext>(builder => builder.UseInMemoryDatabase("espeon"))
                 .BuildServiceProvider();
             
@@ -46,7 +47,7 @@ namespace Espeon.Test {
         
         [Test]
         public async Task TestGetResponseForLocalisationInDbAsync() {
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -55,7 +56,7 @@ namespace Espeon.Test {
         
         [Test]
         public async Task TestGetResponseForLocalisationNotInDbAsync() {
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member2Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -70,7 +71,7 @@ namespace Espeon.Test {
         
         [Test]
         public async Task TestGetResponseTooManyArgs() {
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, "1", "2"));
@@ -78,7 +79,7 @@ namespace Espeon.Test {
         
         [Test]
         public async Task TestGetResponseTooFewArgs() {
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             Assert.DoesNotThrowAsync(async () => await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED));
@@ -87,7 +88,7 @@ namespace Espeon.Test {
         [Test]
         public async Task TestGetResponseFormatsAsync() {
             const string espeon = "espeon";
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member1Id, GuildId, LocalisationStringKey.REMINDER_CREATED, espeon);
@@ -96,7 +97,7 @@ namespace Espeon.Test {
         
         [Test]
         public async Task TestGetResponseFallbacksAsync() {
-            var service = new LocalisationService(this._provider, LocalisationProvider, this._logger);
+            var service = new LocalisationService(this._provider, LocalisationProvider, Logger);
             await service.StartAsync(CancellationToken.None);
 
             var response = await service.GetResponseAsync(Member3Id, GuildId, LocalisationStringKey.PING_COMMAND);
@@ -105,19 +106,19 @@ namespace Espeon.Test {
         
         [Test]
         public void TestGetKeyThrowsOnInvalidKey() {
-            var service = new LocalisationService(this._provider, null, this._logger);
+            var service = new LocalisationService(this._provider, null, Logger);
             Assert.Throws<ArgumentException>(() => service.GetKey("invalid"));
         }
 
         [Test]
         public void TestGetKeyThrows() {
-            var service = new LocalisationService(this._provider, null, this._logger);
+            var service = new LocalisationService(this._provider, null, Logger);
             Assert.DoesNotThrow(() => service.GetKey(LocalisationStringKey.PING_COMMAND.ToString()));
         }
         
         [Test]
         public async Task TestStopAsync() {
-            var service = new LocalisationService(this._provider, null, this._logger);
+            var service = new LocalisationService(this._provider, null, Logger);
             await service.StopAsync(CancellationToken.None);
         }
         

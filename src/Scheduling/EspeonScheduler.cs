@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,14 +7,14 @@ namespace Espeon {
     public class EspeonScheduler {
         private static readonly TimeSpan MaxDelay = TimeSpan.FromMilliseconds(int.MaxValue);
 
-        private readonly ILogger _logger;
+        private readonly ILogger<EspeonScheduler> _logger;
         private readonly BinaryHeap<IScheduledTask> _tasks;
         private readonly object _lock = new object();
 
         private CancellationTokenSource _cts;
 
-        public EspeonScheduler(ILogger logger) {
-            this._logger = logger.ForContext("SourceContext", nameof(EspeonScheduler));
+        public EspeonScheduler(ILogger<EspeonScheduler> logger) {
+            this._logger = logger;
             this._tasks = BinaryHeap<IScheduledTask>.CreateMinHeap();
             this._cts = new CancellationTokenSource();
             _ = TaskLoopAsync();
@@ -36,7 +36,7 @@ namespace Espeon {
                     
                     TimeSpan executeIn;
                     var next = this._tasks.Root;
-                    this._logger.Verbose("Waiting for {task} in {duration}", next.Name, next.ExecuteAt);
+                    this._logger.LogTrace("Waiting for {task} in {duration}", next.Name, next.ExecuteAt);
                     while ((executeIn = next.ExecuteAt - DateTimeOffset.Now) > MaxDelay) {
                         await Task.Delay(MaxDelay, this._cts.Token);
                     }
@@ -47,10 +47,10 @@ namespace Espeon {
                     
                     try {
                         if (!next.IsCancelled) {
-                            this._logger.Verbose("Executing {task}", next.Name);
+                            this._logger.LogTrace("Executing {task}", next.Name);
                             await next.Callback();
                         } else {
-                            this._logger.Debug("{task} was cancelled", next.Name);
+                            this._logger.LogDebug("{task} was cancelled", next.Name);
                         }
                     } catch (Exception ex) {
                         OnError?.Invoke(ex);
@@ -80,7 +80,7 @@ namespace Espeon {
 
         public ScheduledTask<T> DoAt<T>(string name, DateTimeOffset executeAt, T state, Func<T, Task> callback) {
             var newTask = new ScheduledTask<T>(name, executeAt, state, callback);
-            this._logger.Debug("Queueing up {task}", newTask.Name);
+            this._logger.LogDebug("Queueing up {task}", newTask.Name);
             lock (this._lock) {
                 if (this._tasks.Root is null || newTask.ExecuteAt < this._tasks.Root.ExecuteAt) {
                     this._tasks.Insert(newTask);

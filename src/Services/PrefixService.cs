@@ -1,7 +1,7 @@
 ﻿using Disqord;
 using Disqord.Bot.Prefixes;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,21 +10,21 @@ using System.Threading.Tasks;
 namespace Espeon {
     public class PrefixService {
         private readonly IServiceProvider _services;
-        private readonly ILogger _logger;
+        private readonly ILogger<PrefixService> _logger;
         private readonly ConcurrentDictionary<ulong, GuildPrefixes> _guildPrefixes;
 
-        public PrefixService(IServiceProvider services, ILogger logger) {
+        public PrefixService(IServiceProvider services, ILogger<PrefixService> logger) {
             this._services = services;
-            this._logger = logger.ForContext("SourceContext", nameof(PrefixService));
+            this._logger = logger;
             this._guildPrefixes = new ConcurrentDictionary<ulong, GuildPrefixes>();
         }
         
         public PrefixService(
                 IServiceProvider services,
-                ILogger logger,
+                ILogger<PrefixService> logger,
                 ConcurrentDictionary<ulong, GuildPrefixes> prefixCache) {
             this._services = services;
-            this._logger = logger.ForContext("SourceContext", nameof(PrefixService));
+            this._logger = logger;
             this._guildPrefixes = prefixCache;
         }
         
@@ -35,19 +35,19 @@ namespace Espeon {
         }
         
         private async Task<IEnumerable<IPrefix>> GetPrefixesFromDbAsync(IGuild guild) {
-            this._logger.Information("Loading prefixes from db for {guild}", guild.Name);
+            this._logger.LogInformation("Loading prefixes from db for {guild}", guild.Name);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             return (this._guildPrefixes[guild.Id] = await context.GetPrefixesAsync(guild)).Values;
         }
 
         public ValueTask<bool> TryAddPrefixAsync(IGuild guild, IPrefix prefix) {
-            this._logger.Information("Adding prefix {prefix} to {guild}", prefix, guild.Name);
+            this._logger.LogInformation("Adding prefix {prefix} to {guild}", prefix, guild.Name);
             return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Add(prefix));
         }
 
         public ValueTask<bool> TryRemovePrefixAsync(IGuild guild, IPrefix prefix) {
-            this._logger.Information("Removing prefix {prefix} to {guild}", prefix, guild.Name);
+            this._logger.LogInformation("Removing prefix {prefix} to {guild}", prefix, guild.Name);
             return TryModifyAsync(guild, prefix, (prefixes, prefix) => prefixes.Values.Remove(prefix));
         }
         
