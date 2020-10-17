@@ -3,7 +3,7 @@
     "Token": "NDU3NTA3NTUxNzI3MDU4OTQ2.XpDsgA.BItzNqFuaYvVDZ9hisBV4F_gj8A"
   },
   "Postgres": {
-    "ConnectionString": "Host=192.168.1.154;Port=5432;Database=Espeon;Username=postgres;Password=casino"
+    "ConnectionString": "Host=127.0.0.1;Port=5432;Database=Espeon;Username=postgres;Password=casino"
   },
   "Serilog": {
     "Using": [

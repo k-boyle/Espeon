@@ -21,8 +21,8 @@ namespace Espeon {
                 EspeonPrefixProvider prefixProvider,
                 DiscordBotConfiguration configuration)
                     : base(TokenType.Bot, discordOptions.Value.Token, prefixProvider, configuration) {
-            this._logger = logger;
-                this._localisationService = this.GetRequiredService<LocalisationService>();
+            this._logger = logger; 
+            this._localisationService = this.GetRequiredService<LocalisationService>();
             Ready += OnReadyAsync;
             Ready += OnFirstReadyAsync;
             JoinedGuild += OnGuildJoined;
