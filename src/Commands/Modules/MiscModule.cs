@@ -24,10 +24,9 @@ namespace Espeon {
             var commandService = (ICommandService) Context.Bot;
             var modules = commandService.GetAllModules();
             
-            var executableModules = GetModulesThatCanBeExecuted(modules);
             var moduleStringJoiner = new StringJoiner(", ");
             
-            await foreach(var module in executableModules) {
+            foreach(var module in modules) {
                 moduleStringJoiner.Append(Markdown.Code(module.Name));
             }
 
@@ -56,15 +55,8 @@ namespace Espeon {
         [Description("View help for a specific module")]
         [Command("help")]
         public async Task HelpAsync([Remainder] Module module) {
-            var commands = module.Commands;
-            var submodules = module.Submodules;
-
-            var executableCommands = GetCommandsThatCanBeExecuted(commands);
-            var executableSubmodules = GetModulesThatCanBeExecuted(submodules);
-
-            var (commandNamesString, commandAliasesString) = await CreateCommandStringsAsync(executableCommands);
-
-            var submoduleString = await CreateSubmoduleStringAsync(executableSubmodules);
+            var (commandNamesString, commandAliasesString) = await CreateCommandStringsAsync(module.Commands);
+            var submoduleString = await CreateSubmoduleStringAsync(module.Submodules);
 
             var helpEmbedBuilder = CreateModuleHelpEmbed(
                 module,
@@ -79,10 +71,9 @@ namespace Espeon {
         [Description("View help for specific commands")]
         [Command("help")]
         public async Task HelpAsync([Remainder] IEnumerable<Command> commands) {
-            var executableCommands = GetCommandsThatCanBeExecuted(commands);
             var embeds = new List<LocalEmbedBuilder>();
 
-            await foreach (var command in executableCommands) {
+            foreach (var command in commands) {
                 embeds.Add(CreateEmbedForCommandHelp(command));
             }
 

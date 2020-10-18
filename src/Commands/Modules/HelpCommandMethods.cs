@@ -10,9 +10,9 @@ using static Espeon.CommandHelper;
 
 namespace Espeon {
     public partial class MiscModule {
-        private static async Task<string> CreateSubmoduleStringAsync(IAsyncEnumerable<Module> executableSubmodules) {
+        private static async Task<string> CreateSubmoduleStringAsync(IEnumerable<Module> executableSubmodules) {
             var subModuleStringJoiner = new StringJoiner(", ");
-            await foreach (var submodule in executableSubmodules) {
+            foreach (var submodule in executableSubmodules) {
                 subModuleStringJoiner.Append(Markdown.Code(submodule.Name));
             }
 
@@ -20,10 +20,10 @@ namespace Espeon {
             return submoduleString;
         }
 
-        private static async Task<(string, string)> CreateCommandStringsAsync(IAsyncEnumerable<Command> executableCommands) {
+        private static async Task<(string, string)> CreateCommandStringsAsync(IEnumerable<Command> executableCommands) {
             var commandNameStringJoined = new StringJoiner(", ");
             var commandAliasStringJoiner = new StringJoiner(", ");
-            await foreach (var command in executableCommands) {
+            foreach (var command in executableCommands) {
                 commandNameStringJoined.Append(Markdown.Code(command.Name));
 
                 if (command.Aliases.Count > 0) {
@@ -60,7 +60,7 @@ namespace Espeon {
             if (module.FullAliases.Count > 0) {
                 helpEmbedBuilder.AddField("Module Aliases", string.Join(", ", module.FullAliases.Select(Markdown.Code)));
             }
-
+            
             helpEmbedBuilder.AddField("Command Names", commandNamesString);
             helpEmbedBuilder.AddField("Command Aliases", commandAliasesString);
 
@@ -188,26 +188,6 @@ namespace Espeon {
             var pagedProvider = new DefaultPageProvider(pages);
             var menu = new PagedMenu(Context.Member.Id, pagedProvider);
             await Context.Channel.StartMenuAsync(menu);
-        }
-
-        private async IAsyncEnumerable<Module> GetModulesThatCanBeExecuted(IEnumerable<Module> modules) {
-            foreach (var module in modules) {
-                var result = await module.RunChecksAsync(Context);
-
-                if (result.IsSuccessful) {
-                    yield return module;
-                }
-            }
-        }
-
-        private async IAsyncEnumerable<Command> GetCommandsThatCanBeExecuted(IEnumerable<Command> commands) {
-            foreach (var command in commands) {
-                var result = await command.RunChecksAsync(Context);
-                    
-                if (result.IsSuccessful) {
-                    yield return command;
-                }
-            }
         }
 
         private string GetPrefix() {
