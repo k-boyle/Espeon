@@ -15,9 +15,9 @@ namespace Espeon {
     public class OwnerModule : EspeonCommandModule{
         [Command("eval")]
         public async Task EvalAsync([Remainder] string rawCode) {
-            var code = CommandHelpers.GetCode(rawCode);
+            var code = CommandHelper.GetCode(rawCode);
             var sw = Stopwatch.StartNew();
-            var script = CSharpScript.Create(code, CommandHelpers.RoslynScriptOptions, typeof(RoslynCommandContext));
+            var script = CSharpScript.Create(code, CommandHelper.RoslynScriptOptions, typeof(RoslynCommandContext));
             var diagnostics = script.Compile();
             var compilationTime = sw.ElapsedMilliseconds;
             

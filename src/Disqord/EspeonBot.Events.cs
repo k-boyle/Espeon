@@ -28,7 +28,7 @@ namespace Espeon {
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
 
             await OnReadyServicesAsync(context);
-            await CreateGlobalTagsAsync(context);
+            await CommandHelper.AddGlobalTagsAsync(context, this, this._logger);
 
             this._logger.LogInformation("Espeon on first ready executed");
         }
@@ -39,24 +39,6 @@ namespace Espeon {
             foreach (var service in onReadyServices) {
                 await service.OnReadyAsync(context);
             }
-        }
-
-        private async Task CreateGlobalTagsAsync(EspeonDbContext context) {
-            this._logger.LogInformation("Adding global tags");
-            var tags = await context.GetTagsAsync<GlobalTag>();
-            AddModule(moduleBuilder => {
-                    moduleBuilder.WithName("All Global Tags")
-                        .WithDescription("All the global tags");
-
-                    foreach (var tag in tags) {
-                        this._logger.LogDebug("Adding global tag {name}", tag.Key);
-                        moduleBuilder.AddCommand(
-                            context => CommandHelpers.GlobalTagCallbackAsync((EspeonCommandContext) context),
-                            commandBuilder => commandBuilder.WithName(tag.Key).Aliases.Add(tag.Key));
-                    }
-
-                    this._logger.LogDebug("Created global tag module");
-                });
         }
 
         private async Task OnGuildJoined(JoinedGuildEventArgs e) {
