@@ -16,7 +16,14 @@ namespace Espeon {
         private const char NewLine = '\n';
         
         public static ScriptOptions RoslynScriptOptions { get; }
-        public static IReadOnlyDictionary<Type, string> ParameterExampleStrings { get; }
+        
+        public static IReadOnlyDictionary<Type, string> ParameterExampleStrings { get; } = new Dictionary<Type, string> {
+            [typeof(CachedMember)] = "<@376085382913064971>",
+            [typeof(IMessage)] = "767451076084891678",
+            [typeof(LocalCustomEmoji)] = "<:espeon:491227561385525248>",
+            [typeof(CachedTextChannel)] = "#general",
+            [typeof(CachedRole)] = "@Admins"
+        };
         
         private static readonly string UsingsBlock;
         
@@ -42,14 +49,6 @@ namespace Espeon {
             RoslynScriptOptions = ScriptOptions.Default
                 .WithReferences(assemblies.Select(assembly => MetadataReference.CreateFromFile(assembly.Location)))
                 .AddImports(namespaces);
-
-            ParameterExampleStrings = new Dictionary<Type, string> {
-                [typeof(CachedMember)] = "<@376085382913064971>",
-                [typeof(IMessage)] = "767451076084891678",
-                [typeof(LocalCustomEmoji)] = "<:espeon:491227561385525248>",
-                [typeof(CachedTextChannel)] = "#general",
-                [typeof(CachedRole)] = "@Admins"
-            };
         }
         
         public static async Task AddGlobalTagsAsync<T>(

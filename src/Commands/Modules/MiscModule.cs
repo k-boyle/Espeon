@@ -142,10 +142,14 @@ namespace Espeon {
         }
 
         private static string GetImageUrl(IMessage message) {
-            return message is IUserMessage userMessage
-                ? userMessage.Attachments.FirstOrDefault() is { } attachment
+            static string GetAttachmentUrl(IUserMessage userMessage) {
+                return userMessage.Attachments.FirstOrDefault() is { } attachment
                     ? attachment.Url
-                    : string.Empty
+                    : string.Empty;
+            }
+
+            return message is IUserMessage userMessage
+                ? GetAttachmentUrl(userMessage)
                 : string.Empty;
         }
 
