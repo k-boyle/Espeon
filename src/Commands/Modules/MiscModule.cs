@@ -48,7 +48,8 @@ namespace Espeon {
                 }
             };
 
-            await ReplyAsync(embed: helpEmbedBuilder.Build());
+            var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
+            await Context.Channel.StartMenuAsync(delete);
         }
         
         [Name("Module Help")]
@@ -64,7 +65,8 @@ namespace Espeon {
                 commandAliasesString,
                 submoduleString);
 
-            await ReplyAsync(embed: helpEmbedBuilder.Build());
+            var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
+            await Context.Channel.StartMenuAsync(delete);
         }
 
         [Name("Command Help")]
