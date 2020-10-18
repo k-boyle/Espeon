@@ -1,7 +1,10 @@
 ﻿using Disqord;
 using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Rest;
+using Espeon.Menus;
 using Qmmands;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -9,11 +12,85 @@ using System.Threading.Tasks;
 using static Espeon.LocalisationStringKey;
 
 namespace Espeon {
-    [Name("Misc Commands")]
+    [Name("Misc")]
     [Description("Commands that doesn't really fit into a specific category")]
-    public class MiscModule : EspeonCommandModule {
+    public partial class MiscModule : EspeonCommandModule {
         public HttpClient Client { get; set; }
+
+        [Name("Help")]
+        [Description("Displays all the bots modules")]
+        [Command("help")]
+        public async Task HelpAsync() {
+            var commandService = (ICommandService) Context.Bot;
+            var modules = commandService.GetAllModules();
+            
+            var executableModules = GetModulesThatCanBeExecuted(modules);
+            var moduleStringJoiner = new StringJoiner(", ");
+            
+            await foreach(var module in executableModules) {
+                moduleStringJoiner.Append(Markdown.Code(module.Name));
+            }
+
+            var helpEmbedBuilder = new LocalEmbedBuilder {
+                Color = Constants.EspeonColour,
+                Title = "Espeon's Help",
+                Author = new LocalEmbedAuthorBuilder {
+                    IconUrl = Context.Member.GetAvatarUrl(),
+                    Name = Context.Member.DisplayName
+                },
+                ThumbnailUrl = Context.Guild.CurrentMember.GetAvatarUrl(),
+                Description = moduleStringJoiner.ToString(),
+                Footer = new LocalEmbedFooterBuilder {
+                    Text = $"Execute \"{GetPrefix()} module\" to view help for that module"
+                }
+            };
+
+            await ReplyAsync(embed: helpEmbedBuilder.Build());
+        }
         
+        [Name("Module Help")]
+        [Description("View help for a specific module")]
+        [Command("help")]
+        public async Task HelpAsync([Remainder] Module module) {
+            var commands = module.Commands;
+            var submodules = module.Submodules;
+
+            var executableCommands = GetCommandsThatCanBeExecuted(commands);
+            var executableSubmodules = GetModulesThatCanBeExecuted(submodules);
+
+            var (commandNamesString, commandAliasesString) = await CreateCommandStringsAsync(executableCommands);
+
+            var submoduleString = await CreateSubmoduleStringAsync(executableSubmodules);
+
+            var helpEmbedBuilder = CreateModuleHelpEmbed(
+                module,
+                commandNamesString,
+                commandAliasesString,
+                submoduleString);
+
+            await ReplyAsync(embed: helpEmbedBuilder.Build());
+        }
+
+        [Name("Command Help")]
+        [Description("View help for specific commands")]
+        [Command("help")]
+        public async Task HelpAsync([Remainder] IEnumerable<Command> commands) {
+            var executableCommands = GetCommandsThatCanBeExecuted(commands);
+            var embeds = new List<LocalEmbedBuilder>();
+
+            await foreach (var command in executableCommands) {
+                embeds.Add(CreateEmbedForCommandHelp(command));
+            }
+
+            if (embeds.Count == 1) {
+                var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: embeds[0].Build()));
+                await Context.Channel.StartMenuAsync(delete);
+                return;
+            }
+            
+            await SendPagedHelpAsync(embeds);
+        }
+
         [Name("Mock")]
         [Description("Mocks a user")]
         [Command("mock", "m")]
@@ -43,6 +120,7 @@ namespace Espeon {
                 avatarUrl: message.Author.GetAvatarUrl());
         }
         
+        
         [Name("Quote")]
         [Description("Quote a message")]
         [Command("quote", "q")]
@@ -53,27 +131,47 @@ namespace Espeon {
                 Description = message.Content,
                 Author = new LocalEmbedAuthorBuilder {
                     IconUrl = author.GetAvatarUrl(),
-                    Name = Context.Guild.Members.TryGetValue(author.Id, out var member) ? member.DisplayName : author.Name,
-                    Url = message.GetJumpUrl(Context.Bot.GetChannel(message.ChannelId) is CachedTextChannel channel ? channel.Guild : null)
+                    Name = GetDisplayName(author),
+                    Url = GetJumpUrl(message)
                 },
                 Timestamp = message.CreatedAt,
-                ImageUrl = message is IUserMessage userMessage
-                    ? userMessage.Attachments.FirstOrDefault() is { } attachment ? attachment.Url : null
-                    : null
+                ImageUrl = GetImageUrl(message)
             };
 
             await ReplyAsync(embed: builder.Build());
         }
-        
-        [Command("<a:pepohyperwhatif:715291110297043005>")]
-        public async Task PepoWhatIfAsync() {
-            await ReplyAsync("<a:pepohyperwhatif:715291110297043005>");
+
+        private static string GetImageUrl(IMessage message) {
+            static string GetAttachmentUrl(IUserMessage userMessage) {
+                return userMessage.Attachments.FirstOrDefault() is { } attachment
+                    ? attachment.Url
+                    : string.Empty;
+            }
+
+            return message is IUserMessage userMessage
+                ? GetAttachmentUrl(userMessage)
+                : string.Empty;
         }
-        
+
+        private string GetJumpUrl(IMessage message) {
+            var guild = Context.Bot.GetChannel(message.ChannelId) is CachedTextChannel channel
+                ? channel.Guild
+                : null;
+            return message.GetJumpUrl(guild);
+        }
+
+        private string GetDisplayName(IUser author) {
+            return Context.Guild.Members.TryGetValue(author.Id, out var member)
+                ? member.DisplayName
+                : author.Name;
+        }
+
+        [Name("Add Emote")]
+        [Description("Adds the specified emote to the guild")]
         [Command("emote")]
         [RequireBotGuildPermissions(Permission.ManageEmojis)]
         [RequireMemberGuildPermissions(Permission.ManageEmojis)]
-        public async Task StealEmoteAsync(LocalCustomEmoji emoji, string name = null) {
+        public async Task StealEmoteAsync(LocalCustomEmoji emoji, [Example("pepowhatif")] string name = null) {
             await using var httpStream = await Client.GetStreamAsync(emoji.GetUrl());
             await using var memStream = new MemoryStream();
             await httpStream.CopyToAsync(memStream);

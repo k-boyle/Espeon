@@ -33,7 +33,9 @@ namespace Espeon {
             
             AddTypeParser(new UserReminderTypeParser());
             AddTypeParser(new IMessageTypeParser());
-            AddModules(Assembly.GetEntryAssembly());
+            AddTypeParser(new ModuleTypeParser());
+            AddTypeParser(new CommandTypeParser());
+            AddModules(Assembly.GetEntryAssembly(), type => type != typeof(TagModule));
             AddExtensionAsync(new InteractivityExtension());
         }
 

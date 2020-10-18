@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Espeon {
@@ -41,6 +42,7 @@ namespace Espeon {
                         .AddSingleton<PrefixService>()
                         .AddSingleton<EspeonScheduler>()
                         .AddSingleton<DisqordLogger>()
+                        .AddSingleton<HttpClient>()
                         .AddSingleton<ILocalisationProvider, PropertyBasedLocalisationProvider>()
                         .AddOnReadyService<ReminderService>()
                         .AddHostedService<EspeonService>()
