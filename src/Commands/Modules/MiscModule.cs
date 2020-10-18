@@ -39,9 +39,13 @@ namespace Espeon {
                     Name = Context.Member.DisplayName
                 },
                 ThumbnailUrl = Context.Guild.CurrentMember.GetAvatarUrl(),
-                Description = moduleStringJoiner.ToString(),
                 Footer = new LocalEmbedFooterBuilder {
                     Text = $"Execute \"{GetPrefix()} module\" to view help for that module"
+                }, Fields = {
+                    new LocalEmbedFieldBuilder {
+                        Name = "Modules",
+                        Value = moduleStringJoiner.ToString()
+                    }
                 }
             };
 
