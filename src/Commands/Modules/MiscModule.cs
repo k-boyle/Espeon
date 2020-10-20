@@ -56,8 +56,8 @@ namespace Espeon {
         [Description("View help for a specific module")]
         [Command("help")]
         public async Task HelpAsync([Remainder] Module module) {
-            var (commandNamesString, commandAliasesString) = await CreateCommandStringsAsync(module.Commands);
-            var submoduleString = await CreateSubmoduleStringAsync(module.Submodules);
+            var (commandNamesString, commandAliasesString) = CreateCommandStrings(module.Commands);
+            var submoduleString = CreateSubmoduleString(module.Submodules);
 
             var helpEmbedBuilder = CreateModuleHelpEmbed(
                 module,

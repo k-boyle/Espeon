@@ -7,6 +7,7 @@ using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static Espeon.LocalisationStringKey;
 
@@ -42,20 +43,22 @@ namespace Espeon {
             }
             
             if (reminders.Count <= BatchSize) {
-                var embed = CreateReminderEmbed(reminders);
+                var embed = await CreateReminderEmbedAsync(reminders);
                 await ReplyAsync(embed: embed.Build());
                 return;
             }
 
             var numberOfPages = MathEx.IntCeilingDivision(reminders.Count, BatchSize);
-            var reminderPages = reminders.Batch(BatchSize)
-                .Select((reminders, index) => {
-                    var reminderEmbedBuilder = CreateReminderEmbed(reminders);
-                    reminderEmbedBuilder.Footer = new LocalEmbedFooterBuilder {
-                        Text = $"Page [{index + 1}/{numberOfPages}]" 
-                    };
-                    return new Page(reminderEmbedBuilder.Build());
-                });
+            var reminderBatches = reminders.Batch(BatchSize);
+            var pageIndex = 0;
+            var reminderPages = new List<Page>();
+            foreach (var reminderBatch in reminderBatches) {
+                var reminderEmbedBuilder = await CreateReminderEmbedAsync(reminderBatch);
+                reminderEmbedBuilder.Footer = new LocalEmbedFooterBuilder {
+                    Text = $"Page [{++pageIndex}/{numberOfPages}]"
+                };
+                reminderPages.Add(reminderEmbedBuilder.Build());
+            }
             var pageProvder = new DefaultPageProvider(reminderPages);
             var menu = new PagedMenu(Context.User.Id, pageProvder);
             await Context.Channel.StartMenuAsync(menu);
@@ -65,29 +68,47 @@ namespace Espeon {
             return reminder.UserId == Context.Member.Id && Context.Guild.Channels.ContainsKey(reminder.ChannelId);
         }
         
-        private LocalEmbedBuilder CreateReminderEmbed(IEnumerable<UserReminder> reminders) {
-            string FormatReminderString(UserReminder reminder, int index) {
-                var executesIn = reminder.TriggerAt - DateTimeOffset.Now;
-                var channelString = Context.Guild.Channels.TryGetValue(reminder.ChannelId, out var channel)
-                    ? ((CachedTextChannel) channel).Mention
-                    : "Channel Deleted";
-                var valueString = reminder.Value.Length < 100
-                    ? reminder.Value
-                    : $"{reminder.Value.Substring(0, 97)}...";
-
-                return $"{Markdown.Bold("Id")}: {index}\n"
-                     + $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(2, minUnit: TimeUnit.Second)}\n"
-                     + $"{Markdown.Bold("Channel")}: {channelString}\n"
-                     + $"{Markdown.Bold("Reminder")}: {valueString}\n";
+        private async Task<LocalEmbedBuilder> CreateReminderEmbedAsync(IEnumerable<UserReminder> reminders) {
+            var reminderStringBuilder = new StringBuilder();
+            var index = 0;
+            foreach (var reminder in reminders) {
+                var reminderString = await FormatReminderStringAsync(reminder, index++);
+                reminderStringBuilder.AppendLine(reminderString);
             }
-                
+            
             var reminderEmbedBuilder = new LocalEmbedBuilder {
                 Color = Constants.EspeonColour,
                 Title = $"{Context.Member.DisplayName}'s Reminders",
-                Description = string.Join('\n', reminders.Select(FormatReminderString))
+                Description = reminderStringBuilder.ToString()
             };
-                
+
             return reminderEmbedBuilder;
+        }
+
+        private async Task<string> FormatReminderStringAsync(UserReminder reminder, int index) {
+            var reminderStringBuilder = new StringBuilder();
+            var executesIn = reminder.TriggerAt - DateTimeOffset.Now;
+            reminderStringBuilder.AppendLine($"{Markdown.Bold("Id")}: {index}");
+            reminderStringBuilder.AppendLine(
+                $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: TimeUnit.Second)}");
+            var valueString = reminder.Value.Length < 100 
+                ? reminder.Value 
+                : $"{reminder.Value.Substring(0, 97)}...";
+            reminderStringBuilder.AppendLine($"{Markdown.Bold("Reminder")}: {valueString}");
+            
+            if (Context.Guild.Channels.TryGetValue(reminder.ChannelId, out var ch) && ch is CachedTextChannel channel) {
+                reminderStringBuilder.AppendLine($"{Markdown.Bold("Channel")}: {channel.Mention}");
+
+                var message = await channel.GetMessageAsync(reminder.ReminderMessageId);
+
+                if (message != null) {
+                    var jumpUrl = message.GetJumpUrl(channel.Guild);
+                    var linkMarkdown = Markdown.Link(reminder.ReminderMessageId.ToString(), jumpUrl);
+                    reminderStringBuilder.AppendLine($"{Markdown.Bold("Original Message")}: {linkMarkdown}");
+                }
+            }
+
+            return reminderStringBuilder.ToString();
         }
 
         public async ValueTask DisposeAsync() {

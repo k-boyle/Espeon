@@ -10,7 +10,7 @@ using static Espeon.CommandHelper;
 
 namespace Espeon {
     public partial class MiscModule {
-        private static async Task<string> CreateSubmoduleStringAsync(IEnumerable<Module> executableSubmodules) {
+        private static string CreateSubmoduleString(IEnumerable<Module> executableSubmodules) {
             var subModuleStringJoiner = new StringJoiner(", ");
             foreach (var submodule in executableSubmodules) {
                 subModuleStringJoiner.Append(Markdown.Code(submodule.Name));
@@ -20,7 +20,7 @@ namespace Espeon {
             return submoduleString;
         }
 
-        private static async Task<(string, string)> CreateCommandStringsAsync(IEnumerable<Command> executableCommands) {
+        private static (string, string) CreateCommandStrings(IEnumerable<Command> executableCommands) {
             var commandNameStringJoined = new StringJoiner(", ");
             var commandAliasStringJoiner = new StringJoiner(", ");
             foreach (var command in executableCommands) {
