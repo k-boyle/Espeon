@@ -1,18 +1,20 @@
 ﻿using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Yaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Espeon {
     internal class Program {
-        private const string DefaultConfigDir = "./config.json";
+        private const string DefaultConfigDir = "./config.yml";
         
         private static void WriteEspeonAscii() {
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
@@ -32,10 +34,7 @@ namespace Espeon {
                 .UseSerilog((hostContext, loggingConfiguration) => {
                     loggingConfiguration.ReadFrom.Configuration(hostContext.Configuration);
                 })
-                .ConfigureAppConfiguration(configurationBuilder => {
-                    var configDir = configurationBuilder.Build()["config"] ?? DefaultConfigDir;
-                    configurationBuilder.AddJsonFile(configDir);
-                })
+                .ConfigureAppConfiguration(ConfigureConfig)
                 .ConfigureServices((hostContext, serviceCollection) => {
                     var configuration = hostContext.Configuration;
                     serviceCollection.AddSingleton(Espeon)
@@ -52,6 +51,28 @@ namespace Espeon {
                         .ConfigureSection<Localisation>(configuration)
                         .ConfigureSection<Postgres>(configuration);
                 });
+        }
+
+        private static void ConfigureConfig(IConfigurationBuilder configurationBuilder) {
+
+            var configDir = configurationBuilder.Build()["config"] ?? DefaultConfigDir;
+            if (!File.Exists(configDir)) {
+                throw new FileNotFoundException($"Missing config file {configDir}");
+            }
+
+            switch (Path.GetExtension(configDir)) {
+                case ".yaml":
+                case ".yml":
+                    configurationBuilder.AddYamlFile(configDir);
+                    break;
+
+                case ".json":
+                    configurationBuilder.AddJsonFile(configDir);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"{Path.GetExtension(configDir)} is not a valid config type");
+            }
         }
 
         private static EspeonBot Espeon(IServiceProvider provider) {
