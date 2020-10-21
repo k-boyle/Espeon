@@ -54,7 +54,6 @@ namespace Espeon {
         }
 
         private static void ConfigureConfig(IConfigurationBuilder configurationBuilder) {
-
             var configDir = configurationBuilder.Build()["config"] ?? DefaultConfigDir;
             if (!File.Exists(configDir)) {
                 throw new FileNotFoundException($"Missing config file {configDir}");
