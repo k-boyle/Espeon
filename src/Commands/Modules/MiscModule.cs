@@ -3,6 +3,7 @@ using Disqord.Bot;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Rest;
 using Espeon.Menus;
+using Microsoft.Extensions.Options;
 using Qmmands;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,7 @@ namespace Espeon {
     [Description("Commands that doesn't really fit into a specific category")]
     public partial class MiscModule : EspeonCommandModule {
         public HttpClient Client { get; set; }
+        public IOptions<Emotes> EmotesOptions { get; set; }
 
         [Name("Help")]
         [Description("Displays all the bots modules")]
@@ -175,6 +177,22 @@ namespace Espeon {
             memStream.Position = 0;
             var created = await Context.Guild.CreateEmojiAsync(memStream, name ?? emoji.Name);
             await ReplyAsync(created.ToString());
+        }
+        
+        [Name("pepowhatif")]
+        [Description("Sends a pepowhatif")]
+        [Command("pepowhatif", "whatif", "pepo")]
+        public async Task PepoWhatIfAsync(uint size = 0) {
+            var emotes = EmotesOptions.Value;
+            if (emotes.Strings.TryGetValue((EmoteKey) size, out var emoteStr)) {
+                if (Context.Guild.CurrentMember.GetPermissionsFor(Context.Channel).ManageMessages) {
+                    await Context.Message.DeleteAsync();
+                }
+                
+                await ReplyAsync(emoteStr);
+            } else {
+                await ReplyAsync(INVALID_PEPOWHATIF_SIZE);
+            }
         }
     }
 }
