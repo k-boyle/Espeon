@@ -49,7 +49,8 @@ namespace Espeon {
                         .AddDbContext<EspeonDbContext>(UseNpgsql, optionsLifetime: ServiceLifetime.Singleton)
                         .ConfigureSection<Discord>(configuration)
                         .ConfigureSection<Localisation>(configuration)
-                        .ConfigureSection<Postgres>(configuration);
+                        .ConfigureSection<Postgres>(configuration)
+                        .ConfigureSection<Emotes>(configuration);
                 });
         }
 
