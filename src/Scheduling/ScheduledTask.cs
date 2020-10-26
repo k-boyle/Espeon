@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 namespace Espeon {
-    public struct ScheduledTask<T> : IScheduledTask {
+    public class ScheduledTask<T> : IScheduledTask {
         private static int _taskCounter;
         
         public DateTimeOffset ExecuteAt { get; }
