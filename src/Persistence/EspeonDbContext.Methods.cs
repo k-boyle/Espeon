@@ -1,10 +1,11 @@
 ﻿using Disqord;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Espeon {
     public partial class EspeonDbContext {
         public async Task PersistGuildAsync(IGuild guild) {
-            this._logger.Debug("Persisting {guild}", guild.Name);
+            this._logger.LogDebug("Persisting {guild}", guild.Name);
             var guildId = guild.Id.RawValue;
             if (await GuildPrefixes.FindAsync(guildId) is null) {
                 await GuildPrefixes.AddAsync(new GuildPrefixes(guild.Id));
@@ -18,7 +19,7 @@ namespace Espeon {
         }
         
         public async Task RemoveGuildAsync(IGuild guild) {
-            this._logger.Debug("Removing {guild}", guild.Name);
+            this._logger.LogDebug("Removing {guild}", guild.Name);
             var guildId = guild.Id.RawValue;
             var prefixes = await GuildPrefixes.FindAsync(guildId);
             GuildPrefixes.Remove(prefixes);
@@ -28,7 +29,7 @@ namespace Espeon {
         }
 
         public async Task UpdateAsync<T>(T newData) where T : class {
-            this._logger.Debug("Updating {@data}", newData);
+            this._logger.LogDebug("Updating {@data}", newData);
             switch (newData) {
                 case GuildPrefixes prefixes:
                     GuildPrefixes.Update(prefixes);
@@ -55,7 +56,7 @@ namespace Espeon {
         }
         
         public async Task PersistAsync<T>(T data) where T : class {
-            this._logger.Debug("Persisting {@data}", data);
+            this._logger.LogDebug("Persisting {@data}", data);
             switch (data) {
                 case GuildPrefixes prefixes:
                     await GuildPrefixes.AddAsync(prefixes);
@@ -89,7 +90,7 @@ namespace Espeon {
         }
         
         public async Task RemoveAsync<T>(T data) where T : class {
-            this._logger.Debug("Removing {@data}", data);
+            this._logger.LogDebug("Removing {@data}", data);
             switch (data) {
                 case GuildPrefixes prefixes:
                     GuildPrefixes.Remove(prefixes);

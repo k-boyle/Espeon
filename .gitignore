@@ -6,6 +6,8 @@
 *.xml
 *.vscode
 config.json
+config.yml
+config.yaml
 
 # User-specific files
 *.suo
