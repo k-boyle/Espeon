@@ -11,7 +11,7 @@
     <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00078" />
     <PackageReference Include="Disqord.Extensions.Interactivity" Version="1.0.0-nightly-00078" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.2.0-eap" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.8.0-4.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.8.0-5.final" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0-rc.2.20475.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Yaml" Version="2.0.0-preview2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.2.20475.5" />
