@@ -1,70 +1,16 @@
-using System.Buffers;
-using System.Globalization;
-using System.Collections.Generic;
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 
 namespace Espeon
 {
     public class TimeSpanParser {
-        public enum TimeUnit {
-            SECOND = 1,
-            MINUTE = 60,
-            HOUR = 3600,
-            DAY = 86400,
-            WEEK = 604800,
-            MONTH = 2628000,
-            YEAR = 31536000
-        }
+        private readonly IReadOnlyDictionary<string, TimeUnit> _timeUnitByStr;
 
-        private readonly Dictionary<string, TimeUnit> _timeUnitByStr;
-
-        public TimeSpanParser() {
-            this._timeUnitByStr = new Dictionary<string, TimeUnit>(StringComparer.InvariantCultureIgnoreCase) {
-                ["s"] = TimeUnit.SECOND,
-                ["sec"] = TimeUnit.SECOND,
-                ["secs"] = TimeUnit.SECOND,
-                ["second"] = TimeUnit.SECOND,
-                ["seconds"] = TimeUnit.SECOND,
-
-                ["m"] = TimeUnit.MINUTE,
-                ["min"] = TimeUnit.MINUTE,
-                ["minute"] = TimeUnit.MINUTE,
-                ["minutes"] = TimeUnit.MINUTE,
-
-                ["h"] = TimeUnit.HOUR,
-                ["hr"] = TimeUnit.HOUR,
-                ["hrs"] = TimeUnit.HOUR,
-                ["hour"] = TimeUnit.HOUR,
-                ["hours"] = TimeUnit.HOUR,
-
-                ["d"] = TimeUnit.DAY,
-                ["day"] = TimeUnit.DAY,
-                ["days"] = TimeUnit.DAY,
-
-                ["wk"] = TimeUnit.WEEK,
-                ["wks"] = TimeUnit.WEEK,
-                ["week"] = TimeUnit.WEEK,
-                ["weeks"] = TimeUnit.WEEK,
-
-                ["mth"] = TimeUnit.MONTH,
-                ["mths"] = TimeUnit.MONTH,
-                ["month"] = TimeUnit.MONTH,
-                ["months"] = TimeUnit.MONTH,
-
-                ["y"] = TimeUnit.YEAR,
-                ["yr"] = TimeUnit.YEAR,
-                ["yrs"] = TimeUnit.YEAR,
-                ["year"] = TimeUnit.YEAR,
-                ["years"] = TimeUnit.YEAR
-            };
-        }
-
-        public TimeSpanParser(Dictionary<string, TimeUnit> timeUnitByStr) {
+        public TimeSpanParser(IDictionary<string, TimeUnit> timeUnitByStr) {
             this._timeUnitByStr = new Dictionary<string, TimeUnit>(timeUnitByStr);
         }
 
-        public unsafe bool TryParseIn(string input, out TimeSpan timeSpan) {
+        public bool TryParseIn(string input, out TimeSpan timeSpan) {
             timeSpan = TimeSpan.Zero;
 
             if (input.Length < 2) {
@@ -80,7 +26,7 @@ namespace Espeon
                 }
 
                 var digitLength = 0;
-                for (; i < asSpan.Length && char.IsDigit(asSpan[i]) || asSpan[i] == '.' ; i++, digitLength++);
+                for (; i < asSpan.Length && (char.IsDigit(asSpan[i]) || asSpan[i] == '.') ; i++, digitLength++);
 
                 if (digitLength == 0) {
                     i++;
@@ -104,7 +50,7 @@ namespace Espeon
                 var suffix = new string(asSpan.Slice(i - suffixLength, suffixLength));
                 var parseLength = suffixLength + digitLength + whiteSpaces;
                 var startIndex = i - parseLength;
-                if (_timeUnitByStr.TryGetValue(suffix, out var unit)
+                if (this._timeUnitByStr.TryGetValue(suffix, out var unit)
                         && double.TryParse(asSpan.Slice(startIndex, digitLength), out var duration)) {
                     timeSpan = timeSpan.Add(TimeSpan.FromSeconds(duration * (int) unit));
                 }

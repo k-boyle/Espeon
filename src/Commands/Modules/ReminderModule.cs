@@ -2,7 +2,6 @@
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
-using Humanizer.Localisation;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Espeon.LocalisationStringKey;
+using Unit = Humanizer.Localisation.TimeUnit;
 
 namespace Espeon {
     [Name("Reminders")]
@@ -90,23 +90,27 @@ namespace Espeon {
             var executesIn = reminder.TriggerAt - DateTimeOffset.Now;
             reminderStringBuilder.AppendLine($"{Markdown.Bold("Id")}: {index}");
             reminderStringBuilder.AppendLine(
-                $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: TimeUnit.Second)}");
+                $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: Unit.Second)}");
             var valueString = reminder.Value.Length < 100 
                 ? reminder.Value 
                 : $"{reminder.Value.Substring(0, 97)}...";
             reminderStringBuilder.AppendLine($"{Markdown.Bold("Reminder")}: {valueString}");
-            
-            if (Context.Guild.Channels.TryGetValue(reminder.ChannelId, out var ch) && ch is CachedTextChannel channel) {
-                reminderStringBuilder.AppendLine($"{Markdown.Bold("Channel")}: {channel.Mention}");
 
-                var message = await channel.GetMessageAsync(reminder.ReminderMessageId);
-
-                if (message != null) {
-                    var jumpUrl = message.GetJumpUrl(channel.Guild);
-                    var linkMarkdown = Markdown.Link(reminder.ReminderMessageId.ToString(), jumpUrl);
-                    reminderStringBuilder.AppendLine($"{Markdown.Bold("Original Message")}: {linkMarkdown}");
-                }
+            if (!Context.Guild.Channels.TryGetValue(reminder.ChannelId, out var ch) || !(ch is CachedTextChannel channel)) {
+                return reminderStringBuilder.ToString();
             }
+
+            reminderStringBuilder.AppendLine($"{Markdown.Bold("Channel")}: {channel.Mention}");
+
+            var message = await channel.GetMessageAsync(reminder.ReminderMessageId);
+
+            if (message == null) {
+                return reminderStringBuilder.ToString();
+            }
+
+            var jumpUrl = message.GetJumpUrl(channel.Guild);
+            var linkMarkdown = Markdown.Link(reminder.ReminderMessageId.ToString(), jumpUrl);
+            reminderStringBuilder.AppendLine($"{Markdown.Bold("Original Message")}: {linkMarkdown}");
 
             return reminderStringBuilder.ToString();
         }
