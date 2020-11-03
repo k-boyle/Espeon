@@ -19,44 +19,62 @@ namespace Espeon
 
             var asSpan = input.AsSpan();
 
-            for (int i = 0; i < asSpan.Length;) {
-                if (char.IsWhiteSpace(asSpan[i])) {
-                    i++;
-                    continue;
-                }
-
-                var digitLength = 0;
-                for (; i < asSpan.Length && (char.IsDigit(asSpan[i]) || asSpan[i] == '.') ; i++, digitLength++);
-
-                if (digitLength == 0) {
-                    i++;
-                    continue;
-                }
-
-                if (i == asSpan.Length) {
+            for (int index = 0; index < asSpan.Length;) {
+                if (OnlyWhiteSpacesRemain(asSpan, ref index)) {
                     break;
                 }
 
-                var whiteSpaces = 0;
-                for (; i < asSpan.Length && char.IsWhiteSpace(asSpan[i]); i++, whiteSpaces++);
-
-                var suffixLength = 0;
-                for (; i < asSpan.Length && char.IsLetter(asSpan[i]); i++, suffixLength++);
-
-                if (suffixLength == 0) {
+                if (!HasDigits(asSpan, ref index, out var digitLength)) {
                     continue;
                 }
 
-                var suffix = new string(asSpan.Slice(i - suffixLength, suffixLength));
-                var parseLength = suffixLength + digitLength + whiteSpaces;
-                var startIndex = i - parseLength;
+                if (index == asSpan.Length) {
+                    break;
+                }
+
+                if (!HasSuffix(asSpan, ref index, out var whiteSpaces, out var suffix)) {
+                    continue;
+                }
+
+                var numberStartIndex = index - (suffix.Length + digitLength + whiteSpaces);
                 if (this._timeUnitByStr.TryGetValue(suffix, out var unit)
-                        && double.TryParse(asSpan.Slice(startIndex, digitLength), out var duration)) {
+                        && double.TryParse(asSpan.Slice(numberStartIndex, digitLength), out var duration)) {
                     timeSpan = timeSpan.Add(TimeSpan.FromSeconds(duration * (int) unit));
                 }
             }
 
             return timeSpan > TimeSpan.Zero;
+        }
+
+        private static bool HasDigits(ReadOnlySpan<char> asSpan, ref int index, out int digitLength) {
+            digitLength = 0;
+            for (; index < asSpan.Length && (char.IsDigit(asSpan[index]) || asSpan[index] == '.'); index++, digitLength++) ;
+
+            if (digitLength > 0) {
+                return true;
+            }
+
+            index++;
+            return false;
+
+        }
+
+        private static bool OnlyWhiteSpacesRemain(ReadOnlySpan<char> asSpan, ref int i) {
+            for (; i < asSpan.Length && char.IsWhiteSpace(asSpan[i]); i++) ;
+            return i == asSpan.Length;
+        }
+
+        private static bool HasSuffix(ReadOnlySpan<char> asSpan, ref int index, out int whiteSpaces, out string suffix) {
+            whiteSpaces = 0;
+            for (; index < asSpan.Length && char.IsWhiteSpace(asSpan[index]); index++, whiteSpaces++) ;
+
+            var suffixLength = 0;
+            for (; index < asSpan.Length && char.IsLetter(asSpan[index]); index++, suffixLength++) ;
+
+            suffix = suffixLength > 0
+                ? new string(asSpan.Slice(index - suffixLength, suffixLength))
+                : string.Empty;
+            return suffixLength != 0;
         }
     }
 }

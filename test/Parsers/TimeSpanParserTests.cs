@@ -23,6 +23,7 @@ namespace Espeon.Test {
         private static object[][] StringsAndExpectedResults() {
             return new [] {
                 new object[] { "", false, TimeSpan.Zero },
+                new object[] { "     ", false, TimeSpan.Zero },
                 new object[] { "pepowhatif", false, TimeSpan.Zero },
                 new object[] { "5pepowhatif", false, TimeSpan.Zero },
                 new object[] { "1", false, TimeSpan.Zero },
