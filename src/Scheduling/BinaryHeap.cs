@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Espeon {
+    // todo common
     public class BinaryHeap<T> where T : IComparable<T> {
         public T Root => Size > 0 ? this._heap[0] : default;
         public int Size { get; private set; }

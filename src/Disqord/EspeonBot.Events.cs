@@ -1,4 +1,5 @@
-﻿using Disqord.Events;
+﻿using Disqord;
+using Disqord.Events;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ namespace Espeon {
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             foreach (var guild in e.Client.Guilds.Values) {
                 this._logger.LogInformation("Persisting {guildName}", guild.Name);
-                await context.PersistGuildAsync(guild);
+                await PersistGuildAsync(guild, context);
             }
             
             this._logger.LogInformation("Espeon ready");
@@ -41,18 +42,33 @@ namespace Espeon {
             }
         }
 
-        private async Task OnGuildJoined(JoinedGuildEventArgs e) {
-            this._logger.LogInformation("Joined {guild} with {members} members", e.Guild.Name, e.Guild.MemberCount);
+        private async Task OnGuildJoined(JoinedGuildEventArgs args) {
+            var guild = args.Guild;
+            this._logger.LogInformation("Joined {guild} with {members} members", guild.Name, guild.MemberCount);
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
-            await context.PersistGuildAsync(e.Guild);
+            await PersistGuildAsync(guild, context);
         }
 
-        private async Task OnGuildLeft(LeftGuildEventArgs e) {
-            this._logger.LogInformation("Left {guild}", e.Guild.Name);
+        private static async Task PersistGuildAsync(CachedGuild guild, EspeonDbContext context) {
+            await context.GetOrCreateAsync(guild.Id.RawValue, guildId => new GuildPrefixes(guildId));
+            await context.GetOrCreateAsync(guild.Id.RawValue, guildId => new GuildTags(guildId));
+        }
+
+        private async Task OnGuildLeft(LeftGuildEventArgs args) {
+            var guild = args.Guild;
+            this._logger.LogInformation("Left {guild}", guild.Name);
+            
             using var scope = this.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
-            await context.RemoveGuildAsync(e.Guild);
+            
+            this._logger.LogDebug("Removing {guild}", guild.Name);
+            var guildId = guild.Id.RawValue;
+            var prefixes = await context.GuildPrefixes.FindAsync(guildId);
+            context.GuildPrefixes.Remove(prefixes);
+            var tags = await context.GuildTags.FindAsync(guildId);
+            context.GuildTags.Remove(tags);
+            await context.SaveChangesAsync();
         }
         
         private void OnSchedulerError(Exception ex) {

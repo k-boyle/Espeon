@@ -33,7 +33,8 @@ namespace Espeon {
         [Description("Lists your reminders")]
         [Command("list", "ls", "l")]
         public async Task ListRemindersAsync() {
-            var reminders = (await DbContext.GetRemindersAsync(IsValidReminder))
+            var reminders = DbContext.UserReminders
+                .Where(IsValidReminder)
                 .OrderBy(reminder => reminder.TriggerAt)
                 .ToList();
             
