@@ -2,6 +2,7 @@
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
+using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace Espeon {
         [Description("Lists your reminders")]
         [Command("list", "ls", "l")]
         public async Task ListRemindersAsync() {
+            await DbContext.UserReminders.LoadAsync();
             var reminders = DbContext.UserReminders
                 .Where(IsValidReminder)
                 .OrderBy(reminder => reminder.TriggerAt)
