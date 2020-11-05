@@ -16,5 +16,15 @@ namespace Espeon {
                 ? new ValueTask<IMessage>(message)
                 : new ValueTask<IMessage>(GetMessageAsync(channel, messageId));
         }
+        
+        public static ValueTask<IMember> GetOrFetchMemberAsync(this CachedGuild guild, Snowflake memberId) {
+            static async Task<IMember> GetMemberAsync(CachedGuild guild, Snowflake memberId) {
+                return await guild.GetMemberAsync(memberId);
+            }
+            
+            return guild.GetMember(memberId) is { } member
+                ? new ValueTask<IMember>(member)
+                : new ValueTask<IMember>(GetMemberAsync(guild, memberId));
+        }
     }
 }

@@ -53,18 +53,22 @@ namespace Espeon {
             this._logger.LogDebug("Getting response string {key} for {user}", stringKey, memberId);
             return this._userLanguageCache.TryGetValue((guildId, memberId), out var language)
                 ? new ValueTask<string>(GetResponse(language, stringKey, args))
-                : new ValueTask<string>(GetUserLanguageFromDbAsync(memberId, guildId, stringKey, args));
+                : new ValueTask<string>(GetUserLanguageFromDbAsync(guildId, memberId, stringKey, args));
         }
 
         private async Task<string> GetUserLanguageFromDbAsync(
-                Snowflake memberId,
                 Snowflake guildId,
+                Snowflake memberId,
                 LocalisationStringKey stringKey,
                 object[] args) {
             this._logger.LogDebug("Getting response string {key} for {user} from database", stringKey, memberId);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
-            var localisation = await context.GetLocalisationAsync(memberId, guildId);
+
+            var localisation = await context.GetOrCreateAsync(
+                guildId.RawValue,
+                memberId.RawValue,
+                (guildId, userId) => new UserLocalisation(guildId, userId));
             this._userLanguageCache[(guildId, memberId)] = localisation.Value;
             return GetResponse(localisation.Value, stringKey, args);
         }

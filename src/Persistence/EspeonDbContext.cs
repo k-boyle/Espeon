@@ -3,23 +3,36 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Espeon {
-    public partial class EspeonDbContext : DbContext {
+    public class EspeonDbContext : DbContext {
         private const string MentionPrefixLiteral = "<mention>";
         
         private readonly ILogger<EspeonDbContext> _logger;
+        private readonly Dictionary<Type, IEnumerable> _dbSets;
 
         public DbSet<GuildPrefixes> GuildPrefixes { get; set; }
         public DbSet<UserLocalisation> UserLocalisations { get; set; }
         public DbSet<UserReminder> UserReminders { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<GuildTags> GuildTags { get; set; }
+        public DbSet<GlobalTag> GlobalTags { get; set; }
 
         public EspeonDbContext(DbContextOptions options, ILogger<EspeonDbContext> logger) : base(options) {
             this._logger = logger;
+            this._dbSets = new Dictionary<Type, IEnumerable> {
+                [typeof(GuildPrefixes)] = GuildPrefixes,
+                [typeof(UserLocalisation)] = UserLocalisations,
+                [typeof(UserReminder)] = UserReminders,
+                [typeof(Tag)] = Tags,
+                [typeof(GuildTags)] = GuildTags,
+                [typeof(GlobalTag)] = GlobalTags
+            };
         }
         
         internal EspeonDbContext(DbContextOptions options) : base(options) {
@@ -100,6 +113,40 @@ namespace Espeon {
             return string.Equals(value, MentionPrefixLiteral, StringComparison.OrdinalIgnoreCase) 
                 ? MentionPrefix.Instance as IPrefix
                 : new StringPrefix(value);
+        }
+        
+        public async Task<TEntity> GetOrCreateAsync<TEntity, TKey>(TKey key, Func<TKey, TEntity> newEntitySupplier)
+                where TEntity : class {
+            var dbSet = GetDbSet<TEntity>();
+            return await this.GetOrCreateAsync(dbSet, key, newEntitySupplier);
+        }
+        
+        public async Task<TEntity> GetOrCreateAsync<TEntity, TKey>(TKey key1, TKey key2, Func<TKey, TKey, TEntity> newEntitySupplier)
+                where TEntity : class {
+            return await this.GetOrCreateAsync(GetDbSet<TEntity>(), key1, key2, newEntitySupplier);
+        }
+        
+        public async Task<TEntity> IncludeAndFindAsync<TEntity, TProperty, TKey>(
+                TKey key,
+                Expression<Func<TEntity, IEnumerable<TProperty>>> navigationExpression)
+                    where TEntity : class where TProperty : class {
+            return await this.IncludeAndFindAsync(GetDbSet<TEntity>(), key, navigationExpression);
+        }
+        
+        public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class {
+            await this.UpdateAsync(GetDbSet<TEntity>(), entity);
+        }
+        
+        public async Task PersistAsync<TEntity>(TEntity entity) where TEntity : class {
+            await this.PersistAsync(GetDbSet<TEntity>(), entity);
+        }
+        
+        public async Task RemoveAsync<TEntity>(TEntity entity) where TEntity : class {
+            await this.RemoveAsync(GetDbSet<TEntity>(), entity);
+        }
+
+        private DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class {
+            return (DbSet<TEntity>) this._dbSets[typeof(TEntity)];
         }
     }
 }

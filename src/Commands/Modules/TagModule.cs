@@ -20,7 +20,12 @@ namespace Espeon {
             [Description("Finds a tag with the given name, guild specific")]
             [Command]
             public async Task ExecuteTagAsync([Example("espeon")][Remainder] string name) {
-                var tag = await DbContext.GetTagAsync(Context.Guild, name);
+                var guildTags = await DbContext.IncludeAndFindAsync<GuildTags, GuildTag, ulong>(
+                    Context.Guild.Id.RawValue,
+                    tags => tags.Values);
+                var tag = guildTags.Values
+                    .FirstOrDefault(tag1 => tag1.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+                
                 if (tag is null) {
                     await ReplyAsync(TAG_DOESNT_EXIST, name);
                     return;
@@ -28,7 +33,7 @@ namespace Espeon {
 
                 await ReplyAsync(tag.Value);
                 tag.Uses++;
-                await DbContext.UpdateAsync(tag);
+                await DbContext.UpdateAsync(guildTags);
             }
             
             [Name("Create Tag")]
@@ -38,23 +43,27 @@ namespace Espeon {
                     [Example("espeon")] string name,
                     [Example("is really cool")][Remainder] string value) {
                 var module = Context.Command.Module;
-                var paths = module.FullAliases.Select(alias => string.Concat(alias, ' ', name));
+                var paths = module.FullAliases.Select(alias => string.Concat(alias, " ", name));
                 if (CommandUtilities.EnumerateAllCommands(module).Any(
                     command => command.FullAliases.Any(
                         alias => paths.Any(path => path.Equals(alias, StringComparison.CurrentCultureIgnoreCase))))) {
                     await ReplyAsync(TAG_RESERVED_WORD, name);
                     return;
                 }
-                
-                var tag = await DbContext.GetTagAsync(Context.Guild, name);
+
+                var guildTags = await DbContext.IncludeAndFindAsync<GuildTags, GuildTag, ulong>(
+                    Context.Guild.Id.RawValue,
+                    tags => tags.Values);
+                var tag = guildTags.Values
+                    .FirstOrDefault(tag1 => tag1.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
                 
                 if (tag != null) {
                     await ReplyAsync(GUILDTAG_ALREADY_EXISTS, name);
                     return;
                 }
 
-                tag = new GuildTag(Context.Guild.Id, name, value, Context.User.Id);
-                await DbContext.PersistAsync(tag);
+                guildTags.Values.Add(new GuildTag(Context.Guild.Id, name, value, Context.User.Id));
+                await DbContext.UpdateAsync(guildTags);
                 await ReplyAsync(TAG_CREATED, name);
             }
             
@@ -63,7 +72,12 @@ namespace Espeon {
             [Description("Removes a tag with the given name, guild specific")]
             [Command("remove", "rm", "r")]
             public async Task RemoveTagAsync([Example("espeon")] string name) {
-                var tag = await DbContext.GetTagAsync(Context.Guild, name);
+                var guildTags = await DbContext.IncludeAndFindAsync<GuildTags, GuildTag, ulong>(
+                    Context.Guild.Id.RawValue,
+                    tags => tags.Values);
+                var tag = guildTags.Values
+                    .FirstOrDefault(tag1 => tag1.Key.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+
                 if (tag is null) {
                     await ReplyAsync(TAG_DOESNT_EXIST, name);
                     return;
@@ -78,6 +92,7 @@ namespace Espeon {
                 await DbContext.RemoveAsync(tag);
                 await ReplyAsync(TAG_DELETED, name);
             }
+
         }
         
         [Name("Global Tags")]
@@ -109,8 +124,7 @@ namespace Espeon {
                 
                 Commands.RemoveModule(tagModule);
                 await CommandHelper.AddGlobalTagsAsync(DbContext, Commands, Logger);
-
-
+                
                 await ReplyAsync(TAG_CREATED, name);
             }
             
@@ -119,7 +133,8 @@ namespace Espeon {
             [Description("Removes a global tag")]
             [Command("remove", "rm", "r")]
             public async Task RemoveGlobalTagAsync([Example("espeon")][Remainder] string name) {
-                var tag = await DbContext.GetTagAsync<GlobalTag>(name);
+                var tag = await DbContext.GlobalTags.FirstOrDefault2Async(
+                    globalTag => string.Equals(globalTag.Key, name, StringComparison.CurrentCultureIgnoreCase));
                 if (tag is null) {
                     await ReplyAsync(TAG_DOESNT_EXIST, name);
                     return;

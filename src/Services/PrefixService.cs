@@ -38,7 +38,8 @@ namespace Espeon {
             this._logger.LogInformation("Loading prefixes from db for {guild}", guild.Name);
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
-            return (this._guildPrefixes[guild.Id] = await context.GetPrefixesAsync(guild)).Values;
+            var prefixes = await context.GuildPrefixes.FindAsync(guild.Id.RawValue);
+            return (this._guildPrefixes[guild.Id] = prefixes).Values;
         }
 
         public ValueTask<bool> TryAddPrefixAsync(IGuild guild, IPrefix prefix) {

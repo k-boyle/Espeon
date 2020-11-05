@@ -1,6 +1,7 @@
 ﻿using Disqord;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Qmmands;
@@ -56,9 +57,9 @@ namespace Espeon {
                 ICommandService commandService,
                 ILogger<T> logger) {
             logger.LogInformation("Adding global tags");
-            var tags = await context.GetTagsAsync<GlobalTag>();
+            await context.GlobalTags.LoadAsync();
             commandService.AddModule<TagModule>(moduleBuilder => {
-                foreach (var tag in tags) {
+                foreach (var tag in context.GlobalTags) {
                     logger.LogDebug("Adding global tag {name}", tag.Key);
                     moduleBuilder.AddCommand(
                         context => GlobalTagCallbackAsync((EspeonCommandContext) context),
@@ -71,7 +72,8 @@ namespace Espeon {
         
         private static async Task GlobalTagCallbackAsync(EspeonCommandContext context) {
             await using var dbContext = context.ServiceProvider.GetRequiredService<EspeonDbContext>();
-            var tag = await dbContext.GetTagAsync<GlobalTag>(context.Command.Name);
+            var tag = await dbContext.GlobalTags
+                .FirstOrDefaultAsync(globalTag => globalTag.Key == context.Command.Name);
             await context.Channel.SendMessageAsync(tag.Value);
             tag.Uses++;
             await dbContext.UpdateAsync(tag);
