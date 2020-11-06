@@ -1,7 +1,6 @@
 ﻿using Disqord.Bot.Prefixes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,8 +11,7 @@ using System.Threading.Tasks;
 namespace Espeon {
     public class EspeonDbContext : DbContext {
         private const string MentionPrefixLiteral = "<mention>";
-        
-        private readonly ILogger<EspeonDbContext> _logger;
+
         private readonly Dictionary<Type, IEnumerable> _dbSets;
 
         public DbSet<GuildPrefixes> GuildPrefixes { get; set; }
@@ -23,8 +21,7 @@ namespace Espeon {
         public DbSet<GuildTags> GuildTags { get; set; }
         public DbSet<GlobalTag> GlobalTags { get; set; }
 
-        public EspeonDbContext(DbContextOptions options, ILogger<EspeonDbContext> logger) : base(options) {
-            this._logger = logger;
+        public EspeonDbContext(DbContextOptions options) : base(options) {
             this._dbSets = new Dictionary<Type, IEnumerable> {
                 [typeof(GuildPrefixes)] = GuildPrefixes,
                 [typeof(UserLocalisation)] = UserLocalisations,
@@ -33,9 +30,6 @@ namespace Espeon {
                 [typeof(GuildTags)] = GuildTags,
                 [typeof(GlobalTag)] = GlobalTags
             };
-        }
-        
-        internal EspeonDbContext(DbContextOptions options) : base(options) {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {

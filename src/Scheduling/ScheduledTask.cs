@@ -11,6 +11,8 @@ namespace Espeon {
         public string Name { get; }
         public bool IsCancelled { get; private set; }
 
+        private readonly TaskCompletionSource<bool> _taskCompletionSource;
+
         public ScheduledTask(DateTimeOffset executeAt, T state, Func<T, Task> callback)
             : this(null, executeAt, state, callback) { }
         
@@ -20,10 +22,19 @@ namespace Espeon {
             State = state;
             Callback = () => callback(state);
             IsCancelled = false;
+            this._taskCompletionSource = new TaskCompletionSource<bool>();
         }
 
         public void Cancel() {
             IsCancelled = true;
+        }
+        
+        public async Task WaitUntilExecutedAsync() {
+            await this._taskCompletionSource.Task;
+        }
+        
+        void IScheduledTask.Completed() {
+            this._taskCompletionSource.SetResult(true);
         }
         
         public int CompareTo(IScheduledTask other) {

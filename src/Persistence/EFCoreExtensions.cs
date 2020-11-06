@@ -13,7 +13,7 @@ namespace Espeon {
                 TKey key,
                 Func<TKey, TEntity> newEntitySupplier)
                     where TEntity : class {
-            var entity = await FindEntityAsync(dbSet, key);
+            var entity = await dbSet.FindAsync(key);
             
             if (entity != null) {
                 return entity;
@@ -33,7 +33,7 @@ namespace Espeon {
                 TKey key2,
                 Func<TKey, TKey, TEntity> newEntitySupplier)
                     where TEntity : class {
-            var entity = await FindEntityAsync(dbSet, key1, key2);
+            var entity = await dbSet.FindAsync(key1, key2);
             
             if (entity != null) {
                 return entity;
@@ -52,7 +52,7 @@ namespace Espeon {
                 TKey key,
                 Expression<Func<TEntity, IEnumerable<TProperty>>> navigationExpression)
                     where TEntity : class where TProperty : class {
-            var entity = await FindEntityAsync(dbSet, key);
+            var entity = await dbSet.FindAsync(key);
 
             if (entity != null) {
                 await context.Entry(entity).Collection(navigationExpression).LoadAsync();
@@ -61,15 +61,6 @@ namespace Espeon {
             return entity;
         }
 
-        private static async Task<TEntity> FindEntityAsync<TEntity>(DbSet<TEntity> dbSet, params object[] keys)
-                where TEntity : class {
-            if (keys is null || keys.Length == 0) {
-                throw new InvalidOperationException("At least one key must be provided");
-            }
-
-            return await dbSet.FindAsync(keys);
-        }
-        
         public static async Task UpdateAsync<TEntity>(this DbContext context, DbSet<TEntity> dbSet, TEntity entity)
                 where TEntity : class {
             dbSet.Update(entity);
