@@ -1,9 +1,12 @@
 ﻿using System.Text;
 
 namespace Espeon {
-    public readonly struct StringJoiner {
-        private readonly StringBuilder _builder;
+    public struct StringJoiner {
+        private StringBuilder _builder;
         private readonly string _seperator;
+
+        // account for default ctor
+        private StringBuilder Builder => this._builder ??= new StringBuilder();
 
         public StringJoiner(string seperator) {
             this._seperator = seperator;
@@ -11,19 +14,19 @@ namespace Espeon {
         }
         
         public void Append(string str) {
-            if (this._builder.Length > 0) {
-                this._builder.Append(this._seperator);
+            if (Builder.Length > 0) {
+                Builder.Append(this._seperator);
             }
 
-            this._builder.Append(str);
+            Builder.Append(str);
         }
 
         public void Clear() {
-            this._builder.Clear();
+            Builder.Clear();
         }
         
         public override string ToString() {
-            return this._builder.ToString();
+            return Builder.ToString();
         }
     }
 }

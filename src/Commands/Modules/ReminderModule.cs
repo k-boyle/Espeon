@@ -51,7 +51,7 @@ namespace Espeon {
                 return;
             }
 
-            var numberOfPages = MathEx.IntCeilingDivision(reminders.Count, BatchSize);
+            var numberOfPages = MathEx.CeilingDivision(reminders.Count, BatchSize);
             var reminderBatches = reminders.Batch(BatchSize);
             var pageIndex = 0;
             var reminderPages = new List<Page>();

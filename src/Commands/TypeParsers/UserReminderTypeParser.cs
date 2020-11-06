@@ -62,7 +62,6 @@ namespace Espeon
                 DateTimeOffset.Now + timeSpan,
                 value);
             return TypeParserResult<UserReminder>.Successful(reminder);
-
         }
     }
 }
