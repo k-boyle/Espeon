@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Espeon {
-    public class LockedBinaryHeap<T>  where T : IComparable<T> {
+    public abstract class LockedBinaryHeap<T>  where T : IComparable<T> {
         public T Root {
             get {
                 lock (this._heapLock) {
@@ -35,11 +35,11 @@ namespace Espeon {
         }
 
         public static LockedBinaryHeap<T> CreateMinHeap(int initialHeapSize = 16) {
-            return new LockedBinaryHeap<T>(BinaryHeap<T>.CreateMinHeap(initialHeapSize));
+            return new LockedMinBinaryHeap(initialHeapSize);
         }
 
         public static LockedBinaryHeap<T> CreateMaxHeap(int initialHeapSize = 16) {
-            return new LockedBinaryHeap<T>(BinaryHeap<T>.CreateMaxHeap(initialHeapSize));
+            return new LockedMaxBinaryHeap(initialHeapSize);
         }
 
         public void Insert(T node) {
@@ -51,6 +51,16 @@ namespace Espeon {
         public bool TryRemoveRoot(out T root) {
             lock (this._heapLock) {
                 return this._binaryHeap.TryRemoveRoot(out root);
+            }
+        }
+        
+        private class LockedMinBinaryHeap : LockedBinaryHeap<T> {
+            public LockedMinBinaryHeap(int initialHeapSize) : base(BinaryHeap<T>.CreateMinHeap(initialHeapSize)) {
+            }
+        }
+        
+        private class LockedMaxBinaryHeap : LockedBinaryHeap<T> {
+            public LockedMaxBinaryHeap(int initialHeapSize) : base(BinaryHeap<T>.CreateMaxHeap(initialHeapSize)) {
             }
         }
     }
