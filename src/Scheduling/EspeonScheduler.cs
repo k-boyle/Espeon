@@ -18,6 +18,7 @@ namespace Espeon {
         private readonly ConcurrentQueue<IScheduledTask> _doNowTasks;
 
         private CancellationTokenSource _cts;
+        private volatile bool _disposed;
 
         public EspeonScheduler(ILogger<EspeonScheduler> logger) {
             this._logger = logger;
@@ -28,7 +29,7 @@ namespace Espeon {
         }
 
         private async Task TaskLoopAsync() {
-            while (true) {
+            while (!this._disposed) {
                 try {
                     await DoDoNowsAsync();
                     await PauseLoopAsync();
@@ -91,6 +92,8 @@ namespace Espeon {
         }
         
         public ScheduledTask<T> DoNow<T>(string name, T state, Func<T, Task> callback) {
+            CheckNotDisposed();
+            
             var newTask = new ScheduledTask<T>(name, DateTimeOffset.Now, state, callback);
             this._logger.LogDebug("Queueing up {task}", newTask.Name);
             this._doNowTasks.Enqueue(newTask);
@@ -115,6 +118,8 @@ namespace Espeon {
         }
 
         public ScheduledTask<T> DoAt<T>(string name, DateTimeOffset executeAt, T state, Func<T, Task> callback) {
+            CheckNotDisposed();
+            
             var newTask = new ScheduledTask<T>(name, executeAt, state, callback);
             this._logger.LogDebug("Queueing up {task}", newTask.Name);
             var root = this._tasks.Root;
@@ -126,8 +131,28 @@ namespace Espeon {
 
             return newTask;
         }
+        
+        private void CheckNotDisposed() {
+            if (this._disposed) {
+                throw new ObjectDisposedException(nameof(EspeonScheduler));
+            }
+        }
 
         public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        protected virtual void Dispose(bool disposing) {
+            if (this._disposed) {
+                return;
+            }
+
+            if (!disposing) {
+                return;
+            }
+
+            this._disposed = true;
             this._cts.Cancel(true);
             this._cts?.Dispose();
             this._cts = null;

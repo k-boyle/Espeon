@@ -184,6 +184,13 @@ namespace Espeon.Test {
             using var scheduler = new EspeonScheduler(Logger);
             Assert.Throws<InvalidOperationException>(() => scheduler.DoIn(TimeSpan.MaxValue, 10, EmptyCallback));
         }
+        
+        [Test]
+        public void TestThrowsWhenDisposed() {
+            var scheduler = new EspeonScheduler(Logger);
+            scheduler.Dispose();
+            Assert.Throws<ObjectDisposedException>(() => scheduler.DoNow(10, EmptyCallback));
+        }
 
         private static void AssertWithinTolerance(TimeSpan expectedTime, TimeSpan actualTime) {
             var expectedMillis = expectedTime.TotalMilliseconds;
