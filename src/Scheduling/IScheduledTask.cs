@@ -7,5 +7,9 @@ namespace Espeon {
         public Func<Task> Callback { get; }
         public string Name { get; }
         public bool IsCancelled { get; }
+
+        public Task WaitUntilExecutedAsync();
+
+        internal void Completed();
     }
 }

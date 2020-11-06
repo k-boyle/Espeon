@@ -2,7 +2,7 @@
 
 namespace Espeon {
     // todo common
-    public class BinaryHeap<T> where T : IComparable<T> {
+    public abstract class BinaryHeap<T> where T : IComparable<T> {
         public T Root => Size > 0 ? this._heap[0] : default;
         public int Size { get; private set; }
         public bool IsEmpty => Size == 0;
@@ -21,11 +21,11 @@ namespace Espeon {
         }
         
         public static BinaryHeap<T> CreateMinHeap(int initialHeapSize = 16) {
-            return new BinaryHeap<T>(initialHeapSize, -1);
+            return new MinBinaryHeap(initialHeapSize);
         }
         
         public static BinaryHeap<T> CreateMaxHeap(int initialHeapSize = 16) {
-            return new BinaryHeap<T>(initialHeapSize, 1);
+            return new MaxBinaryHeap(initialHeapSize);
         }
 
         public void Insert(T node) {
@@ -86,6 +86,16 @@ namespace Espeon {
             }
             
             return true;
+        }
+        
+        private class MinBinaryHeap : BinaryHeap<T> {
+            public MinBinaryHeap(int initialHeapSize) : base(initialHeapSize, -1) {
+            }
+        }
+        
+        private class MaxBinaryHeap : BinaryHeap<T> {
+            public MaxBinaryHeap(int initialHeapSize): base(initialHeapSize, 1) {
+            }
         }
     }
 }
