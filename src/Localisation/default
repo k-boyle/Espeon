@@ -13,3 +13,5 @@ MODULE_NOT_FOUND=Module could not be found
 NO_MATCHING_COMMANDS=No commands could be found
 NO_REMINDERS_FOUND=No reminders found
 INVALID_PEPOWHATIF_SIZE=pepowhatif can only be size 0, 16, or 36
+MEMBER_NOT_IN_GUILD = Member was not found in this guild
+MEMBER_NOT_IN_CACHE_NO_MENTION = Member was not found in bot cache, try mentioning them

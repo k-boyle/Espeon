@@ -42,7 +42,8 @@ namespace Espeon {
                 ThumbnailUrl = Context.Guild.CurrentMember.GetAvatarUrl(),
                 Footer = new LocalEmbedFooterBuilder {
                     Text = $"Execute \"{GetPrefix()} module\" to view help for that module"
-                }, Fields = {
+                },
+                Fields = {
                     new LocalEmbedFieldBuilder {
                         Name = "Modules",
                         Value = moduleStringJoiner.ToString()
@@ -75,11 +76,7 @@ namespace Espeon {
         [Description("View help for specific commands")]
         [Command("help")]
         public async Task HelpAsync([Remainder] IEnumerable<Command> commands) {
-            var embeds = new List<LocalEmbedBuilder>();
-
-            foreach (var command in commands) {
-                embeds.Add(CreateEmbedForCommandHelp(command));
-            }
+            var embeds = commands.Select(CreateEmbedForCommandHelp).ToList();
 
             if (embeds.Count == 1) {
                 var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: embeds[0].Build()));
@@ -113,9 +110,7 @@ namespace Espeon {
             
             await webhookClient.ExecuteAsync(
                 Mock(message.Content),
-                name: Context.Guild.Members.TryGetValue(message.Author.Id, out var member)
-                    ? member.DisplayName
-                    : message.Author.Name,
+                name: await GetDisplayNameAsync(message.Author),
                 avatarUrl: message.Author.GetAvatarUrl());
         }
         
@@ -130,7 +125,7 @@ namespace Espeon {
                 Description = message.Content,
                 Author = new LocalEmbedAuthorBuilder {
                     IconUrl = author.GetAvatarUrl(),
-                    Name = GetDisplayName(author),
+                    Name = await GetDisplayNameAsync(author),
                     Url = GetJumpUrl(message)
                 },
                 Timestamp = message.CreatedAt,
@@ -159,10 +154,9 @@ namespace Espeon {
             return message.GetJumpUrl(guild);
         }
 
-        private string GetDisplayName(IUser author) {
-            return Context.Guild.Members.TryGetValue(author.Id, out var member)
-                ? member.DisplayName
-                : author.Name;
+        private async Task<string> GetDisplayNameAsync(IUser author) {
+            var guildMember = await Context.Guild.GetOrFetchMemberAsync(author.Id);
+            return guildMember?.DisplayName ?? author.Name;
         }
 
         [Name("Add Emote")]

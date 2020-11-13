@@ -15,15 +15,17 @@ namespace Espeon {
                     ? TypeParserResult<IMessage>.Successful(message)
                     : new EspeonTypeParserFailedResult<IMessage>(INVALID_MESSAGE_ID_PATH);
             }
-            
-            if (TryParseJumpUrl(value, out var ids)) {
-                if (context.Bot.GetChannel(ids.ChannelId) is ICachedMessageChannel channel) {
-                    return await channel.GetOrFetchMessageAsync(ids.MessageId) is { } message
-                        ? TypeParserResult<IMessage>.Successful(message)
-                        : new EspeonTypeParserFailedResult<IMessage>(INVALID_MESSAGE_ID_PATH);
-                }
+
+            if (!TryParseJumpUrl(value, out var ids)) {
+                return new EspeonTypeParserFailedResult<IMessage>(INVALID_MESSAGE_ID_PATH);
             }
-            
+
+            if (context.Bot.GetChannel(ids.ChannelId) is ICachedMessageChannel channel) {
+                return await channel.GetOrFetchMessageAsync(ids.MessageId) is { } message
+                    ? TypeParserResult<IMessage>.Successful(message)
+                    : new EspeonTypeParserFailedResult<IMessage>(INVALID_MESSAGE_ID_PATH);
+            }
+
             return new EspeonTypeParserFailedResult<IMessage>(INVALID_MESSAGE_ID_PATH);
         }
         
