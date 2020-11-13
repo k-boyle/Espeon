@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00078" />
+    <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00079" />
     <PackageReference Include="Disqord.Extensions.Interactivity" Version="1.0.0-nightly-00079" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.2.0-eap" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.8.0" />
