@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class PropertyBasedLocalisationProviderTests {
@@ -85,11 +85,11 @@ namespace Espeon.Test {
             var provider = new PropertyBasedLocalisationProvider(validLocalisationConfig, Logger);
             var result = await provider.GetLocalisationsAsync();
             var expected = new Dictionary<Language, Dictionary<LocalisationStringKey, string>> {
-                [Language.Default] = new Dictionary<LocalisationStringKey, string> {
+                [Language.Default] = new() {
                     [LocalisationStringKey.PING_COMMAND] ="pong",
                     [LocalisationStringKey.REMINDER_CREATED] = "{0}"
                 },
-                [Language.Owo] = new Dictionary<LocalisationStringKey, string>()
+                [Language.Owo] = new()
             };
             
             CollectionAssert.AreEquivalent(expected, result);

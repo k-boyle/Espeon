@@ -1,16 +1,15 @@
-﻿using Disqord;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Qmmands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Espeon.LocalisationStringKey;
-using Unit = Humanizer.Localisation.TimeUnit;
 
 namespace Espeon {
     [Name("Reminders")]
@@ -40,15 +39,15 @@ namespace Espeon {
                 .OrderBy(reminder => reminder.TriggerAt)
                 .ToList();
             
-            if (reminders.Count == 0) {
-                await ReplyAsync(NO_REMINDERS_FOUND);
-                return;
-            }
-            
-            if (reminders.Count <= BatchSize) {
-                var embed = await CreateReminderEmbedAsync(reminders);
-                await ReplyAsync(embed: embed.Build());
-                return;
+            switch (reminders.Count) {
+                case 0:
+                    await ReplyAsync(NO_REMINDERS_FOUND);
+                    return;
+
+                case <= BatchSize: 
+                    var embed = await CreateReminderEmbedAsync(reminders);
+                    await ReplyAsync(embed: embed.Build());
+                    return;
             }
 
             var numberOfPages = MathEx.CeilingDivision(reminders.Count, BatchSize);
@@ -62,8 +61,8 @@ namespace Espeon {
                 };
                 reminderPages.Add(reminderEmbedBuilder.Build());
             }
-            var pageProvder = new DefaultPageProvider(reminderPages);
-            var menu = new PagedMenu(Context.User.Id, pageProvder);
+            var pageProvider = new DefaultPageProvider(reminderPages);
+            var menu = new PagedMenu(Context.User.Id, pageProvider);
             await Context.Channel.StartMenuAsync(menu);
         }
 
@@ -93,7 +92,7 @@ namespace Espeon {
             var executesIn = reminder.TriggerAt - DateTimeOffset.Now;
             reminderStringBuilder.AppendLine($"{Markdown.Bold("Id")}: {index}");
             reminderStringBuilder.AppendLine(
-                $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: Unit.Second)}");
+                $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: Humanizer.Localisation.TimeUnit.Second)}");
             var valueString = reminder.Value.Length < 100 
                 ? reminder.Value 
                 : $"{reminder.Value.Substring(0, 97)}...";

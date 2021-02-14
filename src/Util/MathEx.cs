@@ -7,14 +7,14 @@ namespace Espeon {
                 throw new NotSupportedException("Numerator must be >= 0");
             }
             
-            if (b == 0) {
-                throw new DivideByZeroException("Denominator must be > 0");
+            switch (b) {
+                case 0:
+                    throw new DivideByZeroException("Denominator must be > 0");
+
+                case < 0:
+                    throw new NotSupportedException("Denominator must be > 0");
             }
-            
-            if (b < 0) {
-                throw new NotSupportedException("Denominator must be > 0");
-            }
-            
+
             if (a == 0) {
                 return 0;
             }
@@ -27,12 +27,12 @@ namespace Espeon {
                 throw new NotSupportedException("Numerator must be >= 0");
             }
             
-            if (b == 0) {
-                throw new DivideByZeroException("Denominator must be > 0");
-            }
-            
-            if (b < 0) {
-                throw new NotSupportedException("Denominator must be > 0");
+            switch (b) {
+                case 0:
+                    throw new DivideByZeroException("Denominator must be > 0");
+
+                case < 0:
+                    throw new NotSupportedException("Denominator must be > 0");
             }
 
             if (a == 0) {

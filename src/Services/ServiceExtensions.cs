@@ -1,4 +1,6 @@
-﻿using Disqord;
+﻿using System;
+using System.IO;
+using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Yaml;
@@ -6,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.IO;
 
 namespace Espeon {
     public static class ServiceExtensions {
@@ -41,7 +41,7 @@ namespace Espeon {
                 this IHostBuilder builder,
                 Action<IServiceProvider, DiscordBotConfiguration> botConfigAction,
                 Func<IServiceProvider, EspeonPrefixProvider> prefixProviderSupplier) {
-            return builder.ConfigureServices((hostContext, serviceCollection) => {
+            return builder.ConfigureServices((_, serviceCollection) => {
                 serviceCollection.AddSingleton(provider => {
                     var espeonLogger = provider.GetRequiredService<ILogger<EspeonBot>>();
                     var discordOptions = provider.GetRequiredService<IOptions<Discord>>();

@@ -1,74 +1,74 @@
-﻿using Serilog.Sinks.SystemConsole.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Espeon {
     public static class EspeonLoggingConsoleTheme {
-        public static SystemConsoleTheme Instance { get; } = new SystemConsoleTheme(
+        public static SystemConsoleTheme Instance { get; } = new(
             new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle> {
-                [ConsoleThemeStyle.Text] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Text] = new() {
                     Foreground = ConsoleColor.Gray
                 },
                 
-                [ConsoleThemeStyle.SecondaryText] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.SecondaryText] = new() {
                     Foreground = ConsoleColor.Magenta
                 },
                 
-                [ConsoleThemeStyle.TertiaryText] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.TertiaryText] = new() {
                     Foreground = ConsoleColor.DarkGray
                 },
                 
-                [ConsoleThemeStyle.Invalid] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Invalid] = new() {
                     Foreground = ConsoleColor.Yellow
                 },
                 
-                [ConsoleThemeStyle.Null] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Null] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.Name] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Name] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.String] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.String] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.Number] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Number] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.Boolean] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Boolean] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.Scalar] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.Scalar] = new() {
                     Foreground = ConsoleColor.White
                 },
                 
-                [ConsoleThemeStyle.LevelVerbose] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelVerbose] = new() {
                     Foreground = ConsoleColor.DarkGray
                 },
                 
-                [ConsoleThemeStyle.LevelDebug] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelDebug] = new() {
                     Foreground = ConsoleColor.Green
                 },
                 
-                [ConsoleThemeStyle.LevelInformation] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelInformation] = new() {
                     Foreground = ConsoleColor.Blue
                 },
                 
-                [ConsoleThemeStyle.LevelWarning] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelWarning] = new() {
                     Foreground = ConsoleColor.Yellow
                 },
                 
-                [ConsoleThemeStyle.LevelError] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelError] = new() {
                     Foreground = ConsoleColor.Red
                 },
                 
-                [ConsoleThemeStyle.LevelFatal] = new SystemConsoleThemeStyle {
+                [ConsoleThemeStyle.LevelFatal] = new() {
                     Foreground = ConsoleColor.Red
-                },
+                }
             });
     }
 }

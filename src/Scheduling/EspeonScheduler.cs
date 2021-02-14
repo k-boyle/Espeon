@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Espeon {
     // todo common
@@ -31,7 +31,7 @@ namespace Espeon {
         private async Task TaskLoopAsync() {
             while (!this._disposed) {
                 try {
-                    await DoDoNowsAsync();
+                    await DoDoNowAsync();
                     await PauseLoopAsync();
                     var nextTask = this._tasks.Root;
                     await DelayUntilTaskCanExecuteAsync(nextTask);
@@ -43,7 +43,7 @@ namespace Espeon {
             }
         }
 
-        private async Task DoDoNowsAsync() {
+        private async Task DoDoNowAsync() {
             while (this._doNowTasks.TryDequeue(out var task)) {
                 await ExecuteTaskAsync(task, DoNowCleanup);
             }
@@ -143,7 +143,7 @@ namespace Espeon {
             GC.SuppressFinalize(this);
         }
         
-        protected virtual void Dispose(bool disposing) {
+        protected void Dispose(bool disposing) {
             if (this._disposed) {
                 return;
             }

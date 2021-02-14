@@ -1,5 +1,5 @@
-﻿using Qmmands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Qmmands;
 
 namespace Espeon {
     public class EspeonTypeParserFailedResult<T> : TypeParserResult<T> {
@@ -7,7 +7,7 @@ namespace Espeon {
         }
 
         public static implicit operator ValueTask<EspeonTypeParserFailedResult<T>>(EspeonTypeParserFailedResult<T> result) {
-            return new ValueTask<EspeonTypeParserFailedResult<T>>(result);
+            return new(result);
         }
     }
 }

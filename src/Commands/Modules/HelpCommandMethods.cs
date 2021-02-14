@@ -1,11 +1,11 @@
-﻿using Disqord;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Disqord;
 using Disqord.Bot.Prefixes;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Qmmands;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Espeon.CommandHelper;
 
 namespace Espeon {
@@ -163,15 +163,17 @@ namespace Espeon {
         }
 
         private static void AddCommandAliases(Command command, LocalEmbedBuilder helpEmbedBuilder) {
-            if (command.Aliases.Count > 0) {
-                var aliases = command.Aliases.Where(alias => !string.IsNullOrWhiteSpace(alias)).Select(Markdown.Code);
-                helpEmbedBuilder.Fields.Insert(
-                    1,
-                    new LocalEmbedFieldBuilder {
-                        Name = "Aliases",
-                        Value = string.Join(", ", aliases)
-                    });
+            if (command.Aliases.Count <= 0) {
+                return;
             }
+            
+            var aliases = command.Aliases.Where(alias => !string.IsNullOrWhiteSpace(alias)).Select(Markdown.Code);
+            helpEmbedBuilder.Fields.Insert(
+                1,
+                new LocalEmbedFieldBuilder {
+                    Name = "Aliases",
+                    Value = string.Join(", ", aliases)
+                });
         }
 
         private async Task SendPagedHelpAsync(IReadOnlyList<LocalEmbedBuilder> embeds) {
