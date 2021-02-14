@@ -38,7 +38,7 @@ namespace Espeon {
                     return $"{dateTime.Day}/{dateTime.Month}/{dateTime.Year} {dateTime.TimeOfDay.ToString("g").Split('.').First()}";
                 }
 
-                static string NicefyNamspace(Type inType) {
+                static string NicefyNamespace(Type inType) {
                     var str = inType.ToString();
 
                     return str.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
@@ -70,7 +70,7 @@ namespace Espeon {
                     case Task task:
                         var returnT = type.GetGenericArguments();
                         sb.AppendLine(returnT.Length > 0
-                            ? $"[Task<{string.Join(", ", returnT.Select(NicefyNamspace))}>]"
+                            ? $"[Task<{string.Join(", ", returnT.Select(NicefyNamespace))}>]"
                             : "[Task]");
                         break;
 
@@ -87,7 +87,7 @@ namespace Espeon {
                             sb.AppendLine($"[{value}]");
                         } else {
                             if (type?.IsValueType == false) {
-                                var niceName = NicefyNamspace(type);
+                                var niceName = NicefyNamespace(type);
                                 sb.AppendLine($"[{niceName}]");
                             } else {
                                 sb.AppendLine($"[{value}]");

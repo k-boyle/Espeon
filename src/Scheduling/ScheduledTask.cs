@@ -6,7 +6,6 @@ namespace Espeon {
         private static int _taskCounter;
         
         public DateTimeOffset ExecuteAt { get; }
-        public T State { get; }
         public Func<Task> Callback { get; }
         public string Name { get; }
         public bool IsCancelled { get; private set; }
@@ -19,7 +18,6 @@ namespace Espeon {
         public ScheduledTask(string name, DateTimeOffset executeAt, T state, Func<T, Task> callback) {
             Name = name ?? string.Concat("Task: ", _taskCounter++.ToString());
             ExecuteAt = executeAt;
-            State = state;
             Callback = () => callback(state);
             IsCancelled = false;
             this._taskCompletionSource = new TaskCompletionSource<bool>();

@@ -1,15 +1,15 @@
-﻿using Disqord;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Disqord;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Qmmands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Espeon {
     public static class CommandHelper {
@@ -26,7 +26,7 @@ namespace Espeon {
             [typeof(CachedRole)] = "@Admins"
         };
         
-        private static readonly string UsingsBlock;
+        private static readonly string UsingBlock;
         
         static CommandHelper() {
             var rawUsings = new[] {
@@ -39,7 +39,7 @@ namespace Espeon {
                 "System.Threading.Tasks",
                 "Qmmands"
             };
-            UsingsBlock = string.Concat(rawUsings.Select(str => $"using {str}; "));
+            UsingBlock = string.Concat(rawUsings.Select(str => $"using {str}; "));
             
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location));
@@ -98,7 +98,7 @@ namespace Espeon {
             }
 
             var code = GetCode(rawCode);
-            return string.Concat(UsingsBlock, code);
+            return string.Concat(UsingBlock, code);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using Disqord;
+﻿using System;
+using System.Threading.Tasks;
+using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace Espeon {
     public class ReminderService : IOnReadyService {
@@ -30,12 +30,12 @@ namespace Espeon {
             // create a copy since we can't enumerate UserReminders and remove from it
             // it throws "connection is busy" which is not helpful at all if we attempt to
             // I could attempt to do some hacky stuff with throwing everything onto the 
-            // scheduler... but that'll lead to an unholy amount of issues and very flakey
+            // scheduler... but that'll lead to an unholy amount of issues and very flaky
             var reminders = await context.UserReminders.ToListAsync();
             foreach (var reminder in reminders) {
                 if (reminder.TriggerAt < DateTimeOffset.Now) {
                     this._logger.LogDebug("Sending missed reminder {reminder} for {user}", reminder.Id, reminder.UserId);
-                    await OnReminderAync(context, reminder, true);
+                    await OnReminderAsync(context, reminder, true);
                 } else {
                     SchedulerReminder(reminder);
                 }
@@ -57,13 +57,14 @@ namespace Espeon {
                 reminder.TriggerAt,
                 (reminder, @this: this),
                 async state => {
-                    using var scope = state.@this!._services.CreateScope();
+                    var (userReminder, reminderService) = state;
+                    using var scope = reminderService!._services.CreateScope();
                     await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
-                    await state.@this.OnReminderAync(context, state.reminder, false);
+                    await reminderService.OnReminderAsync(context, userReminder, false);
                 });
         }
 
-        private async Task OnReminderAync(EspeonDbContext context, UserReminder reminder, bool late) {
+        private async Task OnReminderAsync(EspeonDbContext context, UserReminder reminder, bool late) {
             if (this._espeon.GetChannel(reminder.ChannelId) is CachedTextChannel channel) {
                 if (await channel.Guild.GetOrFetchMemberAsync(reminder.UserId) != null) {
                     this._logger.LogDebug("Sending reminder for {user}", reminder.UserId);

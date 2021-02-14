@@ -1,13 +1,13 @@
-﻿using Qmmands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Qmmands;
 using static Espeon.LocalisationStringKey;
 
 namespace Espeon
 {
     public class UserReminderTypeParser : EspeonTypeParser<UserReminder> {
-        private static readonly TimeSpanParser TimeSpanParser = new TimeSpanParser(
+        private static readonly TimeSpanParser TimeSpanParser = new(
             new Dictionary<string, TimeUnit>(StringComparer.InvariantCultureIgnoreCase) {
                 ["s"] = TimeUnit.SECOND,
                 ["sec"] = TimeUnit.SECOND,
@@ -30,6 +30,7 @@ namespace Espeon
                 ["day"] = TimeUnit.DAY,
                 ["days"] = TimeUnit.DAY,
                 
+                ["w"] = TimeUnit.WEEK,
                 ["wk"] = TimeUnit.WEEK,
                 ["wks"] = TimeUnit.WEEK,
                 ["week"] = TimeUnit.WEEK,

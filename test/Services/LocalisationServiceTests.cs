@@ -1,13 +1,13 @@
-﻿using Disqord;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Disqord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Espeon.Test {
     public class LocalisationServiceTests {
@@ -125,7 +125,7 @@ namespace Espeon.Test {
         
         private class TestLocalisationProvider : ILocalisationProvider {
             public ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>> GetLocalisationsAsync() {
-                return new ValueTask<IDictionary<Language, IDictionary<LocalisationStringKey, string>>>(
+                return new(
                     new Dictionary<Language, IDictionary<LocalisationStringKey, string>> {
                         [Language.Default] = new Dictionary<LocalisationStringKey, string> {
                             [LocalisationStringKey.PING_COMMAND] ="pong",

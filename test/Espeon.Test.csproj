@@ -2,7 +2,12 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
+        
+        <RestoreSource>
+            https://api.nuget.org/v3/index.json;
+            https://www.myget.org/F/quahu/api/v3/index.json;
+        </RestoreSource>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,11 +15,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.0-rc.2.20475.6" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-rc.2.20475.5" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0-preview-20200921-01" />
-      <PackageReference Include="NUnit" Version="3.12.0" />
-      <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-alpha.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0-preview.1.21102.2" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0-preview.1.21102.12" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.0-preview-20210127-04" />
+      <PackageReference Include="NUnit" Version="3.13.1" />
+      <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-beta.1" />
     </ItemGroup>
 
     <ItemGroup>
