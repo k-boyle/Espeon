@@ -2,7 +2,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Espeon.Migrations
 {
@@ -13,20 +12,20 @@ namespace Espeon.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "5.0.0-preview.3.20181.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .UseIdentityByDefaultColumns()
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.0-preview.3.20181.2");
 
             modelBuilder.Entity("Espeon.GuildPrefixes", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasColumnName("guild_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
 
                     b.Property<string[]>("Values")
                         .IsRequired()
-                        .HasColumnName("prefixes")
-                        .HasColumnType("text[]");
+                        .HasColumnType("text[]")
+                        .HasColumnName("prefixes");
 
                     b.HasKey("GuildId");
 
@@ -39,8 +38,8 @@ namespace Espeon.Migrations
             modelBuilder.Entity("Espeon.GuildTags", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasColumnName("guild_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
 
                     b.HasKey("GuildId");
 
@@ -54,12 +53,12 @@ namespace Espeon.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("id");
 
                     b.Property<long>("CreateAt")
-                        .HasColumnName("created_at")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -67,17 +66,17 @@ namespace Espeon.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnName("tag_key")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("tag_key");
 
                     b.Property<int>("Uses")
-                        .HasColumnName("uses")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("uses");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnName("tag_string")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("tag_string");
 
                     b.HasKey("Id");
 
@@ -89,16 +88,16 @@ namespace Espeon.Migrations
             modelBuilder.Entity("Espeon.UserLocalisation", b =>
                 {
                     b.Property<decimal>("GuildId")
-                        .HasColumnName("guild_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
 
                     b.Property<decimal>("UserId")
-                        .HasColumnName("user_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("user_id");
 
                     b.Property<int>("Value")
-                        .HasColumnName("localisation")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("localisation");
 
                     b.HasKey("GuildId", "UserId");
 
@@ -109,29 +108,29 @@ namespace Espeon.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("id");
 
                     b.Property<decimal>("ChannelId")
-                        .HasColumnName("channel_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("channel_id");
 
                     b.Property<decimal>("ReminderMessageId")
-                        .HasColumnName("message_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("message_id");
 
                     b.Property<long>("TriggerAt")
-                        .HasColumnName("trigger_at")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("trigger_at");
 
                     b.Property<decimal>("UserId")
-                        .HasColumnName("user_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("user_id");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnName("reminder_string")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("reminder_string");
 
                     b.HasKey("Id");
 
@@ -143,16 +142,16 @@ namespace Espeon.Migrations
                     b.HasBaseType("Espeon.Tag");
 
                     b.Property<decimal>("CreatorId")
-                        .HasColumnName("creator_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("creator_id");
 
                     b.Property<decimal>("GuildId")
-                        .HasColumnName("guild_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("guild_id");
 
                     b.Property<decimal>("OwnerId")
-                        .HasColumnName("owner_id")
-                        .HasColumnType("numeric(20,0)");
+                        .HasColumnType("numeric(20,0)")
+                        .HasColumnName("owner_id");
 
                     b.HasIndex("GuildId");
 
@@ -168,6 +167,13 @@ namespace Espeon.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GuildTags");
+                });
+
+            modelBuilder.Entity("Espeon.GuildTags", b =>
+                {
+                    b.Navigation("Values");
                 });
 #pragma warning restore 612, 618
         }

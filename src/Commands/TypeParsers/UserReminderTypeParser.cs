@@ -36,6 +36,7 @@ namespace Espeon
                 ["week"] = TimeUnit.WEEK,
                 ["weeks"] = TimeUnit.WEEK,
                 
+                ["mo"] = TimeUnit.MONTH,
                 ["mth"] = TimeUnit.MONTH,
                 ["mths"] = TimeUnit.MONTH,
                 ["month"] = TimeUnit.MONTH,
@@ -57,6 +58,7 @@ namespace Espeon
             }
 
             var reminder = new UserReminder(
+                // 0,
                 context.Channel.Id,
                 context.Member.Id,
                 context.Message.Id,

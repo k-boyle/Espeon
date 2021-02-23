@@ -1,12 +1,12 @@
-﻿using Disqord.Bot.Prefixes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Disqord.Bot.Prefixes;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Espeon {
     public class EspeonDbContext : DbContext {
@@ -28,7 +28,7 @@ namespace Espeon {
                 [typeof(UserReminder)] = UserReminders,
                 [typeof(Tag)] = Tags,
                 [typeof(GuildTags)] = GuildTags,
-                [typeof(GlobalTag)] = GlobalTags
+                [typeof(GlobalTag)] = GlobalTags,
             };
         }
 

@@ -17,7 +17,7 @@ namespace Espeon {
     [Group("reminder", "reminders", "remindme", "remind", "rm", "r")]
     public class ReminderModule : EspeonCommandModule, IAsyncDisposable {
         private const int BatchSize = 4;
-        
+
         public ReminderService ReminderService { get; set; }
         public EspeonDbContext DbContext { get; set; }
         
@@ -33,12 +33,14 @@ namespace Espeon {
         [Description("Lists your reminders")]
         [Command("list", "ls", "l")]
         public async Task ListRemindersAsync() {
-            await DbContext.UserReminders.LoadAsync();
-            var reminders = DbContext.UserReminders
-                .Where(IsValidReminder)
+            var reminders = await DbContext.UserReminders
+                .AsQueryable()
+                .Where(reminder => reminder.UserId == Context.Member.Id.RawValue)
                 .OrderBy(reminder => reminder.TriggerAt)
-                .ToList();
-            
+                .AsAsyncEnumerable()
+                .Where(reminder => Context.Guild.Channels.ContainsKey(reminder.ChannelId))
+                .ToListAsync();
+
             switch (reminders.Count) {
                 case 0:
                     await ReplyAsync(NO_REMINDERS_FOUND);
@@ -66,15 +68,38 @@ namespace Espeon {
             await Context.Channel.StartMenuAsync(menu);
         }
 
-        private bool IsValidReminder(UserReminder reminder) {
-            return reminder.UserId == Context.Member.Id && Context.Guild.Channels.ContainsKey(reminder.ChannelId);
+        [Name("Cancel Reminder")]
+        [Description("Cancels a reminder")]
+        [Command("remove", "rm", "cancel", "delete", "del", "r", "d", "yeet")]
+        public async Task CancelReminderAsync(string reminderId) {
+            var reminders = await DbContext.UserReminders
+                .AsQueryable()
+                .Where(reminder => reminder.UserId == Context.Member.Id.RawValue)
+                .OrderBy(reminder => reminder.TriggerAt)
+                .AsAsyncEnumerable()
+                .Where(reminder => Context.Guild.Channels.ContainsKey(reminder.ChannelId) && reminder.Id.StartsWith(reminderId, StringComparison.CurrentCultureIgnoreCase))
+                .ToListAsync();
+
+            switch (reminders.Count) {
+                case 0:
+                    await ReplyAsync(NO_REMINDERS_FOUND);
+                    break;
+                
+                case 1:
+                    await ReminderService.CancelReminderAsync(DbContext, reminders[0]);
+                    await ReplyAsync(REMINDER_DELETED);
+                    break;
+                
+                default:
+                    await ReplyAsync(MULTIPLE_MATCHING_REMINDERS, reminderId);
+                    break;
+            }
         }
-        
+
         private async Task<LocalEmbedBuilder> CreateReminderEmbedAsync(IEnumerable<UserReminder> reminders) {
             var reminderStringBuilder = new StringBuilder();
-            var index = 0;
             foreach (var reminder in reminders) {
-                var reminderString = await FormatReminderStringAsync(reminder, index++);
+                var reminderString = await FormatReminderStringAsync(reminder);
                 reminderStringBuilder.AppendLine(reminderString);
             }
             
@@ -87,10 +112,11 @@ namespace Espeon {
             return reminderEmbedBuilder;
         }
 
-        private async Task<string> FormatReminderStringAsync(UserReminder reminder, int index) {
+        private async Task<string> FormatReminderStringAsync(UserReminder reminder) {
             var reminderStringBuilder = new StringBuilder();
             var executesIn = reminder.TriggerAt - DateTimeOffset.Now;
-            reminderStringBuilder.AppendLine($"{Markdown.Bold("Id")}: {index}");
+            // todo this is a really bad and lazy system
+            reminderStringBuilder.AppendLine($"{Markdown.Bold("Id")}: {reminder.Id[..4]}");
             reminderStringBuilder.AppendLine(
                 $"{Markdown.Bold("Executes In")}: {executesIn.Humanize(1, minUnit: Humanizer.Localisation.TimeUnit.Second)}");
             var valueString = reminder.Value.Length < 100 

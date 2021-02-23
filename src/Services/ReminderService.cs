@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace Espeon {
         private readonly ILogger<ReminderService> _logger;
         private readonly EspeonScheduler _scheduler;
         private readonly EspeonBot _espeon;
+        private readonly ConcurrentDictionary<string, ScheduledTask<(UserReminder, ReminderService)>> _scheduledReminderById;
 
         public ReminderService(
                 IServiceProvider services,
@@ -23,6 +25,7 @@ namespace Espeon {
             this._logger = logger;
             this._scheduler = scheduler;
             this._espeon = espeon;
+            this._scheduledReminderById = new ();
         }
 
         public async Task OnReadyAsync(EspeonDbContext context) {
@@ -50,9 +53,17 @@ namespace Espeon {
             SchedulerReminder(reminder);
         }
 
+        public async Task CancelReminderAsync(EspeonDbContext context, UserReminder reminder) {
+            this._logger.LogDebug("Cancelling reminder {reminder}", reminder.Id);
+            if (this._scheduledReminderById.TryGetValue(reminder.Id, out var task)) {
+                task.Cancel();
+                await context.RemoveAsync(reminder);
+            }
+        }
+        
         private void SchedulerReminder(UserReminder reminder) {
             this._logger.LogDebug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
-            this._scheduler.DoAt(
+            this._scheduledReminderById[reminder.Id] = this._scheduler.DoAt(
                 string.Concat("reminder-", reminder.UserId.ToString(), "-", reminder.Id),
                 reminder.TriggerAt,
                 (reminder, @this: this),

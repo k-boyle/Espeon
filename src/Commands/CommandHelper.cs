@@ -73,6 +73,7 @@ namespace Espeon {
         private static async Task GlobalTagCallbackAsync(EspeonCommandContext context) {
             await using var dbContext = context.ServiceProvider.GetRequiredService<EspeonDbContext>();
             var tag = await dbContext.GlobalTags
+                .AsQueryable()
                 .FirstOrDefaultAsync(globalTag => globalTag.Key == context.Command.Name);
             await context.Channel.SendMessageAsync(tag.Value);
             tag.Uses++;
