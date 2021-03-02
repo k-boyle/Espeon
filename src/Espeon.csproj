@@ -17,7 +17,7 @@
     <PackageReference Include="Disqord.Extensions.Interactivity" Version="1.0.0-nightly-00079" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.1.0-eap01" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0-4.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0-preview.1.21102.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
