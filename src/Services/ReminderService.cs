@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Disqord;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace Espeon {
         private readonly EspeonScheduler _scheduler;
         private readonly EspeonBot _espeon;
         private readonly ConcurrentDictionary<string, ScheduledTask<(UserReminder, ReminderService)>> _scheduledReminderById;
+        private readonly ConcurrentDictionary<ulong, HashSet<UserReminder>> _reminderByUserId;
 
         public ReminderService(
                 IServiceProvider services,
@@ -26,21 +28,18 @@ namespace Espeon {
             this._scheduler = scheduler;
             this._espeon = espeon;
             this._scheduledReminderById = new ();
+            this._reminderByUserId = new();
         }
 
         public async Task OnReadyAsync(EspeonDbContext context) {
             this._logger.LogInformation("Loading all reminders");
-            // create a copy since we can't enumerate UserReminders and remove from it
-            // it throws "connection is busy" which is not helpful at all if we attempt to
-            // I could attempt to do some hacky stuff with throwing everything onto the 
-            // scheduler... but that'll lead to an unholy amount of issues and very flaky
             var reminders = await context.UserReminders.ToListAsync();
             foreach (var reminder in reminders) {
                 if (reminder.TriggerAt < DateTimeOffset.Now) {
                     this._logger.LogDebug("Sending missed reminder {reminder} for {user}", reminder.Id, reminder.UserId);
                     await OnReminderAsync(context, reminder, true);
                 } else {
-                    SchedulerReminder(reminder);
+                    ScheduleReminder(reminder);
                 }
             }
         }
@@ -50,19 +49,34 @@ namespace Espeon {
             using var scope = this._services.CreateScope();
             await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
             await context.PersistAsync(reminder);
-            SchedulerReminder(reminder);
+            ScheduleReminder(reminder);
         }
 
         public async Task CancelReminderAsync(EspeonDbContext context, UserReminder reminder) {
             this._logger.LogDebug("Cancelling reminder {reminder}", reminder.Id);
-            if (this._scheduledReminderById.TryGetValue(reminder.Id, out var task)) {
+            if (this._scheduledReminderById.TryRemove(reminder.Id, out var task)) {
                 task.Cancel();
                 await context.RemoveAsync(reminder);
+                this._reminderByUserId.AddOrUpdate(
+                    reminder.UserId,
+                    (_, __) => new HashSet<UserReminder>(),
+                    (_, set, reminder) => { set.Remove(reminder); return set; },
+                    reminder
+                );
             }
         }
         
-        private void SchedulerReminder(UserReminder reminder) {
+        private void ScheduleReminder(UserReminder reminder) {
             this._logger.LogDebug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
+            this._reminderByUserId.AddOrUpdate(
+                reminder.UserId,
+                (_, reminder) => new HashSet<UserReminder> { reminder },
+                (_, set, reminder) => {
+                    set.Add(reminder);
+                    return set;
+                },
+                reminder
+            );
             this._scheduledReminderById[reminder.Id] = this._scheduler.DoAt(
                 string.Concat("reminder-", reminder.UserId.ToString(), "-", reminder.Id),
                 reminder.TriggerAt,
@@ -72,7 +86,8 @@ namespace Espeon {
                     using var scope = reminderService!._services.CreateScope();
                     await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
                     await reminderService.OnReminderAsync(context, userReminder, false);
-                });
+                }
+            );
         }
 
         private async Task OnReminderAsync(EspeonDbContext context, UserReminder reminder, bool late) {
@@ -98,6 +113,7 @@ namespace Espeon {
             }
 
             await context.RemoveAsync(reminder);
+            this._scheduledReminderById.TryRemove(reminder.Id, out _);
         }
     }
 }

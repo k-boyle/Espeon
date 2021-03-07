@@ -41,5 +41,13 @@ namespace Espeon {
             TriggerAt = triggerAt;
             Value = value;
         }
+
+        public override int GetHashCode() {
+            return Id.GetHashCode();
+        }
+
+        public override bool Equals(object obj) {
+            return obj is UserReminder other && other.Id == Id;
+        }
     }
 }
