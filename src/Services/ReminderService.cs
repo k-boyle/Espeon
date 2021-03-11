@@ -19,15 +19,15 @@ namespace Espeon {
         private readonly ConcurrentDictionary<ulong, HashSet<UserReminder>> _reminderByUserId;
 
         public ReminderService(
-                IServiceProvider services,
-                EspeonScheduler scheduler,
-                EspeonBot espeon,
-                ILogger<ReminderService> logger) {
+            IServiceProvider services,
+            EspeonScheduler scheduler,
+            EspeonBot espeon,
+            ILogger<ReminderService> logger) {
             this._services = services;
             this._logger = logger;
             this._scheduler = scheduler;
             this._espeon = espeon;
-            this._scheduledReminderById = new ();
+            this._scheduledReminderById = new();
             this._reminderByUserId = new();
         }
 
@@ -60,17 +60,22 @@ namespace Espeon {
                 this._reminderByUserId.AddOrUpdate(
                     reminder.UserId,
                     (_, __) => new HashSet<UserReminder>(),
-                    (_, set, reminder) => { set.Remove(reminder); return set; },
+                    (_, set, reminder) => {
+                        set.Remove(reminder);
+                        return set;
+                    },
                     reminder
                 );
             }
         }
-        
+
         private void ScheduleReminder(UserReminder reminder) {
             this._logger.LogDebug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
             this._reminderByUserId.AddOrUpdate(
                 reminder.UserId,
-                (_, reminder) => new HashSet<UserReminder> { reminder },
+                (_, reminder) => new HashSet<UserReminder> {
+                    reminder
+                },
                 (_, set, reminder) => {
                     set.Add(reminder);
                     return set;
@@ -83,7 +88,7 @@ namespace Espeon {
                 (reminder, @this: this),
                 async state => {
                     var (userReminder, reminderService) = state;
-                    using var scope = reminderService!._services.CreateScope();
+                    using var scope = reminderService._services.CreateScope();
                     await using var context = scope.ServiceProvider.GetRequiredService<EspeonDbContext>();
                     await reminderService.OnReminderAsync(context, userReminder, false);
                 }
@@ -91,29 +96,41 @@ namespace Espeon {
         }
 
         private async Task OnReminderAsync(EspeonDbContext context, UserReminder reminder, bool late) {
-            if (this._espeon.GetChannel(reminder.ChannelId) is CachedTextChannel channel) {
-                if (await channel.Guild.GetOrFetchMemberAsync(reminder.UserId) != null) {
-                    this._logger.LogDebug("Sending reminder for {user}", reminder.UserId);
-                    var originalMessage = await channel.GetMessageAsync(reminder.ReminderMessageId);
-                    var embed = new LocalEmbedBuilder().WithColor(Constants.EspeonColour)
-                        .WithDescription(reminder.Value)
-                        .WithTitle(late ? "A (Late) Reminder" : "A Reminder")
-                        .AddField(
-                            ZeroWidthCharacter,
-                            Markdown.Link("Original Message", originalMessage?.GetJumpUrl(channel.Guild)))
-                        .WithFooter("Created")
-                        .WithTimestamp(originalMessage?.CreatedAt)
-                        .Build();
-                    await channel.SendMessageAsync($"<@{reminder.UserId}>", embed: embed);
-                } else {
-                    this._logger.LogWarning("User {user} is not in guild for reminder {reminder}", reminder.UserId, reminder.Id);
-                }
-            } else {
+            if (GetReminderChannel(reminder) is not CachedTextChannel channel) {
                 this._logger.LogWarning("Channel {channel} for reminder {reminder} was not found", reminder.ChannelId, reminder.Id);
+            } else {
+                if (await channel.Guild.GetOrFetchMemberAsync(reminder.UserId) == null) {
+                    this._logger.LogWarning("User {user} is not in guild for reminder {reminder}", reminder.UserId, reminder.Id);
+                } else {
+                    await SendReminderAsync(reminder, late, channel);
+                }
             }
 
             await context.RemoveAsync(reminder);
             this._scheduledReminderById.TryRemove(reminder.Id, out _);
+        }
+
+        private async Task SendReminderAsync(UserReminder reminder, bool late, CachedTextChannel channel) {
+            this._logger.LogDebug("Sending reminder for {user}", reminder.UserId);
+            var originalMessage = await channel.GetMessageAsync(reminder.ReminderMessageId);
+            var embed = new LocalEmbedBuilder()
+                .WithColor(Constants.EspeonColour)
+                .WithDescription(reminder.Value)
+                .WithTitle(late ? "A (Late) Reminder" : "A Reminder")
+                .AddField(
+                    ZeroWidthCharacter,
+                    Markdown.Link("Original Message", originalMessage?.GetJumpUrl(channel.Guild))
+                )
+                .WithFooter("Created")
+                .WithTimestamp(originalMessage?.CreatedAt)
+                .Build();
+            await channel.SendMessageAsync($"<@{reminder.UserId}>", embed: embed);
+        }
+
+        private CachedChannel GetReminderChannel(UserReminder reminder) {
+            var guild = this._espeon.GetGuild(reminder.GuildId);
+            var channel = guild?.GetTextChannel(reminder.ChannelId);
+            return channel ?? this._espeon.GetChannel(reminder.ChannelId);
         }
     }
 }

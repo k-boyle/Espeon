@@ -7,6 +7,7 @@ namespace Espeon {
     public class UserReminder {
         [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         [Required]
@@ -28,18 +29,24 @@ namespace Espeon {
         [Required]
         [Column("reminder_string")]
         public string Value { get; set; }
+        
+        [Required]
+        [Column("guild_id")]
+        public ulong GuildId { get; set; }
 
         public UserReminder(
                 ulong channelId,
                 ulong userId,
                 ulong reminderMessageId,
                 DateTimeOffset triggerAt,
-                string value) {
+                string value,
+                ulong guildId) {
             ChannelId = channelId;
             UserId = userId;
             ReminderMessageId = reminderMessageId;
             TriggerAt = triggerAt;
             Value = value;
+            GuildId = guildId;
         }
 
         public override int GetHashCode() {

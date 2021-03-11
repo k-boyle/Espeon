@@ -58,12 +58,12 @@ namespace Espeon
             }
 
             var reminder = new UserReminder(
-                // 0,
                 context.Channel.Id,
                 context.Member.Id,
                 context.Message.Id,
                 DateTimeOffset.Now + timeSpan,
-                value);
+                value,
+                context.Guild.Id);
             return TypeParserResult<UserReminder>.Successful(reminder);
         }
     }
