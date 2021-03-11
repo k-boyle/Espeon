@@ -1,15 +1,14 @@
-﻿using Disqord;
-using Disqord.Bot;
-using Disqord.Extensions.Interactivity.Menus;
-using Disqord.Rest;
-using Espeon.Menus;
-using Microsoft.Extensions.Options;
-using Qmmands;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Disqord;
+using Disqord.Bot;
+using Disqord.Extensions.Interactivity.Menus;
+using Disqord.Rest;
+using Microsoft.Extensions.Options;
+using Qmmands;
 using static Espeon.LocalisationStringKey;
 
 namespace Espeon {
@@ -51,7 +50,7 @@ namespace Espeon {
                 }
             };
 
-            var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
+            var delete = new DeleteOnReaction(Context.User.Id, async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
             await Context.Channel.StartMenuAsync(delete);
         }
         
@@ -68,7 +67,7 @@ namespace Espeon {
                 commandAliasesString,
                 submoduleString);
 
-            var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
+            var delete = new DeleteOnReaction(Context.User.Id, async () => await ReplyAsync(embed: helpEmbedBuilder.Build()));
             await Context.Channel.StartMenuAsync(delete);
         }
 
@@ -79,7 +78,7 @@ namespace Espeon {
             var embeds = commands.Select(CreateEmbedForCommandHelp).ToList();
 
             if (embeds.Count == 1) {
-                var delete = new DeleteOnReaction(async () => await ReplyAsync(embed: embeds[0].Build()));
+                var delete = new DeleteOnReaction(Context.User.Id, async () => await ReplyAsync(embed: embeds[0].Build()));
                 await Context.Channel.StartMenuAsync(delete);
                 return;
             }

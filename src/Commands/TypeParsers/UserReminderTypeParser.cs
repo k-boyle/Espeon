@@ -36,6 +36,7 @@ namespace Espeon
                 ["week"] = TimeUnit.WEEK,
                 ["weeks"] = TimeUnit.WEEK,
                 
+                ["mo"] = TimeUnit.MONTH,
                 ["mth"] = TimeUnit.MONTH,
                 ["mths"] = TimeUnit.MONTH,
                 ["month"] = TimeUnit.MONTH,
@@ -61,7 +62,8 @@ namespace Espeon
                 context.Member.Id,
                 context.Message.Id,
                 DateTimeOffset.Now + timeSpan,
-                value);
+                value,
+                context.Guild.Id);
             return TypeParserResult<UserReminder>.Successful(reminder);
         }
     }

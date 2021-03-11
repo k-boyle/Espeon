@@ -7,6 +7,7 @@ namespace Espeon {
     public abstract class Tag {
         [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         
         [Required]

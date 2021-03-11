@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0-preview.1.21102.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0-preview.1.21102.12" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.0-preview-20210127-04" />
       <PackageReference Include="NUnit" Version="3.13.1" />
