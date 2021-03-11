@@ -19,10 +19,10 @@ namespace Espeon {
         private readonly ConcurrentDictionary<ulong, HashSet<UserReminder>> _reminderByUserId;
 
         public ReminderService(
-            IServiceProvider services,
-            EspeonScheduler scheduler,
-            EspeonBot espeon,
-            ILogger<ReminderService> logger) {
+                IServiceProvider services,
+                EspeonScheduler scheduler,
+                EspeonBot espeon,
+                ILogger<ReminderService> logger) {
             this._services = services;
             this._logger = logger;
             this._scheduler = scheduler;
