@@ -7,7 +7,6 @@ using Disqord;
 using Disqord.Extensions.Interactivity.Menus;
 using Disqord.Extensions.Interactivity.Menus.Paged;
 using Humanizer;
-using Microsoft.EntityFrameworkCore;
 using Qmmands;
 using static Espeon.LocalisationStringKey;
 
@@ -33,13 +32,10 @@ namespace Espeon {
         [Description("Lists your reminders")]
         [Command("list", "ls", "l")]
         public async Task ListRemindersAsync() {
-            var reminders = await DbContext.UserReminders
-                .AsQueryable()
-                .Where(reminder => reminder.UserId == Context.Member.Id.RawValue)
+            var reminders = ReminderService.GetRemindersForUser(Context.Member.Id)
+                .Where(reminder => reminder.UserId == Context.Member.Id.RawValue && Context.Guild.Channels.ContainsKey(reminder.ChannelId))
                 .OrderBy(reminder => reminder.TriggerAt)
-                .AsAsyncEnumerable()
-                .Where(reminder => Context.Guild.Channels.ContainsKey(reminder.ChannelId))
-                .ToListAsync();
+                .ToList();
 
             switch (reminders.Count) {
                 case 0:
@@ -72,13 +68,14 @@ namespace Espeon {
         [Description("Cancels a reminder")]
         [Command("remove", "rm", "cancel", "delete", "del", "r", "d", "yeet")]
         public async Task CancelReminderAsync(string reminderId) {
-            var reminders = await DbContext.UserReminders
-                .AsQueryable()
-                .Where(reminder => reminder.UserId == Context.Member.Id.RawValue)
+            var reminders = ReminderService.GetRemindersForUser(Context.User.Id)
+                .Where(reminder => 
+                    reminder.UserId == Context.Member.Id.RawValue
+                        && Context.Guild.Channels.ContainsKey(reminder.ChannelId)
+                        && reminder.Id.StartsWith(reminderId, StringComparison.CurrentCultureIgnoreCase)
+                )
                 .OrderBy(reminder => reminder.TriggerAt)
-                .AsAsyncEnumerable()
-                .Where(reminder => Context.Guild.Channels.ContainsKey(reminder.ChannelId) && reminder.Id.StartsWith(reminderId, StringComparison.CurrentCultureIgnoreCase))
-                .ToListAsync();
+                .ToList();
 
             switch (reminders.Count) {
                 case 0:

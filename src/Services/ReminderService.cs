@@ -69,6 +69,10 @@ namespace Espeon {
             }
         }
 
+        public IEnumerable<UserReminder> GetRemindersForUser(ulong userId) {
+            return this._reminderByUserId.TryGetValue(userId, out var reminders) ? reminders : null;
+        }
+
         private void ScheduleReminder(UserReminder reminder) {
             this._logger.LogDebug("Scheduling reminder {reminder} for {user} at {at}", reminder.Id, reminder.UserId, reminder.TriggerAt);
             this._reminderByUserId.AddOrUpdate(
