@@ -1,13 +1,13 @@
-﻿using Disqord;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Disqord;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Espeon {
     public class LocalisationService : IHostedService {
@@ -83,6 +83,23 @@ namespace Espeon {
 
         public LocalisationStringKey GetKey(string str) {
             return this._localisationCache.GetOrAdd(str, Enum.Parse<LocalisationStringKey>);
+        }
+
+        public async Task UpdateLocalisationAsync(
+                EspeonDbContext context,
+                ulong guildId,
+                ulong userId,
+                Language language) {
+            var locale = await context.GetOrCreateAsync(
+                guildId,
+                userId,
+                (guild, user) => new UserLocalisation(guild, user)
+            );
+            locale.Value = language;
+
+            this._userLanguageCache[(guildId, userId)] = language;
+            
+            await context.UpdateAsync(locale);
         }
     }
 }
