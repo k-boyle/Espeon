@@ -1,51 +1,54 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <RestoreSource>
-      https://api.nuget.org/v3/index.json;
-      https://www.myget.org/F/quahu/api/v3/index.json;
-    </RestoreSource>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00082" />
-    <PackageReference Include="Disqord.Extensions.Interactivity" Version="1.0.0-nightly-00082" />
-    <PackageReference Include="Humanizer" Version="2.8.26" />
-    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0-eap01" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Yaml" Version="2.0.0-preview2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0-preview.1.21102.12" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
-    <PackageReference Include="Serilog" Version="2.10.1-dev-01285" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.2-dev-10284" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00264" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00909" />
-    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Yaml" Version="2.0.0-preview2" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0-preview.2.21154.6" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0-preview.2.21154.6" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1-beta2" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0-preview2" />
+      <PackageReference Include="Qmmands" Version="4.0.0-nightly-00253" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.2-dev-10284" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00264" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
+      <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00909" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Localisation\owo">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Localisation\default">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="config.yml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+      <None Update="config.yml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Configuration" />
+      <Folder Include="Services" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Disqord, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.dll</HintPath>
+      </Reference>
+      <Reference Include="Disqord.Bot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.Bot.dll</HintPath>
+      </Reference>
+      <Reference Include="Disqord.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Disqord.Gateway, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.Gateway.dll</HintPath>
+      </Reference>
+      <Reference Include="Disqord.Rest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.Rest.dll</HintPath>
+      </Reference>
+      <Reference Include="Disqord.Rest.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\kiera\source\repos\Disqord\src\Disqord.Bot\bin\Release\net5.0\Disqord.Rest.Api.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

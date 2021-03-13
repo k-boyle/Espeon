@@ -1,49 +1,44 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Disqord.Bot.Hosting;
+using Espeon.Logging;
+using Microsoft.Extensions.Configuration.Yaml;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
-namespace Espeon {
-    internal class Program {
-        private static void WriteEspeonAscii() {
+namespace Espeon
+{
+    public class Program
+    {
+        private const string CONFIG = "./config.yml";
+
+        public static void Main(string[] args)
+        {
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.WriteLine(Constants.EspeonAscii);
             Console.ForegroundColor = default;
-        }
 
-        private static async Task Main(string[] args) {
-            WriteEspeonAscii();
-            var host = CreateHostBuilder(args).Build();
-            using var scope = host.Services.CreateScope();
-            await host.RunAsync();
-        }
-        
-        private static IHostBuilder CreateHostBuilder(string[] args) {
-            return Host.CreateDefaultBuilder(args)
-                .UseSerilog((hostContext, loggingConfiguration) => {
-                    loggingConfiguration.ReadFrom.Configuration(hostContext.Configuration);
+            var host = Host.CreateDefaultBuilder(args)
+                .UseSerilog((context, logger) =>
+                {
+                    logger.ReadFrom.Configuration(context.Configuration, "serilog")
+                        .WriteTo.Console(outputTemplate: LoggerTemplate.CONSOLE, theme: EspeonLoggingConsoleTheme.Instance)
+                        .WriteTo.File("./logs/log-.txt", outputTemplate: LoggerTemplate.FILE, rollingInterval: RollingInterval.Day)
+                        .Enrich.With<ClassNameEnricher>();
                 })
-                .ConfigureEspeonConfiguration()
-                .ConfigureEspeon(
-                    (provider, config) => config.Logger = new DisqordLogger(provider),
-                    provider => new EspeonPrefixProvider(provider.GetRequiredService<PrefixService>()))
-                .ConfigureServices((hostContext, serviceCollection) => {
-                    var configuration = hostContext.Configuration;
-                    serviceCollection.AddSingleton<PrefixService>()
-                        .AddSingleton<EspeonScheduler>()
-                        .AddSingleton<HttpClient>()
-                        .AddSingleton<ILocalisationProvider, PropertyBasedLocalisationProvider>()
-                        .AddOnReadyService<ReminderService>()
-                        .AddHostedService<EspeonService>()
-                        .AddFetchableHostedService<LocalisationService>()
-                        .AddEspeonDbContext()
-                        .ConfigureSection<Discord>(configuration)
-                        .ConfigureSection<Localisation>(configuration)
-                        .ConfigureSection<Postgres>(configuration)
-                        .ConfigureSection<Emotes>(configuration);
-                });
+                .ConfigureServices(services => {})
+                .ConfigureAppConfiguration(configuration => configuration.AddYamlFile(CONFIG))
+                .ConfigureDiscordBot((context, bot) =>
+                {
+                    bot.Token = context.Configuration["discord:token"];
+                    bot.Prefixes = new[] { "ts" };
+                    bot.UseMentionPrefix = true;
+                })
+                .Build();
+
+            using (host)
+            {
+                host.Run();
+            }
         }
     }
 }
