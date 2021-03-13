@@ -140,7 +140,6 @@ namespace Espeon {
 
         public void Dispose() {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
         
         protected void Dispose(bool disposing) {
