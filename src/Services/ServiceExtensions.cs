@@ -24,7 +24,7 @@ namespace Espeon {
         }
         
         public static IServiceCollection AddOnReadyService<T>(this IServiceCollection collection) where T : class, IOnReadyService {
-            return collection.AddSingleton<IOnReadyService, T>()
+            return collection.AddSingleton<IOnReadyService, T>(provider => provider.GetService<T>())
                 .AddSingleton<T>();
         }
 

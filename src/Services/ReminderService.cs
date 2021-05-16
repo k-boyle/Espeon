@@ -59,7 +59,7 @@ namespace Espeon {
                 await context.RemoveAsync(reminder);
                 this._reminderByUserId.AddOrUpdate(
                     reminder.UserId,
-                    (_, __) => new HashSet<UserReminder>(),
+                    (_, _) => new HashSet<UserReminder>(),
                     (_, set, reminder) => {
                         set.Remove(reminder);
                         return set;
@@ -70,7 +70,7 @@ namespace Espeon {
         }
 
         public IEnumerable<UserReminder> GetRemindersForUser(ulong userId) {
-            return this._reminderByUserId.TryGetValue(userId, out var reminders) ? reminders : null;
+            return this._reminderByUserId.TryGetValue(userId, out var reminders) ? reminders : Array.Empty<UserReminder>();
         }
 
         private void ScheduleReminder(UserReminder reminder) {

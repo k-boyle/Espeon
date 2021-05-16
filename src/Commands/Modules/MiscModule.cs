@@ -187,5 +187,15 @@ namespace Espeon {
                 await ReplyAsync(INVALID_PEPOWHATIF_SIZE);
             }
         }
+
+        [Name("Trinit")]
+        [Description("Treats a user as if they were Trinit")]
+        [Command("trinit", "tnt", "trinitrotoluene")]
+        [RequireBotGuildPermissions(Permission.BanMembers)]
+        [RequireMemberGuildPermissions(Permission.BanMembers)]
+        public async Task TrinitAsync([Remainder] [NotOwner] IMember member) {
+            await member.BanAsync("They're trinit");
+            await member.UnbanAsync(RestRequestOptions.FromReason("Cried to Quahu"));
+        }
     }
 }
