@@ -16,7 +16,7 @@
     <PackageReference Include="Disqord.Bot" Version="1.0.0-nightly-00082" />
     <PackageReference Include="Disqord.Extensions.Interactivity" Version="1.0.0-nightly-00082" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
-    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0-eap01" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2">
       <PrivateAssets>all</PrivateAssets>
